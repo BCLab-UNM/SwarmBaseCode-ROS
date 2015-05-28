@@ -1,0 +1,32 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+    <model name="at231">
+        <static>true</static>
+        <link name='link'>
+
+
+            <collision name ='collision'>
+                <geometry>
+                    <box>
+                        <size>0.0763 0.05912 .001</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>0.0763 0.05912 .001</size>
+                    </box>
+                </geometry>
+
+                <material>
+                    <script>
+                        <uri>model://at231/materials/scripts</uri>
+                        <uri>model://at231/materials/textures</uri>
+                        <name>at231/Diffuse</name>
+                    </script>
+                </material>
+            </visual>
+        </link>     
+    </model>
+</sdf>

@@ -1,0 +1,15 @@
+material at60/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-60.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+material at98/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-98.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

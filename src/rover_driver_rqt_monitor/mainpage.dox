@@ -1,0 +1,6 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\b kurts_rqt_robot_steering provides a GUI plugin for steering a robot using twist messages.  It is an extension of the robot steering plugin that came with ROS
+*/

@@ -1,0 +1,6 @@
+int32 X
+int32 Y
+int32 targetSize
+int32 cost
+---
+bool mapUpdated

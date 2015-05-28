@@ -1,0 +1,15 @@
+material at93/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-93.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

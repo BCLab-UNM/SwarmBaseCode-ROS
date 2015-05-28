@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+  <model name="at5">
+    <link name='link'>
+      <pose>0 0 0.1 0 0 0</pose>
+
+      <collision name='collision'>
+        <geometry>
+	  <box>
+	    <size>.279 .216 .001</size>
+	  </box>
+	</geometry>
+      </collision>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>.279 .216 .001</size>
+          </box>
+        </geometry>
+
+        <material>
+          <script>
+            <uri>model://at5/materials/scripts</uri>
+            <uri>model://at5/materials/textures</uri>
+            <name>at5/Diffuse</name>
+          </script>
+        </material>
+      </visual>
+    </link>     
+  </model>
+</sdf>

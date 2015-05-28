@@ -1,0 +1,97 @@
+# TODO: insert header here
+
+# TODO: remove old commented out code to clean it up
+
+from __future__ import division
+import os
+import rospkg
+
+# TODO: remove unused imports
+from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Pose2D
+from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseWithCovarianceStamped
+from geometry_msgs.msg import Vector3
+from std_msgs.msg import Int32
+from std_msgs.msg import Float32
+from nav_msgs.msg import Odometry
+import rospy
+from python_qt_binding import loadUi
+from python_qt_binding.QtCore import Qt, QTimer, Slot
+from python_qt_binding.QtGui import QKeySequence, QShortcut, QWidget
+from rqt_gui_py.plugin import Plugin
+
+
+class RoverDriverRqtWhere(Plugin):
+
+    # slider_factor = 1000.0
+    max_motor_speed = 4000.0
+
+    # initialization routine
+    def __init__(self, context):
+        super(RoverDriverRqtWhere, self).__init__(context)
+        self.setObjectName('RoverDriverRqtWhere')
+
+	# load the user interface
+        self._widget = QWidget()
+        rp = rospkg.RosPack()
+        ui_file = os.path.join(rp.get_path('rover_driver_rqt_where'), 'resource', 'RoverDriverRqtWhere.ui')
+        loadUi(ui_file, self._widget)
+        self._widget.setObjectName('RoverDriverRqtWhereUi')
+	# TODO: Look into this serial number feature.  Might want to use it.
+        if context.serial_number() > 1:
+            self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+        context.add_widget(self._widget)
+
+	# set up callback routines to get called when data changes
+	self._subscriber = rospy.Subscriber("/moe/pose_fusion", PoseWithCovarianceStamped, self.Fusion_Pose_callback)
+	self._subscriber = rospy.Subscriber("/moe/fused_attitude", Vector3, self.Fusion_Attitude_callback)
+	self._subscriber = rospy.Subscriber("/moe/gps_odom", Odometry, self.GPS_Pose_callback)
+	self._subscriber = rospy.Subscriber("/moe/motor_odom", Odometry, self.Motor_Pose_callback)
+	self._subscriber = rospy.Subscriber("/moe/imu_attitude", Vector3, self.IMU_Attitude_callback)
+
+    # def save_settings(self, plugin_settings, instance_settings):
+        # instance_settings.set_value('topic' , "/rassor2/drum_rear_left")
+        # instance_settings.set_value('vx_max', self._widget.max_x_linear_double_spin_box.value())
+        
+    # def restore_settings(self, plugin_settings, instance_settings):
+                     
+        # value = instance_settings.value('topic', "/rassor2/drum_rear_left")
+        # value = rospy.get_param("~default_topic", value)           
+        # self._widget.topic_line_edit.setText(value)
+        
+        # value = self._widget.max_x_linear_double_spin_box.value()
+        # value = instance_settings.value( 'vx_max', value)
+        # value = rospy.get_param("~default_vx_max", value)           
+        # self._widget.max_x_linear_double_spin_box.setValue(float(value))
+        
+    def Fusion_Pose_callback(self, message):
+	    self._widget.FusedXPositionData.setText('%0.3f m' % (message.pose.pose.position.x))
+	    self._widget.FusedYPositionData.setText('%0.3f m' % (message.pose.pose.position.y))
+	    self._widget.FusedZPositionData.setText('%0.3f m' % (message.pose.pose.position.z))
+
+    def Fusion_Attitude_callback(self, message):
+	    self._widget.FusedRollData.setText('%0.1f deg' % (message.x))
+	    self._widget.FusedPitchData.setText('%0.1f deg' % (message.y))
+	    self._widget.FusedYawData.setText('%0.1f deg' % (message.z))
+	    self._widget.FusedHeadingData.setText('%0.1f deg' % (message.z))
+
+    def Motor_Pose_callback(self, message):
+	    self._widget.OdometryXPositionData.setText('%0.3f m' % (message.pose.pose.position.x))
+	    self._widget.OdometryYPositionData.setText('%0.3f m' % (message.pose.pose.position.y))
+	    self._widget.OdometryZPositionData.setText('%0.3f m' % (message.pose.pose.position.z))
+
+    def GPS_Pose_callback(self, message):
+	    self._widget.GpsXPositionData.setText('%0.3f m' % (message.pose.pose.position.x))
+	    self._widget.GpsYPositionData.setText('%0.3f m' % (message.pose.pose.position.y))
+	    self._widget.GpsZPositionData.setText('%0.3f m' % (message.pose.pose.position.z))
+
+    def IMU_Attitude_callback(self, message):
+	    self._widget.ImuRollData.setText('%0.1f deg' % (message.x))
+	    self._widget.ImuPitchData.setText('%0.1f deg' % (message.y))
+	    self._widget.ImuYawData.setText('%0.1f deg' % (message.z))
+	    self._widget.ImuHeadingData.setText('%0.1f deg' % (message.z))
+
+
+
+

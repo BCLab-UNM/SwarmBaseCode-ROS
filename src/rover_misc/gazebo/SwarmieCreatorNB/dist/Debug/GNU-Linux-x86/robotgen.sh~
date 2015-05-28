@@ -1,0 +1,14 @@
+#!/bin/bash
+echo "How many robots? "
+read numRobots
+for ((i = 0; i < "$numRobots"; i++)); do
+echo "Enter Robot Name:"; read robotName
+echo "Enter Robot Color:"; read robotColor
+'./robotcreator' "$robotName" "$robotColor"
+echo "Done"
+echo
+echo "Generated a" "$robotColor" "$robotName" "in newRobots/"
+echo
+done
+
+

@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">  
+ <class>RoverDriverRqtMonitorWidget</class>
+ <widget class="QWidget" name="RoverDriverRqtMonitorWidget">
+
+  <property name="windowTitle">
+   <string>Rover Monitor GUI (v1)</string>
+  </property>
+
+  <layout class="QVBoxLayout" name="MainEightRows">
+
+   <item>
+    <layout class="QHBoxLayout" name="MoeDataRow">
+   
+     <item>
+      <widget class="QLabel" name="MoeNameLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Moe: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoeStateData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoeTargetLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Targets: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoeTargetData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoePositionLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Pos: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoeXPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD, </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoeYPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="MoeHeadingData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>(TBD)</string>
+       </property>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout" name="LarryDataRow">
+   
+     <item>
+      <widget class="QLabel" name="LarryNameLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Larry: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryStateData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryTargetLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Targets: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryTargetData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryPositionLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Pos: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryXPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD, </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryYPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="LarryHeadingData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>(TBD)</string>
+       </property>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout" name="CurlyDataRow">
+   
+     <item>
+      <widget class="QLabel" name="CurlyNameLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Curly: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyStateData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyTargetLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Targets: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyTargetData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyPositionLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Pos: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyXPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD, </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyYPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="CurlyHeadingData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>(TBD)</string>
+       </property>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout" name="ShempDataRow">
+   
+     <item>
+      <widget class="QLabel" name="ShempNameLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Shemp: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempStateData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempTargetLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Targets: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempTargetData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempPositionLabel">
+       <property name="alignment" >
+	  <set>Qt::AlignRight</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>Pos: </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempXPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD, </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempYPositionData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>TBD </string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QLabel" name="ShempHeadingData">
+       <property name="alignment" >
+	  <set>Qt::AlignLeft</set>
+       </property>
+       <property name="toolTip">
+        <string></string>
+       </property>
+       <property name="text">
+        <string>(TBD)</string>
+       </property>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+  </layout>
+ </widget>
+
+ <resources/>
+ <connections/>
+</ui>
+
+

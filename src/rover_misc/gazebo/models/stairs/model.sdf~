@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="stairs">
+    <static>true</static>
+
+
+
+    <link name="tread_link">
+      <pose>0 0 0 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://stairs/meshes/nist_stairs_120.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://stairs/meshes/nist_stairs_120.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+
+    <link name="riser_link">
+      <pose>0 0.620 0.500 1.5708 3.14159 0</pose>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://stairs/meshes/nist_stairs_120.dae</uri>
+            <scale>1 0.85 1.17</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://stairs/meshes/nist_stairs_120.dae</uri>
+            <scale>1 0.85 1.17</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+
+
+  </model>
+</sdf>

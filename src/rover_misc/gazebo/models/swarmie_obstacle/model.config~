@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<model>
+  <name>Swarmie Obstacle 25cm</name>
+  <version>1.0</version>
+  <sdf version='1.4'>model.sdf</sdf>
+
+  <description>
+    A 25x25x25 cm white cube.
+  </description>
+</model>

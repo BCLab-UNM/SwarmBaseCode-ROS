@@ -1,0 +1,15 @@
+material at197/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-197.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

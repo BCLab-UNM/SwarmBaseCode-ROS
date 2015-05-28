@@ -1,0 +1,7 @@
+float32 X
+float32 Y
+float32 currentHeading
+int16 coneAngle
+---
+float32 newHeading
+bool pheromFound

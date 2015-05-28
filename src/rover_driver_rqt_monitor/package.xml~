@@ -1,0 +1,26 @@
+<package>
+  <name>rover_driver_rqt_where</name>
+  <version>1.0.0</version>
+  <description>This is an RQT plugin that allows the user to view velocity, heading, location, attitude data on RASSOR2 or the test platform.</description>
+  <maintainer email="kurt.leucht@nasa.gov">Kurt Leucht</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">TBD</url>
+  <url type="repository">TBD</url>
+  <url type="bugtracker">TBD</url>
+
+  <author>Kurt Leucht</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>python-rospkg</run_depend>
+  <run_depend>rostopic</run_depend>
+  <run_depend>rqt_gui</run_depend>
+  <run_depend>rqt_gui_py</run_depend>
+
+  <export>
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
+  </export>
+</package>

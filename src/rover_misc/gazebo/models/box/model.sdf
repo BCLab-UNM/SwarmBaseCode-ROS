@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="box">
+    <static>true</static>
+    <link name="box">
+      <pose>0 0 0.35 0 0 0</pose>
+      <inertial>
+        <inertia>
+          <ixx>2.050000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.050000</iyy>
+          <iyz>0</iyz>
+          <izz>2.050000</izz>
+        </inertia>
+        <mass>25.000000</mass>
+      </inertial>
+      <collision name="box">
+        <geometry>
+          <box>
+            <size>1.00 1.00 0.7</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="box">
+        <geometry>
+          <box>
+            <size>1.00 1.00 0.7</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Wood</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

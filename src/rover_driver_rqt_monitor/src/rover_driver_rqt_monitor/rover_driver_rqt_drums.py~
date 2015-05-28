@@ -1,0 +1,430 @@
+# TODO: insert header here
+
+# TODO: remove old commented out code to clean it up
+
+from __future__ import division
+import os
+import rospkg
+
+# TODO: remove unused imports
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Int32
+from std_msgs.msg import Float32
+import rospy
+from python_qt_binding import loadUi
+from python_qt_binding.QtCore import Qt, QTimer, Slot
+from python_qt_binding.QtGui import QKeySequence, QShortcut, QWidget
+from rqt_gui_py.plugin import Plugin
+
+
+class RoverDriverRqtDrums(Plugin):
+
+    # slider_factor = 1000.0
+    max_motor_speed = 4000.0
+
+    # initialization routine
+    def __init__(self, context):
+        super(RoverDriverRqtDrums, self).__init__(context)
+        self.setObjectName('RoverDriverRqtDrums')
+
+        # set up publication for drum motor Topics
+        self._publisher_drum_rear_left = rospy.Publisher("/rassor2/drum_rear_left", Twist)
+        self._publisher_drum_rear_right = rospy.Publisher("/rassor2/drum_rear_right", Twist)
+        self._publisher_drum_front_left = rospy.Publisher("/rassor2/drum_front_left", Twist)
+        self._publisher_drum_front_right = rospy.Publisher("/rassor2/drum_front_right", Twist)
+
+	# load the user interface
+        self._widget = QWidget()
+        rp = rospkg.RosPack()
+        ui_file = os.path.join(rp.get_path('rover_driver_rqt_drums'), 'resource', 'RoverDriverRqtDrums.ui')
+        loadUi(ui_file, self._widget)
+        self._widget.setObjectName('RoverDriverRqtDrumsUi')
+	# TODO: Look into this serial number feature.  Might want to use it.
+        if context.serial_number() > 1:
+            self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+        context.add_widget(self._widget)
+
+	# set up callback routines to get called when data changes
+	self._subscriber = rospy.Subscriber("/rassor2/drum_rear_left_current", Float32, self.LeftRearCurrentValue_callback)
+	self._subscriber = rospy.Subscriber("/rassor2/drum_rear_right_current", Float32, self.RightRearCurrentValue_callback)
+	self._subscriber = rospy.Subscriber("/rassor2/drum_front_left_current", Float32, self.LeftFrontCurrentValue_callback)
+	self._subscriber = rospy.Subscriber("/rassor2/drum_front_right_current", Float32, self.RightFrontCurrentValue_callback)
+
+	# routines to run when Dump buttons are pressed
+        self._widget.LeftRearDumpButton.pressed.connect(self._on_LeftRearDumpButton_pressed)
+        self._widget.RightRearDumpButton.pressed.connect(self._on_RightRearDumpButton_pressed)
+        self._widget.LeftFrontDumpButton.pressed.connect(self._on_LeftFrontDumpButton_pressed)
+        self._widget.RightFrontDumpButton.pressed.connect(self._on_RightFrontDumpButton_pressed)
+        self._widget.BothRearDumpButton.pressed.connect(self._on_BothRearDumpButton_pressed)
+        self._widget.BothFrontDumpButton.pressed.connect(self._on_BothFrontDumpButton_pressed)
+        self._widget.AllFourDumpButton.pressed.connect(self._on_AllFourDumpButton_pressed)
+
+	# routines to run when Dig buttons are pressed
+        self._widget.LeftRearDigButton.pressed.connect(self._on_LeftRearDigButton_pressed)
+        self._widget.RightRearDigButton.pressed.connect(self._on_RightRearDigButton_pressed)
+        self._widget.LeftFrontDigButton.pressed.connect(self._on_LeftFrontDigButton_pressed)
+        self._widget.RightFrontDigButton.pressed.connect(self._on_RightFrontDigButton_pressed)
+        self._widget.BothRearDigButton.pressed.connect(self._on_BothRearDigButton_pressed)
+        self._widget.BothFrontDigButton.pressed.connect(self._on_BothFrontDigButton_pressed)
+        self._widget.AllFourDigButton.pressed.connect(self._on_AllFourDigButton_pressed)
+
+	# routines to run when Stop buttons are pressed
+        self._widget.LeftRearStopButton.pressed.connect(self._on_LeftRearStopButton_pressed)
+        self._widget.RightRearStopButton.pressed.connect(self._on_RightRearStopButton_pressed)
+        self._widget.LeftFrontStopButton.pressed.connect(self._on_LeftFrontStopButton_pressed)
+        self._widget.RightFrontStopButton.pressed.connect(self._on_RightFrontStopButton_pressed)
+        self._widget.BothRearStopButton.pressed.connect(self._on_BothRearStopButton_pressed)
+        self._widget.BothFrontStopButton.pressed.connect(self._on_BothFrontStopButton_pressed)
+        self._widget.AllFourStopButton.pressed.connect(self._on_AllFourStopButton_pressed)
+
+
+    # @Slot(str)
+    # def _on_topic_changed(self, topic):
+        # topic = str(topic)
+        # self._unregister_publisher()
+        # self._publisher_drum_rear_left = rospy.Publisher(topic, Twist)
+
+    # def _on_stop_pressed(self):
+        # self._widget.x_linear_slider.setValue(0)
+        # self._widget.z_angular_slider.setValue(0)
+
+    # def _on_x_linear_slider_changed(self):
+        # self._widget.current_x_linear_label.setText('%0.2f m/s' % (self._widget.x_linear_slider.value() / RoverDriverRqtDrums.slider_factor))
+        # self._on_parameter_changed()
+
+    # def _on_z_angular_slider_changed(self):
+        # self._widget.current_z_angular_label.setText('%0.2f rad/s' % (self._widget.z_angular_slider.value() / RoverDriverRqtDrums.slider_factor))
+        # self._on_parameter_changed()
+
+    def _on_LeftRearDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+
+    def _on_RightRearDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_right.publish(twist)
+
+    def _on_LeftFrontDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_left.publish(twist)
+
+    def _on_RightFrontDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_BothRearDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+        self._publisher_drum_rear_right.publish(twist)
+
+    def _on_BothFrontDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_left.publish(twist)
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_AllFourDumpButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+        self._publisher_drum_rear_right.publish(twist)
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        self._publisher_drum_front_left.publish(twist)
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_LeftRearDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+
+    def _on_RightRearDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_right.publish(twist)
+
+    def _on_LeftFrontDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_left.publish(twist)
+
+    def _on_RightFrontDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_BothRearDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+        self._publisher_drum_rear_right.publish(twist)
+
+    def _on_BothFrontDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_left.publish(twist)
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_AllFourDigButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+        self._publisher_drum_rear_right.publish(twist)
+        twist.linear.x = -1 * (float(self._widget.MotorSpeedInput.text()) / RoverDriverRqtDrums.max_motor_speed)
+        self._publisher_drum_front_left.publish(twist)
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_LeftRearStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+
+    def _on_RightRearStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_right.publish(twist)
+
+    def _on_LeftFrontStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_left.publish(twist)
+
+    def _on_RightFrontStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_BothRearStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+        self._publisher_drum_rear_right.publish(twist)
+
+    def _on_BothFrontStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_front_left.publish(twist)
+        self._publisher_drum_front_right.publish(twist)
+
+    def _on_AllFourStopButton_pressed(self):
+        twist = Twist()
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self._publisher_drum_rear_left.publish(twist)
+        self._publisher_drum_rear_right.publish(twist)
+        self._publisher_drum_front_left.publish(twist)
+        self._publisher_drum_front_right.publish(twist)
+
+    # def _on_reset_x_linear_pressed(self):
+        # self._widget.x_linear_slider.setValue(0)
+
+    # def _on_decrease_x_linear_pressed(self):
+        # self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() - self._widget.x_linear_slider.singleStep())
+
+    # def _on_increase_z_angular_pressed(self):
+        # self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() + self._widget.z_angular_slider.singleStep())
+
+    # def _on_reset_z_angular_pressed(self):
+        # self._widget.z_angular_slider.setValue(0)
+
+    # def _on_decrease_z_angular_pressed(self):
+        # self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() - self._widget.z_angular_slider.singleStep())
+
+    # def _on_max_x_linear_changed(self, value):
+        # self._widget.x_linear_slider.setMaximum(value * RoverDriverRqtDrums.slider_factor)
+
+    # def _on_min_x_linear_changed(self, value):
+        # self._widget.x_linear_slider.setMinimum(value * RoverDriverRqtDrums.slider_factor)
+
+    # def _on_max_z_angular_changed(self, value):
+        # self._widget.z_angular_slider.setMaximum(value * RoverDriverRqtDrums.slider_factor)
+
+    # def _on_min_z_angular_changed(self, value):
+        # self._widget.z_angular_slider.setMinimum(value * RoverDriverRqtDrums.slider_factor)
+
+    # def _on_strong_increase_x_linear_pressed(self):
+        # self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() + self._widget.x_linear_slider.pageStep())
+
+    # def _on_strong_decrease_x_linear_pressed(self):
+        # self._widget.x_linear_slider.setValue(self._widget.x_linear_slider.value() - self._widget.x_linear_slider.pageStep())
+
+    # def _on_strong_increase_z_angular_pressed(self):
+        # self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() + self._widget.z_angular_slider.pageStep())
+
+    # def _on_strong_decrease_z_angular_pressed(self):
+        # self._widget.z_angular_slider.setValue(self._widget.z_angular_slider.value() - self._widget.z_angular_slider.pageStep())
+
+    # def _on_parameter_changed(self):
+        # self._send_twist(self._widget.x_linear_slider.value() / RoverDriverRqtDrums.slider_factor, self._widget.z_angular_slider.value() / RoverDriverRqtDrums.slider_factor)
+
+    # def _unregister_publisher(self):
+        # if self._publisher_drum_rear_left is not None:
+            # self._publisher_drum_rear_left.unregister()
+            # self._publisher_drum_rear_left = None
+
+    def shutdown_plugin(self):
+        # self._update_parameter_timer.stop()
+        # self._unregister_publisher()
+	self._publisher_drum_rear_left.unregister()
+	self._publisher_drum_rear_right.unregister()
+	self._publisher_drum_front_left.unregister()
+	self._publisher_drum_front_right.unregister()
+
+    # def save_settings(self, plugin_settings, instance_settings):
+        # instance_settings.set_value('topic' , "/rassor2/drum_rear_left")
+        # instance_settings.set_value('vx_max', self._widget.max_x_linear_double_spin_box.value())
+        # instance_settings.set_value('vx_min', self._widget.min_x_linear_double_spin_box.value()) 
+        # instance_settings.set_value('vw_max', self._widget.max_z_angular_double_spin_box.value())
+        # instance_settings.set_value('vw_min', self._widget.min_z_angular_double_spin_box.value())
+        
+    # def restore_settings(self, plugin_settings, instance_settings):
+                     
+        # value = instance_settings.value('topic', "/rassor2/drum_rear_left")
+        # value = rospy.get_param("~default_topic", value)           
+        # self._widget.topic_line_edit.setText(value)
+        
+        # value = self._widget.max_x_linear_double_spin_box.value()
+        # value = instance_settings.value( 'vx_max', value)
+        # value = rospy.get_param("~default_vx_max", value)           
+        # self._widget.max_x_linear_double_spin_box.setValue(float(value))
+        
+        # value = self._widget.min_x_linear_double_spin_box.value()
+        # value = instance_settings.value( 'vx_min', value)
+        # value = rospy.get_param("~default_vx_min", value)    
+        # self._widget.min_x_linear_double_spin_box.setValue(float(value))
+        
+        # value = self._widget.max_z_angular_double_spin_box.value()
+        # value = instance_settings.value( 'vw_max', value)
+        # value = rospy.get_param("~default_vw_max", value)     
+        # self._widget.max_z_angular_double_spin_box.setValue(float(value))
+        
+        # value = self._widget.min_z_angular_double_spin_box.value()
+        # value = instance_settings.value( 'vw_min', value)
+        # value = rospy.get_param("~default_vw_min", value) 
+        # self._widget.min_z_angular_double_spin_box.setValue(float(value))
+        
+       
+    def LeftRearCurrentValue_callback(self, message):
+	    self._widget.LeftRearCurrentValue.setText('%0.3f amps' % (message.data))
+
+    def RightRearCurrentValue_callback(self, message):
+	    self._widget.RightRearCurrentValue.setText('%0.3f amps' % (message.data))
+
+    def LeftFrontCurrentValue_callback(self, message):
+	    self._widget.LeftFrontCurrentValue.setText('%0.3f amps' % (message.data))
+
+    def RightFrontCurrentValue_callback(self, message):
+	    self._widget.RightFrontCurrentValue.setText('%0.3f amps' % (message.data))
+
+
+
+
+

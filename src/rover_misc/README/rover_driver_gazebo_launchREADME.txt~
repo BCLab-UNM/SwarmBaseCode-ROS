@@ -1,0 +1,71 @@
+YOU MUST CREATE THE "rover_driver_gazebo_launch" PACKAGE IN "rover_driver_workspace" BEFORE USING THIS SCRIPT. 
+
+cd ~/rover_driver_workspace/src
+catkin_create_package rover_driver_gazebo_launch std_msgs roscpp rospy roslaunch
+cd ~/rover_driver_workspace
+catkin_make
+source devel/setup.bash
+
+THE FOLLOWING MUST BE LOCATED IN ~/rover_driver_workspace/src/rover_driver_gazebo_launch/src
+
+/launch_files
+/launch_template
+/launch_template/driver_template.launch
+/launch_template/addRovers.launch
+/worlds
+/worlds/wall_world.world
+/worlds/blank_world.world
+/worlds/empty.world
+add_rovers
+rover_driver_node_launch
+rover_driver_gazebo_launch.sh
+
+
+*******************************************************
+SYNTAX:
+
+./rover_driver_gazebo_launch.sh [First robot spawned NAME] [NUMBER OF APRIL TAGS TO SPAWN] [NUMBER OF CINDER_BLOCKS]
+
+
+*******************************************************
+
+This script will:
+
+Check the ~/rover_misc_workspace/src/gazebo/models directory for the Swarmie you selected from the argument line. If the robot file is not found, it will give you one chance to insert the correct files into the directory. Use ./robotcreator to create your robot files.
+
+After the script makes sure that the robot is in the correct directory, it will then use "rover_driver_node_launch" to create the necessary launch files for starting the rosnodes and to start Gazebo.
+
+The launch file will start roscore and launch the necessary nodes to operate the rover. It will also launch Gazebo with a preloaded world. The current world it loads is: "empty.world" which is a blank world. You can change which world it loads by editing the driver_template.launch file in the launch_template directory. Ensure that the world file exists in the worlds directory before starting the script.
+
+The script starts the roslaunch file. The roslaunch file will start roscore, rosnodes, and gazebo.  
+
+After starting the roslaunch file, the script will start rqt.
+
+With rqt started, the script will ask if you would like to place the rover. 
+
+If you choose "0", it will place the rover at the origin (0,0)
+If you choose "1", it will place the rover at a random location on the map.
+If you choose "2", it will place the rover at a location you specify. 
+
+The random number generator will generate a random float with 3 significant digits. New floats are generated for each model being spawned. They range from -9 to +9.
+
+After spawning the first rover, the script will ask you how many more rovers you would like to spawn and then prompt you which rovers to spawn. This script will look in the ~/rover_misc_workspace/src/gazebo/models/ directory for the model name and if it does not exist it will give you one chance to add the rover to the directory. If you do not add the rover to the directory the script will close.
+
+Similar to above, the script will then prompt you where to place the rover.
+
+After spawning the additional rovers, the script will spawn AprilTags from tag numbers (0-256). The script will spawn the tags that correlate with the number you specify on the command line. For example, if you choose 50 AprilTags, it will incrementally spawn the tags 0 to 49 and spawn them at a random (x,y) coordinate. 
+
+After generating AprilTags at random locations on the map, the script will then generate the amount of CINDER_BLOCKs you specified on the command line and place them at random locations on the map.
+
+The Gazebo command "gzfactory" is called to spawn the rover, tag, and obstacle models. More information can be found here: http://gazebosim.org/user_guide/started__commandlinetools.html
+
+Finally, with everything spawned and all the nodes running the script will wait for the user to close out of the scrpit by entering the "q" command on the current terminal. This will close all of the rosnodes, roscore, gazebo, and rqt processes started by the script.
+
+******************************************************
+MORE INFO
+******************************************************
+
+To add additional nodes on startup, you will need to edit the driver_template.launch and addRovers.launch files in the directory launch_templates. 
+
+
+

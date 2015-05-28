@@ -1,0 +1,15 @@
+material at244/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-244.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

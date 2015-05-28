@@ -1,0 +1,15 @@
+material at174/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-174.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

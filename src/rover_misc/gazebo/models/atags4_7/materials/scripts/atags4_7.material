@@ -1,0 +1,15 @@
+material atags4_7/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atags4_7.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

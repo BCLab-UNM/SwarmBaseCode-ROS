@@ -1,0 +1,17 @@
+<library path="src">
+  <class name="RoverDriverRqtWhere" type="rover_driver_rqt_where.rover_driver_rqt_where.RoverDriverRqtWhere" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      allows user to figure out where rover is
+    </description>
+    <qtgui>
+      <group>
+        <label>Robot Tools</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to robot tools.</statustip>
+      </group>
+      <label>Robot Where GUI</label>
+      <icon type="theme">input-gaming</icon>
+      <statustip>allows user to figure out where the rover is</statustip>
+    </qtgui>
+  </class>
+</library>

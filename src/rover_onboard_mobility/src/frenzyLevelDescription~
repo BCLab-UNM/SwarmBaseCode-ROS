@@ -1,0 +1,35 @@
+
+frenzyLevel 
+	-grows exponetially when robot can't turn in the direction it wants (wheel stuck, no obstacle detected)
+	-grows exponentially while robot is seeing an obstacle
+	-decays exponentially at every time step
+	-exponential growth from 0 to 1
+	-? growth rate ~ 0.01
+	-? decay rate ~0.1
+
+bool onTarget(desiredHeading, currentHeading) 
+	tolerance window = tolerance window + frenzy level*360
+	return if(currentHeading == desiredHeading +/- tolerance window)
+
+initiateRandomTurn
+	initiateTurn(randomDirection)
+
+initiateTurn(turnDirection) 
+	speed = defaultSpeed +/- randBetween(0,frenzyLevel*(fullSpeed-defaultSpeed))
+	desiredHeading = currentHeading +/- randBetween(searchCorrelation+frenzyLevel*(360-searchCorrelation))
+
+initiateRandomLinearMove
+	driveDirection = frenzyLevel > 0.9 ? randomDirection : forward
+	speed = defaultSpeed +/- randBetween(0,frenzyLevel*(fullSpeed-defaultSpeed))	
+
+avoidObstacle
+	turnDirection = frenzyLevel > 0.9 ? randomDirection : awayFromDetectedObstacle
+	initiateTurn(turnDirection)
+	intiiateRandomLinearMove()
+
+
+	
+
+
+
+

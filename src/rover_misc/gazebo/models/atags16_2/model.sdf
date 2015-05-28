@@ -1,0 +1,55 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+    <model name="atags16_2">
+        <static>true</static>
+        <link name='link'>
+
+	    <inertial>
+		<mass>1</mass>
+		<inertia>
+		  <ixx>1.0</ixx>
+		  <ixy>0.0</ixy>
+		  <ixz>0.0</ixz>
+		  <iyy>1.0</iyy>
+		  <iyz>0.0</iyz>
+		  <izz>1.0</izz>
+		</inertia>
+	    </inertial>
+
+            <collision name ='collision'>
+                <geometry>
+                    <box>
+                        <size>0.419 0.381 .010</size>
+                    </box>
+                </geometry>
+		<surface>
+		  <friction>
+		    <ode>
+		      <mu>0.9</mu>
+		      <mu2>0.9</mu2>
+		      <fdir1>0 0 0</fdir1>
+		      <slip1>0.7</slip1>
+		      <slip2>0.7</slip2>
+		    </ode>
+		  </friction>
+		</surface>
+            </collision>
+
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>0.419 0.381 .010</size>
+                    </box>
+                </geometry>
+
+                <material>
+                    <script>
+                        <uri>model://atags16_2/materials/scripts</uri>
+                        <uri>model://atags16_2/materials/textures</uri>
+                        <name>atags16_2/Diffuse</name>
+                    </script>
+                </material>
+            </visual>
+        </link>     
+    </model>
+</sdf>

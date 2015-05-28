@@ -1,0 +1,15 @@
+material atags4_3/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atags4_3.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

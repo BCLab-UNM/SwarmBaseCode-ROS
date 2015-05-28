@@ -1,0 +1,15 @@
+material at79/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-79.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

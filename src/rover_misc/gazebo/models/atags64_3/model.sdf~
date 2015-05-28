@@ -1,0 +1,32 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+    <model name="atags_192_255_group">
+        <static>true</static>
+        <link name='link'>
+
+
+            <collision name ='collision'>
+                <geometry>
+                    <box>
+                        <size>1.116 .864 .001</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>1.116 .864 .001</size>
+                    </box>
+                </geometry>
+
+                <material>
+                    <script>
+                        <uri>model://atags_192_255_group/materials/scripts</uri>
+                        <uri>model://atags_192_255_group/materials/textures</uri>
+                        <name>atags_192_255_group/Diffuse</name>
+                    </script>
+                </material>
+            </visual>
+        </link>     
+    </model>
+</sdf>

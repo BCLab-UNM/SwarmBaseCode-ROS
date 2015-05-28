@@ -1,0 +1,15 @@
+material at67/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture atag-67.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

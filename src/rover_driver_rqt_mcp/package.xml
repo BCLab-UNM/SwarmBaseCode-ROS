@@ -1,0 +1,25 @@
+<package>
+  <name>rover_driver_rqt_mcp</name>
+  <version>0.0.1</version>
+  <description>rover_driver_rqt_mcp swarmie control program</description>
+  <maintainer email="karl.a.stolleis@nasa.gov">Karl</maintainer>
+
+  <license>BSD</license>
+
+  <author>Karl Stolleis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rqt_gui</build_depend>
+  <build_depend>rqt_gui_cpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <run_depend>rqt_gui</run_depend>
+  <run_depend>rqt_gui_cpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+
+  <export>
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
+  </export>
+</package>

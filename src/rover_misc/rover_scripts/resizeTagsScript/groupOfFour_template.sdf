@@ -1,0 +1,33 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+   <!--<model name="atags4_0">-->
+        <model name="TEMPLATE">
+        <static>true</static>
+        <link name='link'>
+
+
+            <collision name ='collision'>
+                <geometry>
+                    <box>
+                        <size>0.15275 0.11825 .001</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>0.15275 0.11825 .001</size>
+                    </box>
+                </geometry>
+
+                <material>
+                    <script>
+                        <uri>model://TEMPLATE/materials/scripts</uri>
+                        <uri>model://TEMPLATE/materials/textures</uri>
+                        <name>TEMPLATE/Diffuse</name>
+                    </script>
+                </material>
+            </visual>
+        </link>     
+    </model>
+</sdf>

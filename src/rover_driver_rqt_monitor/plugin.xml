@@ -1,0 +1,17 @@
+<library path="src">
+  <class name="RoverDriverRqtMonitor" type="rover_driver_rqt_monitor.rover_driver_rqt_monitor.RoverDriverRqtMonitor" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      allows user to monitor all 4 rovers from a single GUI
+    </description>
+    <qtgui>
+      <group>
+        <label>Robot Tools</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to robot tools.</statustip>
+      </group>
+      <label>Robot Monitor GUI</label>
+      <icon type="theme">input-gaming</icon>
+      <statustip>allows user to monitor all 4 rovers from a single GUI</statustip>
+    </qtgui>
+  </class>
+</library>

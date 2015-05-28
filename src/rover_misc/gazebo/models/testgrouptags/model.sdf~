@@ -1,0 +1,32 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+    <model name="tagttestgroup">
+        <static>true</static>
+        <link name='link'>
+
+
+            <collision name ='collision'>
+                <geometry>
+                    <box>
+                        <size>..4185 .324 .001</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>.4185 .324 .001</size>
+                    </box>
+                </geometry>
+
+                <material>
+                    <script>
+                        <uri>model://testgrouptags/materials/scripts</uri>
+                        <uri>model://testgrouptags/materials/textures</uri>
+                        <name>testgrouptags/Diffuse</name>
+                    </script>
+                </material>
+            </visual>
+        </link>     
+    </model>
+</sdf>

@@ -1,0 +1,21 @@
+This script remotely starts up the ros nodes on a Swarmie.
+
+Before starting this script you first must be connected to the "robot" wireless router and make sure that the Swarmie you want to start is turned on.
+
+Also, you must at least start roscore in another terminal window prior to running the script. This will ensure that the onboard nodes have a roscore to use.
+
+The syntax of the script is
+
+./remote_node_launch.sh [NETWORK NAME] [USER NAME]
+
+As of now, the network name is ksc. So, if I wanted to start the nodes on shemp I would type in a terminal window:
+
+./remote_node_launch.sh ksc shemp
+
+and hit enter.
+
+This script ssh's into the Swarmie and starts up the rover_onboard_node_launch.sh script that is located on all of the Swarmies. When the script is finished you will be able to interact with the ssh connection of the Swarmie you have choosen.
+
+To change the nodes that are launched, you will need to edit the rover_onboard_node_launch.sh script that is located on the Swarmies. A copy is also located in rover_scripts directory.
+
+A copy of remote_node_launch.sh is located in the rover_scripts directory

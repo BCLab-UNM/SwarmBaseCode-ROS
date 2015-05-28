@@ -1,0 +1,3 @@
+<launch>
+  <node name="world_state" pkg="rover_driver_world_state" type="world_state" />
+</launch>
