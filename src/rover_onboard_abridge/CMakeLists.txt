@@ -12,14 +12,14 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES abridge
   CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs
-#  DEPENDS system_lib
 )
 
-include_directories(include)
+add_executable(
+  abridge src/abridge.cpp src/usbSerial.cpp
+)
 
-add_executable(abridge src/abridge.cpp src/usbSerial.cpp)
-
- target_link_libraries(abridge
-   ${catkin_LIBRARIES}
- )
+target_link_libraries(
+  abridge
+  ${catkin_LIBRARIES}
+)
 
