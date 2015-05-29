@@ -1,9 +1,0 @@
-<launch>
-<node name="TEMPLATE_MAPPING" pkg="rover_onboard_mapping" type="mapping" args="$(arg name)" />
-  <node name="TEMPLATE_MOBILITY" pkg="rover_onboard_mobility" type="mobility" args="$(arg name)" />
-  <node name="TEMPLATE_LOCALIZATION" pkg="rover_onboard_localization" type="localization" args="$(arg name)" />
-  <node name="TEMPLATE_TARGET" pkg="rover_onboard_target_detection" type="target" args="$(arg name)" />
-  <node name="TEMPLATE_PATH" pkg="rover_onboard_path_planning" type="path" args="$(arg name)" />
-  <node name="TEMPLATE_OBSTACLE" pkg="rover_onboard_obstacle_detection" type="obstacle" args="$(arg name)" />
-  <node name="TEMPLATE_BATTERY" pkg="rover_onboard_battery" type="battery" args="$(arg name)" />
-</launch>
