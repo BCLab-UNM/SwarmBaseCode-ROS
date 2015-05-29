@@ -29,9 +29,7 @@ generate_messages(
 )
 
 catkin_package(
-  INCLUDE_DIRS include
   CATKIN_DEPENDS cv_bridge geometry_msgs image_transport roscpp sensor_msgs std_msgs message_runtime
-  DEPENDS system_lib
 )
 
 add_executable(
