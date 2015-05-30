@@ -22,27 +22,22 @@ add_service_files(
   updateMap.srv
 )
 
-generate_messages()
+#generate_messages()
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-  ~/rover_workspace/devel/include
-)
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES rover_onboard_workspace
   CATKIN_DEPENDS cv_bridge geometry_msgs image_transport roscpp sensor_msgs std_msgs message_runtime
-  DEPENDS system_lib
 )
 
 add_executable(
   mapping src/mapping.cpp
 )
+
 add_dependencies(
-	mapping rover_onboard_target_detection_generate_messages_cpp
+  mapping rover_onboard_target_detection_generate_messages_cpp
 )
 
-target_link_libraries(mapping
+target_link_libraries(
+  mapping
   ${catkin_LIBRARIES}
 )
 

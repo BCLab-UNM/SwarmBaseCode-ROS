@@ -9,20 +9,15 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES localization
   CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs
-#  DEPENDS system_lib
 )
 
+add_executable(
+  localization src/localization.cpp
+)
 
-include_directories(include)
-
-## Declare a cpp executable
-add_executable(localization src/localization.cpp)
-
-## Specify libraries to link a library or executable target against
- target_link_libraries(localization
-   ${catkin_LIBRARIES}
- )
+target_link_libraries(
+  localization
+  ${catkin_LIBRARIES}
+)
 

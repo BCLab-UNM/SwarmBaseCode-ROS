@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rover_onboard_target_detection)
-set(CMAKE_C_FLAGS "-std=c99" )
-set (CMAKE_CXX_FLAGS "-fpermissive")
+#set(CMAKE_C_FLAGS "-std=c99" )
+#set (CMAKE_CXX_FLAGS "-fpermissive")
 find_package(catkin REQUIRED COMPONENTS 
   cv_bridge
   geometry_msgs
