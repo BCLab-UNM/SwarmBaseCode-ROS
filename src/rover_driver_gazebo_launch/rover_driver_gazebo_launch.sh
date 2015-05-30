@@ -97,14 +97,14 @@ function tagDist()
 
 clear
 #Generate executables. This is necessary because Filezilla does not handle executables that well.
-echo "Checking randomlocations..."
-./randomlocations
+echo "Checking random_locations..."
+./random_locations
 if [ $? -ne 0 ];then
-  echo "randomlocations is not executable..."
+  echo "random_locations is not executable..."
   echo "Generating executable from source..."
-  g++ -O -Wall NBMain/randomLocationsMain.cpp -o randomlocations
+  g++ -O -Wall src/random_locations.cpp -o random_locations
 else
-  echo "randomlocations is executable..."
+  echo "random_locations is executable..."
 fi
 echo
 echo "Checking rover_driver_node_launch..."
@@ -112,22 +112,11 @@ echo "Checking rover_driver_node_launch..."
 if [ $? -ne 0 ];then
   echo "rover_driver_node_launch is not executable..."
   echo "Generating executable from source..."
-  g++ -O -Wall NBMain/node_launch.cpp -o rover_driver_node_launch -lboost_system
+  g++ -O -Wall src/rover_driver_node_launch.cpp -o rover_driver_node_launch -lboost_system
 else
   echo "rover_driver_node_launch is executable..."
 fi
 rm check.launch
-echo
-echo "Checking add_rovers..."
-./add_rovers check check
-if [ $? -ne 0 ];then
-  echo "add_rovers is not executable..."
-  echo "Generating executable from source..."
-  g++ -O -Wall NBMain/add_Rovers_Main.cpp -o add_rovers -lboost_system
-else
-  echo "add_rovers is executable..."
-fi
-rm add_check.launch
 
 
 #Rover number check. 
@@ -410,8 +399,7 @@ fi
 
 
 #Call the permissions function for the following files
-permissions 'add_rovers'
-permissions 'randomlocations'
+permissions 'random_locations'
 permissions 'rover_driver_node_launch'
 
 #Remove tmp files
@@ -423,7 +411,8 @@ if [ -f $currentWorkingDirectory$tmpTxtName ];then
 fi
 randomTmpName='randomNumbers.txt'
 if [ -f $currentWorkingDirectory$randomTmpName ]; then
-   rm randomNumbers.txt#Get the target distribution
+   rm randomNumbers.txt
+#Get the target distribution
 let "tagDistIndex = $targetCountIndex + 1"
 tagDist=${arguments[$tagDistIndex]}
 if [ -z "$tagDist" ] || [[ -n ${tagDist//[0-9]/} ]];then
@@ -511,15 +500,12 @@ echo
 ################################
 # Generate rtandom numbers for use later  #
 ################################
-  './randomlocations'
+  './random_locations'
 
 ################################
 # ENVIRONMENT                  #
 ################################
-source ~/rover_driver_workspace/devel/setup.bash
-source ~/rover_onboard_workspace/devel/setup.bash
-# Don't ask why.  This just works.  You would do well to do this also in your own ~/.bashrc
-source ~/rover_driver_workspace/devel/setup.bash
+source ~/rover_workspace/devel/setup.bash
 
 ################################
 # ROS                          #
@@ -542,9 +528,7 @@ for ((i = 0; i < $numberOfRovers; i++));do
   mv "${roverNameArray[$i]}".launch launch_files/
   echo "Executing launch file ..."
   #roslaunch rover_driver_gazebo_launch "${roverNameArray[$i]}".launch name:="${roverNameArray[$i]}" &
-  cd launch_files
-  roslaunch ./"${roverNameArray[$i]}".launch name:="${roverNameArray[$i]}" &
-  cd ..
+  roslaunch launch_files/"${roverNameArray[$i]}".launch name:="${roverNameArray[$i]}" &
   sleep 2
   #mv *.csv logs/
   #echo "Moved log file to logs folder"
@@ -555,7 +539,7 @@ done
 # WORLD                        #
 ################################
 echo "Starting world_state"
-roslaunch rover_driver_gazebo_launch world_state.launch &
+roslaunch launch_files/world_state.launch &
 sleep 2
 
 ################################
