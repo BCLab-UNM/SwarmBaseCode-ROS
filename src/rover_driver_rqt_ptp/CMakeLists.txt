@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rover_driver_rqt_motor)
+project(rover_driver_rqt_ptp)
 
-find_package(catkin REQUIRED COMPONENTS 
+find_package(catkin REQUIRED COMPONENTS
   rqt_gui
   rqt_gui_cpp
 )
@@ -17,7 +17,7 @@ catkin_package(
 
 qt4_wrap_ui(
   rover_driver_rqt_motor_UIS_H
-  src/rover_motor.ui
+  src/rover_ptp.ui
 )
 
 include(
@@ -30,22 +30,12 @@ include_directories(
 )
 
 add_library(
-  rover_driver_rqt_motor
-  src/rover_motor.cpp
+  rover_driver_rqt_ptp
+  src/rover_ptp.cpp
   ${rover_driver_rqt_motor_UIS_H}
 )
 
 target_link_libraries(
-  rover_driver_rqt_motor
-  ${catkin_LIBRARIES}
-)
-
-add_executable(
-  joystick_driver
-  src/joystick_driver.cpp
-)
-
-target_link_libraries(
-  joystick_driver
+  rover_driver_rqt_ptp
   ${catkin_LIBRARIES}
 )

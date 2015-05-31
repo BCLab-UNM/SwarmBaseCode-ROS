@@ -1,4 +1,4 @@
-#include <rover_driver_rqt_motor/rover_motor.h>
+#include <rover_motor.h>
 
 
 // TODO: move these globals to a shared header file

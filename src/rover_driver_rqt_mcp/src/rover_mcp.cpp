@@ -1,4 +1,4 @@
-#include <rover_driver_rqt_mcp/rover_mcp.h>
+#include <rover_mcp.h>
 
 
 namespace rover_driver_rqt_mcp {
@@ -13,8 +13,8 @@ void RoverMcp::initPlugin(qt_gui_cpp::PluginContext& context){
 
     connect(ui.manualButton, SIGNAL(pressed()), this, SLOT(manualMode()));
     connect(ui.autoButton, SIGNAL(pressed()), this, SLOT(autoMode()));
-    connect(ui.manualSimButton, SIGNAL(pressed()), this, SLOT(manualSimMode()));
-    connect(ui.autoSimButton, SIGNAL(pressed()), this, SLOT(autoSimMode()));
+    //connect(ui.manualSimButton, SIGNAL(pressed()), this, SLOT(manualSimMode()));
+    //connect(ui.autoSimButton, SIGNAL(pressed()), this, SLOT(autoSimMode()));
     connect(ui.publishButton, SIGNAL(pressed()), this, SLOT(publishName()));
     connect(ui.parameterButton, SIGNAL(pressed()), this, SLOT(publishParameters()));
     connect(ui.speedSlider, SIGNAL(sliderReleased()), this, SLOT(publishVel()));
@@ -94,6 +94,17 @@ void RoverMcp::publishVel(){
 
 void RoverMcp::publishName(){
     QString name = ui.robotList->currentText();
+
+    //Caylyne added for targets harvested per rover
+    const QString harvested = name + "/harvested";
+    harvestedSubscriber = mcpNode.subscribe((harvested.toStdString()), 1, &RoverMcp::harvestDataHandler, this);
+    ui.targetData->setEnabled(true);
+
+    //Kurt added for rover's state machine state
+    const QString stateMachine = name + "/state_machine";
+    stateMachineSubscriber = mcpNode.subscribe((stateMachine.toStdString()), 1, &RoverMcp::stateMachineDataHandler, this);
+    ui.stateMachineData->setEnabled(true);
+
     QString mode = name + "/mode";
     modePublish = mcpNode.advertise<std_msgs::UInt8>(mode.toStdString(), 10, this);
     QString parameters = name +"/parameters";
@@ -115,8 +126,8 @@ void RoverMcp::publishName(){
 
     ui.manualButton->setEnabled(true);
     ui.autoButton->setEnabled(true);
-    ui.manualSimButton->setEnabled(true);
-    ui.autoSimButton->setEnabled(true);
+    //ui.manualSimButton->setEnabled(true);
+    //ui.autoSimButton->setEnabled(true);
     ui.parameterButton->setEnabled(true);
     ui.pheromoneData->setEnabled(true);
     ui.uninformedData->setEnabled(true);
@@ -163,6 +174,18 @@ void RoverMcp::publishParameters(){
     parameterArray.data.clear();
 
 }
+
+void RoverMcp::harvestDataHandler(const std_msgs::UInt64 message) {
+	QString str(QString::number(message.data));
+    	ui.targetData->setText(str);
+}
+
+void RoverMcp::stateMachineDataHandler(const std_msgs::String message) {
+	QString str(QString::fromStdString(message.data));
+    	ui.stateMachineData->setText(str);
+}
+
+
 
 
 }

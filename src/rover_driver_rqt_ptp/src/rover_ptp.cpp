@@ -1,4 +1,4 @@
-#include <rover_driver_rqt_ptp/rover_ptp.h>
+#include <rover_ptp.h>
 
 
 namespace rover_driver_rqt_ptp {
