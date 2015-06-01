@@ -15,8 +15,13 @@ catkin_package(
   CATKIN_DEPENDS rqt_gui rqt_gui_cpp std_msgs geometry_msgs
 )
 
+qt4_wrap_cpp(
+  rover_driver_rqt_mcp_MOCS
+  include/rover_mcp.h
+)
+
 qt4_wrap_ui(
-  rover_driver_rqt_motor_UIS_H
+  rover_driver_rqt_mcp_UIS_H
   src/rover_mcp.ui
 )
 
@@ -31,12 +36,12 @@ include_directories(
 
 add_library(
   rover_driver_rqt_mcp
-  src/rover_mcp.cpp 
-  ${rover_driver_rqt_motor_UIS_H}
+  src/rover_mcp.cpp
+  ${rover_driver_rqt_mcp_MOCS}
+  ${rover_driver_rqt_mcp_UIS_H}
 )
 
 target_link_libraries(
   rover_driver_rqt_mcp
   ${catkin_LIBRARIES}
 )
-

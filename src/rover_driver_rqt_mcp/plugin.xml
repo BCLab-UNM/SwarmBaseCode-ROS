@@ -1,0 +1,17 @@
+<library path="lib/librover_driver_rqt_mcp">
+  <class name="rover_driver_rqt_mcp/RoverMcp" type="rover_driver_rqt_mcp::RoverMcp" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      A GUI plugin to manually teleoperate a single rover.
+    </description>
+    <qtgui>
+      <group>
+        <label>KSC Robots</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to KSC Robots.</statustip>
+      </group>
+      <label>Rover MCP</label>
+      <icon type="theme">face-monkey</icon>
+      <statustip>A GUI plugin to for swarmie Mision Control Program.</statustip>
+    </qtgui>
+  </class>
+</library>
