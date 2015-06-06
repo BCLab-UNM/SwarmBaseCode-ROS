@@ -1,6 +1,6 @@
 # Swarmie-ROS
 
-A ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://swarmathon.cs.unm.edu), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt](http://iant.cs.unm.edu) robot swarms at the University of New Mexico.
+This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://swarmathon.cs.unm.edu), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt](http://iant.cs.unm.edu) robot swarms at the University of New Mexico.
 
 This repository contains:
 
