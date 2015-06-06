@@ -1,6 +1,6 @@
 # Swarmie-ROS
 
-This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://swarmathon.cs.unm.edu), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt](http://iant.cs.unm.edu) robot swarms at the University of New Mexico.
+This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://swarmathon.cs.unm.edu), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt robot swarms](http://iant.cs.unm.edu) at the [University of New Mexico](http://www.unm.edu/).
 
 This repository contains:
 
@@ -10,7 +10,7 @@ This repository contains:
 
 ### Quick Start Installation Guide
 
-Swarmie-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported.
+Swarmie-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported at this time.
 
 ##### 1. Install ROS Indigo
 
@@ -18,7 +18,7 @@ Follow the detailed instructions for installing ROS Indigo under Ubuntu 14.04 [h
 
 ##### 2. Install additional Gazebo plugins
 
-Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the hector_gazebo_plugins package, which should be installed using the apt-get package management tool:
+Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) package, which should be installed using the apt-get package management tool:
 
 ```
 sudo apt-get install ros-indigo-hector-gazebo-plugins
@@ -26,19 +26,26 @@ sudo apt-get install ros-indigo-hector-gazebo-plugins
 
 ##### 3. Install Swarmie-ROS
 
-1. Clone, or [download](https://github.com/BCLab-UNM/Swarmie-ROS/archive/master.zip) extract, this GitHub repository to your home directory (~/)
-2. Change your current working directory to the root directory of the downloaded repo
+1. Clone, or [download](https://github.com/BCLab-UNM/Swarmie-ROS/archive/master.zip) and extract, this GitHub repository to your home directory (~/)
+2. Rename the downloaded repo so it can be properly identified by ROS and catkin
   * If you cloned this repo using git:
     ```
-    cd ~/Swarmie-ROS
+    mv ~/Swarmie-ROS ~/rover_workspace
     ```
     
   * If you downloaded and extracted this repo directly from GitHub
     ```
-    cd ~/Swarmie-ROS-master
+    mv ~/Swarmie-ROS-master ~/rover_workspace
     ```
+3. Change your current working directory to the root directory of the downloaded repo:
 
-3. Compile Swarmie-ROS as a ROS catkin workspace:
+  ```
+  cd ~/rover_workspace
+  ```
+
+4. Compile Swarmie-ROS as a ROS catkin workspace:
+
   ```
   catkin_make
   ```
+
