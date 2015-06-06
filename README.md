@@ -16,33 +16,29 @@ Swarmie-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr)
 
 Follow the detailed instructions for installing ROS Indigo under Ubuntu 14.04 [here](http://wiki.ros.org/indigo/Installation/Ubuntu). We recommend the Desktop-Full installation, which includes the Gazebo 2 simulator.
 
-##### 2. Modify your shell's startup file
+##### 2. Install additional Gazebo plugins
 
-Open your Linux shell's startup file in the text editor of your choice. For the vast majority of users, this means editing the bash startup script ~/.bashrc. Add these lines to the end of your .bashrc file:
-
-```
-#Swarmie setup                                                                                             
-if [ -f ~/rover_workspace/devel/setup.bash ];
-then
-  source ~/rover_workspace/devel/setup.bash
-fi
-export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models
-```
-
-After saving the startup file, make sure to source the file so your current shell is up-to-date:
+Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the hector_gazebo_plugins package, which should be installed using the apt-get package management tool:
 
 ```
-source ~/.bashrc
+sudo apt-get install ros-indigo-hector-gazebo-plugins
 ```
 
-##### 3. Install additional required ROS libraries
+##### 3. Install Swarmie-ROS
 
+1. Clone, or [download](https://github.com/BCLab-UNM/Swarmie-ROS/archive/master.zip) extract, this GitHub repository to your home directory (~/)
+2. Change your current working directory to the root directory of the downloaded repo
+  * If you cloned this repo using git:
+    ```
+    cd ~/Swarmie-ROS
+    ```
+    
+  * If you downloaded and extracted this repo directly from GitHub
+    ```
+    cd ~/Swarmie-ROS-master
+    ```
 
-
-```
-sudo apt-get install aptitude
-```
-
-```
-sudo apt-get install ros-indigo-hector-gazebo
-```
+3. Compile Swarmie-ROS as a ROS catkin workspace:
+  ```
+  catkin_make
+  ```
