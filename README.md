@@ -27,6 +27,7 @@ sudo apt-get install ros-indigo-hector-gazebo-plugins
 ##### 3. Install Swarmie-ROS
 
 1. Clone, or [download](https://github.com/BCLab-UNM/Swarmie-ROS/archive/master.zip) and extract, this GitHub repository to your home directory (~/)
+
 2. Rename the downloaded repo so it can be properly identified by ROS and catkin
   * If you cloned this repo using git:
     ```
@@ -37,6 +38,7 @@ sudo apt-get install ros-indigo-hector-gazebo-plugins
     ```
     mv ~/Swarmie-ROS-master ~/rover_workspace
     ```
+
 3. Change your current working directory to the root directory of the downloaded repo:
 
   ```
@@ -49,3 +51,9 @@ sudo apt-get install ros-indigo-hector-gazebo-plugins
   catkin_make
   ```
 
+5. Update your bash session by automatically exporting the enviromental variable that stores the location of Gazebo's model files:
+
+  ```
+  echo "export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models" >> ~/.bashrc
+  source ~/.bashrc
+  ```
