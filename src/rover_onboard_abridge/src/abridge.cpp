@@ -145,27 +145,18 @@ void parseData(string str) {
     while (getline(oss, word, delimiter)) {
         dataSet.push_back(word);
     }
-    if (dataSet.size() >= 14) {
-        rtime.data = dataSet.at(0);
-        gps.latitude = atof(dataSet.at(1).c_str())*100;
-        gps.longitude = atof(dataSet.at(2).c_str())*100;
-        imu.orientation = tf::createQuaternionMsgFromYaw(atof(dataSet.at(3).c_str()) * M_PI / 180.0);
+    if (dataSet.size() == 10) {
+        imu.orientation = tf::createQuaternionMsgFromYaw(atof(dataSet.at(0).c_str()) * M_PI / 180.0);
         imu.orientation.z = fmod(-1 * imu.orientation.z, 360.0);
+        imu.linear_acceleration.x = atof(dataSet.at(1).c_str());
+        imu.linear_acceleration.y = atof(dataSet.at(2).c_str());
+        imu.linear_acceleration.z = atof(dataSet.at(3).c_str());
         imu.angular_velocity.x = atof(dataSet.at(4).c_str());
         imu.angular_velocity.y = atof(dataSet.at(5).c_str());
         imu.angular_velocity.z = atof(dataSet.at(6).c_str());
-        imu.linear_acceleration.x = atof(dataSet.at(7).c_str());
-        imu.linear_acceleration.y = atof(dataSet.at(8).c_str());
-        imu.linear_acceleration.z = atof(dataSet.at(9).c_str());
-        usCenter.range = atof(dataSet.at(10).c_str()) / 100.0;
-        usLeft.range = atof(dataSet.at(11).c_str()) / 100.0;
-        usRight.range = atof(dataSet.at(12).c_str()) / 100.0;
-        int gpsStatus = (int) atof(dataSet.at(13).c_str());
-        if(gpsStatus <= 0){
-            gps.status.STATUS_NO_FIX; // is this a function call?  
-        } else {
-            gps.status.STATUS_FIX; // is this a function call? 
-        }
+        usCenter.range = atof(dataSet.at(7).c_str()) / 100.0;
+        usLeft.range = atof(dataSet.at(8).c_str()) / 100.0;
+        usRight.range = atof(dataSet.at(9).c_str()) / 100.0;
     	status.data = "ONLINE";
     }
     
