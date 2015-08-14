@@ -1,0 +1,36 @@
+#ifndef USBSERIAL_H
+#define	USBSERIAL_H
+
+#include <cstdlib>
+#include <string>
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+#include <unistd.h>  
+#include <fcntl.h>   
+#include <termios.h> 
+
+using namespace std;
+
+class USBSerial {
+public:
+    
+    USBSerial();
+    virtual ~USBSerial();
+  
+    void openUSBPort(char name[], int baud);
+    void sendData(char data[]);
+    string readData();
+    void closeUSBPort();
+
+private:
+
+    struct termios ioStruct;
+    int usbFileDescriptor;
+    char serialDataIn[128];
+    char dataOut[16];
+
+};
+
+#endif
+
