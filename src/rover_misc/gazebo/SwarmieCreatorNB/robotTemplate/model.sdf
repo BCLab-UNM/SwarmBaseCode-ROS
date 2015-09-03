@@ -528,8 +528,8 @@
             <alwaysOn>1</alwaysOn>
             <updateRate>10</updateRate>
             <bodyName>chassis</bodyName>
-            <topicName>/driverStation/gps</topicName>
-            <!--<velocityTopicName>/driverStation/gps_vel</velocityTopicName>-->
+            <topicName>/driverStation/fix</topicName>
+            <!--<velocityTopicName>/driverStation/fix_velocity</velocityTopicName>-->
             <referenceLatitude>28.584810</referenceLatitude>
             <referenceLongitude>-80.649650</referenceLongitude>
             <referenceHeading>0.0</referenceHeading>

@@ -585,8 +585,8 @@
             <alwaysOn>1</alwaysOn>
             <updateRate>4</updateRate>
             <bodyName>chassis</bodyName>
-            <topicName>/shemp/gps</topicName>
-            <!--<velocityTopicName>/shemp/gps_vel</velocityTopicName>-->
+            <topicName>/shemp/fix</topicName>
+            <!--<velocityTopicName>/shemp/fix_velocity</velocityTopicName>-->
             <referenceLatitude>28.584810</referenceLatitude>
             <referenceLongitude>-80.649650</referenceLongitude>
             <referenceHeading>0.0</referenceHeading>

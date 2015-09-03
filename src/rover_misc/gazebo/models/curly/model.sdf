@@ -585,8 +585,8 @@
             <alwaysOn>1</alwaysOn>
             <updateRate>4</updateRate>
             <bodyName>chassis</bodyName>
-            <topicName>/curly/gps</topicName>
-            <!--<velocityTopicName>/curly/gps_vel</velocityTopicName>-->
+            <topicName>/curly/fix</topicName>
+            <!--<velocityTopicName>/curly/fix_velocity</velocityTopicName>-->
             <referenceLatitude>28.584810</referenceLatitude>
             <referenceLongitude>-80.649650</referenceLongitude>
             <referenceHeading>0.0</referenceHeading>
