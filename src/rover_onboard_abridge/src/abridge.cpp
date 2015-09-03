@@ -39,17 +39,13 @@ sensor_msgs::Range usLeft;
 sensor_msgs::Range usCenter;
 sensor_msgs::Range usRight;
 sensor_msgs::Imu imu;
-sensor_msgs::NavSatFix gps;
 
 ros::Subscriber moveSubscriber;
 
 ros::Publisher imuPublish;
-ros::Publisher gpsPublish;
 ros::Publisher usLeftPublish;
 ros::Publisher usCenterPublish;
 ros::Publisher usRightPublish;
-ros::Publisher timePublish;
-ros::Publisher statusPublish;
 ros::Timer publishTimer;
 
 float linearSpeed = 0.;
@@ -81,9 +77,6 @@ int main(int argc, char **argv) {
     moveSubscriber = aNH.subscribe((publishedName + "/mobility"), 10, cmdHandler);
 
     imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);
-    gpsPublish = aNH.advertise<sensor_msgs::NavSatFix>((publishedName + "/gps"), 10);
-    timePublish = aNH.advertise<std_msgs::String>((publishedName + "/time"), 1);
-    statusPublish = aNH.advertise<std_msgs::String>((publishedName + "/status"), 1);
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
     usLeftPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/USLeft"), 10);
@@ -130,13 +123,10 @@ void serialActivityTimer(const ros::TimerEvent& e) {
 }
 
 void publishRosTopics() {
-    timePublish.publish(rtime);
     usLeftPublish.publish(usLeft);
     usCenterPublish.publish(usCenter);
     usRightPublish.publish(usRight);
     imuPublish.publish(imu);
-    gpsPublish.publish(gps);
-    statusPublish.publish(status);
 }
 
 void parseData(string str) {
