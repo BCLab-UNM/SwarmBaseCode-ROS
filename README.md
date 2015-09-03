@@ -45,13 +45,20 @@ sudo apt-get install ros-indigo-hector-gazebo-plugins
   cd ~/rover_workspace
   ```
 
-4. Compile Swarmie-ROS as a ROS catkin workspace:
+4. Set up GPS submodule:
+
+  ```
+  git submodule init
+  git submodule update
+  ```
+
+5. Compile Swarmie-ROS as a ROS catkin workspace:
 
   ```
   catkin_make
   ```
 
-5. Update your bash session by automatically exporting the enviromental variable that stores the location of Gazebo's model files:
+6. Update your bash session by automatically exporting the enviromental variable that stores the location of Gazebo's model files:
 
   ```
   echo "export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models" >> ~/.bashrc
