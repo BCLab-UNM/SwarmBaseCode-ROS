@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle lNH;
     
     imuSubscriber = lNH.subscribe((publishedName + "/imu"), 10, imuHandler);
-    gpsSubscriber = lNH.subscribe((publishedName + "/gps"), 10, gpsHandler);
+    gpsSubscriber = lNH.subscribe((publishedName + "/fix"), 10, gpsHandler);
 
     //pose2dPublish = lNH.advertise<geometry_msgs::Pose2D>((publishedName + "/pose2d"), 10);
     //posePublish = lNH.advertise<geometry_msgs::Pose>((publishedName + "/pose"), 10);
