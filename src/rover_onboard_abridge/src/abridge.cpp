@@ -33,8 +33,6 @@ const int baud = 115200;
 char dataCmd[] = "d\n";
 char moveCmd[16];
 
-std_msgs::String rtime;
-std_msgs::String status;
 sensor_msgs::Range usLeft;
 sensor_msgs::Range usCenter;
 sensor_msgs::Range usRight;
@@ -89,8 +87,6 @@ int main(int argc, char **argv) {
     usCenter.field_of_view = 55;
     usRight.radiation_type = 0;
     usRight.field_of_view = 55;
-    
-    status.data = "INITIALIZED";
 
     ros::spin();
 
@@ -147,7 +143,6 @@ void parseData(string str) {
         usCenter.range = atof(dataSet.at(7).c_str()) / 100.0;
         usLeft.range = atof(dataSet.at(8).c_str()) / 100.0;
         usRight.range = atof(dataSet.at(9).c_str()) / 100.0;
-    	status.data = "ONLINE";
     }
     
     dataSet.clear();
