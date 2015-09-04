@@ -4,11 +4,9 @@
   <version>0.0.0</version>
   <description>The rover_onboard_abridge package</description>
 
-  <maintainer email="karl.a.stolleis@nasa.gov">Karl Stolleis</maintainer>
+  <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
 
   <license>GPLv2</license>
-
-  <author email="karl.a.stolleis@nasa.gov">Karl Stolleis</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>geometry_msgs</build_depend>
