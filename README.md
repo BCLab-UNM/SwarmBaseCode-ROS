@@ -67,7 +67,7 @@ sudo apt-get install git
 7. Update your bash session to automatically source the setup file for Swarmie-ROS:
 
   ```
-  echo "~/rover_workspace/devel/setup.bash" >> ~/.bashrc
+  echo "source ~/rover_workspace/devel/setup.bash" >> ~/.bashrc
   source ~/.bashrc
   ```
 
