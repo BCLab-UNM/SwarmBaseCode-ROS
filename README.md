@@ -63,8 +63,15 @@ sudo apt-get install git
   ```
   catkin_make
   ```
+  
+7. Update your bash session to automatically source the setup file for Swarmie-ROS:
 
-7. Update your bash session by automatically exporting the enviromental variable that stores the location of Gazebo's model files:
+  ```
+  echo "~/rover_workspace/devel/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  ```
+
+8. Update your bash session to automatically export the enviromental variable that stores the location of Gazebo's model files:
 
   ```
   echo "export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models" >> ~/.bashrc
