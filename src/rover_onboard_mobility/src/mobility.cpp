@@ -628,7 +628,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
 
 	resetFrenzy();
-	fullStop();
+	//fullStop();
 	// this keeps robots from immediately being frenzied up when started
         lastPosX = -100;
         lastPosY = -100;
