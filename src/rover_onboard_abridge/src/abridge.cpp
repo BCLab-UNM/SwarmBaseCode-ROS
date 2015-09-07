@@ -140,8 +140,8 @@ void parseData(string str) {
         imu.angular_velocity.x = atof(dataSet.at(4).c_str());
         imu.angular_velocity.y = atof(dataSet.at(5).c_str());
         imu.angular_velocity.z = atof(dataSet.at(6).c_str());
-        usCenter.range = atof(dataSet.at(7).c_str()) / 100.0;
-        usLeft.range = atof(dataSet.at(8).c_str()) / 100.0;
+        usLeft.range = atof(dataSet.at(7).c_str()) / 100.0;
+        usCenter.range = atof(dataSet.at(8).c_str()) / 100.0;
         usRight.range = atof(dataSet.at(9).c_str()) / 100.0;
     }
     
