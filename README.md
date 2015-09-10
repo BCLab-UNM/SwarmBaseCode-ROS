@@ -1,6 +1,6 @@
 # Swarmie-ROS
 
-This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://swarmathon.cs.unm.edu), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt robot swarms](http://iant.cs.unm.edu) at the [University of New Mexico](http://www.unm.edu/).
+This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://www.nasaswarmathon.com), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt robot swarms](http://swarms.cs.unm.edu) at the [University of New Mexico](http://www.unm.edu/).
 
 This repository contains:
 
@@ -32,10 +32,10 @@ sudo apt-get install git
 
 ##### 4. Install Swarmie-ROS
 
-2. Clone this GitHub repository to your home directory (~/):
+2. Clone this GitHub repository to your home directory (~):
 
   ```
-  cd ~/
+  cd ~
   git clone git@github.com:BCLab-UNM/Swarmie-ROS.git
   ```
 
