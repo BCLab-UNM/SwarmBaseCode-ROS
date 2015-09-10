@@ -28,7 +28,7 @@ char delimiter = ',';
 vector<string> dataSet;
 
 USBSerial usb;
-char port[] = "/dev/ttyACM0";
+//char port[] = "/dev/ttyACM0";
 const int baud = 115200;
 char dataCmd[] = "d\n";
 char moveCmd[16];
@@ -56,9 +56,12 @@ int main(int argc, char **argv) {
     gethostname(host, sizeof (host));
     string hostname(host);
     string publishedName;
-
     ros::init(argc, argv, (hostname + "_ABRIDGE"));
-    usb.openUSBPort(port, baud);
+
+    ros::NodeHandle param("~");
+    string devicePath;
+    param.param("device", devicePath, string("/dev/ttyUSB0"));
+    usb.openUSBPort(devicePath, baud);
 
     sleep(5);
 

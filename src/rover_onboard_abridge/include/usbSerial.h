@@ -18,7 +18,7 @@ public:
     USBSerial();
     virtual ~USBSerial();
   
-    void openUSBPort(char name[], int baud);
+    void openUSBPort(string devicePath, int baud);
     void sendData(char data[]);
     string readData();
     void closeUSBPort();

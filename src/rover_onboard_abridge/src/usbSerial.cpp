@@ -6,7 +6,7 @@ USBSerial::USBSerial() {
 
 }
 
-void USBSerial::openUSBPort(char name[], int baud) {
+void USBSerial::openUSBPort(string devicePath, int baud) {
     memset(&ioStruct, 0, sizeof (ioStruct));
     ioStruct.c_iflag = 0;
     ioStruct.c_oflag = 0;
@@ -15,7 +15,7 @@ void USBSerial::openUSBPort(char name[], int baud) {
     ioStruct.c_cc[VMIN] = 1;
     ioStruct.c_cc[VTIME] = 5;
 
-    usbFileDescriptor = open(name, O_RDWR | O_NONBLOCK);
+    usbFileDescriptor = open(devicePath.c_str(), O_RDWR | O_NONBLOCK);
     if (usbFileDescriptor <= 0) {
         cout << "Opening USB0 FAILED " << usbFileDescriptor << endl;
         exit(1);
