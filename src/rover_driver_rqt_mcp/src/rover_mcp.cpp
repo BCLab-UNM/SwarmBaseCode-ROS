@@ -25,7 +25,7 @@ void RoverMcp::initPlugin(qt_gui_cpp::PluginContext& context){
     }
 
     QStringList robots;
-    robots << "moe" << "larry" << "curly" << "shemp" << "harve" << "rassor2";
+    robots << "alpha" << "beta" << "gamma" << "omega";
     ui.robotList->addItems(robots);
 
     context.addWidget(widget);

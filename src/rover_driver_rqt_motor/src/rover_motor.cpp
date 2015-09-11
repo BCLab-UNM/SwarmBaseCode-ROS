@@ -59,7 +59,7 @@ void RoverMotor::initPlugin(qt_gui_cpp::PluginContext& context){
     }
 
     QStringList robots;
-    robots << "moe" << "larry" << "curly" << "shemp" << "harve" << "driverStation" << "driver";
+    robots << "alpha" << "beta" << "gamma" << "omega";
     ui.robotList->addItems(robots);
 
     context.addWidget(widget);
