@@ -1,6 +1,6 @@
 This program, robotCreator, creates the necessary files for a SWARMIE rover to be inserted into the simulation environment, Gazebo. The syntax of the program is:
 
-./robotcreator [NAME] [COLOR]
+./robotCreator [NAME] [COLOR]
 
 The [NAME] argument is the name you wish to name the rover. This IS case sensitive and will only accept names that are NOT separated by spaces.The following are NOT acceptable:
 
@@ -39,7 +39,7 @@ NOTE: If no name and no color are selected then the program will default to:
 
 NECESSARY FILES AND DIRECTORIES
 
-This program needs the directory "robotTemplate" in its working directory at runtime. robotTemplate contains two files and one folder that contain templates for the rover models:
+This program needs the directory "template" in its working directory at runtime. template contains two files and one folder that contain templates for the rover models:
 
 model.sdf
 model.config
@@ -55,10 +55,6 @@ meshes/Swarmie_Top_V2.dae
 meshes/SwarmieUS_V2.dae
 
 
-It also requires the directory "newRobots" to exist in the working directory at runtime. This is where the program will drop the newly created directory for the new swarmie.
-
-To insert this new swarmie into Gazebo, copy the entire directory (i.e. moe) from newRobots/ into:
-
-~/rover_misc_workspace/src/gazebo/models
+It also requires the directory "../models/" to exist in the working directory at runtime. This is where the program will drop the newly created directory for the new swarmie.
 
 

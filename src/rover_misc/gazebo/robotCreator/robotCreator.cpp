@@ -97,8 +97,8 @@ int main(int argc, char*argv[]) {
     string pathNameModelSdf;
     string meshesPath;
     string colorPath;
-    ifstream modelConfig("robotTemplate/model.config");
-    ifstream modelSdf("robotTemplate/model.sdf");
+    ifstream modelConfig("template/model.config");
+    ifstream modelSdf("template/model.sdf");
     ofstream configOutput;
     ofstream sdfOutput;
     ofstream colorOutput;
@@ -151,7 +151,7 @@ int main(int argc, char*argv[]) {
         newColor = "FlatBlack";
     }
 
-    string dirLocal = "newRobots/" + robotName;
+    string dirLocal = "../models/" + robotName;
     if (boost::filesystem::exists(dirLocal)) {
         cout << "Directory already exists" << endl;
         cout << "Overwrite existing directory? [y/n]" << endl;
@@ -174,12 +174,12 @@ int main(int argc, char*argv[]) {
         boost::filesystem::create_directory(dirLocal);
     }
 
-    pathNameModelConfig = "newRobots/" + robotName + "/model.config";
-    pathNameModelSdf = "newRobots/" + robotName + "/tmp.sdf";
-    meshesPath = "newRobots/" + robotName + "/meshes";
-    colorPath = "newRobots/" + robotName + "/model.sdf";
+    pathNameModelConfig = "../models/" + robotName + "/model.config";
+    pathNameModelSdf = "../models/" + robotName + "/tmp.sdf";
+    meshesPath = "../models/" + robotName + "/meshes";
+    colorPath = "../models/" + robotName + "/model.sdf";
 
-    copyDir("robotTemplate/meshes", meshesPath);
+    copyDir("template/meshes", meshesPath);
 
     configOutput.open(pathNameModelConfig.c_str());
 
@@ -213,7 +213,7 @@ int main(int argc, char*argv[]) {
 
     }
 
-    cout << "Created " << robotName << " in newRobots/" << endl;
+    cout << "Created " << robotName << " in ../models/" << endl;
 
     return 0;
 }
