@@ -2,8 +2,14 @@
 
 
 #Point to ROS master on the network
-export ROS_MASTER_URI=http://beta:11311
+if [ -z "$1" ]
+then
+    echo "Error: ROS_MASTER_URI hostname was not provided"
+    exit 1
+else
+    export ROS_MASTER_URI=http://$1:11311
 
+fi
 
 #Function to lookup correct path for a given device
 findDevicePath() {
