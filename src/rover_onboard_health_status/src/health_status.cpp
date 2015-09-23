@@ -1,30 +1,3 @@
-/*
- * Author: Kurt Leucht
- * Maintainer: Kurt Leucht
- * Email: kurt.leucht@nasa.gov
- * NASA Center: Kennedy Space Center
- * Mail Stop: NE-C1
- * 
- * Project Name: Swarmie Robotics NASA Center Innovation Fund
- * Principal Investigator: Cheryle Mako
- * Email: cheryle.l.mako@nasa.gov 
- * 
- * Date Created: October 2, 2014
- * Safety Critical: NO
- * NASA Software Classification: D
- * 
- * This software is copyright the National Aeronautics and Space Administration (NASA)
- * and is distributed under the GNU LGPL license.  All rights reserved.
- * Permission to use, copy, modify and distribute this software is granted under
- * the LGPL and there is no implied warranty for this software.  This software is provided
- * "as is" and NASA or the authors are not responsible for indirect or direct damage
- * to any user of the software.  The authors and NASA are under no obligation to provide
- * maintenence, updates, support or modifications to the software.
- * 
- * Revision Log:
- * -cpu utilization COMPLETE, TBD-date (KWL)
- */
-
 // ROS headers
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
