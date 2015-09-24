@@ -1,10 +1,6 @@
 <launch>
-  <node name="gamma_MAPPING" pkg="rover_onboard_mapping" type="mapping" args="$(arg name)" />
   <node name="gamma_MOBILITY" pkg="rover_onboard_mobility" type="mobility" args="$(arg name)" />
   <node name="gamma_LOCALIZATION" pkg="rover_onboard_localization" type="localization" args="$(arg name)" />
   <node name="gamma_TARGET" pkg="rover_onboard_target_detection" type="target" args="$(arg name)" />
-  <node name="gamma_PATH" pkg="rover_onboard_path_planning" type="path" args="$(arg name)" />
   <node name="gamma_OBSTACLE" pkg="rover_onboard_obstacle_detection" type="obstacle" args="$(arg name)" />
-  <node name="gamma_BATTERY" pkg="rover_onboard_battery" type="battery" args="$(arg name)" />
-  <node name="gamma_HEALTH" pkg="rover_onboard_health_status" type="health_status" args="$(arg name)" />
 </launch>

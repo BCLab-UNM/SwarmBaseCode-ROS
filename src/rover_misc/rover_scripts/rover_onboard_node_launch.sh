@@ -34,7 +34,6 @@ nohup rosrun rover_onboard_target_detection camera &
 nohup rosrun rover_onboard_localization localization &
 nohup rosrun rover_onboard_mobility mobility &
 nohup rosrun rover_onboard_obstacle_detection obstacle &
-nohup rosrun rover_onboard_path_planning path &
 nohup rosrun rover_onboard_target_detection target &
 
 microcontrollerDevicePath=$(findDevicePath Arduino)
