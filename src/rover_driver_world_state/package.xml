@@ -4,11 +4,9 @@
   <version>0.0.0</version>
   <description>The rover_driver_world_state package</description>
 
-  <maintainer email="matthew.w.nugent@nasa.gov">Matthew Nugent</maintainer>
+  <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
 
   <license>GPLv2</license>
-
-  <author email="matthew.w.nugent@nasa.gov">Matthew Nugent</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cv_bridge</build_depend>
