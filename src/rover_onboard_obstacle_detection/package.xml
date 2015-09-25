@@ -4,9 +4,9 @@
   <version>0.0.0</version>
   <description>The rover_onboard_obstacle_detection package</description>
 
-  <maintainer email="swampworks1@todo.todo">swampworks1</maintainer>
+  <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
 
-  <license>TODO</license>
+  <license>GPLv2</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>geometry_msgs</build_depend>
