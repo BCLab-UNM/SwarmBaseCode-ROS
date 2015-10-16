@@ -4,7 +4,7 @@
     <model name="alpha">
         <static>false</static>
 
-        <link name='chassis'>
+        <link name='base_link'>
             <pose>0 0 .080 0 0 0</pose>
 	      <inertial>
 		<mass>15</mass>
@@ -80,7 +80,7 @@
         </link>
         
         <joint name="top" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>top</child>
             <axis>
                 <xyz>0 0 0</xyz>
@@ -142,7 +142,7 @@
         </link>
         
         <joint name="left_front" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>left_front_wheel</child>
             <axis>
                 <xyz>0 1 0</xyz>
@@ -200,7 +200,7 @@
         </link>
         
         <joint name="right_front" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>right_front_wheel</child>
             <axis>
                 <xyz>0 1 0</xyz>
@@ -258,7 +258,7 @@
         </link>
         
         <joint name="left_rear" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>left_rear_wheel</child>
             <axis>
                 <xyz>0 1 0</xyz>
@@ -316,7 +316,7 @@
         </link>
         
         <joint name="right_rear" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>right_rear_wheel</child>
             <axis>
                 <xyz>0 1 0</xyz>
@@ -324,7 +324,7 @@
         </joint>   
 
         <joint name="us_center_joint" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>us_center_link</child>
             <axis>
                 <xyz>0 0 1</xyz>
@@ -378,7 +378,7 @@
         </link> 
               
         <joint name="us_right_joint" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>us_right_link</child>
             <axis>
                 <xyz>0 0 1</xyz>
@@ -432,7 +432,7 @@
         </link> 
                
         <joint name="us_left_joint" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>us_left_link</child>
             <axis>
                 <xyz>0 0 1</xyz>
@@ -486,7 +486,7 @@
         </link>
         
 	<joint name="camera_joint" type="revolute">
-            <parent>chassis</parent>
+            <parent>base_link</parent>
             <child>camera_link</child>
             <axis>
                 <xyz>0 1 0</xyz>
@@ -573,7 +573,7 @@
             <rightRearJoint>right_rear</rightRearJoint>
             <wheelSeparation>0.187</wheelSeparation>
             <wheelDiameter>0.120</wheelDiameter>
-            <robotBaseFrame>chassis</robotBaseFrame>
+            <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
             <commandTopic>/alpha/mobility</commandTopic>
             <odometryTopic>/alpha/odom</odometryTopic>
@@ -584,7 +584,7 @@
         <plugin name="gps_sim" filename="libhector_gazebo_ros_gps.so">
             <alwaysOn>1</alwaysOn>
             <updateRate>5</updateRate>
-            <bodyName>chassis</bodyName>
+            <bodyName>base_link</bodyName>
             <topicName>/alpha/fix</topicName>
             <!--<velocityTopicName>/alpha/fix_velocity</velocityTopicName>-->
             <referenceLatitude>28.584810</referenceLatitude>
@@ -605,7 +605,7 @@
         <!-- start IMU plugin -->
         <plugin name="imu_sim" filename="libhector_gazebo_ros_imu.so">
             <updateRate>10</updateRate>
-            <bodyName>chassis</bodyName>
+            <bodyName>base_link</bodyName>
             <topicName>/alpha/imu</topicName>
             <rpyOffsets>0 0 0</rpyOffsets> 
             <gaussianNoise>0</gaussianNoise>  
