@@ -3,48 +3,4 @@
   <node name="gamma_LOCALIZATION" pkg="rover_onboard_localization" type="localization" args="$(arg name)" />
   <node name="gamma_TARGET" pkg="rover_onboard_target_detection" type="target" args="$(arg name)" />
   <node name="gamma_OBSTACLE" pkg="rover_onboard_obstacle_detection" type="obstacle" args="$(arg name)" />
-
-  <node pkg="robot_localization" type="navsat_transform_node" name="gamma_NAVSAT" respawn="true">
-
-      <param name="magnetic_declination_radians" value="0.1530654"/>
-      <param name="yaw_offset" value="1.57079632679"/>
-      <param name="world_state" value="map"/>
-
-      <remap from="/imu/data" to="/$(arg name)/imu" />
-      <remap from="/gps/fix" to="/$(arg name)/fix" />
-      <remap from="/odometry/filtered" to="/$(arg name)/odom/ekf" />
-
-      <remap from="/odometry/gps" to="/$(arg name)/odom/navsat" />
-
-  </node>
-
-  <node pkg="robot_localization" type="ekf_localization_node" name="gamma_EKF" respawn="true">
-
-      <param name="odom0" value="/$(arg name)/odom/navsat" />
-      <param name="odom1" value="/$(arg name)/odom" />
-      <param name="imu0" value="/$(arg name)/imu" />
-      <param name="two_d_mode" value="true" />
-
-      <rosparam param="odom0_config">[true, true, false, 
-                                false, false, false, 
-                                false, false, false, 
-                                false, false, false, 
-                                false, false, false]</rosparam>
-
-      <rosparam param="odom1_config">[true, true, false, 
-                                false, false, false, 
-                                false, false, false, 
-                                false, false, false, 
-                                false, false, false]</rosparam>
-
-      <rosparam param="imu0_config">[false, false, false, 
-                               false, false, true, 
-                               false, false, false, 
-                               false, false, true, 
-                               true, false, false]</rosparam>
-
-      <remap from="/odometry/filtered" to="/$(arg name)/odom/ekf" />
-    
-  </node>
-
 </launch>
