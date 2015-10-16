@@ -37,6 +37,16 @@ nohup rosrun rover_onboard_obstacle_detection obstacle &
 nohup rosrun rover_onboard_path_planning path &
 nohup rosrun rover_onboard_target_detection target &
 
+nohup rosrun robot_localization navsat_transform_node __name:=navsat _world_frame:=map _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
+
+rosparam set /ekf_localization_node/odom0 /$HOSTNAME/odom/navsat
+rosparam set /ekf_localization_node/odom1 /$HOSTNAME/odom
+rosparam set /ekf_localization_node/imu0 /$HOSTNAME/imu
+rosparam set /ekf_localization_node/odom0_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
+rosparam set /ekf_localization_node/odom1_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
+rosparam set /ekf_localization_node/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
+nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true __name:=ekf /odometry/filtered:=/$HOSTNAME/odom/ekf &
+
 microcontrollerDevicePath=$(findDevicePath Arduino)
 if [ -z "$microcontrollerDevicePath" ]
 then
