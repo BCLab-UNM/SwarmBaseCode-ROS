@@ -16,7 +16,15 @@ Swarmie-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr)
 
 Follow the detailed instructions for installing ROS Indigo under Ubuntu 14.04 [here](http://wiki.ros.org/indigo/Installation/Ubuntu). We recommend the Desktop-Full installation, which includes the Gazebo 2 simulator.
 
-##### 2. Install additional Gazebo plugins
+##### 2. Install additional ROS plugins
+
+Our simulated and physical Swarmies use existing ROS plugins, external to this repo, to facilitate non-linear state estimation through sensor fusion and frame transforms. These plugins are contained in the [robot_localization](http://wiki.ros.org/robot_localization) package, which should be installed using the apt-get package management tool:
+
+```
+sudo apt-get install ros-indigo-robot-localization
+```
+
+##### 3. Install additional Gazebo plugins
 
 Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) package, which should be installed using the apt-get package management tool:
 
@@ -24,54 +32,54 @@ Our simulated Swarmies use existing Gazebo plugins, external to this repo, to re
 sudo apt-get install ros-indigo-hector-gazebo-plugins
 ```
 
-##### 3. Install git (if git is already installed, skip to step 4):
+##### 4. Install git (if git is already installed, skip to step 4):
 
 ```
 sudo apt-get install git
 ```
 
-##### 4. Install Swarmie-ROS
+##### 5. Install Swarmie-ROS
 
-2. Clone this GitHub repository to your home directory (~):
+1. Clone this GitHub repository to your home directory (~):
 
   ```
   cd ~
   git clone git@github.com:BCLab-UNM/Swarmie-ROS.git
   ```
 
-3. Rename the downloaded repo so it can be properly identified by ROS and catkin:
+2. Rename the downloaded repo so it can be properly identified by ROS and catkin:
 
   ```
   mv ~/Swarmie-ROS ~/rover_workspace
   ```
 
-4. Change your current working directory to the root directory of the downloaded repo:
+3. Change your current working directory to the root directory of the downloaded repo:
 
   ```
   cd ~/rover_workspace
   ```
 
-5. Set up GPS submodule:
+4. Set up GPS submodule:
 
   ```
   git submodule init
   git submodule update
   ```
 
-6. Compile Swarmie-ROS as a ROS catkin workspace:
+5. Compile Swarmie-ROS as a ROS catkin workspace:
 
   ```
   catkin_make
   ```
   
-7. Update your bash session to automatically source the setup file for Swarmie-ROS:
+6. Update your bash session to automatically source the setup file for Swarmie-ROS:
 
   ```
   echo "source ~/rover_workspace/devel/setup.bash" >> ~/.bashrc
   source ~/.bashrc
   ```
 
-8. Update your bash session to automatically export the enviromental variable that stores the location of Gazebo's model files:
+7. Update your bash session to automatically export the enviromental variable that stores the location of Gazebo's model files:
 
   ```
   echo "export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models" >> ~/.bashrc
