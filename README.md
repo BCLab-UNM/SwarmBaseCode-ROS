@@ -32,7 +32,7 @@ Our simulated Swarmies use existing Gazebo plugins, external to this repo, to re
 sudo apt-get install ros-indigo-hector-gazebo-plugins
 ```
 
-##### 4. Install git (if git is already installed, skip to step 4):
+##### 4. Install git (if git is already installed, skip to step 5):
 
 ```
 sudo apt-get install git
