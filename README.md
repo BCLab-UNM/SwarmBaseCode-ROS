@@ -1,4 +1,4 @@
-# Swarmie-ROS
+# Swarmathon-ROS
 
 This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://www.nasaswarmathon.com), a national swarm robotics competition. This particular framework is a ROS implementation of the CPFA (central-place foraging algorithm) developed for [iAnt robot swarms](http://swarms.cs.unm.edu) at the [University of New Mexico](http://www.unm.edu/).
 
@@ -10,7 +10,7 @@ This repository contains:
 
 ### Quick Start Installation Guide
 
-Swarmie-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported at this time.
+Swarmathon-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported at this time.
 
 ##### 1. Install ROS Indigo
 
@@ -38,19 +38,19 @@ sudo apt-get install ros-indigo-hector-gazebo-plugins
 sudo apt-get install git
 ```
 
-##### 5. Install Swarmie-ROS
+##### 5. Install Swarmathon-ROS
 
 1. Clone this GitHub repository to your home directory (~):
 
   ```
   cd ~
-  git clone git@github.com:BCLab-UNM/Swarmie-ROS.git
+  git clone git@github.com:BCLab-UNM/Swarmathon-ROS.git
   ```
 
 2. Rename the downloaded repo so it can be properly identified by ROS and catkin:
 
   ```
-  mv ~/Swarmie-ROS ~/rover_workspace
+  mv ~/Swarmathon-ROS ~/rover_workspace
   ```
 
 3. Change your current working directory to the root directory of the downloaded repo:
@@ -66,13 +66,13 @@ sudo apt-get install git
   git submodule update
   ```
 
-5. Compile Swarmie-ROS as a ROS catkin workspace:
+5. Compile Swarmathon-ROS as a ROS catkin workspace:
 
   ```
   catkin_make
   ```
   
-6. Update your bash session to automatically source the setup file for Swarmie-ROS:
+6. Update your bash session to automatically source the setup file for Swarmathon-ROS:
 
   ```
   echo "source ~/rover_workspace/devel/setup.bash" >> ~/.bashrc
