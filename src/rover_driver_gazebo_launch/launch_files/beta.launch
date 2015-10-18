@@ -1,7 +1,6 @@
 <launch>
   <node name="beta_MAPPING" pkg="rover_onboard_mapping" type="mapping" args="$(arg name)" />
   <node name="beta_MOBILITY" pkg="rover_onboard_mobility" type="mobility" args="$(arg name)" />
-  <node name="beta_LOCALIZATION" pkg="rover_onboard_localization" type="localization" args="$(arg name)" />
   <node name="beta_TARGET" pkg="rover_onboard_target_detection" type="target" args="$(arg name)" />
   <node name="beta_PATH" pkg="rover_onboard_path_planning" type="path" args="$(arg name)" />
   <node name="beta_OBSTACLE" pkg="rover_onboard_obstacle_detection" type="obstacle" args="$(arg name)" />

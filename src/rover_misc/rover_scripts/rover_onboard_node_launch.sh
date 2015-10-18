@@ -31,7 +31,6 @@ findDevicePath() {
 
 #Startup ROS packages/processes
 nohup rosrun rover_onboard_target_detection camera &
-nohup rosrun rover_onboard_localization localization &
 nohup rosrun rover_onboard_mobility mobility &
 nohup rosrun rover_onboard_obstacle_detection obstacle &
 nohup rosrun rover_onboard_path_planning path &
@@ -72,7 +71,6 @@ while true; do
     if [ "$choice" == "q" ];then
 	pkill abridge
 	pkill camera
-	pkill localization
 	pkill mobility
 	pkill obstacle
 	pkill path
