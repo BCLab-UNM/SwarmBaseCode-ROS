@@ -51,6 +51,7 @@ float rad2deg(float radian);
 float deg2rad(float degree);
 
 //ROS Timers
+void publishStatusTimerEventHandler(const ros::TimerEvent&);
 void mobilityStateMachine(const ros::TimerEvent&);
 void probabilityLoop(const ros::TimerEvent&);
 void stuckChecker(const ros::TimerEvent&);
@@ -112,6 +113,7 @@ double pheromLaying;
 double pheromFollowing;
 double chargeLeave;
 double chargeReturn;
+float status_publish_interval = 5;
 float missionTime = 0; //counts the number of seconds the current mission has lasted
 float searchTime = 0; //counts the number of seconds the current search segment has lasted
 float walkingTime = 0; //tracks how long the robot has been walking this leg
@@ -200,6 +202,7 @@ string publishedName;
 char prev_state_machine[128];
 
 //ROS Components
+ros::Publisher status_publisher;
 ros::Subscriber joySubscriber;
 ros::Subscriber modeSubscriber;
 ros::Subscriber parameterSubscriber;
@@ -215,10 +218,15 @@ ros::Publisher mobilityPublish;
 ros::Publisher pheromonePublish;
 ros::Publisher harvestedPublish;
 ros::Publisher stateMachinePublish;
+
+
+// Timers
+ros::Timer publish_status_timer;
 ros::Timer stateMachineTimer;
 ros::Timer probabilityTimer;
 ros::Timer stuckTimer;
 ros::Timer parameterTimer;
+
 ros::ServiceClient harvestClient;
 ros::ServiceClient mapHarvestClient;
 ros::ServiceClient obstacleCountClient;
@@ -278,12 +286,14 @@ int main(int argc, char **argv) {
     realLocSubscriber = mNH.subscribe((publishedName + "/location_real"), 10, realLocHandler);
     imageLocSubscriber = mNH.subscribe((publishedName + "/location_image"), 10, imageLocHandler); /// this image location coordinate system is used by pheremone following
 
+    status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     mobilityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/mobility"), 10);
     pheromonePublish = mNH.advertise<std_msgs::Bool>((publishedName + "/pheromone"), 1, true);
     chargingStatePublisher = mNH.advertise<std_msgs::Bool>((publishedName + "/chargingState"), 1, true); //publishes whether or not the rover is currently at home charging its batteries.
     harvestedPublish = mNH.advertise<std_msgs::UInt64>((publishedName + "/harvested"), 1, true); //publishes the targets harvested per rover
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true); //publishes the current state of the state machine, in human readable form
 
+    publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
     probabilityTimer = mNH.createTimer(ros::Duration(probabilityLoopTimeStep), probabilityLoop);
     stuckTimer = mNH.createTimer(ros::Duration(stuckLoopTimeStep), stuckChecker);
@@ -1649,5 +1659,14 @@ void batteryHandler(const std_msgs::Float32& message) {
     }
 
 }
+
+
+void publishStatusTimerEventHandler(const ros::TimerEvent&)
+{
+  std_msgs::String msg;
+  msg.data = "online";
+  status_publisher.publish(msg);
+}
+
 
 
