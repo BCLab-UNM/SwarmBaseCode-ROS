@@ -1,4 +1,4 @@
-material MyGroundPlane/Image
+material MarsGroundPlane/Image
     {
       technique
       {
@@ -10,7 +10,7 @@ material MyGroundPlane/Image
 
           texture_unit
           {
-            texture MyImage.png
+            texture GravelImage.png
             filtering trilinear
 	    scale 0.02 0.02
           }

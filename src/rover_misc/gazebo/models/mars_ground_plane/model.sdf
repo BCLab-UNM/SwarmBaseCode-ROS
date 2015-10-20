@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.4">
-<model name="my_ground_plane">
+<model name="mars_ground_plane">
   <static>true</static>
     <link name="link">
       <collision name="collision">
@@ -29,9 +29,9 @@
         </geometry>
         <material>
           <script>
-            <uri>model://my_ground_plane/materials/scripts</uri>
-            <uri>model://my_ground_plane/materials/textures</uri>
-            <name>MyGroundPlane/Image</name>
+            <uri>model://media/materials/scripts</uri>
+            <uri>model://media/materials/textures</uri>
+            <name>MarsGroundPlane/Image</name>
           </script>
         </material>
       </visual>
