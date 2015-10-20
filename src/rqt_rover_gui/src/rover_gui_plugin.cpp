@@ -25,6 +25,7 @@ namespace rqt_rover_gui
   RoverGUIPlugin::RoverGUIPlugin() : rqt_gui_cpp::Plugin(), widget(0)
   {
     setObjectName("RoverGUI");
+    log_messages = "";
 
   }
 
@@ -34,19 +35,6 @@ namespace rqt_rover_gui
 
     QStringList argv = context.argv();
 
-    // Add discovered rovers to the GUI list
-    rover_names = findConnectedRovers();
-
-    if (rover_names.empty())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("No rovers found. Cannot continue.");
-        msgBox.exec();
-        ros::shutdown();
-        QApplication::quit();
-    }
-
-
     widget = new QWidget();
 
     ui.setupUi(widget);
@@ -55,64 +43,19 @@ namespace rqt_rover_gui
 
     widget->setWindowTitle("Rover Interface");
 
-    for(vector<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
-    {
-        QListWidgetItem* new_item = new QListWidgetItem(QString::fromStdString(*i));
-        new_item->setForeground(Qt::red);
-        ui.rover_list->addItem(new_item);
-    }
-
-    string selected_rover_name = rover_names.at(0);
-
-    // Create a subscriber to listen for joystick events
-    joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
-
-    // Create a subscriber to listen for camera events
-    image_transport::ImageTransport it(nh);
-    int frame_rate = 1;
-    // Theroa codex results in the least information being transmitted
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
-
-    //ros::spin();
-    odometry_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::odometryEventHandler, this);
-
-
-    // Set the robot to accept manual control. Latch so even if the robot connects later it will get the message.
-    string manual_mode_topic = "/"+selected_rover_name+"/mode";
-    manual_mode_publisher = nh.advertise<std_msgs::UInt8>(manual_mode_topic, 10, true); // last argument sets latch to true
-
-     std_msgs::UInt8 manual_mode_msg;
-     manual_mode_msg.data = 1; // should be 1 or 0 here?
-     manual_mode_publisher.publish(manual_mode_msg);
-
-    string joystick_topic = "/"+selected_rover_name+"/joystick";
-    joystick_publisher = nh.advertise<sensor_msgs::Joy>(joystick_topic, 10, this);
-
-    ROS_INFO_STREAM("Rover GUI started.");
-
-    ROS_INFO_STREAM("Node name is " + ros::this_node::getName() + " and rover name is " + selected_rover_name + ".");
-
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
 
     connect(ui.rover_list, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentRoverChangedEventHandler(QListWidgetItem*,QListWidgetItem*)));
 
+    // Create a subscriber to listen for joystick events
+    joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
 
-    // Rover map test
-
-    //ui.map_frame->addToRoverPath(0,0);
-    //ui.map_frame->addToRoverPath(1.0,1.0);
-
-    //ui.map_frame->addCollectionPoint(0,0);
-
-    // for (int i = 0; i < 25; i++) ui.map_frame->addTargetLocation(rand()*1.0/RAND_MAX, rand()*1.0/RAND_MAX);
-    // for (int i = 0; i < 5; i++) ui.map_frame->addCollectionPoint(rand()*1.0/RAND_MAX, rand()*1.0/RAND_MAX);
-    // for (int i = 0; i < 15; i++) ui.map_frame->addToRoverPath(rand()*1.0/RAND_MAX, rand()*1.0/RAND_MAX);
-
-
-    //ui.map_frame->addTargetLocation(0.75, 0.75);
-    //ui.map_frame->addTargetLocation(1.0, 1.0);
+    // Add discovered rovers to the GUI list
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(pollRoversTimerEventHandler()));
+    timer->start(5000);
 
   }
 
@@ -146,9 +89,6 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
       {
         ui.joy_lcd_right->display(-joy_msg->axes[3]);
       }
-
-
-
 
 // Magic axis values in the code below were taken the rover_driver_rqt_motor code /joystick output for default linear and angular velocities.
 // Magic indicies are taken from rover_motor.cpp.
@@ -216,9 +156,9 @@ void RoverGUIPlugin::odometryEventHandler(const nav_msgs::Odometry::ConstPtr& ms
      ui.camera_frame->setImage(qimg);
  }
 
-vector<string> RoverGUIPlugin::findConnectedRovers()
+set<string> RoverGUIPlugin::findConnectedRovers()
 {
-    vector<string> rovers;
+    set<string> rovers;
 
     ros::master::V_TopicInfo master_topics;
     ros::master::getTopics(master_topics);
@@ -239,40 +179,92 @@ vector<string> RoverGUIPlugin::findConnectedRovers()
             found = rover_name.find("/");
             if (found==std::string::npos)
             {
-                rovers.push_back(rover_name);
+                rovers.insert(rover_name);
             }
         }
     }
 
-
-      // ui.log->append("Test message");
-
-    if (rovers.empty()) cout << "No rovers found" << endl;
     return rovers;
 }
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    cout << "rover clicked" << endl;
-
     selected_rover_name = current->text().toStdString();
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
 
+    setupSubscribers();
+    setupPublishers();
+
+
+    // Clear map
+    ui.map_frame->clearMap();
+
+    setupSubscribers();
+    setupPublishers();
+
+}
+
+void RoverGUIPlugin::pollRoversTimerEventHandler()
+{
+    set<string>new_rover_names = findConnectedRovers();
+
+    // Wait for a rover to connect
+    while (new_rover_names.empty())
+    {
+        QString new_message = "Waiting for rover to connect...<br>";
+        log_messages = log_messages+new_message;
+        ui.log->setText("<font color='white'>"+log_messages+"</font>");
+        return;
+    }
+
+    if (new_rover_names == rover_names)
+    {
+        return;
+    }
+
+    rover_names = new_rover_names;
+
+   QString new_message = "List of connected rovers has changed.<br>";
+   log_messages = log_messages+new_message;
+   ui.log->setText("<font color='white'>"+log_messages+"</font>");
+
+    for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
+    {
+        QListWidgetItem* new_item = new QListWidgetItem(QString::fromStdString(*i));
+        new_item->setForeground(Qt::red);
+        ui.rover_list->addItem(new_item);
+    }
+}
+
+void RoverGUIPlugin::setupPublishers()
+{
+    // Set the robot to accept manual control. Latch so even if the robot connects later it will get the message.
+    string manual_mode_topic = "/"+selected_rover_name+"/mode";
+    manual_mode_publisher = nh.advertise<std_msgs::UInt8>(manual_mode_topic, 10, true); // last argument sets latch to true
+
+     std_msgs::UInt8 manual_mode_msg;
+     manual_mode_msg.data = 1; // should be 1 or 0 here?
+     manual_mode_publisher.publish(manual_mode_msg);
+
+    string joystick_topic = "/"+selected_rover_name+"/joystick";
+    joystick_publisher = nh.advertise<sensor_msgs::Joy>(joystick_topic, 10, this);
+}
+
+void RoverGUIPlugin::setupSubscribers()
+{
     // Create a subscriber to listen for camera events
     image_transport::ImageTransport it(nh);
     int frame_rate = 1;
     // Theroa codex results in the least information being transmitted
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
+    camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this);//, image_transport::TransportHints("theora"));
 
     //ros::spin();
     odometry_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::odometryEventHandler, this);
 
-
-    // Clear map
-
 }
+
 
 } // End namespace
 

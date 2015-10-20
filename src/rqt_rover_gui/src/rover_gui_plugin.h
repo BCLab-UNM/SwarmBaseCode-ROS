@@ -36,11 +36,15 @@ namespace rqt_rover_gui {
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void odometryEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
 
+    void setupSubscribers();
+    void setupPublishers();
+
     // Detect rovers that are broadcasting information
-    vector<string> findConnectedRovers();
+    set<string> findConnectedRovers();
 
   private slots:
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
+    void pollRoversTimerEventHandler();
 
   private:
 
@@ -51,10 +55,12 @@ namespace rqt_rover_gui {
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
-    vector<string> rover_names;
+    set<string> rover_names;
     ros::NodeHandle nh;
     QWidget* widget;
     Ui::RoverGUI ui;
+
+    QString log_messages;
 
   };
 } // end namespace
