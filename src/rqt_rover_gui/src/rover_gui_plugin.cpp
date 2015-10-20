@@ -7,6 +7,7 @@
 #include <rover_gui_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QMessageBox>
 #include <QStringList>
 #include <QLCDNumber>
 #include <std_msgs/Float32.h>
@@ -24,14 +25,27 @@ namespace rqt_rover_gui
   RoverGUIPlugin::RoverGUIPlugin() : rqt_gui_cpp::Plugin(), widget(0)
   {
     setObjectName("RoverGUI");
+
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
   {
-
     cout << "Rover GUI Starting..." << endl;
 
     QStringList argv = context.argv();
+
+    // Add discovered rovers to the GUI list
+    rover_names = findConnectedRovers();
+
+    if (rover_names.empty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("No rovers found. Cannot continue.");
+        msgBox.exec();
+        ros::shutdown();
+        QApplication::quit();
+    }
+
 
     widget = new QWidget();
 
@@ -41,8 +55,6 @@ namespace rqt_rover_gui
 
     widget->setWindowTitle("Rover Interface");
 
-    // Add discovered rovers to the GUI list
-    vector<string> rover_names = findConnectedRovers();
     for(vector<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
     {
         QListWidgetItem* new_item = new QListWidgetItem(QString::fromStdString(*i));
@@ -247,9 +259,6 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
-
-    // Create a subscriber to listen for joystick events
-    joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
 
     // Create a subscriber to listen for camera events
     image_transport::ImageTransport it(nh);

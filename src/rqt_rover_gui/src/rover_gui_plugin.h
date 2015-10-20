@@ -51,7 +51,7 @@ namespace rqt_rover_gui {
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
-
+    vector<string> rover_names;
     ros::NodeHandle nh;
     QWidget* widget;
     Ui::RoverGUI ui;
