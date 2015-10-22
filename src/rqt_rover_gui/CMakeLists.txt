@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rqt_rover_gui)
 
-#set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS 
   rqt_gui
@@ -24,6 +24,9 @@ qt4_wrap_cpp(
   src/rover_gui_plugin.h
   src/CameraFrame.h
   src/MapFrame.h
+  src/USFrame.h
+  src/GPSFrame.h
+  src/IMUFrame.h
 )
 
 qt4_wrap_ui(
@@ -45,6 +48,9 @@ add_library(
   src/rover_gui_plugin.cpp
   src/CameraFrame.cpp
   src/MapFrame.cpp
+  src/USFrame.cpp
+  src/GPSFrame.cpp
+  src/IMUFrame.cpp
   ${rover_gui_plugin_MOCS}
   ${rover_gui_plugin_UIS_H}
   ${OpenCV_LIBS}

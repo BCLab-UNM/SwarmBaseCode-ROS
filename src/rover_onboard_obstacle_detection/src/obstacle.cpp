@@ -142,6 +142,10 @@ void loadParameters(const ros::TimerEvent&) {
  * Or I just can't figure it out....
  * 
  */    
+
+// Note on above: You have to set C++11 compatability
+//  in the CMakeLists.txt file otherwise the compilers ignore C++11 conventtions.
+// Matthew Fricke
     double param;
 
     ros::param::param((publishedName + "/mobility/senseRange"), param, (double) senseRange); senseRange = (float) param;

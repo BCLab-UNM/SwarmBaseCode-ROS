@@ -21,7 +21,7 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 }
 
 void MapFrame::addToRoverPath(float x, float y)
-{
+{ 
     if (x > max_seen_x) max_seen_x = x;
     if (y > max_seen_y) max_seen_y = y;
     if (x < min_seen_x) min_seen_x = x;
@@ -66,6 +66,13 @@ void MapFrame::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.setPen(Qt::white);
+
+    if (rover_path.empty() && target_locations.empty() && collection_points.empty())
+    {
+        painter.drawText(QPoint(50,50), "Map Frame: Nothing to display.");
+        return;
+    }
+
 
     frame_width = this->width();
     frame_height = this->height();

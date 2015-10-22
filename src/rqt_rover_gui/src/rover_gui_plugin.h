@@ -10,7 +10,8 @@
 #include <sensor_msgs/Image.h>
 #include <ros/macros.h>
 #include <nav_msgs/Odometry.h>
-
+#include <sensor_msgs/Range.h>
+#include <sensor_msgs/Imu.h>
 #include <pluginlib/class_list_macros.h>
 
 #include <QWidget>
@@ -35,6 +36,10 @@ namespace rqt_rover_gui {
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void odometryEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+    void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
+    void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
+    void rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
+    void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
     void setupSubscribers();
     void setupPublishers();
@@ -50,8 +55,14 @@ namespace rqt_rover_gui {
 
     ros::Publisher manual_mode_publisher;
     ros::Publisher joystick_publisher;
+
     ros::Subscriber joystick_subscriber;
     ros::Subscriber odometry_subscriber;
+    ros::Subscriber us_center_subscriber;
+    ros::Subscriber us_left_subscriber;
+    ros::Subscriber us_right_subscriber;
+    ros::Subscriber imu_subscriber;
+
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;

@@ -176,7 +176,7 @@ set<string> RoverGUIPlugin::findConnectedRovers()
           {
             rover_name = info.name.substr(1,found-1);
 
-            found = rover_name.find("/");
+            found = rover_name.find("/"); // Eliminate potential names with / in them
             if (found==std::string::npos)
             {
                 rovers.insert(rover_name);
@@ -200,9 +200,6 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     // Clear map
     ui.map_frame->clearMap();
-
-    setupSubscribers();
-    setupPublishers();
 
 }
 
@@ -261,10 +258,53 @@ void RoverGUIPlugin::setupSubscribers()
     camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this);//, image_transport::TransportHints("theora"));
 
     //ros::spin();
-    odometry_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::odometryEventHandler, this);
+    odometry_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/ekf", 10, &RoverGUIPlugin::odometryEventHandler, this);
+
+    // Ultrasound Subscriptions
+
+    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/USCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
+    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/USLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
+    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/USRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
+
+
+    // IMU Subscriptions
+    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
+
+    // GPS Subscriptions
 
 }
 
+void RoverGUIPlugin::centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
+{
+    ui.us_frame->setCenterRange(msg->range);
+ }
+
+void RoverGUIPlugin::rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
+{
+    ui.us_frame->setRightRange(msg->range);
+}
+
+void RoverGUIPlugin::leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
+{
+    ui.us_frame->setLeftRange(msg->range);
+}
+
+void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
+{
+    ui.imu_frame->setLinearAcceleration( msg->linear_acceleration.x,
+                                         msg->linear_acceleration.y,
+                                         msg->linear_acceleration.z );
+
+    ui.imu_frame->setAngularVelocity(    msg->angular_velocity.x,
+                                         msg->angular_velocity.y,
+                                         msg->angular_velocity.z    );
+
+    ui.imu_frame->setOrientation(        msg->orientation.w,
+                                         msg->orientation.x,
+                                         msg->orientation.y,
+                                         msg->orientation.z         );
+
+}
 
 } // End namespace
 
