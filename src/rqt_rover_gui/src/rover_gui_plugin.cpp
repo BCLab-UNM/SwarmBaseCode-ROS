@@ -276,33 +276,34 @@ void RoverGUIPlugin::setupSubscribers()
 
 void RoverGUIPlugin::centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
-    ui.us_frame->setCenterRange(msg->range);
+    ui.us_frame->setCenterRange(msg->range, msg->min_range, msg->max_range);
  }
 
 void RoverGUIPlugin::rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
-    ui.us_frame->setRightRange(msg->range);
+    ui.us_frame->setRightRange(msg->range, msg->min_range, msg->max_range);
 }
 
 void RoverGUIPlugin::leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
-    ui.us_frame->setLeftRange(msg->range);
+    ui.us_frame->setLeftRange(msg->range, msg->min_range, msg->max_range);
+
 }
 
 void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
 {
-    ui.imu_frame->setLinearAcceleration( msg->linear_acceleration.x,
+   /* ui.imu_widget->setLinearAcceleration( msg->linear_acceleration.x,
                                          msg->linear_acceleration.y,
                                          msg->linear_acceleration.z );
 
-    ui.imu_frame->setAngularVelocity(    msg->angular_velocity.x,
+    ui.imu_widget->setAngularVelocity(    msg->angular_velocity.x,
                                          msg->angular_velocity.y,
                                          msg->angular_velocity.z    );
 
-    ui.imu_frame->setOrientation(        msg->orientation.w,
+    ui.imu_widget->setOrientation(        msg->orientation.w,
                                          msg->orientation.x,
                                          msg->orientation.y,
-                                         msg->orientation.z         );
+                                         msg->orientation.z        ); */
 
 }
 

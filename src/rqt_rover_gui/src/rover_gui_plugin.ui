@@ -195,22 +195,6 @@ border-color: rgb(255, 255, 255);</string>
     </rect>
    </property>
   </widget>
-  <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
-   <property name="geometry">
-    <rect>
-     <x>710</x>
-     <y>300</y>
-     <width>271</width>
-     <height>211</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-  </widget>
   <widget class="rqt_rover_gui::USFrame" name="us_frame">
    <property name="geometry">
     <rect>
@@ -256,6 +240,22 @@ border-color: rgb(255, 255, 255);</string>
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Rovers:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
+  <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>300</y>
+     <width>281</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
   <zorder>map_frame</zorder>
   <zorder>camera_frame</zorder>
   <zorder>joystick_frame</zorder>
@@ -263,10 +263,10 @@ border-color: rgb(255, 255, 255);</string>
   <zorder>label</zorder>
   <zorder>log</zorder>
   <zorder>rover_list</zorder>
-  <zorder>imu_frame</zorder>
   <zorder>us_frame</zorder>
   <zorder>gps_frame</zorder>
   <zorder>label_2</zorder>
+  <zorder>imu_frame</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -289,15 +289,15 @@ border-color: rgb(255, 255, 255);</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>rqt_rover_gui::IMUFrame</class>
-   <extends>QFrame</extends>
-   <header>IMUFrame.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>rqt_rover_gui::USFrame</class>
    <extends>QFrame</extends>
    <header>USFrame.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>rqt_rover_gui::IMUFrame</class>
+   <extends>QFrame</extends>
+   <header>IMUFrame.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

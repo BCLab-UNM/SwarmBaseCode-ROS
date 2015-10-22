@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS
   QtCore
   QtGui
+  QtOpenGL
 )
 
 catkin_package(
@@ -27,6 +28,7 @@ qt4_wrap_cpp(
   src/USFrame.h
   src/GPSFrame.h
   src/IMUFrame.h
+  #src/IMUWidget.h
 )
 
 qt4_wrap_ui(
@@ -50,6 +52,7 @@ add_library(
   src/MapFrame.cpp
   src/USFrame.cpp
   src/GPSFrame.cpp
+  #src/IMUWidget.cpp
   src/IMUFrame.cpp
   ${rover_gui_plugin_MOCS}
   ${rover_gui_plugin_UIS_H}
@@ -58,6 +61,8 @@ add_library(
 
 target_link_libraries(
   rqt_rover_gui
+  #GL
+  #glut
   ${catkin_LIBRARIES}
 )
 

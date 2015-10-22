@@ -6,8 +6,7 @@
 #include <QMutex>
 #include <QPainter>
 #include <vector>
-#include <tuple>
-#include <utility> // For STL pair and make_tuple
+#include <utility> // For STL pair
 
 using namespace std;
 
@@ -23,6 +22,7 @@ public:
     void setAngularVelocity(float x, float y, float z);
     void setOrientation(float w, float x, float y, float z);
 
+
 signals:
 
     void delayedUpdate();
@@ -35,10 +35,11 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
+    QPoint cameraTransform( tuple<float, float, float> point_3D, tuple<float, float, float> eye, tuple<float, float, float> camera_position, tuple<float, float, float> camera_angle );
 
-tuple<float, float, float> linear_acceleration; // ROS Geometry Messages Vector3: <x, y, z>
-tuple<float, float, float> angular_velocity; // ROS Geometry Messages Vector3: <x, y, z>
-tuple<float, float, float, float> orientation; // ROS Geometry Messages Quaternion: <w, x, y, z>
+    tuple<float, float, float> linear_acceleration; // ROS Geometry Messages Vector3: <x, y, z>
+    tuple<float, float, float> angular_velocity; // ROS Geometry Messages Vector3: <x, y, z>
+    tuple<float, float, float, float> orientation; // ROS Geometry Messages Quaternion: <w, x, y, z>
 
 };
 
