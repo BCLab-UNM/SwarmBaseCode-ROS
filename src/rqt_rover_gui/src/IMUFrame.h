@@ -36,6 +36,7 @@ protected:
 
 private:
     QPoint cameraTransform( tuple<float, float, float> point_3D, tuple<float, float, float> eye, tuple<float, float, float> camera_position, tuple<float, float, float> camera_angle );
+    tuple<float, float, float> rotateAboutXAxis(tuple<float, float, float> point, float angle);
 
     tuple<float, float, float> linear_acceleration; // ROS Geometry Messages Vector3: <x, y, z>
     tuple<float, float, float> angular_velocity; // ROS Geometry Messages Vector3: <x, y, z>
