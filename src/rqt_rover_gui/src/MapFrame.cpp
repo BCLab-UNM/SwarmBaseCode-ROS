@@ -18,9 +18,14 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 
     max_seen_x = 1;
     max_seen_y = 1;
+
+    display_ekf_data = false;
+    display_gps_data = false;
+    display_encoder_data = false;
+
 }
 
-void MapFrame::addToRoverPath(float x, float y)
+void MapFrame::addToGPSRoverPath(float x, float y)
 { 
     if (x > max_seen_x) max_seen_x = x;
     if (y > max_seen_y) max_seen_y = y;
@@ -32,14 +37,52 @@ void MapFrame::addToRoverPath(float x, float y)
     max_seen_height = std::fabs(min_seen_y)+std::fabs(max_seen_y);
 
     update_mutex.lock();
-    rover_path.push_back(pair<float,float>(x,y));
+    gps_rover_path.push_back(pair<float,float>(x,y));
+    update_mutex.unlock();
+    emit delayedUpdate();
+}
+
+void MapFrame::addToEncoderRoverPath(float x, float y)
+{
+    if (x > max_seen_x) max_seen_x = x;
+    if (y > max_seen_y) max_seen_y = y;
+    if (x < min_seen_x) min_seen_x = x;
+    if (y < min_seen_y) min_seen_y = y;
+
+    // Normalize the displayed coordinates to the largest coordinates seen since we don't know the coordinate system.
+    max_seen_width = std::fabs(min_seen_x)+std::fabs(max_seen_x);
+    max_seen_height = std::fabs(min_seen_y)+std::fabs(max_seen_y);
+
+    update_mutex.lock();
+    encoder_rover_path.push_back(pair<float,float>(x,y));
+    update_mutex.unlock();
+    emit delayedUpdate();
+}
+
+
+void MapFrame::addToEKFRoverPath(float x, float y)
+{
+    if (x > max_seen_x) max_seen_x = x;
+    if (y > max_seen_y) max_seen_y = y;
+    if (x < min_seen_x) min_seen_x = x;
+    if (y < min_seen_y) min_seen_y = y;
+
+    // Normalize the displayed coordinates to the largest coordinates seen since we don't know the coordinate system.
+    max_seen_width = std::fabs(min_seen_x)+std::fabs(max_seen_x);
+    max_seen_height = std::fabs(min_seen_y)+std::fabs(max_seen_y);
+
+    update_mutex.lock();
+    ekf_rover_path.push_back(pair<float,float>(x,y));
     update_mutex.unlock();
     emit delayedUpdate();
 }
 
 void MapFrame::clearMap()
 {
-    rover_path.clear();
+    ekf_rover_path.clear();
+    encoder_rover_path.clear();
+    gps_rover_path.clear();
+
     target_locations.clear();
     collection_points.clear();
 }
@@ -67,7 +110,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setPen(Qt::white);
 
-    if (rover_path.empty() && target_locations.empty() && collection_points.empty())
+    if (ekf_rover_path.empty() && encoder_rover_path.empty() && gps_rover_path.empty() && target_locations.empty() && collection_points.empty())
     {
         painter.drawText(QPoint(50,50), "Map Frame: Nothing to display.");
         return;
@@ -98,17 +141,57 @@ void MapFrame::paintEvent(QPaintEvent* event)
         scaled_collection_points.push_back(point);
     }
 
-    QPainterPath scaled_rover_path;
-    for(std::vector< pair<float,float> >::iterator it = rover_path.begin(); it != rover_path.end(); ++it) {
+    std::vector<QPoint> scaled_gps_rover_points;
+    for(std::vector< pair<float,float> >::iterator it = gps_rover_path.begin(); it != gps_rover_path.end(); ++it) {
+        pair<float,float> coordinate  = *it;
+
+        float x = ((coordinate.first-min_seen_x)/max_seen_width)*frame_width;
+        float y = ((coordinate.second-min_seen_y)/max_seen_height)*frame_height;
+        scaled_gps_rover_points.push_back( QPoint(x,y) );
+    }
+
+
+    QPainterPath scaled_ekf_rover_path;
+    for(std::vector< pair<float,float> >::iterator it = ekf_rover_path.begin(); it != ekf_rover_path.end(); ++it) {
         pair<float,float> coordinate  = *it;
         QPoint point;
         float x = ((coordinate.first-min_seen_x)/max_seen_width)*frame_width;
         float y = ((coordinate.second-min_seen_y)/max_seen_height)*frame_height;
 
-        scaled_rover_path.lineTo(x, y);
+        scaled_ekf_rover_path.lineTo(x, y);
     }
 
-    painter.drawPath(scaled_rover_path);
+    QPainterPath scaled_gps_rover_path;
+    for(std::vector< pair<float,float> >::iterator it = gps_rover_path.begin(); it != gps_rover_path.end(); ++it) {
+        pair<float,float> coordinate  = *it;
+        QPoint point;
+        float x = ((coordinate.first-min_seen_x)/max_seen_width)*frame_width;
+        float y = ((coordinate.second-min_seen_y)/max_seen_height)*frame_height;
+
+        scaled_gps_rover_path.lineTo(x, y);
+    }
+
+    QPainterPath scaled_encoder_rover_path;
+    for(std::vector< pair<float,float> >::iterator it = encoder_rover_path.begin(); it != encoder_rover_path.end(); ++it) {
+        pair<float,float> coordinate  = *it;
+        QPoint point;
+        float x = ((coordinate.first-min_seen_x)/max_seen_width)*frame_width;
+        float y = ((coordinate.second-min_seen_y)/max_seen_height)*frame_height;
+
+        scaled_encoder_rover_path.lineTo(x, y);
+    }
+
+
+    painter.setPen(Qt::red);
+    if (display_gps_data) painter.drawPoints(&scaled_gps_rover_points[0], scaled_gps_rover_points.size());
+   // if (display_gps_data) painter.drawPath(scaled_gps_rover_path);
+
+    painter.setPen(Qt::white);
+    if (display_ekf_data) painter.drawPath(scaled_ekf_rover_path);
+    painter.setPen(Qt::green);
+    if (display_encoder_data) painter.drawPath(scaled_encoder_rover_path);
+
+
     painter.setPen(Qt::red);
     QPoint* point_array = &scaled_collection_points[0];
     painter.drawPoints(point_array, scaled_collection_points.size());
@@ -119,6 +202,22 @@ void MapFrame::paintEvent(QPaintEvent* event)
     update_mutex.unlock();
 
     painter.setPen(Qt::white);
+}
+
+
+void MapFrame::setDisplayEncoderData(bool display)
+{
+    display_encoder_data = display;
+}
+
+void MapFrame::setDisplayGPSData(bool display)
+{
+    display_gps_data = display;
+}
+
+void MapFrame::setDisplayEKFData(bool display)
+{
+    display_ekf_data = display;
 }
 
 }

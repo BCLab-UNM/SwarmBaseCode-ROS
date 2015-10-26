@@ -19,7 +19,15 @@ class MapFrame : public QFrame
 public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
-    void addToRoverPath(float x, float y);
+    void setDisplayEncoderData(bool display);
+    void setDisplayGPSData(bool display);
+    void setDisplayEKFData(bool display);
+
+    void addToGPSRoverPath(float x, float y);
+    void addToEncoderRoverPath(float x, float y);
+    void addToEKFRoverPath(float x, float y);
+
+
     void addTargetLocation(float x, float y);
     void addCollectionPoint(float x, float y);
     void clearMap();
@@ -37,7 +45,10 @@ protected:
 
 private:
 
-    vector< pair<float,float> > rover_path;
+    vector< pair<float,float> > gps_rover_path;
+    vector< pair<float,float> > ekf_rover_path;
+    vector< pair<float,float> > encoder_rover_path;
+
     vector< pair<float,float> > collection_points;
     vector< pair<float,float> > target_locations;
     mutable QMutex update_mutex;
@@ -51,6 +62,10 @@ private:
 
     float max_seen_width;
     float max_seen_height;
+
+    bool display_gps_data;
+    bool display_ekf_data;
+    bool display_encoder_data;
 
 };
 
