@@ -28,6 +28,7 @@ signals:
     void delayedUpdate();
 
 public slots:
+    void rotateTimerEventHandler();
 
 
 protected:
@@ -36,11 +37,15 @@ protected:
 
 private:
     QPoint cameraTransform( tuple<float, float, float> point_3D, tuple<float, float, float> eye, tuple<float, float, float> camera_position, tuple<float, float, float> camera_angle );
-    tuple<float, float, float> rotateAboutXAxis(tuple<float, float, float> point, float angle);
+    tuple<float, float, float> rotateAboutAxis(tuple<float, float, float> point, float angle,  tuple<float, float, float> axis_of_rotation);
+    float** setUpRotationMatrix(float angle, tuple<float, float, float> axis_rotation); // angle in radians
 
     tuple<float, float, float> linear_acceleration; // ROS Geometry Messages Vector3: <x, y, z>
     tuple<float, float, float> angular_velocity; // ROS Geometry Messages Vector3: <x, y, z>
     tuple<float, float, float, float> orientation; // ROS Geometry Messages Quaternion: <w, x, y, z>
+
+    // Test points to render
+    tuple<float, float, float> cube[8];
 
 };
 
