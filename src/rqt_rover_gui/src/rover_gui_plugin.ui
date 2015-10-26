@@ -38,10 +38,10 @@ border-color: rgb(255, 255, 255);</string>
   <widget class="QFrame" name="joystick_frame">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>540</y>
-     <width>241</width>
-     <height>211</height>
+     <x>50</x>
+     <y>590</y>
+     <width>161</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -53,8 +53,8 @@ border-color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="joy_lcd_forward">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>20</y>
+      <x>50</x>
+      <y>10</y>
       <width>64</width>
       <height>31</height>
      </rect>
@@ -69,7 +69,7 @@ border-color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>100</y>
+      <y>40</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -83,8 +83,8 @@ border-color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="joy_lcd_right">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>100</y>
+      <x>80</x>
+      <y>40</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -98,8 +98,8 @@ border-color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="joy_lcd_back">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>170</y>
+      <x>50</x>
+      <y>70</y>
       <width>64</width>
       <height>31</height>
      </rect>
@@ -157,6 +157,9 @@ border-color: rgb(255, 255, 255);</string>
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
     <property name="text">
      <string>GPS</string>
     </property>
@@ -170,6 +173,9 @@ border-color: rgb(255, 255, 255);</string>
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
     <property name="text">
      <string>EKF</string>
     </property>
@@ -182,6 +188,9 @@ border-color: rgb(255, 255, 255);</string>
       <width>97</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string>Encoders</string>
@@ -217,7 +226,7 @@ border-color: rgb(255, 255, 255);</string>
   <widget class="QTextBrowser" name="log">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>230</x>
      <y>550</y>
      <width>441</width>
      <height>192</height>
@@ -295,6 +304,79 @@ border-color: rgb(255, 255, 255);</string>
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
+  <widget class="QFrame" name="control_frame">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>550</y>
+     <width>241</width>
+     <height>191</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>181</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="title">
+     <string>Rover Control</string>
+    </property>
+    <widget class="QRadioButton" name="autonomous_control_radio_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>117</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Autonomous</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">control_type_radio_group</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="joystick_control_radio_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>117</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Joystick</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">control_type_radio_group</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
   <zorder>map_frame</zorder>
   <zorder>camera_frame</zorder>
   <zorder>joystick_frame</zorder>
@@ -306,6 +388,7 @@ border-color: rgb(255, 255, 255);</string>
   <zorder>gps_frame</zorder>
   <zorder>label_2</zorder>
   <zorder>imu_frame</zorder>
+  <zorder>control_frame</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -342,4 +425,7 @@ border-color: rgb(255, 255, 255);</string>
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="control_type_radio_group"/>
+ </buttongroups>
 </ui>

@@ -14,6 +14,10 @@
 #include <sensor_msgs/Imu.h>
 #include <pluginlib/class_list_macros.h>
 
+//ROS msg types
+#include "rover_onboard_target_detection/ATag.h"
+#include "rover_onboard_target_detection/harvest.h"
+
 #include <QWidget>
 #include <QTimer>
 #include <QLabel>
@@ -44,23 +48,26 @@ namespace rqt_rover_gui {
     void rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
+    void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
+
     void setupSubscribers();
     void setupPublishers();
 
     // Detect rovers that are broadcasting information
     set<string> findConnectedRovers();
 
+    // Display log message to the text frame in the GUI
+    void displayLogMessage(QString msg);
+
   private slots:
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
     void pollRoversTimerEventHandler();
 
-    void on_checkBox_3_toggled(bool checked);
+    void GPSCheckboxToggledEventHandler(bool checked);
 
-    void on_gps_checkbox_toggled(bool checked);
+    void EKFCheckboxToggledEventHandler(bool checked);
 
-    void on_ekf_checkbox_toggled(bool checked);
-
-    void on_encoder_checkbox_toggled(bool checked);
+    void encoderCheckboxToggledEventHandler(bool checked);
 
   private:
 
@@ -75,6 +82,7 @@ namespace rqt_rover_gui {
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
+    ros::Subscriber target_detection_subscriber;
 
     image_transport::Subscriber camera_subscriber;
 

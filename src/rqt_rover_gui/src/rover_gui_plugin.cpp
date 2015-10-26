@@ -49,16 +49,14 @@ namespace rqt_rover_gui
 
     // Setup QT message connections
     connect(ui.rover_list, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentRoverChangedEventHandler(QListWidgetItem*,QListWidgetItem*)));
-    connect(ui.ekf_checkbox, SIGNAL(toggled(bool)), this, SLOT(on_ekf_checkbox_toggled(bool)));
-    connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(on_gps_checkbox_toggled(bool)));
-    connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(on_encoder_checkbox_toggled(bool)));
+    connect(ui.ekf_checkbox, SIGNAL(toggled(bool)), this, SLOT(EKFCheckboxToggledEventHandler(bool)));
+    connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
+    connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
 
-    QString new_message = "Searching for rovers...<br>";
-    log_messages = log_messages+new_message;
-    ui.log->setText("<font color='white'>"+log_messages+"</font>");
+    displayLogMessage("Searching for rovers...");
 
     // Add discovered rovers to the GUI list
     QTimer *timer = new QTimer(this);
@@ -242,11 +240,9 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     set<string>new_rover_names = findConnectedRovers();
 
     // Wait for a rover to connect
-    while (new_rover_names.empty())
+    if (new_rover_names.empty())
     {
-        QString new_message = "Waiting for rover to connect...<br>";
-        log_messages = log_messages+new_message;
-        ui.log->setText("<font color='white'>"+log_messages+"</font>");
+        displayLogMessage("Waiting for rover to connect...)");
         return;
     }
 
@@ -257,9 +253,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
     rover_names = new_rover_names;
 
-   QString new_message = "List of connected rovers has changed.<br>";
-   log_messages = log_messages+new_message;
-   ui.log->setText("<font color='white'>"+log_messages+"</font>");
+   displayLogMessage("List of connected rovers has changed");
 
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
     {
@@ -307,7 +301,8 @@ void RoverGUIPlugin::setupSubscribers()
     // IMU Subscriptions
     imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
 
-    // GPS Subscriptions
+    // Target detected topic
+    target_detection_subscriber = nh.subscribe("/"+selected_rover_name+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
 
 }
 
@@ -343,22 +338,35 @@ void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
 
 }
 
-void rqt_rover_gui::RoverGUIPlugin::on_gps_checkbox_toggled(bool checked)
+void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)
 {
     ui.map_frame->setDisplayGPSData(checked);
 }
 
-void rqt_rover_gui::RoverGUIPlugin::on_ekf_checkbox_toggled(bool checked)
+void RoverGUIPlugin::EKFCheckboxToggledEventHandler(bool checked)
 {
     ui.map_frame->setDisplayEKFData(checked);
 }
 
-void rqt_rover_gui::RoverGUIPlugin::on_encoder_checkbox_toggled(bool checked)
+void RoverGUIPlugin::encoderCheckboxToggledEventHandler(bool checked)
 {
     ui.map_frame->setDisplayEncoderData(checked);
 }
 
+// Currently broken. Calling displayLogMessage from the ROS event thread causes a crash or hang
+void RoverGUIPlugin::targetDetectedEventHandler(rover_onboard_target_detection::ATag tagInfo) //rover_onboard_target_detection::ATag msg )
+{
+    // Just let the user know the event happened
+   // displayLogMessage("Tag detected");
 
+}
+
+void RoverGUIPlugin::displayLogMessage(QString msg)
+{
+    QString new_message = msg+"<br>";
+    log_messages = log_messages+new_message;
+    ui.log->setText("<font color='white'>"+log_messages+"</font>");
+}
 
 } // End namespace
 
