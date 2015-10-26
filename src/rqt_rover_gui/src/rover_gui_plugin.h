@@ -35,7 +35,10 @@ namespace rqt_rover_gui {
     // Handles output from the joystick node
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
-    void odometryEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+    void EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+    void GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+    void encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -51,13 +54,23 @@ namespace rqt_rover_gui {
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
     void pollRoversTimerEventHandler();
 
+    void on_checkBox_3_toggled(bool checked);
+
+    void on_gps_checkbox_toggled(bool checked);
+
+    void on_ekf_checkbox_toggled(bool checked);
+
+    void on_encoder_checkbox_toggled(bool checked);
+
   private:
 
     ros::Publisher manual_mode_publisher;
     ros::Publisher joystick_publisher;
 
     ros::Subscriber joystick_subscriber;
-    ros::Subscriber odometry_subscriber;
+    ros::Subscriber encoder_subscriber;
+    ros::Subscriber gps_subscriber;
+    ros::Subscriber ekf_subscriber;
     ros::Subscriber us_center_subscriber;
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;

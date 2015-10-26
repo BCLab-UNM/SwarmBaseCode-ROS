@@ -148,6 +148,45 @@ border-color: rgb(255, 255, 255);</string>
    <property name="lineWidth">
     <number>1</number>
    </property>
+   <widget class="QCheckBox" name="gps_checkbox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GPS</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ekf_checkbox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>EKF</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="encoder_checkbox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Encoders</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="rover_name">
    <property name="geometry">
@@ -178,9 +217,9 @@ border-color: rgb(255, 255, 255);</string>
   <widget class="QTextBrowser" name="log">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>280</x>
      <y>550</y>
-     <width>651</width>
+     <width>441</width>
      <height>192</height>
     </rect>
    </property>

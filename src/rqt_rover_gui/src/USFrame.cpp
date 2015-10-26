@@ -60,18 +60,25 @@ void USFrame::paintEvent(QPaintEvent* event)
     painter.drawLine(start_point, right_vector);
 
 
-    QString left_range_qstr = QString::number(left_range);
-    QString right_range_qstr = QString::number(right_range);
-    QString center_range_qstr = QString::number(center_range);
+    float left_range_rounded = roundf(left_range * 100) / 100;
+    float right_range_rounded = roundf(right_range * 100) / 100;
+    float center_range_rounded = roundf(center_range * 100) / 100;
+
+
+    QString left_range_in_meters_qstr = QString::number(left_range_rounded*3)+"m";
+    QString right_range_in_meters_qstr = QString::number(right_range_rounded*3)+"m";
+    QString center_range_in_meters_qstr = QString::number(center_range_rounded*3)+"m";
+
+    QString left_range_qstr = QString::number(left_range_rounded);
+    QString right_range_qstr = QString::number(right_range_rounded);
+    QString center_range_qstr = QString::number(center_range_rounded);
 
 
     QFontMetrics fm(painter.font());
 
-    // Write the sensor values at 1/4, 1/2, 3/4 screen width and offset so the center of the text displayed is at those positions.
-    painter.drawText(QPoint(frame_center_x-frame_width/4-fm.width(left_range_qstr)/2,frame_height), left_range_qstr);
-    painter.drawText(QPoint(frame_center_x-fm.width(center_range_qstr)/2,frame_height), center_range_qstr);
-    painter.drawText(QPoint(frame_center_x+frame_width/4-fm.width(right_range_qstr)/2,frame_height), right_range_qstr);
-
+    painter.drawText(QPoint(frame_center_x-frame_width/4-fm.width(left_range_in_meters_qstr)/2,frame_height), left_range_in_meters_qstr);
+    painter.drawText(QPoint(frame_center_x-fm.width(right_range_in_meters_qstr)/2,frame_height), right_range_in_meters_qstr);
+    painter.drawText(QPoint(frame_center_x+frame_width/4-fm.width(right_range_in_meters_qstr)/2,frame_height), center_range_in_meters_qstr);
 
 }
 

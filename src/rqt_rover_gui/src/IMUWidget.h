@@ -1,6 +1,7 @@
 #ifndef rtq_rover_gui_IMUWidget_H
 #define rtq_rover_gui_IMUWidget_H
 
+#include <QtOpenGL>
 #include <QGLWidget>
 #include <QFrame>
 #include <QImage>

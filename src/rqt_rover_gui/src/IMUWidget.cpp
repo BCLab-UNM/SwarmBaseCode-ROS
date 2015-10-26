@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cmath>
 
-#include <QtOpenGL>
+
 
 #include <IMUWidget.h>
 

@@ -47,10 +47,18 @@ namespace rqt_rover_gui
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
 
+    // Setup QT message connections
     connect(ui.rover_list, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentRoverChangedEventHandler(QListWidgetItem*,QListWidgetItem*)));
+    connect(ui.ekf_checkbox, SIGNAL(toggled(bool)), this, SLOT(on_ekf_checkbox_toggled(bool)));
+    connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(on_gps_checkbox_toggled(bool)));
+    connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(on_encoder_checkbox_toggled(bool)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
+
+    QString new_message = "Searching for rovers...<br>";
+    log_messages = log_messages+new_message;
+    ui.log->setText("<font color='white'>"+log_messages+"</font>");
 
     // Add discovered rovers to the GUI list
     QTimer *timer = new QTimer(this);
@@ -115,7 +123,7 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 
 }
 
-void RoverGUIPlugin::odometryEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
+void RoverGUIPlugin::EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
 {
 
     float x = msg->pose.pose.position.x;
@@ -124,7 +132,33 @@ void RoverGUIPlugin::odometryEventHandler(const nav_msgs::Odometry::ConstPtr& ms
     QString x_str; x_str.setNum(x);
     QString y_str; y_str.setNum(y);
 
-   ui.map_frame->addToRoverPath(x,y);
+   ui.map_frame->addToEKFRoverPath(x,y);
+}
+
+
+void RoverGUIPlugin::encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
+{
+
+    float x = msg->pose.pose.position.x;
+    float y = msg->pose.pose.position.y;
+
+    QString x_str; x_str.setNum(x);
+    QString y_str; y_str.setNum(y);
+
+   ui.map_frame->addToEncoderRoverPath(x,y);
+}
+
+
+void RoverGUIPlugin::GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
+{
+
+    float x = msg->pose.pose.position.x;
+    float y = msg->pose.pose.position.y;
+
+    QString x_str; x_str.setNum(x);
+    QString y_str; y_str.setNum(y);
+
+   ui.map_frame->addToGPSRoverPath(x,y);
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)
@@ -257,8 +291,11 @@ void RoverGUIPlugin::setupSubscribers()
     // Theroa codex results in the least information being transmitted
     camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this);//, image_transport::TransportHints("theora"));
 
-    //ros::spin();
-    odometry_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/ekf", 10, &RoverGUIPlugin::odometryEventHandler, this);
+    // Odometry and GPS subscribers
+    encoder_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
+    ekf_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
+    gps_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
+
 
     // Ultrasound Subscriptions
 
@@ -287,7 +324,6 @@ void RoverGUIPlugin::rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg
 void RoverGUIPlugin::leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
     ui.us_frame->setLeftRange(msg->range, msg->min_range, msg->max_range);
-
 }
 
 void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
@@ -307,6 +343,26 @@ void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
 
 }
 
+void rqt_rover_gui::RoverGUIPlugin::on_gps_checkbox_toggled(bool checked)
+{
+    ui.map_frame->setDisplayGPSData(checked);
+}
+
+void rqt_rover_gui::RoverGUIPlugin::on_ekf_checkbox_toggled(bool checked)
+{
+    ui.map_frame->setDisplayEKFData(checked);
+}
+
+void rqt_rover_gui::RoverGUIPlugin::on_encoder_checkbox_toggled(bool checked)
+{
+    ui.map_frame->setDisplayEncoderData(checked);
+}
+
+
+
 } // End namespace
 
+
+
 PLUGINLIB_EXPORT_CLASS(rqt_rover_gui::RoverGUIPlugin, rqt_gui_cpp::Plugin)
+
