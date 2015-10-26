@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS
   QtCore
   QtGui
-  QtOpenGL
+  #QtOpenGL
 )
 
 catkin_package(
@@ -61,8 +61,8 @@ add_library(
 
 target_link_libraries(
   rqt_rover_gui
-  #GL
-  #glut
+  GL
+  glut
   ${catkin_LIBRARIES}
 )
 
