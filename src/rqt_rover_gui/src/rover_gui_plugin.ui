@@ -38,7 +38,7 @@ border-color: rgb(255, 255, 255);</string>
   <widget class="QFrame" name="joystick_frame">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>60</x>
      <y>590</y>
      <width>161</width>
      <height>111</height>
@@ -393,6 +393,9 @@ border-color: rgb(255, 255, 255);</string>
       <string notr="true">control_type_radio_group</string>
      </attribute>
     </widget>
+    <zorder>autonomous_control_radio_button</zorder>
+    <zorder>joystick_control_radio_button</zorder>
+    <zorder>joystick_frame</zorder>
    </widget>
   </widget>
   <zorder>map_frame</zorder>

@@ -72,6 +72,8 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
+    ui.joystick_frame->setHidden(false);
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -381,6 +383,8 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
 
+    ui.joystick_frame->setHidden(true);
+
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 2; // 2 indicates autonomous control
     control_mode_publisher.publish(control_mode_msg);
@@ -390,6 +394,9 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
+
+    ui.joystick_frame->setHidden(false);
+
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control
     control_mode_publisher.publish(control_mode_msg);
