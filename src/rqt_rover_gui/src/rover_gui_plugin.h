@@ -62,16 +62,15 @@ namespace rqt_rover_gui {
   private slots:
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
     void pollRoversTimerEventHandler();
-
     void GPSCheckboxToggledEventHandler(bool checked);
-
     void EKFCheckboxToggledEventHandler(bool checked);
-
     void encoderCheckboxToggledEventHandler(bool checked);
+    void autonomousRadioButtonEventHandler(bool marked);
+    void joystickRadioButtonEventHandler(bool marked);
 
   private:
 
-    ros::Publisher manual_mode_publisher;
+    ros::Publisher control_mode_publisher;
     ros::Publisher joystick_publisher;
 
     ros::Subscriber joystick_subscriber;

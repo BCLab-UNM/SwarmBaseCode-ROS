@@ -1,6 +1,7 @@
 #ifndef rtq_rover_gui_CAMERAFRAME_H
 #define rtq_rover_gui_CAMERAFRAME_H
 
+#include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
 #include <QMutex>
@@ -33,6 +34,8 @@ private:
     QImage image;
     mutable QMutex image_update_mutex;
 
+    QTime frame_rate_timer;
+    int frames;
 };
 
 }

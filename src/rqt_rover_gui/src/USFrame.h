@@ -1,6 +1,7 @@
 #ifndef rtq_rover_gui_USFrame_H
 #define rtq_rover_gui_USFrame_H
 
+#include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
 #include <QMutex>
@@ -48,6 +49,8 @@ private:
     float right_max_range;
     float right_min_range;
 
+    QTime frame_rate_timer;
+    int frames;
 };
 
 }

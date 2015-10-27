@@ -7,6 +7,8 @@
 #include <rover_gui_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QCheckBox>
+#include <QRadioButton>
 #include <QMessageBox>
 #include <QStringList>
 #include <QLCDNumber>
@@ -52,6 +54,8 @@ namespace rqt_rover_gui
     connect(ui.ekf_checkbox, SIGNAL(toggled(bool)), this, SLOT(EKFCheckboxToggledEventHandler(bool)));
     connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
+    connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
+    connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -62,6 +66,11 @@ namespace rqt_rover_gui
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(pollRoversTimerEventHandler()));
     timer->start(5000);
+
+    // Setup the initial display parameters for the map
+    ui.map_frame->setDisplayGPSData(ui.gps_checkbox->isChecked());
+    ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
+    ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
   }
 
@@ -233,6 +242,10 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     // Clear map
     ui.map_frame->clearMap();
 
+    // Enable control mode radio group now that a rover has been selected
+    ui.autonomous_control_radio_button->setEnabled(true);
+    ui.joystick_control_radio_button->setEnabled(true);
+
 }
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
@@ -266,12 +279,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 void RoverGUIPlugin::setupPublishers()
 {
     // Set the robot to accept manual control. Latch so even if the robot connects later it will get the message.
-    string manual_mode_topic = "/"+selected_rover_name+"/mode";
-    manual_mode_publisher = nh.advertise<std_msgs::UInt8>(manual_mode_topic, 10, true); // last argument sets latch to true
-
-     std_msgs::UInt8 manual_mode_msg;
-     manual_mode_msg.data = 1; // should be 1 or 0 here?
-     manual_mode_publisher.publish(manual_mode_msg);
+    string control_mode_topic = "/"+selected_rover_name+"/mode";
+    control_mode_publisher = nh.advertise<std_msgs::UInt8>(control_mode_topic, 10, true); // last argument sets latch to true
 
     string joystick_topic = "/"+selected_rover_name+"/joystick";
     joystick_publisher = nh.advertise<sensor_msgs::Joy>(joystick_topic, 10, this);
@@ -366,6 +375,25 @@ void RoverGUIPlugin::displayLogMessage(QString msg)
     QString new_message = msg+"<br>";
     log_messages = log_messages+new_message;
     ui.log->setText("<font color='white'>"+log_messages+"</font>");
+}
+
+void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+
+    std_msgs::UInt8 control_mode_msg;
+    control_mode_msg.data = 2; // 2 indicates autonomous control
+    control_mode_publisher.publish(control_mode_msg);
+    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
+}
+
+void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+    std_msgs::UInt8 control_mode_msg;
+    control_mode_msg.data = 1; // 1 indicates manual control
+    control_mode_publisher.publish(control_mode_msg);
+    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");
 }
 
 } // End namespace

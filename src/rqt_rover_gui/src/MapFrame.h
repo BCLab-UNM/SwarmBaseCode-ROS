@@ -1,6 +1,7 @@
 #ifndef rtq_rover_gui_MapFrame_H
 #define rtq_rover_gui_MapFrame_H
 
+#include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
 #include <QMutex>
@@ -66,6 +67,9 @@ private:
     bool display_gps_data;
     bool display_ekf_data;
     bool display_encoder_data;
+
+    QTime frame_rate_timer;
+    int frames;
 
 };
 

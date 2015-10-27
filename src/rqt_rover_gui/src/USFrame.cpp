@@ -22,12 +22,30 @@ USFrame::USFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     right_min_range = 0.0;
     center_min_range = 0.0;
 
+    frames = 0;
 }
 
 void USFrame::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.setPen(Qt::white);
+
+    // Track the frames per second for development purposes
+    QString frames_per_second;
+    frames_per_second = QString::number(frames /(frame_rate_timer.elapsed() / 1000.0), 'f', 0) + " FPS";
+
+    QFontMetrics fm(painter.font());
+    painter.drawText(this->width()-fm.width(frames_per_second), fm.height(), frames_per_second);
+
+     frames++;
+
+    if (!(frames % 100)) // time how long it takes to dispay 100 frames
+    {
+        frame_rate_timer.start();
+        frames = 0;
+    }
+
+    // end frames per second
 
 
     float frame_width = this->width();
@@ -72,9 +90,6 @@ void USFrame::paintEvent(QPaintEvent* event)
     QString left_range_qstr = QString::number(left_range_rounded);
     QString right_range_qstr = QString::number(right_range_rounded);
     QString center_range_qstr = QString::number(center_range_rounded);
-
-
-    QFontMetrics fm(painter.font());
 
     painter.drawText(QPoint(frame_center_x-frame_width/4-fm.width(left_range_in_meters_qstr)/2,frame_height), left_range_in_meters_qstr);
     painter.drawText(QPoint(frame_center_x-fm.width(right_range_in_meters_qstr)/2,frame_height), right_range_in_meters_qstr);

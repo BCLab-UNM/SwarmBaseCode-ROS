@@ -37,6 +37,8 @@ IMUFrame::IMUFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
         QTimer *timer = new QTimer(this);
            connect(timer, SIGNAL(timeout()), this, SLOT(rotateTimerEventHandler()));
            timer->start(100);
+
+        frames = 0;
 }
 
 void IMUFrame::rotateTimerEventHandler()
@@ -62,6 +64,23 @@ void IMUFrame::paintEvent(QPaintEvent* event)
     float center_x = this->width()/2;
 
     float center_y = this->height()/2;
+
+    // Track the frames per second for development purposes
+    QString frames_per_second;
+    frames_per_second = QString::number(frames /(frame_rate_timer.elapsed() / 1000.0), 'f', 0) + " FPS";
+
+    QFontMetrics fm(painter.font());
+    painter.drawText(this->width()-fm.width(frames_per_second), fm.height(), frames_per_second);
+
+     frames++;
+
+    if (!(frames % 100)) // time how long it takes to dispay 100 frames
+    {
+        frame_rate_timer.start();
+        frames = 0;
+    }
+
+    // end frames per second
 
     // Setup axes
     tuple<float, float, float> axes_origin = make_tuple(0,0,0);

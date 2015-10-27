@@ -1,6 +1,7 @@
 #ifndef rtq_rover_gui_IMUFrame_H
 #define rtq_rover_gui_IMUFrame_H
 
+#include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
 #include <QMutex>
@@ -47,6 +48,8 @@ private:
     // Test points to render
     tuple<float, float, float> cube[8];
 
+    QTime frame_rate_timer;
+    int frames;
 };
 
 }

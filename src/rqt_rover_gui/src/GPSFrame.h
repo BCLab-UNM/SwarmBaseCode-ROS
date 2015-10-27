@@ -1,6 +1,7 @@
 #ifndef rtq_rover_gui_GPSFrame_H
 #define rtq_rover_gui_GPSFrame_H
 
+#include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
 #include <QMutex>
@@ -33,7 +34,8 @@ protected:
 
 private:
 
-
+    QTime frame_rate_timer;
+    int frames;
 
 };
 
