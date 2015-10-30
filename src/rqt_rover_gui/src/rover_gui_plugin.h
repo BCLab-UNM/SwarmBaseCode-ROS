@@ -1,6 +1,10 @@
 #ifndef rqt_rover_gui__rover_gui_plugin_H
 #define rqt_rover_gui__rover_gui_plugin_H
 
+#include "gazebo/physics/physics.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/gazebo.hh"
+
 #include <rqt_gui_cpp/plugin.h>
 #include <ui_rover_gui_plugin.h>
 //#include <rqt_rover_gui/ui_rover_gui_plugin.h>
@@ -15,12 +19,14 @@
 #include <pluginlib/class_list_macros.h>
 
 //ROS msg types
-#include "rover_onboard_target_detection/ATag.h"
-#include "rover_onboard_target_detection/harvest.h"
+//#include "rover_onboard_target_detection/ATag.h"
+//#include "rover_onboard_target_detection/harvest.h"
 
 #include <QWidget>
 #include <QTimer>
 #include <QLabel>
+
+#include "GazeboSimCreator.h"
 
 namespace rqt_rover_gui {
 
@@ -37,6 +43,8 @@ namespace rqt_rover_gui {
     virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
     
     // Handles output from the joystick node
+    QString startROSJoyNode();
+
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
@@ -48,7 +56,9 @@ namespace rqt_rover_gui {
     void rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
-    void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
+    void addModelToGazebo();
+
+   // void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
 
     void setupSubscribers();
     void setupPublishers();
@@ -67,6 +77,7 @@ namespace rqt_rover_gui {
     void encoderCheckboxToggledEventHandler(bool checked);
     void autonomousRadioButtonEventHandler(bool marked);
     void joystickRadioButtonEventHandler(bool marked);
+    void buildSimulationButtonEventHandler();
 
   private:
 
@@ -92,7 +103,7 @@ namespace rqt_rover_gui {
     Ui::RoverGUI ui;
 
     QString log_messages;
-
+    GazeboSimCreator sim_creator;
   };
 } // end namespace
 

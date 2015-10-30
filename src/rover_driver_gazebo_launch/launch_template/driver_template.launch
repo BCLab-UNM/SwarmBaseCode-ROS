@@ -9,7 +9,6 @@
 
   <node pkg="robot_localization" type="navsat_transform_node" name="TEMPLATE_NAVSAT" respawn="true">
 
-      <param name="magnetic_declination_radians" value="0.1530654"/>
       <param name="yaw_offset" value="1.57079632679"/>
       <param name="world_state" value="map"/>
 

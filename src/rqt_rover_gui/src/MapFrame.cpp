@@ -147,17 +147,16 @@ void MapFrame::paintEvent(QPaintEvent* event)
     int map_width = this->width()-map_origin_x;
     int map_height = this->height()-map_origin_y;
 
-    int map_center_x = map_origin_x+(map_width/2);
-    int map_center_y = map_origin_y+(map_height/2);
+    int map_center_x = map_origin_x+((map_width-map_origin_x)/2);
+    int map_center_y = map_origin_y+((map_height-map_origin_y)/2);
 
     // Draw the scale bars
-    painter.setPen(Qt::gray);
-    painter.drawLine(QPoint(map_center_x, map_origin_y), QPoint(map_center_x, map_height));
-    painter.drawLine(QPoint(map_origin_x, map_center_y), QPoint(map_width, map_center_y));
-    painter.setPen(Qt::white);
-    // cross hairs at 0, 0
+    //painter.setPen(Qt::gray);
+    //painter.drawLine(QPoint(map_center_x, map_origin_y), QPoint(map_center_x, map_height));
+    //painter.drawLine(QPoint(map_origin_x, map_center_y), QPoint(map_width, map_center_y));
+    //painter.setPen(Qt::white);
 
-
+    // cross hairs at map display center
     QPoint axes_origin(map_origin_x,map_origin_y);
     QPoint x_axis(map_width,map_origin_y);
     QPoint y_axis(map_origin_x,map_height);
@@ -165,6 +164,17 @@ void MapFrame::paintEvent(QPaintEvent* event)
     painter.drawLine(axes_origin, y_axis);
     painter.drawLine(QPoint(map_width, map_origin_y), QPoint(map_width, map_height));
     painter.drawLine(QPoint(map_origin_x, map_height), QPoint(map_width, map_height));
+
+    // Draw rover origin crosshairs
+    // painter.setPen(Qt::green);
+    float intial_x = ekf_rover_path.begin()->first;
+    float intial_y = ekf_rover_path.begin()->second;
+    float rover_origin_x = map_origin_x+((intial_x-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+    float rover_origin_y = map_origin_y+((intial_y-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+    painter.setPen(Qt::gray);
+    painter.drawLine(QPoint(rover_origin_x, map_origin_y), QPoint(rover_origin_x, map_height));
+    painter.drawLine(QPoint(map_origin_x, rover_origin_y), QPoint(map_width, rover_origin_y));
+    painter.setPen(Qt::white);
 
     int n_ticks = 5;
     float tick_length = 5;
@@ -188,8 +198,13 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
     for (int i = 0; i < n_ticks-1; i++)
     {
-        QString x_label = QString::number((i+1)*max_seen_width/n_ticks-max_seen_width/2, 'f', 1) + "m";
-        QString y_label = QString::number((i+1)*max_seen_height/n_ticks-max_seen_height/2, 'f', 1) + "m";;
+        float fraction_of_map_to_rover_x = (rover_origin_x-map_origin_x)/map_width;
+        float fraction_of_map_to_rover_y = (rover_origin_y-map_origin_y)/map_width;
+        float x_label_f = (i+1)*max_seen_width/n_ticks-fraction_of_map_to_rover_x*max_seen_width;
+        float y_label_f = (i+1)*max_seen_height/n_ticks-fraction_of_map_to_rover_y*max_seen_height;
+
+        QString x_label = QString::number(x_label_f, 'f', 1) + "m";
+        QString y_label = QString::number(-y_label_f, 'f', 1) + "m";
 
         int x_labels_offset_x = -(fm.width(x_label))/2;
         int x_labels_offset_y = 0;

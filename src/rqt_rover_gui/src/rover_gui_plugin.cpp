@@ -7,6 +7,10 @@
 #include <rover_gui_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QProcess>
+#include <QPalette>
+#include <QTabBar>
+#include <QTabWidget>
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QMessageBox>
@@ -56,6 +60,7 @@ namespace rqt_rover_gui
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
     connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
     connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
+    connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -74,6 +79,7 @@ namespace rqt_rover_gui
 
     ui.joystick_frame->setHidden(false);
 
+    ui.tab_widget->setCurrentIndex(0);
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -257,7 +263,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     // Wait for a rover to connect
     if (new_rover_names.empty())
     {
-        displayLogMessage("Waiting for rover to connect...)");
+        displayLogMessage("Waiting for rover to connect...");
         return;
     }
 
@@ -313,7 +319,7 @@ void RoverGUIPlugin::setupSubscribers()
     imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
 
     // Target detected topic
-    target_detection_subscriber = nh.subscribe("/"+selected_rover_name+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
+   // target_detection_subscriber = nh.subscribe("/"+selected_rover_name+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
 
 }
 
@@ -365,12 +371,12 @@ void RoverGUIPlugin::encoderCheckboxToggledEventHandler(bool checked)
 }
 
 // Currently broken. Calling displayLogMessage from the ROS event thread causes a crash or hang
-void RoverGUIPlugin::targetDetectedEventHandler(rover_onboard_target_detection::ATag tagInfo) //rover_onboard_target_detection::ATag msg )
-{
-    // Just let the user know the event happened
-   // displayLogMessage("Tag detected");
+//void RoverGUIPlugin::targetDetectedEventHandler(rover_onboard_target_detection::ATag tagInfo) //rover_onboard_target_detection::ATag msg )
+//{
+//    // Just let the user know the event happened
+//   // displayLogMessage("Tag detected");
 
-}
+//}
 
 void RoverGUIPlugin::displayLogMessage(QString msg)
 {
@@ -401,6 +407,51 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
     control_mode_msg.data = 1; // 1 indicates manual control
     control_mode_publisher.publish(control_mode_msg);
     displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");
+
+    QString return_msg = startROSJoyNode();
+    displayLogMessage(return_msg);
+}
+
+void RoverGUIPlugin::buildSimulationButtonEventHandler()
+{
+    displayLogMessage("Building simulation...");
+
+    QString return_msg;
+
+    return_msg = sim_creator.startGazebo();
+
+    cout << return_msg.toStdString() << endl;
+    displayLogMessage(return_msg);
+
+    displayLogMessage("Adding rover alpha...");
+    return_msg = sim_creator.removeRover("alpha");
+    displayLogMessage(return_msg);
+
+    displayLogMessage("Adding ground plane...");
+    return_msg = sim_creator.addGroundPlane("mars_ground_plane");
+    displayLogMessage(return_msg);
+
+//    displayLogMessage("Adding rover alpha...");
+//    return_msg = sim_creator.addRover("alpha", -1, 0);
+//    displayLogMessage(return_msg);
+
+}
+
+QString RoverGUIPlugin::startROSJoyNode()
+{
+    QStringList arguments;
+
+    QProcess sh;
+//    sh.start("sh", QStringList() << "-c" << "rosrun joy joy_node");
+    //sh.start("sh -c who");
+
+    sh.waitForFinished();
+    QByteArray output = sh.readAll();
+    sh.close();
+
+    QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
+
+    return return_msg;
 }
 
 } // End namespace
