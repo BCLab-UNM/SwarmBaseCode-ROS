@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   message_generation
+  random_numbers
 )
 
 add_message_files(
@@ -14,16 +15,10 @@ add_message_files(
   ATag.msg
 )
 
-add_service_files(
-  FILES
-  harvest.srv
-  trackPheromone.srv
-)
-
 generate_messages()
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs message_runtime
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs message_runtime random_numbers
 )
 
 add_executable(
