@@ -1,50 +1,24 @@
-#include <cstdlib>
-#include <string.h>
-#include <string>
-#include <iostream>
-
 #include <ros/ros.h>
-#include <std_msgs/String.h>
-#include <std_msgs/UInt64.h>
+
+//ROS messages
+#include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/UInt8.h>
-#include <std_msgs/Float32MultiArray.h>
-#include <sensor_msgs/Range.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Pose2D.h>
-#include <geometry_msgs/Vector3.h>
 
 using namespace std;
 
-void leftHandler(const sensor_msgs::Range::ConstPtr& message);
-void centerHandler(const sensor_msgs::Range::ConstPtr& message);
-void rightHandler(const sensor_msgs::Range::ConstPtr& message);
-//void modeHandler(const std_msgs::UInt8::ConstPtr& message);
-void parameterHandler(const std_msgs::Float32MultiArray message);
-void loadParameters(const ros::TimerEvent&);
-
-void setMode();
-
+//Globals
+double collisionDistance = 0.4; //meters the ultrasonic detectors will flag obstacles
 string publishedName;
 char host[128];
 
-ros::Subscriber leftSubscriber;
-ros::Subscriber centerSubscriber;
-ros::Subscriber rightSubscriber;
-//ros::Subscriber modeSubscriber;
-ros::Timer parameterTimer;
-
+//Publishers
 ros::Publisher obstaclePublish;
-std_msgs::UInt8 obstacleMode;
 
-float leftVal = 500.0;
-float centerVal = 500.0;
-float rightVal = 500.0;
-//bool autoMode = 500.0;
+//Subscribers
+ros::Subscriber sonarSubscriber;
 
-//Default hardcoded parameters, consider moving these to be UI driven or from Parameter Server
-float senseRange = .4; //meters the ultrasonic detectors will flag obstacles
-float cautionRange = .6; //meters the ultrasonic detectors command the robot to slow down to caution speed
-float parameterTime = 1.0; //how often to check for new parameter server values
+//Callback handlers
+void sonarHandler(const std_msgs::Float64MultiArray sonar);
 
 int main(int argc, char** argv) {
 
@@ -61,91 +35,29 @@ int main(int argc, char** argv) {
 
     ros::init(argc, argv, (publishedName + "_OBSTACLE"));
     ros::NodeHandle oNH;
-
-    ros::TimerEvent actNow;
-    loadParameters(actNow);
     
-    leftSubscriber = oNH.subscribe((publishedName + "/USLeft"), 10, leftHandler);
-    centerSubscriber = oNH.subscribe((publishedName + "/USCenter"), 10, centerHandler);
-    rightSubscriber = oNH.subscribe((publishedName + "/USRight"), 10, rightHandler);
-    //modeSubscriber = oNH.subscribe((publishedName + "/mode"), 1, modeHandler);
+    sonarSubscriber = oNH.subscribe((publishedName + "/sonar"), 10, sonarHandler);
 
     obstaclePublish = oNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle"), 10);
 
-    parameterTimer = oNH.createTimer(ros::Duration(parameterTime), loadParameters);
+    ros::spin();
 
-    while (ros::ok()) {
-        ros::spin();
-    }
-
-    return 0;
+    return EXIT_SUCCESS;
 }
 
-void leftHandler(const sensor_msgs::Range::ConstPtr& message) {
-    leftVal = message->range;
-    setMode();
+void sonarHandler(const std_msgs::Float64MultiArray sonar) {
+	std_msgs::UInt8 obstacleMode;
+	
+	if ((sonar.data[0] > collisionDistance) && (sonar.data[0] > collisionDistance) && (sonar.data[0] > collisionDistance)) {
+		obstacleMode.data = 0; //no collision
+	}
+	else if ((sonar.data[0] > collisionDistance) && (sonar.data[2] < collisionDistance)) {
+		obstacleMode.data = 1; //collision on right side
+	}
+	else {
+		obstacleMode.data = 2; //collision in front or on left side
+	}
+	
+	obstaclePublish.publish(obstacleMode);
 }
-
-void centerHandler(const sensor_msgs::Range::ConstPtr& message) {
-    centerVal = message->range;
-    setMode();
-
-    // TODO: this is a hack, but We only need to publish at the rate of the sensors!
-    obstaclePublish.publish(obstacleMode);
-}
-
-void rightHandler(const sensor_msgs::Range::ConstPtr& message) {
-    rightVal = message->range;
-    setMode();
-}
-
-//void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
-    //if (message->data > 1) {
-        //autoMode = true;
-    //} else {
-        //autoMode = false;
-    //}
-
-//}
-
-void setMode() {
-    if (leftVal > senseRange && centerVal < senseRange && rightVal > senseRange) {
-        obstacleMode.data = 2;
-    } else if (leftVal < senseRange && centerVal > senseRange && rightVal > senseRange) {
-        obstacleMode.data = 3;
-    } else if (leftVal > senseRange && centerVal > senseRange && rightVal < senseRange) {
-        obstacleMode.data = 4;
-    } else if (leftVal < senseRange && centerVal < senseRange && rightVal > senseRange) {
-        obstacleMode.data = 5;
-    } else if (leftVal > senseRange && centerVal < senseRange && rightVal < senseRange) {
-        obstacleMode.data = 6;
-    } else if (leftVal < senseRange && centerVal > senseRange && rightVal < senseRange) {
-        obstacleMode.data = 7;
-    } else if (leftVal < senseRange && centerVal < senseRange && rightVal < senseRange) {
-        obstacleMode.data = 8;
-    } else if (leftVal < cautionRange || centerVal < cautionRange || rightVal < cautionRange) {
-        obstacleMode.data = 9;
-    } else {
-        obstacleMode.data = 1;
-    }    
-
-    //obstaclePublish.publish(obstacleMode);
-}
-
-void loadParameters(const ros::TimerEvent&) {
-/*
- * Load parameters from parameter server. ROS doesn't seem to follow latest C++11
- * standard so while it says it supports floats, it doesn't because floats 
- * can't be passed to templates in C++11. Doubles can, so passing everything as
- * a double and casting it back to a float.
- * 
- * Or I just can't figure it out....
- * 
- */    
-    double param;
-
-    ros::param::param((publishedName + "/mobility/senseRange"), param, (double) senseRange); senseRange = (float) param;
-    ros::param::param((publishedName + "/mobility/cautionRange"), param, (double) cautionRange); cautionRange = (float) param;
-}
-
 

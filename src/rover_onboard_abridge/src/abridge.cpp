@@ -1,20 +1,17 @@
-#include <string.h>
-#include <unistd.h>  
-#include <sstream>
-#include <vector>
-#include <usbSerial.h>
-#include <math.h>
-
 #include <ros/ros.h>
-#include <std_msgs/String.h>
-#include <std_msgs/UInt64.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Quaternion.h>
-#include <sensor_msgs/Range.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/NavSatFix.h>
+
+//ROS libraries
 #include <tf/transform_datatypes.h>
-#include <tf/tf.h>
+
+//ROS messages
+#include <std_msgs/Float64MultiArray.h>
+#include <std_msgs/String.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/Twist.h>
+#include <sensor_msgs/Imu.h>
+
+//Package include
+#include <usbSerial.h>
 
 using namespace std;
 
@@ -28,22 +25,17 @@ char delimiter = ',';
 vector<string> dataSet;
 
 USBSerial usb;
-//char port[] = "/dev/ttyACM0";
 const int baud = 115200;
 char dataCmd[] = "d\n";
 char moveCmd[16];
 
-sensor_msgs::Range usLeft;
-sensor_msgs::Range usCenter;
-sensor_msgs::Range usRight;
+std_msgs::Float64MultiArray sonar;
 sensor_msgs::Imu imu;
 
 ros::Subscriber moveSubscriber;
 
 ros::Publisher imuPublish;
-ros::Publisher usLeftPublish;
-ros::Publisher usCenterPublish;
-ros::Publisher usRightPublish;
+ros::Publisher sonarPublish;
 ros::Timer publishTimer;
 
 float linearSpeed = 0.;
@@ -77,19 +69,14 @@ int main(int argc, char **argv) {
 
     moveSubscriber = aNH.subscribe((publishedName + "/mobility"), 10, cmdHandler);
 
-    imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);
+    imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);    
+    sonarPublish = aNH.advertise<std_msgs::Float64MultiArray>((publishedName + "/sonar"), 10);
+    
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
-    usLeftPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/USLeft"), 10);
-    usCenterPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/USCenter"), 10);
-    usRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/USRight"), 10);
-    
-    usLeft.radiation_type = 0;
-    usLeft.field_of_view = 55;
-    usCenter.radiation_type = 0;
-    usCenter.field_of_view = 55;
-    usRight.radiation_type = 0;
-    usRight.field_of_view = 55;
+    sonar.layout.dim[0].label = "left_center_right";
+    sonar.layout.dim[0].size = 3;
+    sonar.layout.dim[0].stride = 3;
 
     ros::spin();
 
@@ -122,9 +109,7 @@ void serialActivityTimer(const ros::TimerEvent& e) {
 }
 
 void publishRosTopics() {
-    usLeftPublish.publish(usLeft);
-    usCenterPublish.publish(usCenter);
-    usRightPublish.publish(usRight);
+    sonarPublish.publish(sonar);
     imuPublish.publish(imu);
 }
 
@@ -143,9 +128,9 @@ void parseData(string str) {
         imu.angular_velocity.x = atof(dataSet.at(4).c_str());
         imu.angular_velocity.y = atof(dataSet.at(5).c_str());
         imu.angular_velocity.z = atof(dataSet.at(6).c_str());
-        usLeft.range = atof(dataSet.at(7).c_str()) / 100.0;
-        usCenter.range = atof(dataSet.at(8).c_str()) / 100.0;
-        usRight.range = atof(dataSet.at(9).c_str()) / 100.0;
+        sonar.data[0] = atof(dataSet.at(7).c_str()) / 100.0;
+        sonar.data[1] = atof(dataSet.at(8).c_str()) / 100.0;
+        sonar.data[2] = atof(dataSet.at(9).c_str()) / 100.0;
     }
     
     dataSet.clear();
