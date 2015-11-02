@@ -371,7 +371,7 @@
                 </ray>
                 <plugin name="us" filename="libhector_gazebo_ros_sonar.so">
                     <gaussianNoise>0.005</gaussianNoise>
-                    <topicName>/alpha/USCenter</topicName>
+                    <topicName>/alpha/sonarCenter</topicName>
                     <frameId>us_center_link</frameId>
                 </plugin>
             </sensor>
@@ -425,7 +425,7 @@
                 </ray>
                 <plugin name="us" filename="libhector_gazebo_ros_sonar.so">
                     <gaussianNoise>0.005</gaussianNoise>
-                    <topicName>/alpha/USRight</topicName>
+                    <topicName>/alpha/sonarRight</topicName>
                     <frameId>us_center_link</frameId>
                 </plugin>
             </sensor>
@@ -479,7 +479,7 @@
                 </ray>
                 <plugin name="us" filename="libhector_gazebo_ros_sonar.so">
                     <gaussianNoise>0.005</gaussianNoise>
-                    <topicName>/alpha/USLeft</topicName>
+                    <topicName>/alpha/sonarLeft</topicName>
                     <frameId>us_center_link</frameId>
                 </plugin>
             </sensor>
