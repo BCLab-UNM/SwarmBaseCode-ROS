@@ -72,6 +72,10 @@ int main(int argc, char **argv) {
 
     rng = new random_numbers::RandomNumberGenerator(); //instantiate random number generator
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
+    
+    //select initial search position 50 cm from center (0,0)
+	goalLocation.x = 0.5 * cos(goalLocation.theta);
+	goalLocation.y = 0.5 * sin(goalLocation.theta);
 
     if (argc >= 2) {
         publishedName = argv[1];
@@ -115,14 +119,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) {
 					stateMachineState = STATE_MACHINE_ROTATE; //rotate
 				}
-				//If distance between current and goal is significant
-				else if (hypot(goalLocation.x - currentLocation.x, goalLocation.y - currentLocation.y) > 0.1) {
+				//If goal has not yet been reached
+				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
 				//Otherwise, assign a new goal
 				else {
 					 //select new heading from Gaussian distribution around current heading
-					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+					goalLocation.theta = rng->gaussian(currentLocation.theta, 1.0);
 					
 					//select new position 50 cm from current location
 					goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
@@ -132,7 +136,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				//Purposefully fall through to next case without breaking
 			}
 			
-			//Calculate angle between currentLocation and goalLocation
+			//Calculate angle between currentLocation.theta and goalLocation.theta
 			//Rotate left or right depending on sign of angle
 			//Stay in this state until angle is minimized
 			case STATE_MACHINE_ROTATE: {
@@ -150,13 +154,13 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			    break;
 			}
 			
-			//Calculate Euclidean distance between currentLocation and goalLocation
-			//Stay in this state until distance is minimized
+			//Calculate angle between currentLocation.x/y and goalLocation.x/y
+			//Drive forward
+			//Stay in this state until angle is at least PI/2
 			case STATE_MACHINE_TRANSLATE: {
 				stateMachineMsg.data = "TRANSLATING";
-				if (hypot(goalLocation.x - currentLocation.x, goalLocation.y - currentLocation.y) > 0.1) {
-					double angle = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
-					setVelocity(0.3, angle); //drive forward, correcting for motor drift during translation
+				if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
+					setVelocity(0.3, 0.0);
 				}
 				else {
 					setVelocity(0.0, 0.0); //stop
