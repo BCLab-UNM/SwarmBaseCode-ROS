@@ -1,0 +1,14 @@
+blacklist: []
+build_space: build
+catkin_make_args: []
+cmake_args: []
+devel_space: devel
+extend_path: null
+install: false
+install_space: install
+isolate_devel: false
+isolate_install: false
+make_args: []
+source_space: src
+use_internal_make_jobserver: true
+whitelist: []

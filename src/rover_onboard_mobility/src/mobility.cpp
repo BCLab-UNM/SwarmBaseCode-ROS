@@ -94,9 +94,11 @@ int main(int argc, char **argv) {
     obstacleSubscriber = mNH.subscribe((publishedName + "/obstacle"), 10, obstacleHandler);
     odometrySubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, odometryHandler);
 
+    status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     mobilityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/mobility"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true); //publishes the current state of the state machine, in human readable form
 
+    publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
     
     ros::spin();
@@ -262,5 +264,14 @@ void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
         mobilityPublish.publish(mobility);
     } 
 }
+
+
+void publishStatusTimerEventHandler(const ros::TimerEvent&)
+{
+  std_msgs::String msg;
+  msg.data = "online";
+  status_publisher.publish(msg);
+}
+
 
 

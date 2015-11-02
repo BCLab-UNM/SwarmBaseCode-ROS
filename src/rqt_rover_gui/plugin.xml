@@ -1,0 +1,10 @@
+<library path="lib/librqt_rover_gui">
+  <class name="Rover Interface" type="rqt_rover_gui::RoverGUIPlugin" base_class_type="rqt_gui_cpp::Plugin">
+    <description>The Rover GUI</description>
+    <qtgui>
+      <label>Rover GUI</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Rover GUI</statustip>
+    </qtgui>
+  </class>
+</library>
