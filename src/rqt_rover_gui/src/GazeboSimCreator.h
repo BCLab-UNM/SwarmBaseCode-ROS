@@ -11,9 +11,12 @@ public:
     ~GazeboSimCreator();
 
     QString addGroundPlane( QString ground_name );
-    QString addRover(QString rover_name, float x, float y);
+    QString removeGroundPlane( QString ground_name );
+    QString addRover(QString rover_name, float x, float y, float z);
     QString removeRover(QString rover_name);
+    QString startRoverNode(QString rover_name);
     QString startGazebo();
+    QString stopGazebo();
 
 private:
     QProcess* gazebo_process;

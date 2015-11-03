@@ -100,7 +100,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -603,14 +603,14 @@ border-color: rgb(255, 255, 255);</string>
        <x>350</x>
        <y>20</y>
        <width>501</width>
-       <height>431</height>
+       <height>427</height>
       </rect>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../resources/resources.qrc">:/images/rover.png</pixmap>
+      <pixmap>../resources/rover.png</pixmap>
      </property>
     </widget>
     <widget class="QPushButton" name="build_simulation_button">
@@ -693,6 +693,24 @@ background-color: rgb(0, 0, 0);
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="clear_simulation_button">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>330</y>
+       <width>161</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>Clear Simulation</string>
      </property>
     </widget>
    </widget>
@@ -899,8 +917,6 @@ background-color: rgb(0, 0, 0);
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

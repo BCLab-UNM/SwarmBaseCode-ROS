@@ -31,6 +31,7 @@ geometry_msgs::Pose2D goalLocation;
 uint currentMode = 0;
 uint targetDetected = 0xFFFFFFFF; //id of the target detected and being harvested
 float mobilityLoopTimeStep = 0.125; //time between the mobility loop calls
+float status_publish_interval = 5;
 
 // state machine states
 #define STATE_MACHINE_TRANSFORM	0
@@ -46,6 +47,7 @@ char prev_state_machine[128];
 //Publishers
 ros::Publisher mobilityPublish;
 ros::Publisher stateMachinePublish;
+ros::Publisher status_publisher;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -56,6 +58,8 @@ ros::Subscriber odometrySubscriber;
 
 //Timers
 ros::Timer stateMachineTimer;
+ros::Timer publish_status_timer;
+
 
 //Callback handlers
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
@@ -64,6 +68,7 @@ void targetHandler(const rover_onboard_target_detection::ATag tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
+void publishStatusTimerEventHandler(const ros::TimerEvent&);
 
 int main(int argc, char **argv) {
 
@@ -268,6 +273,7 @@ void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
 
 void publishStatusTimerEventHandler(const ros::TimerEvent&)
 {
+  cout << "timer" << endl;
   std_msgs::String msg;
   msg.data = "online";
   status_publisher.publish(msg);

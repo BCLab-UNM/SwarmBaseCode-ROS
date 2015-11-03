@@ -70,6 +70,7 @@ namespace rqt_rover_gui {
     void displayLogMessage(QString msg);
 
   private slots:
+
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
     void pollRoversTimerEventHandler();
     void GPSCheckboxToggledEventHandler(bool checked);
@@ -78,6 +79,7 @@ namespace rqt_rover_gui {
     void autonomousRadioButtonEventHandler(bool marked);
     void joystickRadioButtonEventHandler(bool marked);
     void buildSimulationButtonEventHandler();
+    void clearSimulationButtonEventHandler();
 
   private:
 

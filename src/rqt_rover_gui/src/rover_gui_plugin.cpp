@@ -7,6 +7,7 @@
 #include <rover_gui_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QScrollBar>
 #include <QProcess>
 #include <QPalette>
 #include <QTabBar>
@@ -61,6 +62,7 @@ namespace rqt_rover_gui
     connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
     connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
+    connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -281,6 +283,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         QListWidgetItem* new_item = new QListWidgetItem(QString::fromStdString(*i));
         new_item->setForeground(Qt::red);
         ui.rover_list->addItem(new_item);
+
     }
 }
 
@@ -383,6 +386,9 @@ void RoverGUIPlugin::displayLogMessage(QString msg)
     QString new_message = msg+"<br>";
     log_messages = log_messages+new_message;
     ui.log->setText("<font color='white'>"+log_messages+"</font>");
+
+    QScrollBar *sb = ui.log->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
 void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
@@ -423,18 +429,50 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     cout << return_msg.toStdString() << endl;
     displayLogMessage(return_msg);
 
-    displayLogMessage("Adding rover alpha...");
-    return_msg = sim_creator.removeRover("alpha");
-    displayLogMessage(return_msg);
-
     displayLogMessage("Adding ground plane...");
     return_msg = sim_creator.addGroundPlane("mars_ground_plane");
     displayLogMessage(return_msg);
 
-//    displayLogMessage("Adding rover alpha...");
-//    return_msg = sim_creator.addRover("alpha", -1, 0);
+    displayLogMessage("Adding rover alpha...");
+    return_msg = sim_creator.addRover("alpha", 0, 0, 0);
+    displayLogMessage(return_msg);
+
+   displayLogMessage("Starting rover node for alpha...");
+   return_msg = sim_creator.startRoverNode("alpha");
+   displayLogMessage(return_msg);
+
+}
+
+void RoverGUIPlugin::clearSimulationButtonEventHandler()
+{
+    displayLogMessage("Clearing simulation...");
+
+    QString return_msg;
+
+    return_msg = sim_creator.stopGazebo();
+
+    cout << return_msg.toStdString() << endl;
+    displayLogMessage(return_msg);
+
+//    displayLogMessage("Removing rover alpha...");
+//    return_msg = sim_creator.removeRover("alpha");
 //    displayLogMessage(return_msg);
 
+//    displayLogMessage("Removing rover beta...");
+//    return_msg = sim_creator.removeRover("beta");
+//    displayLogMessage(return_msg);
+
+//    displayLogMessage("Removing rover gamma...");
+//    return_msg = sim_creator.removeRover("gamma");
+//    displayLogMessage(return_msg);
+
+//    displayLogMessage("Removing ground...");
+//    return_msg = sim_creator.removeGroundPlane("mars_ground_plane");
+//    displayLogMessage(return_msg);
+
+//    displayLogMessage("Stopping gazebo...");
+//    sim_creator.stopGazebo();
+//    displayLogMessage(return_msg);
 }
 
 QString RoverGUIPlugin::startROSJoyNode()
