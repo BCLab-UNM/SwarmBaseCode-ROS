@@ -52,6 +52,8 @@ namespace rqt_rover_gui
     
     context.addWidget(widget);
 
+    ui.version_number_label->setText("<font color='white'>0.02 Alpha</font>");
+
     widget->setWindowTitle("Rover Interface");
 
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
