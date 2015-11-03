@@ -86,6 +86,7 @@ namespace rqt_rover_gui
 
   void RoverGUIPlugin::shutdownPlugin()
   {
+    sim_creator.stopGazebo();
     //ros::shutdown();
   }
 
@@ -434,11 +435,27 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     displayLogMessage(return_msg);
 
     displayLogMessage("Adding rover alpha...");
-    return_msg = sim_creator.addRover("alpha", 0, 0, 0);
+    return_msg = sim_creator.addRover("alpha", -1, 0, 0);
+    displayLogMessage(return_msg);
+
+    displayLogMessage("Adding rover beta...");
+    return_msg = sim_creator.addRover("beta", 0, 0, 0);
+    displayLogMessage(return_msg);
+
+    displayLogMessage("Adding rover gamma...");
+    return_msg = sim_creator.addRover("gamma", 1, 0, 0);
     displayLogMessage(return_msg);
 
    displayLogMessage("Starting rover node for alpha...");
    return_msg = sim_creator.startRoverNode("alpha");
+   displayLogMessage(return_msg);
+
+   displayLogMessage("Starting rover node for beta...");
+   return_msg = sim_creator.startRoverNode("beta");
+   displayLogMessage(return_msg);
+
+   displayLogMessage("Starting rover node for gamma...");
+   return_msg = sim_creator.startRoverNode("gamma");
    displayLogMessage(return_msg);
 
 }
@@ -453,26 +470,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     cout << return_msg.toStdString() << endl;
     displayLogMessage(return_msg);
-
-//    displayLogMessage("Removing rover alpha...");
-//    return_msg = sim_creator.removeRover("alpha");
-//    displayLogMessage(return_msg);
-
-//    displayLogMessage("Removing rover beta...");
-//    return_msg = sim_creator.removeRover("beta");
-//    displayLogMessage(return_msg);
-
-//    displayLogMessage("Removing rover gamma...");
-//    return_msg = sim_creator.removeRover("gamma");
-//    displayLogMessage(return_msg);
-
-//    displayLogMessage("Removing ground...");
-//    return_msg = sim_creator.removeGroundPlane("mars_ground_plane");
-//    displayLogMessage(return_msg);
-
-//    displayLogMessage("Stopping gazebo...");
-//    sim_creator.stopGazebo();
-//    displayLogMessage(return_msg);
 }
 
 QString RoverGUIPlugin::startROSJoyNode()

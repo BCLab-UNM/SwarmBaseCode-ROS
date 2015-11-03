@@ -38,9 +38,9 @@ border-color: rgb(255, 255, 255);</string>
   <widget class="BWTabWidget" name="tab_widget">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>160</x>
      <y>10</y>
-     <width>1001</width>
+     <width>861</width>
      <height>551</height>
     </rect>
    </property>
@@ -100,7 +100,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -112,7 +112,7 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
      <property name="geometry">
       <rect>
-       <x>700</x>
+       <x>580</x>
        <y>300</y>
        <width>281</width>
        <height>211</height>
@@ -128,7 +128,7 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::GPSFrame" name="gps_frame">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>10</x>
        <y>300</y>
        <width>271</width>
        <height>211</height>
@@ -141,23 +141,10 @@ QTabBar::tab:only-one {
       <enum>QFrame::Raised</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Rovers:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="rover_name">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>70</x>
        <y>10</y>
        <width>191</width>
        <height>20</height>
@@ -170,7 +157,7 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::MapFrame" name="map_frame">
      <property name="geometry">
       <rect>
-       <x>580</x>
+       <x>450</x>
        <y>40</y>
        <width>320</width>
        <height>240</height>
@@ -246,33 +233,10 @@ QTabBar::tab:only-one {
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>201</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Rover Interface Ver 0.0.1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QListWidget" name="rover_list">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>111</width>
-       <height>201</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="rqt_rover_gui::USFrame" name="us_frame">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>290</x>
        <y>300</y>
        <width>281</width>
        <height>211</height>
@@ -288,7 +252,7 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::CameraFrame" name="camera_frame">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>110</x>
        <y>40</y>
        <width>320</width>
        <height>240</height>
@@ -876,6 +840,55 @@ background-color: rgb(0, 0, 0);
      </font>
     </property>
    </widget>
+  </widget>
+  <widget class="QListWidget" name="rover_list">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>90</y>
+     <width>111</width>
+     <height>201</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>111</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Swarmathon &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>70</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Rovers:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>121</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Rover Interface&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

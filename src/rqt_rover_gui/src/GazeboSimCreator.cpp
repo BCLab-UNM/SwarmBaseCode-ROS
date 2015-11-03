@@ -2,6 +2,7 @@
 #include <string>
 #include <unistd.h>
 #include <iostream>
+#include <utility> // For pair
 
 using namespace std;
 
@@ -25,6 +26,15 @@ QString GazeboSimCreator::startGazebo()
 
 QString GazeboSimCreator::stopGazebo()
 {
+    // Close rover processes
+    for(map<QString, QProcess*>::iterator it = rover_processes.begin(); it != rover_processes.end(); it++)
+    {
+        it->second->close();
+        it->second->waitForFinished();
+    }
+
+    rover_processes.clear(); // calls destructors for us.
+
     if (gazebo_process == NULL) return "Gazebo is not running";
 
     QString argument = "~/rover_workspace/src/rover_driver_gazebo_launch/cleanup.sh";
@@ -56,6 +66,8 @@ QString GazeboSimCreator::startRoverNode( QString rover_name )
 
     QProcess* rover_process = new QProcess();
 
+    rover_processes.insert(pair<QString, QProcess*>(rover_name, rover_process));
+
     rover_process->start("sh", QStringList() << "-c" << argument);
 
     return "rover process spawned";
@@ -63,10 +75,8 @@ QString GazeboSimCreator::startRoverNode( QString rover_name )
 
 QString GazeboSimCreator::addGroundPlane( QString ground_name )
 {
-    QString argument = "./rover_driver_node_launch " + ground_name;
-
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + ground_name + "/model.sdf -model " + ground_name;
     QProcess sh;
-    sh.setWorkingDirectory("~/rover_workspace/src/rover_driver_gazebo_launch");
     sh.start("sh", QStringList() << "-c" << argument);
 
     sh.waitForFinished();

@@ -18,6 +18,8 @@
 #include <sensor_msgs/Imu.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <set>
+
 //ROS msg types
 //#include "rover_onboard_target_detection/ATag.h"
 //#include "rover_onboard_target_detection/harvest.h"
@@ -27,6 +29,8 @@
 #include <QLabel>
 
 #include "GazeboSimCreator.h"
+
+using namespace std;
 
 namespace rqt_rover_gui {
 

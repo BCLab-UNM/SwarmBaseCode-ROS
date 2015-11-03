@@ -3,6 +3,10 @@
 
 #include <QProcess>
 #include <QString>
+#include <map>
+#include <string>
+
+using namespace std;
 
 class GazeboSimCreator
 {
@@ -21,6 +25,7 @@ public:
 private:
     QProcess* gazebo_process;
     QProcess* command_process;
+    map<QString, QProcess*> rover_processes;
 };
 
 #endif // GAZEBOSIMCREATOR_H
