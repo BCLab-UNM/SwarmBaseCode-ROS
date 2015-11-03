@@ -65,6 +65,7 @@ namespace rqt_rover_gui {
     void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
     void addModelToGazebo();
+    QString addPowerLawTargets();
 
    // void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
 

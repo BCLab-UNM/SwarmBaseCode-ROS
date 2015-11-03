@@ -367,9 +367,9 @@ void RoverGUIPlugin::setupSubscribers()
 
     // Ultrasound Subscriptions
 
-    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/USCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
-    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/USLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
-    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/USRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
+    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
+    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
+    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
 
     // IMU Subscriptions
@@ -563,6 +563,10 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    return_msg = sim_creator.startRoverNode("gamma");
    displayLogMessage(return_msg);
 
+   displayLogMessage("Adding powerlaw distribution of targets...");
+   addPowerLawTargets();
+   displayLogMessage(return_msg);
+
 }
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
@@ -617,6 +621,44 @@ QString RoverGUIPlugin::stopROSJoyNode()
     {
         return "Tried to stop the joystick node but it isn't running.";
     }
+}
+
+QString RoverGUIPlugin::addPowerLawTargets()
+{
+    QString output = "";
+    // One pile of 64
+    output+= sim_creator.addModel("atags64_0", 10-rand()%20, 10-rand()%20, 0);
+    displayLogMessage("Added cluster of 64 targets");
+
+    // Four piles of 16
+    for (int i = 0; i < 4; i++)
+    {
+        output+= sim_creator.addModel(QString("atags64_")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
+        displayLogMessage("Added cluster of 16 targets");
+    }
+
+    // Four piles of 16
+    for (int i = 0; i < 4; i++)
+    {
+        output+= sim_creator.addModel(QString("atags16_")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
+        displayLogMessage("Added cluster of 16 targets");
+    }
+
+    // Sixteen piles of 4
+    for (int i = 0; i < 16; i++)
+    {
+        output+= sim_creator.addModel(QString("atags4_")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
+        displayLogMessage("Added cluster of 4 targets");
+    }
+
+    // Sixty-four piles of 1
+    for (int i = 0; i < 64; i++)
+    {
+        output+= sim_creator.addModel(QString("at")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
+        displayLogMessage("Added a single target");
+    }
+
+    return output;
 }
 
 

@@ -90,7 +90,7 @@ QString GazeboSimCreator::addGroundPlane( QString ground_name )
 
 QString GazeboSimCreator::addRover(QString rover_name, float x, float y, float z)
 {
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + rover_name + "/model.sdf -model " + rover_name + " -x " + QString::number(x) + " -y" + QString::number(y)+ " -z" + QString::number(z);
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + rover_name + "/model.sdf -model " + rover_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
@@ -135,6 +135,38 @@ QString GazeboSimCreator::removeGroundPlane( QString ground_name )
 
     return return_msg;
 }
+
+QString GazeboSimCreator::addModel(QString model_name, float x, float y, float z)
+{
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + model_name + "/model.sdf -model " + model_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
+    QProcess sh;
+    sh.startDetached("sh", QStringList() << "-c" << argument);
+
+    //sh.waitForFinished();
+    //QByteArray output = sh.readAll();
+    //sh.close();
+
+    //QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
+
+    return "Added model: "+model_name; //return_msg;
+}
+
+QString GazeboSimCreator::removeModel( QString model_name )
+{
+    QString argument = "rosservice call gazebo/delete_model '{model_name: "+model_name+"}'";
+
+    QProcess sh;
+    sh.start("sh", QStringList() << "-c" << argument);
+
+    sh.waitForFinished();
+    QByteArray output = sh.readAll();
+    sh.close();
+
+    QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
+
+    return return_msg;
+}
+
 
 GazeboSimCreator::~GazeboSimCreator()
 {
