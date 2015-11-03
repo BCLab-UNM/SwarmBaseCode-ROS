@@ -698,7 +698,7 @@ background-color: rgb(0, 0, 0);
      <x>520</x>
      <y>600</y>
      <width>201</width>
-     <height>101</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -713,7 +713,7 @@ background-color: rgb(0, 0, 0);
       <x>10</x>
       <y>10</y>
       <width>181</width>
-      <height>80</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -730,7 +730,7 @@ background-color: rgb(0, 0, 0);
       <rect>
        <x>10</x>
        <y>60</y>
-       <width>117</width>
+       <width>171</width>
        <height>22</height>
       </rect>
      </property>
@@ -740,6 +740,9 @@ background-color: rgb(0, 0, 0);
      <property name="text">
       <string>Autonomous</string>
      </property>
+     <attribute name="buttonGroup">
+      <string notr="true">rover_control_button_group</string>
+     </attribute>
     </widget>
     <widget class="QRadioButton" name="joystick_control_radio_button">
      <property name="enabled">
@@ -762,6 +765,31 @@ background-color: rgb(0, 0, 0);
      <property name="checked">
       <bool>true</bool>
      </property>
+     <attribute name="buttonGroup">
+      <string notr="true">rover_control_button_group</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="all_autonomous_control_radio_button">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>151</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>All Autonomous</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">rover_control_button_group</string>
+     </attribute>
     </widget>
    </widget>
   </widget>
@@ -769,7 +797,7 @@ background-color: rgb(0, 0, 0);
    <property name="geometry">
     <rect>
      <x>730</x>
-     <y>600</y>
+     <y>610</y>
      <width>201</width>
      <height>111</height>
     </rect>
@@ -932,4 +960,7 @@ background-color: rgb(0, 0, 0);
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="rover_control_button_group"/>
+ </buttongroups>
 </ui>

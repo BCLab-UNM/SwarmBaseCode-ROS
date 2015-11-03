@@ -18,6 +18,9 @@
 #include <sensor_msgs/Imu.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QProcess>
+
+#include <map>
 #include <set>
 
 //ROS msg types
@@ -48,6 +51,7 @@ namespace rqt_rover_gui {
     
     // Handles output from the joystick node
     QString startROSJoyNode();
+    QString stopROSJoyNode();
 
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
@@ -81,6 +85,7 @@ namespace rqt_rover_gui {
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
     void autonomousRadioButtonEventHandler(bool marked);
+    void allAutonomousRadioButtonEventHandler(bool marked);
     void joystickRadioButtonEventHandler(bool marked);
     void buildSimulationButtonEventHandler();
     void clearSimulationButtonEventHandler();
@@ -108,8 +113,13 @@ namespace rqt_rover_gui {
     QWidget* widget;
     Ui::RoverGUI ui;
 
+    QProcess* joy_process;
+
     QString log_messages;
     GazeboSimCreator sim_creator;
+
+    map<string,int> rover_control_state;
+    bool all_autonomous;
   };
 } // end namespace
 

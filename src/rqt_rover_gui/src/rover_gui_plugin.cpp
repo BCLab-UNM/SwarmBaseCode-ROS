@@ -7,6 +7,7 @@
 #include <rover_gui_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QListWidget>
 #include <QScrollBar>
 #include <QProcess>
 #include <QPalette>
@@ -14,6 +15,7 @@
 #include <QTabWidget>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QButtonGroup>
 #include <QMessageBox>
 #include <QStringList>
 #include <QLCDNumber>
@@ -33,6 +35,8 @@ namespace rqt_rover_gui
   {
     setObjectName("RoverGUI");
     log_messages = "";
+    all_autonomous = false;
+    joy_process = NULL;
 
   }
 
@@ -60,6 +64,7 @@ namespace rqt_rover_gui
     connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
     connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
+    connect(ui.all_autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(allAutonomousRadioButtonEventHandler(bool)));
     connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
@@ -82,11 +87,16 @@ namespace rqt_rover_gui
     ui.joystick_frame->setHidden(false);
 
     ui.tab_widget->setCurrentIndex(0);
+
+    //QString return_msg = startROSJoyNode();
+    //displayLogMessage(return_msg);
   }
 
   void RoverGUIPlugin::shutdownPlugin()
   {
     sim_creator.stopGazebo();
+    stopROSJoyNode();
+
     //ros::shutdown();
   }
 
@@ -249,6 +259,40 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     setupSubscribers();
     setupPublishers();
 
+    std::map<string, int>::iterator it = rover_control_state.find(selected_rover_name);
+
+    // No entry for this rover name
+    if (it == rover_control_state.end())
+    {
+        // Default to joystick
+        ui.joystick_control_radio_button->setChecked(true);
+        ui.autonomous_control_radio_button->setChecked(false);
+        ui.all_autonomous_control_radio_button->setChecked(false);
+        joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
+        rover_control_state[selected_rover_name]=1;
+    }
+    else
+    {
+    int control_state = it->second;
+
+    switch (control_state)
+    {
+    case 1: ui.joystick_control_radio_button->setChecked(true);
+        ui.autonomous_control_radio_button->setChecked(false);
+        ui.all_autonomous_control_radio_button->setChecked(false);
+        break;
+    case 2: ui.joystick_control_radio_button->setChecked(false);
+        ui.autonomous_control_radio_button->setChecked(true);
+        ui.all_autonomous_control_radio_button->setChecked(false);
+        break;
+    case 3: ui.joystick_control_radio_button->setChecked(false);
+        ui.autonomous_control_radio_button->setChecked(false);
+        ui.all_autonomous_control_radio_button->setChecked(true);
+        break;
+    default:
+        displayLogMessage("Unknown control state");
+    }
+}
 
     // Clear map
     ui.map_frame->clearMap();
@@ -256,6 +300,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setEnabled(true);
+    ui.all_autonomous_control_radio_button->setEnabled(true);
 
 }
 
@@ -267,6 +312,12 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     if (new_rover_names.empty())
     {
         displayLogMessage("Waiting for rover to connect...");
+        ui.map_frame->clearMap();
+        selected_rover_name = "";
+        // Disable control mode radio group since no rover has been selected
+        ui.autonomous_control_radio_button->setEnabled(false);
+        ui.joystick_control_radio_button->setEnabled(false);
+        ui.all_autonomous_control_radio_button->setEnabled(false);
         return;
     }
 
@@ -278,6 +329,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     rover_names = new_rover_names;
 
    displayLogMessage("List of connected rovers has changed");
+
+    ui.rover_list->clear();
 
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
     {
@@ -396,27 +449,79 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
 
+    // Remember that this rover was set to single rover autonomous control
+    set<string>::iterator it;
+    // And for rovers with all autonomous as their state should now be just autonomous
+     for (it = rover_names.begin(); it != rover_names.end(); it++)
+     {
+         if (rover_control_state[*it]==3) rover_control_state[*it]=2;
+     }
+    rover_control_state[selected_rover_name] = 2;
+
     ui.joystick_frame->setHidden(true);
+    setupPublishers();
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 2; // 2 indicates autonomous control
     control_mode_publisher.publish(control_mode_msg);
+    QString return_msg = stopROSJoyNode();
+    displayLogMessage(return_msg);
+
     displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
+}
+
+void RoverGUIPlugin::allAutonomousRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+
+    all_autonomous = true;
+
+    ui.joystick_frame->setHidden(true);
+
+    set<string>::iterator it;
+     for (it = rover_names.begin(); it != rover_names.end(); it++)
+     {
+         selected_rover_name = *it;
+         setupPublishers();
+         rover_control_state[*it]=3;
+         std_msgs::UInt8 control_mode_msg;
+         control_mode_msg.data = 2; // 2 indicates autonomous control
+         control_mode_publisher.publish(control_mode_msg);
+         QString return_msg = stopROSJoyNode();
+         displayLogMessage(return_msg);
+
+         displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
+     }
+
+
 }
 
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
 
+    all_autonomous = false;
+
+    // Remember that this rover was set to joystick control
+    set<string>::iterator it;
+    // And for rovers with all autonomous as their state should now be just autonomous
+     for (it = rover_names.begin(); it != rover_names.end(); it++)
+     {
+         if (rover_control_state[*it]==3) rover_control_state[*it]=2;
+     }
+    rover_control_state[selected_rover_name] = 1;
+
+    setupPublishers();
     ui.joystick_frame->setHidden(false);
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control
     control_mode_publisher.publish(control_mode_msg);
-    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");
 
     QString return_msg = startROSJoyNode();
     displayLogMessage(return_msg);
+
+    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");\
 }
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
@@ -465,29 +570,55 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     displayLogMessage("Clearing simulation...");
 
     QString return_msg;
+    return_msg = sim_creator.stopGazebo();
+    displayLogMessage(return_msg);
 
     return_msg = sim_creator.stopGazebo();
-
-    cout << return_msg.toStdString() << endl;
     displayLogMessage(return_msg);
 }
 
 QString RoverGUIPlugin::startROSJoyNode()
 {
-    QStringList arguments;
+    if (!joy_process)
+    {
 
-    QProcess sh;
-//    sh.start("sh", QStringList() << "-c" << "rosrun joy joy_node");
-    //sh.start("sh -c who");
+        QString argument = "rosrun joy joy_node";
 
-    sh.waitForFinished();
-    QByteArray output = sh.readAll();
-    sh.close();
+        joy_process = new QProcess();
 
-    QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
+        joy_process->start("sh", QStringList() << "-c" << argument);
 
-    return return_msg;
+       // joy_process->waitForStarted();
+
+        return "Started the joystick node.";
+
+    }
+    else
+    {
+        return "The joystick node is already running.";
+    }
 }
+
+QString RoverGUIPlugin::stopROSJoyNode()
+{
+   return "Do nothing for debug";
+
+    if (joy_process)
+    {
+        joy_process->terminate();
+        joy_process->waitForFinished();
+        delete joy_process;
+        joy_process = NULL;
+
+        return "Stopped the running joystick node.";
+
+    }
+    else
+    {
+        return "Tried to stop the joystick node but it isn't running.";
+    }
+}
+
 
 } // End namespace
 
