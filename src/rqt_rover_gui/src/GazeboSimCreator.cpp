@@ -138,6 +138,8 @@ QString GazeboSimCreator::removeGroundPlane( QString ground_name )
 
 QString GazeboSimCreator::addModel(QString model_name, float x, float y, float z)
 {
+    return "Disabled for debugging";
+
     QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + model_name + "/model.sdf -model " + model_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
     QProcess sh;
     sh.startDetached("sh", QStringList() << "-c" << argument);
