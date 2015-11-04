@@ -74,8 +74,6 @@ add_library(
 
 target_link_libraries(
   rqt_rover_gui
-  GL
-  glut
   ${GAZEBO_libraries}
   ${catkin_LIBRARIES}
 )
