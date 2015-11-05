@@ -130,6 +130,23 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
+				//If returning with a target
+				else if (targetDetected != 0xFFFFFFFF) {
+					//If goal has not yet been reached
+					if (hypot(0.0 - currentLocation.x, 0.0 - currentLocation.y) > 0.2) {
+				        //set angle to center as goal heading
+						goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+						
+						//set center as goal position
+						goalLocation.x = 0.0;
+						goalLocation.y = 0.0;
+					}
+					//Otherwise, reset target and select new random uniform heading
+					else {
+						targetDetected = 0xFFFFFFFF;
+						goalLocation.theta = rng->uniformReal(0, 2 * M_PI);
+					}
+				}
 				//Otherwise, assign a new goal
 				else {
 					 //select new heading from Gaussian distribution around current heading
@@ -206,7 +223,7 @@ void setVelocity(double linearVel, double angularVel) {
  ************************/
 
 void targetHandler(const rover_onboard_target_detection::ATag tagInfo) {
-    if (tagInfo.tagsFound) {
+    if (tagInfo.tagsFound && (targetDetected == 0xFFFFFFFF)) {
         targetDetected = *tagInfo.tagID.begin();
         
         //set angle to center as goal heading
@@ -215,7 +232,7 @@ void targetHandler(const rover_onboard_target_detection::ATag tagInfo) {
 		//set center as goal position
 		goalLocation.x = 0.0;
 		goalLocation.y = 0.0;
-		
+
 		//switch to transform state to trigger return to center
 		stateMachineState = STATE_MACHINE_TRANSFORM;
     }
@@ -273,7 +290,6 @@ void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
 
 void publishStatusTimerEventHandler(const ros::TimerEvent&)
 {
-  cout << "timer" << endl;
   std_msgs::String msg;
   msg.data = "online";
   status_publisher.publish(msg);
