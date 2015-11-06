@@ -166,26 +166,26 @@ To close the simulation and the GUI, click the red exit button in the top left-h
   qtcreator &
   ```
 
-4. Choose "Open File or Project" from the File menu.
+4. Choose "Open File or Project" from the File menu
 
 5. Navigate to ```~/rover_workspace/src/rqt_rover_gui/```
 
 6. Select CMakeLists.txt
 
-7. Click "Yes" to creating a .pro file.
+7. Click "Yes" to creating a .pro file
 
 8. Enter ```~/rover_workspace/build``` as the default build path
 
-9. Click Configure Project.
+9. Click Configure Project
 
-10. Click on the Projects icon on the left toolbar.
+10. Click on the Projects icon on the left toolbar
 
-11. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box.
+11. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box
 
-12. Click the Edit toolbox icon on the left. 
+12. Click the Edit toolbox icon on the left
 
 13. Double-click CMakeLists.txt
 
-14. Click the "Build Now" button to build the project.
+14. Click the "Build Now" button to build the project
 
-Qt Creator can now be used to build the rover_workspace.
+Qt Creator can now be used to build the rover_workspace
