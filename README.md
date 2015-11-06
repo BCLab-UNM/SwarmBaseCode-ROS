@@ -164,10 +164,12 @@ Select a rover to view its sensor outputs.
 
 There are four sensor display frames:
 
-The camera output. This is a rover eyes view of the world.
+The camera output. This is a rover eye's view of the world.
 
-The ultrasound output is shown as three white bars, one for each ultrasound. The length of the rays indicates the distance to any obects in front of the ultrasound. The distance in meters is displayed in text below these rays. The max distance reported by the ultrasounds is 3m.  
+The ultrasound output is shown as three white rays, one for each ultrasound. The length of the rays indicates the distance to any objects in front of the ultrasound. The distance in meters is displayed in text below these rays. The maximum distance reported by the ultrasounds is 3 meters.  
 
-The IMU sensor display consists of a cube where the red face is the bottom of the rover, blue is the top, and the red and blue bars are front and back. The cube is viewed from the top down. The cube is positioned according to the IMU orientation data. For example if the rover flips over the red side will be closes to the observer. Accelerometer data is shown as a 3d vector projected into 2d space ponting towards the sum of the acdcelerations in 3d space.
+The IMU sensor display consists of a cube where the red face is the bottom of the rover, the blue face is the top of the rover, and the red and blue bars are the front and back of the rover. The cube is viewed from the top down. The cube is positioned according to the IMU orientation data. For example, if the rover flips over, the red side will be closest to the observer. Accelerometer data is shown as a 3D vector projected into 2D space pointing towards the sum of the accelerations in 3D space.
  
-The map view shows the path taken by the currently selected rover. Green is the encoder position date. In simulation the encoder position data comes from the odometry topic being published by skidsteer drive controller plugin. The the real robots it is the encoder output. GPS points are shown as red dots. The EKF is the extended Kalman filter fuses the output of the IMU, GPS, and encoder sensors.
+The map view shows the path taken by the currently selected rover. Green is the encoder position data. In simulation, the encoder position data comes from the odometry topic being published by Gazebo's skid steer controller plugin. In the real robots, it is the encoder output. GPS points are shown as red dots. The EKF is the output of an extended Kalman filter which fuses data from the IMU, GPS, and encoder sensors.
+
+To close the simulation and the GUI, click the red exit button in the top left-hand corner.
