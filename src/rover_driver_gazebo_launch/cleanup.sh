@@ -1,12 +1,11 @@
 	   pkill gzclient
 	   echo "Killing gzclient"
-           sleep 1
            pkill gzserver
 	   echo "Killing gzserver"
-           sleep 1
 #           pkill rqt
 #	   echo "Killing rqt"
 #           sleep 1
+#	   rosnode kill -a
 	   pkill roslaunch
 	   echo "Killing roslaunch"
            sleep 1

@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS
   QtCore
   QtGui
+  QtXml
 )
 
 find_package(gazebo REQUIRED)
@@ -30,14 +31,12 @@ qt4_add_resources(rqt_rover_gui_resources_rcc ${rover_gui_plugin_RESOURCES})
 
 qt4_wrap_cpp(
   rover_gui_plugin_MOCS
-  src/GazeboSimCreator.h
   src/rover_gui_plugin.h
   src/CameraFrame.h
   src/MapFrame.h
   src/USFrame.h
   src/GPSFrame.h
   src/IMUFrame.h
-  src/BWTabWidget.h
   #src/IMUWidget.h
 )
 
@@ -63,9 +62,9 @@ add_library(
   src/MapFrame.cpp
   src/USFrame.cpp
   src/GPSFrame.cpp
-  src/BWTabWidget.cpp
   #src/IMUWidget.cpp
   src/IMUFrame.cpp
+  src/BWTabWidget.cpp
   ${rover_gui_plugin_RESOURCES}
   ${rover_gui_plugin_MOCS}
   ${rover_gui_plugin_UIS_H}

@@ -18,6 +18,9 @@
 #include <sensor_msgs/Imu.h>
 #include <pluginlib/class_list_macros.h>
 
+#include <QProcess>
+
+#include <map>
 #include <set>
 
 //ROS msg types
@@ -48,6 +51,7 @@ namespace rqt_rover_gui {
     
     // Handles output from the joystick node
     QString startROSJoyNode();
+    QString stopROSJoyNode();
 
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
@@ -61,6 +65,9 @@ namespace rqt_rover_gui {
     void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
     void addModelToGazebo();
+    QString addPowerLawTargets();
+    QString addUniformTargets();
+    QString addClusteredTargets();
 
    // void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
 
@@ -81,13 +88,17 @@ namespace rqt_rover_gui {
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
     void autonomousRadioButtonEventHandler(bool marked);
+    void allAutonomousRadioButtonEventHandler(bool marked);
     void joystickRadioButtonEventHandler(bool marked);
     void buildSimulationButtonEventHandler();
     void clearSimulationButtonEventHandler();
 
   private:
 
-    ros::Publisher control_mode_publisher;
+    void checkAndRepositionRover(QString rover_name, float x, float y);
+    void readXML(QString path);
+
+    map<string,ros::Publisher> control_mode_publishers;
     ros::Publisher joystick_publisher;
 
     ros::Subscriber joystick_subscriber;
@@ -108,8 +119,16 @@ namespace rqt_rover_gui {
     QWidget* widget;
     Ui::RoverGUI ui;
 
+    QProcess* joy_process;
+
     QString log_messages;
     GazeboSimCreator sim_creator;
+
+    map<string,int> rover_control_state;
+    bool all_autonomous;
+
+    int arena_width; // in meters
+    int arena_height; // in meters
   };
 } // end namespace
 

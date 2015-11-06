@@ -23,7 +23,6 @@ public:
     void setAngularVelocity(float x, float y, float z);
     void setOrientation(float w, float x, float y, float z);
 
-
 signals:
 
     void delayedUpdate();
@@ -38,8 +37,9 @@ protected:
 
 private:
     QPoint cameraTransform( tuple<float, float, float> point_3D, tuple<float, float, float> eye, tuple<float, float, float> camera_position, tuple<float, float, float> camera_angle );
+    tuple<float, float, float> rotateByQuaternion( tuple<float, float, float> point,  tuple<float, float, float, float> quaternion);
     tuple<float, float, float> rotateAboutAxis(tuple<float, float, float> point, float angle,  tuple<float, float, float> axis_of_rotation);
-    float** setUpRotationMatrix(float angle, tuple<float, float, float> axis_rotation); // angle in radians
+    float** setUpRotationMatrix(float angle, tuple<float, float, float> axis_rotation); // angle in radians   
 
     tuple<float, float, float> linear_acceleration; // ROS Geometry Messages Vector3: <x, y, z>
     tuple<float, float, float> angular_velocity; // ROS Geometry Messages Vector3: <x, y, z>
@@ -47,6 +47,19 @@ private:
 
     // Test points to render
     tuple<float, float, float> cube[8];
+    tuple<float, float, float> rotated_cube[8];
+
+    tuple<float, float, float> line1_start;
+    tuple<float, float, float> line1_end;
+
+    tuple<float, float, float> line2_start;
+    tuple<float, float, float> line2_end;
+
+    tuple<float, float, float> rotated_line1_start;
+    tuple<float, float, float> rotated_line1_end;
+
+    tuple<float, float, float> rotated_line2_start;
+    tuple<float, float, float> rotated_line2_end;
 
     QTime frame_rate_timer;
     int frames;
