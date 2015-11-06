@@ -27,6 +27,7 @@ public:
     QString moveRover(QString rover_name, float x, float y, float z);
     QString applyForceToRover(QString rover_name, float x, float y, float z, float duration);
     bool isLocationOccupied(float x, float y, float clearence);
+    bool isGazeboRunning();
 
 private:
     QProcess* gazebo_process;

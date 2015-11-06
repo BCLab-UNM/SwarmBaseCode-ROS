@@ -554,6 +554,12 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
     QString return_msg;
 
+    if (sim_creator.isGazeboRunning())
+    {
+        displayLogMessage("A gazebo simulation process is already running. Restart the Swarmathon GUI to clear.");
+        return;
+    }
+
     return_msg = sim_creator.startGazebo();
 
     cout << return_msg.toStdString() << endl;

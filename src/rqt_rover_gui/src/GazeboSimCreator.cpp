@@ -233,6 +233,11 @@ bool GazeboSimCreator::isLocationOccupied(float x, float y, float clearance)
     return false;
 }
 
+bool GazeboSimCreator::isGazeboRunning()
+{
+    return gazebo_process != NULL;
+}
+
 GazeboSimCreator::~GazeboSimCreator()
 {
     stopGazebo();
