@@ -99,6 +99,8 @@ namespace rqt_rover_gui
 
     ui.texture_combobox->setItemData(0, Qt::white, Qt::TextColorRole);
 
+    ui.clear_simulation_button->setHidden(true);
+
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
 
@@ -800,7 +802,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
 
     QString output = "";
     // One pile of 64
-    float clearance = 0.1; //meters
+    float clearance = 0.075; //meters
     float proposed_x;
     float proposed_y;
 

@@ -711,6 +711,9 @@ border: 1px solid white;
      </widget>
     </widget>
     <widget class="QPushButton" name="clear_simulation_button">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -1480,7 +1483,6 @@ border: 1px solid white;
        <string>val</string>
       </property>
      </widget>
-     <zorder>label_18</zorder>
      <zorder>label_19</zorder>
      <zorder>label_20</zorder>
      <zorder>label_21</zorder>
