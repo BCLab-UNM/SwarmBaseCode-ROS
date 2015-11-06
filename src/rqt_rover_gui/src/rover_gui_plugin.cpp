@@ -458,6 +458,9 @@ void RoverGUIPlugin::displayLogMessage(QString msg)
     if (msg == NULL) msg = "Message was a NULL pointer";
 
 
+    // replace new lines with <br> in the message
+    msg.replace("\n","<br>");
+
     QString new_message = msg+"<br>";
     log_messages = log_messages+new_message;
     ui.log->setText("<font color='white'>"+log_messages+"</font>");
