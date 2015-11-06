@@ -358,7 +358,7 @@ void RoverGUIPlugin::setupPublishers()
 {
     // Set the robot to accept manual control. Latch so even if the robot connects later it will get the message.
     string control_mode_topic = "/"+selected_rover_name+"/mode";
-    control_mode_publisher = nh.advertise<std_msgs::UInt8>(control_mode_topic, 10, true); // last argument sets latch to true
+    control_mode_publishers[selected_rover_name]=nh.advertise<std_msgs::UInt8>(control_mode_topic, 10, true); // last argument sets latch to true
 
     string joystick_topic = "/"+selected_rover_name+"/joystick";
     joystick_publisher = nh.advertise<sensor_msgs::Joy>(joystick_topic, 10, this);
@@ -480,11 +480,11 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 2; // 2 indicates autonomous control
-    control_mode_publisher.publish(control_mode_msg);
+    control_mode_publishers[selected_rover_name].publish(control_mode_msg);
     QString return_msg = stopROSJoyNode();
     displayLogMessage(return_msg);
 
-    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
+
 }
 
 void RoverGUIPlugin::allAutonomousRadioButtonEventHandler(bool marked)
@@ -495,22 +495,25 @@ void RoverGUIPlugin::allAutonomousRadioButtonEventHandler(bool marked)
 
     ui.joystick_frame->setHidden(true);
 
+    string remember_selected_rover_name = selected_rover_name;
+
     set<string>::iterator it;
      for (it = rover_names.begin(); it != rover_names.end(); it++)
      {
          selected_rover_name = *it;
-         setupPublishers();
          rover_control_state[*it]=3;
+         setupPublishers();
          std_msgs::UInt8 control_mode_msg;
          control_mode_msg.data = 2; // 2 indicates autonomous control
-         control_mode_publisher.publish(control_mode_msg);
-         QString return_msg = stopROSJoyNode();
-         displayLogMessage(return_msg);
+         control_mode_publishers[selected_rover_name].publish(control_mode_msg);
 
          displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
      }
 
+     selected_rover_name = remember_selected_rover_name;
 
+    QString return_msg = stopROSJoyNode();
+    displayLogMessage(return_msg);
 }
 
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
@@ -533,7 +536,7 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control
-    control_mode_publisher.publish(control_mode_msg);
+    control_mode_publishers[selected_rover_name].publish(control_mode_msg);
 
     QString return_msg = startROSJoyNode();
     displayLogMessage(return_msg);
@@ -690,7 +693,7 @@ QString RoverGUIPlugin::startROSJoyNode()
 
 QString RoverGUIPlugin::stopROSJoyNode()
 {
-   return "Do nothing for debug";
+   //return "Do nothing for debug";
 
     if (joy_process)
     {
