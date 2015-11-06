@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS
   QtCore
   QtGui
+  QtXml
 )
 
 find_package(gazebo REQUIRED)
