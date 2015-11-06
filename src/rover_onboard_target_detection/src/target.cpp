@@ -114,12 +114,16 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 
     //Detect AprilTags
     zarray_t *detections = apriltag_detector_detect(td, im);
-    apriltag_detection_t *det;
-    zarray_get(detections, 0, &det); //use the first tag detected in the image
-    tagDetected.data = det->id;
-
-    //Publish detected tag
-    tagPublish.publish(tagDetected);
+    
+    //Check result for valid tag
+    if (zarray_size(detections) > 0) {
+	    apriltag_detection_t *det;
+	    zarray_get(detections, 0, &det); //use the first tag detected in the image
+	    tagDetected.data = det->id;
+	
+	    //Publish detected tag
+	    tagPublish.publish(tagDetected);
+	}
 }
 
 image_u8_t *copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride) {
