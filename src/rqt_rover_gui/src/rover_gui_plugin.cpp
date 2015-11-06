@@ -17,6 +17,7 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <QStringList>
 #include <QLCDNumber>
 #include <std_msgs/Float32.h>
@@ -37,6 +38,9 @@ namespace rqt_rover_gui
     log_messages = "";
     all_autonomous = false;
     joy_process = NULL;
+
+    arena_height = 20;
+    arena_width = 20;
 
   }
 
@@ -92,6 +96,8 @@ namespace rqt_rover_gui
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
+
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -439,6 +445,10 @@ void RoverGUIPlugin::encoderCheckboxToggledEventHandler(bool checked)
 
 void RoverGUIPlugin::displayLogMessage(QString msg)
 {
+    if (msg.isEmpty()) msg = "Message is empty";
+    if (msg == NULL) msg = "Message was a NULL pointer";
+
+
     QString new_message = msg+"<br>";
     log_messages = log_messages+new_message;
     ui.log->setText("<font color='white'>"+log_messages+"</font>");
@@ -546,12 +556,13 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     displayLogMessage(return_msg);
 
     displayLogMessage("Adding rover beta...");
-    return_msg = sim_creator.addRover("beta", 0, 0, 0);
+    return_msg = sim_creator.addRover("beta", 0, 1, 0);
     displayLogMessage(return_msg);
 
     displayLogMessage("Adding rover gamma...");
     return_msg = sim_creator.addRover("gamma", 1, 0, 0);
     displayLogMessage(return_msg);
+
 
    displayLogMessage("Starting rover node for alpha...");
    return_msg = sim_creator.startRoverNode("alpha");
@@ -565,10 +576,57 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    return_msg = sim_creator.startRoverNode("gamma");
    displayLogMessage(return_msg);
 
-   displayLogMessage("Adding powerlaw distribution of targets...");
-   addPowerLawTargets();
+   if (ui.final_radio_button->isChecked())
+   {
+
+       displayLogMessage("Adding rover epsilon...");
+       return_msg = sim_creator.addRover("epsilon", 1, 1, 0);
+       displayLogMessage(return_msg);
+
+       displayLogMessage("Adding rover delta...");
+       return_msg = sim_creator.addRover("delta", -1, -1, 0);
+       displayLogMessage(return_msg);
+
+       displayLogMessage("Adding rover zeta...");
+       return_msg = sim_creator.addRover("zeta", 1, -1, 0);
+       displayLogMessage(return_msg);
+
+
+   displayLogMessage("Starting rover node for delta...");
+   return_msg = sim_creator.startRoverNode("delta");
    displayLogMessage(return_msg);
 
+   displayLogMessage("Starting rover node for episilon...");
+   return_msg = sim_creator.startRoverNode("epsilon");
+   displayLogMessage(return_msg);
+
+   displayLogMessage("Starting rover node for zeta...");
+   return_msg = sim_creator.startRoverNode("zeta");
+   displayLogMessage(return_msg);
+}
+   if (ui.powerlaw_distribution_radio_button->isChecked())
+   {
+       displayLogMessage("Adding powerlaw distribution of targets...");
+       return_msg = addPowerLawTargets();
+       displayLogMessage(return_msg);
+   }
+   else if (ui.uniform_distribution_radio_button->isChecked())
+   {
+       displayLogMessage("Adding uniform distribution of targets...");
+       return_msg = addUniformTargets();
+       displayLogMessage(return_msg);
+   }
+   else if (ui.clustered_distribution_radio_button->isChecked())
+   {
+       displayLogMessage("Adding clustered distribution of targets...");
+       return_msg = addClusteredTargets();
+       displayLogMessage(return_msg);
+   }
+
+//   // Test rover movement
+//   displayLogMessage("Moving alpha");
+//   return_msg = sim_creator.moveRover("alpha", 10, 0, 0);
+//   displayLogMessage(return_msg);
 }
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
@@ -625,42 +683,177 @@ QString RoverGUIPlugin::stopROSJoyNode()
     }
 }
 
-QString RoverGUIPlugin::addPowerLawTargets()
+QString RoverGUIPlugin::addUniformTargets()
 {
-    QString output = "";
-    // One pile of 64
-    output+= sim_creator.addModel("atags64_0", 10-rand()%20, 10-rand()%20, 0);
-    displayLogMessage("Added cluster of 64 targets");
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing 256 Targets");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
 
-    // Four piles of 16
+    QString output;
+    float clearance = 0; //meters
+    float proposed_x;
+    float proposed_y;
+
+    // 256 piles of 1 tag
+    for (int i = 0; i < 256; i++)
+    {
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        do
+        {
+            displayLogMessage("Tried to place target "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
+            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+       }
+        while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
+
+        output = sim_creator.addModel(QString("at")+QString::number(i), proposed_x, proposed_y, 0);
+
+       progress_dialog.setValue(i*100.0f/256);
+    }
+    displayLogMessage("Placed 256 single targets");
+
+    return output;
+}
+
+QString RoverGUIPlugin::addClusteredTargets()
+{
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing 256 Targets into 4 Clusters (64 targets each)");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
+    QString output;
+    float clearance = 0.5; //meters
+    float proposed_x;
+    float proposed_y;
+
+    // Four piles of 64
     for (int i = 0; i < 4; i++)
     {
-        output+= sim_creator.addModel(QString("atags64_")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
-        displayLogMessage("Added cluster of 16 targets");
+        // Keep GUI responsive
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        do
+        {
+            displayLogMessage("Tried to place cluster "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
+            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+        }
+        while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
+
+        progress_dialog.setValue(i*100.0f/4);
+
+        output = sim_creator.addModel(QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0);
+        displayLogMessage(output);
     }
 
+    displayLogMessage("Placed four clusters of 64 targets");
+
+    return output;
+}
+
+QString RoverGUIPlugin::addPowerLawTargets()
+{
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing 256 Targets into 85 Clusters (Power Law pattern)");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
+
+    float total_number_of_clusters = 85;
+    float clusters_placed = 0;
+
+    QString output = "";
+    // One pile of 64
+    float clearance = 0.1; //meters
+    float proposed_x;
+    float proposed_y;
+
+    do
+    {
+        displayLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+        proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
+        proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+    }
+    while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
+
+    progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+    output+= sim_creator.addModel("atags64_0", arena_width/2-rand()%boost::math::iround(arena_width), 10-rand()%boost::math::iround(arena_height), 0);
+
     // Four piles of 16
     for (int i = 0; i < 4; i++)
     {
-        output+= sim_creator.addModel(QString("atags16_")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
-        displayLogMessage("Added cluster of 16 targets");
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        do
+        {
+            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
+            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+            displayLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+        }
+        while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
+
+        progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+        output+= sim_creator.addModel(QString("atags16_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
     // Sixteen piles of 4
     for (int i = 0; i < 16; i++)
     {
-        output+= sim_creator.addModel(QString("atags4_")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
-        displayLogMessage("Added cluster of 4 targets");
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        do
+        {
+            displayLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
+            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+        }
+        while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
+
+        progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+        output+= sim_creator.addModel(QString("atags4_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
     // Sixty-four piles of 1
     for (int i = 0; i < 64; i++)
     {
-        output+= sim_creator.addModel(QString("at")+QString::number(i), 10-rand()%20, 10-rand()%20, 0);
-        displayLogMessage("Added a single target");
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        do
+        {
+            displayLogMessage("Tried to place target "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
+            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+        }
+        while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
+
+        progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+        output+= sim_creator.addModel(QString("at")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
     return output;
+}
+
+void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float y)
+{
+    return;
+    float arena_width = 20;
+    float arena_height = 20;
+    if (x < -arena_width/2)
+    {
+        float duration = 10; //seconds
+        float x_comp, y_comp, z_comp;
+        x_comp =
+        z_comp = 0;
+        y_comp = 0;
+        displayLogMessage("Moving rover back into the arena");
+        QString return_msg = sim_creator.moveRover(rover_name, x_comp, y, 0);
+        displayLogMessage(return_msg);
+    }
 }
 
 

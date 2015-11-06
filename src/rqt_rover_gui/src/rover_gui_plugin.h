@@ -66,6 +66,8 @@ namespace rqt_rover_gui {
 
     void addModelToGazebo();
     QString addPowerLawTargets();
+    QString addUniformTargets();
+    QString addClusteredTargets();
 
    // void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
 
@@ -92,6 +94,8 @@ namespace rqt_rover_gui {
     void clearSimulationButtonEventHandler();
 
   private:
+
+    void checkAndRepositionRover(QString rover_name, float x, float y);
 
     ros::Publisher control_mode_publisher;
     ros::Publisher joystick_publisher;
@@ -121,6 +125,9 @@ namespace rqt_rover_gui {
 
     map<string,int> rover_control_state;
     bool all_autonomous;
+
+    int arena_width; // in meters
+    int arena_height; // in meters
   };
 } // end namespace
 

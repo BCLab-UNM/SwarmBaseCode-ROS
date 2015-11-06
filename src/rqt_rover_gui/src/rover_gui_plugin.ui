@@ -303,7 +303,7 @@ border-color: rgb(255, 255, 255);</string>
       </property>
       <widget class="QRadioButton" name="joystick_radio_button">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -325,7 +325,7 @@ border-color: rgb(255, 255, 255);</string>
       </widget>
       <widget class="QRadioButton" name="final_radio_button">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -413,7 +413,7 @@ border-color: rgb(255, 255, 255);</string>
       </property>
       <widget class="QRadioButton" name="uniform_distribution_radio_button">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -435,7 +435,7 @@ border-color: rgb(255, 255, 255);</string>
       </widget>
       <widget class="QRadioButton" name="powerlaw_distribution_radio_button">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -454,7 +454,7 @@ border-color: rgb(255, 255, 255);</string>
       </widget>
       <widget class="QRadioButton" name="clustered_distribution_radio_button">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>

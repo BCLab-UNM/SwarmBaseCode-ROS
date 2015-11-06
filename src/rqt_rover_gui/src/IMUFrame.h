@@ -49,6 +49,18 @@ private:
     tuple<float, float, float> cube[8];
     tuple<float, float, float> rotated_cube[8];
 
+    tuple<float, float, float> line1_start;
+    tuple<float, float, float> line1_end;
+
+    tuple<float, float, float> line2_start;
+    tuple<float, float, float> line2_end;
+
+    tuple<float, float, float> rotated_line1_start;
+    tuple<float, float, float> rotated_line1_end;
+
+    tuple<float, float, float> rotated_line2_start;
+    tuple<float, float, float> rotated_line2_end;
+
     QTime frame_rate_timer;
     int frames;
 };

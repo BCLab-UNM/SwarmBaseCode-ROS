@@ -32,6 +32,12 @@ IMUFrame::IMUFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
         cube[6] = make_tuple(-width_of_square/2, width_of_square/2, width_of_square/2);
         cube[7] = make_tuple(-width_of_square/2, -width_of_square/2, width_of_square/2);
 
+        line1_start = make_tuple(width_of_square/2, 0, 0);
+        line2_start = make_tuple(-width_of_square/2, 0, 0);
+
+        line1_end = make_tuple(width_of_square, 0, 0);
+        line2_end = make_tuple(-width_of_square, 0, 0);
+
         // Setup a timer to rotate the square every 1/10 second
 //        QTimer *timer = new QTimer(this);
 //        connect(timer, SIGNAL(timeout()), this, SLOT(rotateTimerEventHandler()));
@@ -58,6 +64,18 @@ IMUFrame::IMUFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
         for (int i = 0; i < 8; i++)
         rotated_cube[i] = cube[i];
 
+        // Rotate the lines coming out of the cube
+        line1_start = rotateByQuaternion(line1_start, quaternion);
+        rotated_line2_start = rotateByQuaternion(line2_start, quaternion);
+
+        line1_end = rotateByQuaternion(line1_end, quaternion);
+        line2_end = rotateByQuaternion(line2_end, quaternion);
+
+        rotated_line1_start = line1_start;
+        rotated_line2_start = line2_start;
+
+        rotated_line1_end = line1_end;
+        rotated_line1_end = line1_end;
 
         frames = 0;
 }
@@ -112,9 +130,9 @@ void IMUFrame::paintEvent(QPaintEvent* event)
 
 
     // Setup camera transform inputs
-     tuple<float, float, float> eye = make_tuple(0, 0, 1000);
-     tuple<float, float, float> camera_position = make_tuple(0, 0, 1080);
-     tuple<float, float, float> camera_angle = make_tuple(0, 0, M_PI);
+     tuple<float, float, float> eye = make_tuple(0, 500, 1000);
+     tuple<float, float, float> camera_position = make_tuple(0, 500, 1080);
+     tuple<float, float, float> camera_angle = make_tuple(0, 0, M_PI/2);
 
     // Project 3D points into 2D
     QPoint projected_cube[8];
@@ -166,6 +184,25 @@ void IMUFrame::paintEvent(QPaintEvent* event)
 
     painter.setPen(Qt::white);
 
+    // draw two lines orthogonal to the yz faces of the cube to help visualize orientation
+    QPoint projected_line1_start = cameraTransform(rotated_line1_start, eye, camera_position, camera_angle);
+    QPoint projected_line1_end = cameraTransform(rotated_line1_end, eye, camera_position, camera_angle);
+    QPoint projected_line2_start = cameraTransform(rotated_line2_start, eye, camera_position, camera_angle);
+    QPoint projected_line2_end = cameraTransform(rotated_line2_end, eye, camera_position, camera_angle);
+
+    // Translate to the right place in the frame
+    projected_line1_start.setX(projected_line1_start.x()+center_x);
+    projected_line1_start.setY(projected_line1_start.y()+center_y);
+
+    projected_line1_end.setX(projected_line1_end.x()+center_x);
+    projected_line1_end.setY(projected_line1_end.y()+center_y);
+
+    projected_line2_start.setX(projected_line2_start.x()+center_x);
+    projected_line2_start.setY(projected_line2_start.y()+center_y);
+
+    projected_line2_end.setX(projected_line2_end.x()+center_x);
+    projected_line2_end.setY(projected_line2_end.y()+center_y);
+
     // Draw the cube
     QPoint projected_cube_top[4];
     QPoint projected_cube_bottom[4];
@@ -204,6 +241,11 @@ void IMUFrame::paintEvent(QPaintEvent* event)
     {
         painter.drawPolygon(projected_cube_top,4);
         painter.fillPath(top_path,Qt::blue);
+        painter.setPen(Qt::blue);
+        painter.drawLine(projected_line1_start, projected_line1_end);
+        painter.setPen(Qt::red);
+        painter.drawLine(projected_line2_start, projected_line2_end);
+        painter.setPen(Qt::white);
         painter.drawPolygon(projected_cube_bottom,4);
         painter.fillPath(bottom_path,Qt::red);
     }
@@ -211,6 +253,11 @@ void IMUFrame::paintEvent(QPaintEvent* event)
     {
         painter.drawPolygon(projected_cube_bottom,4);
         painter.fillPath(bottom_path,Qt::red);
+        painter.setPen(Qt::blue);
+        painter.drawLine(projected_line1_start, projected_line1_end);
+        painter.setPen(Qt::red);
+        painter.drawLine(projected_line2_start, projected_line2_end);
+        painter.setPen(Qt::white);
         painter.drawPolygon(projected_cube_top,4);
         painter.fillPath(top_path,Qt::blue);
     }
@@ -223,38 +270,27 @@ void IMUFrame::paintEvent(QPaintEvent* event)
     painter.drawLine(projected_cube_top[3], projected_cube_bottom[3]);
 
 
-    // Draw arrow in the direction of Z acceleration
 
 
-
- //   painter.drawText(50, 50, "IMU");
-
+// Draw an acceleration arrow from the IMU accelerometer
 
 tuple<float, float, float> accel_start = make_tuple(0,0,0);
 tuple<float, float, float> accel_end = linear_acceleration;
 
-tuple<float, float, float> accel_end_head_x_left = linear_acceleration;
-tuple<float, float, float> accel_end_head_x_right = linear_acceleration;
-get<0>(accel_end_head_x_left) = get<0>(accel_end_head_x_left)-5;
-get<0>(accel_end_head_x_right) = get<0>(accel_end_head_x_right)+5;
-
-tuple<float, float, float> accel_end_head_y_left = linear_acceleration;
-tuple<float, float, float> accel_end_head_y_right = linear_acceleration;
-get<0>(accel_end_head_y_left) = get<0>(accel_end_head_y_left)-5;
-get<0>(accel_end_head_y_right) = get<0>(accel_end_head_y_right)+5;
-
+tuple<float, float, float> accel_end_head_x_left = accel_end;
+tuple<float, float, float> accel_end_head_x_right = accel_end;
+get<0>(accel_end_head_x_left) = get<0>(accel_end_head_x_left)-1;
+get<0>(accel_end_head_x_right) = get<0>(accel_end_head_x_right)+1;
+get<1>(accel_end_head_x_left) = get<1>(accel_end_head_x_left)+1;
+get<1>(accel_end_head_x_right) = get<1>(accel_end_head_x_right)+1;
 
 // rotate about the x axis so z is up and down on the screen
-tuple<float,float,float> axis_of_rotation = make_tuple(1,0,0);
+tuple<float,float,float> axis_of_rotation = make_tuple(0,1,0);
 accel_start = rotateAboutAxis(accel_start, M_PI/2, axis_of_rotation);
 accel_end = rotateAboutAxis(accel_end, M_PI/2, axis_of_rotation);
 
 accel_end_head_x_left = rotateAboutAxis(accel_end_head_x_left, M_PI/2, axis_of_rotation);
 accel_end_head_x_right = rotateAboutAxis(accel_end_head_x_right, M_PI/2, axis_of_rotation);
-
-accel_end_head_y_left = rotateAboutAxis(accel_end_head_y_left, M_PI/2, axis_of_rotation);
-accel_end_head_y_right = rotateAboutAxis(accel_end_head_y_right, M_PI/2, axis_of_rotation);
-
 
 QPoint projected_accel_start = cameraTransform(accel_start, eye, camera_position, camera_angle);
 QPoint projected_accel_end = cameraTransform(accel_end, eye, camera_position, camera_angle);
@@ -262,22 +298,14 @@ QPoint projected_accel_end = cameraTransform(accel_end, eye, camera_position, ca
 QPoint projected_accel_end_head_x_left = cameraTransform(accel_end_head_x_left, eye, camera_position, camera_angle);
 QPoint projected_accel_end_head_x_right = cameraTransform(accel_end_head_x_right, eye, camera_position, camera_angle);
 
-QPoint projected_accel_end_head_y_left = cameraTransform(accel_end_head_y_left, eye, camera_position, camera_angle);
-QPoint projected_accel_end_head_y_right = cameraTransform(accel_end_head_y_right, eye, camera_position, camera_angle);
+painter.drawLine( QPoint(projected_accel_start.x()+center_x, projected_accel_start.y()+center_y),
+                         QPoint(10*projected_accel_end.x()+center_x, 10*projected_accel_end.y()+center_y));
 
+painter.drawLine( QPoint(projected_accel_end_head_x_left.x()+center_x, projected_accel_end_head_x_left.y()+center_y),
+                                 QPoint(10*projected_accel_end.x()+center_x, 10*projected_accel_end.y()+center_y));
 
-painter.drawLine( QPoint(20+projected_accel_end_head_x_left.x(), 100+projected_accel_end_head_x_left.y()),
-                         QPoint(20+10*projected_accel_end.x(), 100+10*projected_accel_end.y()));
-
-painter.drawLine( QPoint(20+projected_accel_end_head_x_right.x(), 100+projected_accel_end_head_x_right.y()),
-                                 QPoint(20+10*projected_accel_end.x(), 100+10*projected_accel_end.y()));
-
-
-painter.drawLine( QPoint(20+projected_accel_end_head_y_left.x(), 100+projected_accel_end_head_y_left.y()),
-                         QPoint(20+10*projected_accel_end.x(), 100+10*projected_accel_end.y()));
-
-painter.drawLine( QPoint(20+projected_accel_end_head_y_right.x(), 100+projected_accel_end_head_y_right.y()),
-                                 QPoint(20+10*projected_accel_end.x(), 100+10*projected_accel_end.y()));
+painter.drawLine( QPoint(projected_accel_end_head_x_right.x()+center_x, projected_accel_end_head_x_right.y()+center_y),
+                                 QPoint(10*projected_accel_end.x()+center_x, 10*projected_accel_end.y()+center_y));
 
 
 
@@ -303,11 +331,13 @@ painter.drawLine( QPoint(20+projected_accel_end_head_y_right.x(), 100+projected_
 void IMUFrame::setLinearAcceleration(float x, float y, float z)
 {
     linear_acceleration = make_tuple(x, y, z);
+    emit delayedUpdate();
 }
 
 void IMUFrame::setAngularVelocity(float x, float y, float z)
 {
     angular_velocity = make_tuple(x, y, z);
+    emit delayedUpdate();
 }
 
 void IMUFrame::setOrientation(float w, float x, float y, float z)
@@ -316,12 +346,24 @@ void IMUFrame::setOrientation(float w, float x, float y, float z)
     // It also has a w component, which represents the amount of rotation which will occur about this axis. The rotationMatrix() function can use this representation
     // to rotate the object properly
 
-    orientation = make_tuple(w, x, y, z);
-    float angle_of_rotation = get<0>(orientation);
-    tuple<float, float, float> axis_of_rotation = make_tuple(get<1>(orientation), get<2>(orientation), get<3>(orientation));
+//    orientation = make_tuple(w, x, y, z);
+//    float angle_of_rotation = get<0>(orientation);
+//    tuple<float, float, float> axis_of_rotation = make_tuple(get<1>(orientation), get<2>(orientation), get<3>(orientation));
+
+//    for (int i = 0; i < 8; i++)
+//        rotated_cube[i] = rotateAboutAxis(cube[i], angle_of_rotation, axis_of_rotation);
+
+    tuple<float,float,float,float> quaternion = make_tuple(w,x,y,z);
 
     for (int i = 0; i < 8; i++)
-        rotated_cube[i] = rotateAboutAxis(cube[i], angle_of_rotation, axis_of_rotation);
+        rotated_cube[i] = rotateByQuaternion(cube[i], quaternion);
+
+    rotated_line1_start = rotateByQuaternion(line1_start, quaternion);
+    rotated_line2_start = rotateByQuaternion(line2_start, quaternion);
+
+    rotated_line1_end = rotateByQuaternion(line1_end, quaternion);
+    rotated_line2_end = rotateByQuaternion(line2_end, quaternion);
+
 
     emit delayedUpdate();
 }
@@ -432,8 +474,12 @@ float** IMUFrame::setUpRotationMatrix(float angle, tuple<float, float, float> ax
         tuple<float, float, float> rotated_point;
 
         // Extract the vector part of the quaternion
-        float magnitude = sqrt(get<1>(quaternion)*get<1>(quaternion)+get<2>(quaternion)*get<2>(quaternion)+get<3>(quaternion)*get<3>(quaternion));
-        tuple<float, float, float> u = make_tuple(get<1>(quaternion)/magnitude, get<2>(quaternion)/magnitude, get<3>(quaternion)/magnitude);
+        //float magnitude = sqrt(get<1>(quaternion)*get<1>(quaternion)+get<2>(quaternion)*get<2>(quaternion)+get<3>(quaternion)*get<3>(quaternion));
+
+        //cout << "Magnitude: " << magnitude << endl;
+
+        //tuple<float, float, float> u = make_tuple(get<1>(quaternion)/magnitude, get<2>(quaternion)/magnitude, get<3>(quaternion)/magnitude);
+        tuple<float, float, float> u = make_tuple(get<1>(quaternion), get<2>(quaternion), get<3>(quaternion));
 
         // Extract the scalar part of the quaternion
         float s = get<0>(quaternion);
