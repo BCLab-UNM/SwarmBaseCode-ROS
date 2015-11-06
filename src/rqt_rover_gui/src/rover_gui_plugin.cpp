@@ -317,6 +317,8 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.joystick_control_radio_button->setEnabled(true);
     ui.all_autonomous_control_radio_button->setEnabled(true);
 
+    QString model_path = "~/rover_workspace/src/rover_misc/gazebo/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
+    readXML(model_path);
 }
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
@@ -888,54 +890,62 @@ void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float 
 
 void RoverGUIPlugin::readXML(QString path)
 {
+    return;
     QDomDocument xml_doc;
     QFile file(path);
-    if(!file.open(QIODevice::ReadOnly))
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         displayLogMessage("Error: could not open " + path );
+        return;
     }
 
-    xml_doc.setContent(&file);
+    if(!xml_doc.setContent(&file))
+    {
+        displayLogMessage("Error: could not parse " + path );
+        return;
+    }
 
-    QDomElement root = xml_doc.documentElement();
+//    QDomElement root = xml_doc.documentElement();
 
-    QString gps_reference_lat = root.attribute("referenceLatitude");
-    QString gps_reference_long = root.attribute("referenceLongitude");
-    QString gps_reference_heading = root.attribute("referenceHeading");
-    QString gps_reference_altitude = root.attribute("referenceAltitude");
-    QString gps_offset = root.attribute("offset");
-    QString gps_drift = root.attribute("drift");
-    QString gps_drift_frequency = root.attribute("driftFrequency");
-    QString gps_gaussian_noise = root.attribute("gaussianNoise");
+//    QString gps_reference_lat = root.attribute("referenceLatitude");
+//    QString gps_reference_long = root.attribute("referenceLongitude");
+//    QString gps_reference_heading = root.attribute("referenceHeading");
+//    QString gps_reference_altitude = root.attribute("referenceAltitude");
+//    QString gps_offset = root.attribute("offset");
+//    QString gps_drift = root.attribute("drift");
+//    QString gps_drift_frequency = root.attribute("driftFrequency");
+//    QString gps_gaussian_noise = root.attribute("gaussianNoise");
 
-    QString imu_update_rate = root.attribute("updateRate");
-    QString imu_rpy_offsets = root.attribute("rpyOffsets");
-    QString imu_gaussian_noise = root.attribute("gaussianNoise");
-    QString imu_accel_drift = root.attribute("accelDrift");
-    QString imu_accel_gaussian_noise = root.attribute("accelGaussianNoise");
-    QString imu_rate_drift = root.attribute("rateDrift");
-    QString imu_rate_gaussian_noise = root.attribute("rateGaussianNoise");
-    QString imu_heading_drift = root.attribute("headingDrift");
-    QString imu_heading_gaussian_noise = root.attribute("headingGaussianNoise");
+//    QString imu_update_rate = root.attribute("updateRate");
+//    QString imu_rpy_offsets = root.attribute("rpyOffsets");
+//    QString imu_gaussian_noise = root.attribute("gaussianNoise");
+//    QString imu_accel_drift = root.attribute("accelDrift");
+//    QString imu_accel_gaussian_noise = root.attribute("accelGaussianNoise");
+//    QString imu_rate_drift = root.attribute("rateDrift");
+//    QString imu_rate_gaussian_noise = root.attribute("rateGaussianNoise");
+//    QString imu_heading_drift = root.attribute("headingDrift");
+//    QString imu_heading_gaussian_noise = root.attribute("headingGaussianNoise");
 
-    QString camera_update_rate = root.attribute("update_rate");
-    QString camera_horizontal_fov = root.attribute("horizontal_fov");
-    QString camera_width = root.attribute("width");
-    QString camera_height = root.attribute("height");
-    QString camera_format = root.attribute("format");
-    QString camera_clip_near = root.attribute("near");
-    QString camera_clip_far = root.attribute("far");
-    QString camera_noise_type = root.attribute("type");
-    QString camera_noise_mean = root.attribute("mean");
-    QString camera_noise_stddev = root.attribute("stddev");
+//    QString camera_update_rate = root.attribute("update_rate");
+//    QString camera_horizontal_fov = root.attribute("horizontal_fov");
+//    QString camera_width = root.attribute("width");
+//    QString camera_height = root.attribute("height");
+//    QString camera_format = root.attribute("format");
+//    QString camera_clip_near = root.attribute("near");
+//    QString camera_clip_far = root.attribute("far");
+//    QString camera_noise_type = root.attribute("type");
+//    QString camera_noise_mean = root.attribute("mean");
+//    QString camera_noise_stddev = root.attribute("stddev");
 
-    QString sonar_noise_mean = root.attribute("samples");
-    QString sonar_horz_resolution = root.attribute("resolution");
-    QString sonar_min_angle = root.attribute("min_angle");
-    QString sonar_max_angle = root.attribute("max_angle");
-    QString sonar_min = root.attribute("min");
-    QString sonar_max = root.attribute("max");
-    QString sonar_range_resolution = root.attribute("resolution");
+//    QString sonar_noise_mean = root.attribute("samples");
+//    QString sonar_horz_resolution = root.attribute("resolution");
+//    QString sonar_min_angle = root.attribute("min_angle");
+//    QString sonar_max_angle = root.attribute("max_angle");
+//    QString sonar_min = root.attribute("min");
+//    QString sonar_max = root.attribute("max");
+//    QString sonar_range_resolution = root.attribute("resolution");
+
+    //cout << "GPS Ref. Lat. " << gps_reference_lat.toStdString() << endl;
 
 }
 

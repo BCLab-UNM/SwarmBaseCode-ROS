@@ -92,8 +92,8 @@ void USFrame::paintEvent(QPaintEvent* event)
     QString center_range_qstr = QString::number(center_range_rounded);
 
     painter.drawText(QPoint(frame_center_x-frame_width/4-fm.width(left_range_in_meters_qstr)/2,frame_height), left_range_in_meters_qstr);
-    painter.drawText(QPoint(frame_center_x-fm.width(right_range_in_meters_qstr)/2,frame_height), right_range_in_meters_qstr);
-    painter.drawText(QPoint(frame_center_x+frame_width/4-fm.width(right_range_in_meters_qstr)/2,frame_height), center_range_in_meters_qstr);
+    painter.drawText(QPoint(frame_center_x-fm.width(center_range_in_meters_qstr)/2,frame_height), center_range_in_meters_qstr);
+    painter.drawText(QPoint(frame_center_x+frame_width/4-fm.width(right_range_in_meters_qstr)/2,frame_height), right_range_in_meters_qstr);
 
 }
 
