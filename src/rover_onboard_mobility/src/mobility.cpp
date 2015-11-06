@@ -15,9 +15,6 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 
-//Package dependencies
-#include "rover_onboard_target_detection/ATag.h"
-
 using namespace std;
 
 //Random number generator
@@ -68,7 +65,7 @@ ros::Timer publish_status_timer;
 //Callback handlers
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
-void targetHandler(const rover_onboard_target_detection::ATag tagInfo);
+void targetHandler(const std_msgs::Int16::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
@@ -231,9 +228,10 @@ void setVelocity(double linearVel, double angularVel) {
  * ROS CALLBACK HANDLERS
  ************************/
 
-void targetHandler(const rover_onboard_target_detection::ATag tagInfo) {
-    if (tagInfo.tagsFound && (targetDetected.data == -1)) {
-        targetDetected.data = *tagInfo.tagID.begin();
+void targetHandler(const std_msgs::Int16::ConstPtr& message) {
+	//if target has not previously been detected 
+    if (targetDetected.data == -1) {
+        targetDetected = *message;
         
         //check if target has not yet been collected
         if (!targetsCollected[targetDetected.data]) { 

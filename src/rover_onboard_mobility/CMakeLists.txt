@@ -6,27 +6,15 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
-  message_generation
   random_numbers
 )
 
-add_message_files(
-  FILES
-  ATag.msg
-)
-
-generate_messages()
-
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs message_runtime random_numbers
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs random_numbers
 )
 
 add_executable(
   mobility src/mobility.cpp
-)
-
-add_dependencies(
-  mobility rover_onboard_target_detection_generate_messages_cpp
 )
 
 target_link_libraries(
