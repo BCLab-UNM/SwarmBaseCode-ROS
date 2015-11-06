@@ -85,3 +85,50 @@ sudo apt-get install git
   echo "export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models" >> ~/.bashrc
   source ~/.bashrc
   ```
+
+8. Editing the QT gui
+
+Install QT IDE
+
+sudo apt-get install qtcreator
+
+sudo apt-get python-catkin-tools
+
+9. Building the workspace
+
+clean the workspace with "catkin clean -a"
+
+build the workspace with "catkin build"
+
+10. Setup the QT Creator
+
+run "qtcreator &"
+
+Choose open project from the file menu.
+
+Navigate to ~/rover_worksace/src/rqt_rover_gui/src/
+
+Select CMakeLists.txt
+
+QT Creator will ask for the build path: type in ~/rover_workspace/build
+
+Click on the projects icon on the left toolbar.
+
+Enter "-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel" in the CMake arguments text box.
+
+Now qtcreator can be used to build the rover_workspace
+
+11. To run the Swarmathon ROS make ~/rover_workspace exectuatable:
+
+cd ~rover_workspace
+
+chmod +x ./run.sh
+
+./run.sh
+
+The GUI will now launch. The run script kills a number of gazebo and ROS processes. Killing these processes is suggested by gazebosim.com as the best way to clean up the gazebo environment at the moment.
+
+To create a 
+
+![Alt text](http://swarmathon.cs.unm.edu/img/GUI2.png "Opening Screen")
+
