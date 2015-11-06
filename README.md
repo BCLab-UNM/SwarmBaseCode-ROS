@@ -88,51 +88,20 @@ sudo apt-get install git
   source ~/.bashrc
   ```
 
-8. Editing the QT gui
+##### 6. Run the Swarmathon-ROS simulation:
 
-Install QT IDE
+1. Change the permissions on the simulation run script to make it exectuatable:
+  
+  ```
+  cd ~/rover_workspace
+  chmod +x ./run.sh
+  ```
+  
+2. Start the simulation
 
-sudo apt-get install qtcreator
-
-sudo apt-get install python-catkin-tools
-
-9. Building the workspace
-
-clean the workspace with "catkin clean -a"
-
-build the workspace with "catkin build"
-
-10. Setup the QT Creator
-
-run "qtcreator &"
-
-Choose open project from the file menu.
-
-Navigate to ~/rover_workspace/src/rqt_rover_gui/
-
-Select CMakeLists.txt
-
-Click yes to creating a .pro file.
-
-QT Creator will ask for the default build path: type in ~/rover_workspace/build
-
-Click configure project.
-
-Click on the projects icon on the left toolbar.
-
-Enter "-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel" in the CMake arguments text box.
-
-Click the edit toolbox icon on the left. Double click CMakeLists.txt. Click the "build now" button to build the project.
-
-Now qtcreator can be used to build the rover_workspace
-
-11. To run the Swarmathon ROS make ~/rover_workspace exectuatable:
-
-cd ~rover_workspace
-
-chmod +x ./run.sh
-
-./run.sh
+  ```
+  ./run.sh
+  ```
 
 The GUI will now launch. The run script kills a number of gazebo and ROS processes. Killing these processes is suggested by gazebosim.com as the best way to clean up the gazebo environment at the moment.
 
@@ -175,3 +144,48 @@ The IMU sensor display consists of a cube where the red face is the bottom of th
 The map view shows the path taken by the currently selected rover. Green is the encoder position data. In simulation, the encoder position data comes from the odometry topic being published by Gazebo's skid steer controller plugin. In the real robots, it is the encoder output. GPS points are shown as red dots. The EKF is the output of an extended Kalman filter which fuses data from the IMU, GPS, and encoder sensors.
 
 To close the simulation and the GUI, click the red exit button in the top left-hand corner.
+
+##### 7. Editing the simulation GUI via Qt Creator
+
+1. Install QT IDE:
+
+  ```
+  sudo apt-get install qtcreator
+  sudo apt-get install python-catkin-tools
+  ```
+  
+2. Build the workspace:
+
+  ```
+  catkin clean -a
+  catkin build
+  ```
+
+3. Run Qt Creator:
+  ```
+  qtcreator &
+  ```
+
+4. Choose "Open File or Project" from the File menu.
+
+5. Navigate to ```~/rover_workspace/src/rqt_rover_gui/```
+
+6. Select CMakeLists.txt
+
+7. Click "Yes" to creating a .pro file.
+
+8. Enter ```~/rover_workspace/build``` as the default build path
+
+9. Click Configure Project.
+
+10. Click on the Projects icon on the left toolbar.
+
+11. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box.
+
+12. Click the Edit toolbox icon on the left. 
+
+13. Double-click CMakeLists.txt
+
+14. Click the "Build Now" button to build the project.
+
+Qt Creator can now be used to build the rover_workspace.
