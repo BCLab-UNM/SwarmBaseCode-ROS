@@ -112,25 +112,9 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
      <property name="geometry">
       <rect>
-       <x>580</x>
+       <x>450</x>
        <y>300</y>
        <width>281</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-    </widget>
-    <widget class="rqt_rover_gui::GPSFrame" name="gps_frame">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>300</y>
-       <width>271</width>
        <height>211</height>
       </rect>
      </property>
@@ -236,7 +220,7 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::USFrame" name="us_frame">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>150</x>
        <y>300</y>
        <width>281</width>
        <height>211</height>
@@ -1506,22 +1490,6 @@ border: 1px solid white;
      <zorder>label_47</zorder>
      <zorder>label_48</zorder>
     </widget>
-    <widget class="QLabel" name="label_25">
-     <property name="geometry">
-      <rect>
-       <x>520</x>
-       <y>440</y>
-       <width>71</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Ref. Long.</string>
-     </property>
-    </widget>
     <zorder>simulation_setup_frame</zorder>
     <zorder>label_7</zorder>
     <zorder>rover_image_label</zorder>
@@ -1535,7 +1503,6 @@ border: 1px solid white;
     <zorder>label_12</zorder>
     <zorder>frame_6</zorder>
     <zorder>label_17</zorder>
-    <zorder>label_25</zorder>
    </widget>
   </widget>
   <widget class="QTextBrowser" name="log">
@@ -1816,12 +1783,6 @@ border: 1px solid white;
    <class>rqt_rover_gui::MapFrame</class>
    <extends>QFrame</extends>
    <header>MapFrame.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>rqt_rover_gui::GPSFrame</class>
-   <extends>QFrame</extends>
-   <header>GPSFrame.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

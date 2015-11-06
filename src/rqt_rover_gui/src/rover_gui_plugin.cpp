@@ -59,7 +59,7 @@ namespace rqt_rover_gui
     
     context.addWidget(widget);
 
-    ui.version_number_label->setText("<font color='white'>0.02 Alpha</font>");
+    ui.version_number_label->setText("<font color='white'>0.04 Alpha</font>");
 
     widget->setWindowTitle("Rover Interface");
 
