@@ -536,13 +536,6 @@ for ((i = 0; i < $numberOfRovers; i++));do
 done
 
 ################################
-# WORLD                        #
-################################
-echo "Starting world_state"
-roslaunch launch_files/world_state.launch &
-sleep 2
-
-################################
 # GAZEBO                       #
 ################################
 echo "Starting gazebo"
