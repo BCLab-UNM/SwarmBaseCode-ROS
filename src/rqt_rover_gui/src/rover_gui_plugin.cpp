@@ -59,7 +59,7 @@ namespace rqt_rover_gui
     
     context.addWidget(widget);
 
-    ui.version_number_label->setText("<font color='white'>0.04 Alpha</font>");
+    ui.version_number_label->setText("<font color='white'>0.1.0</font>");
 
     widget->setWindowTitle("Rover Interface");
 
@@ -458,6 +458,9 @@ void RoverGUIPlugin::displayLogMessage(QString msg)
     if (msg == NULL) msg = "Message was a NULL pointer";
 
 
+    // replace new lines with <br> in the message
+    msg.replace("\n","<br>");
+
     QString new_message = msg+"<br>";
     log_messages = log_messages+new_message;
     ui.log->setText("<font color='white'>"+log_messages+"</font>");
@@ -553,6 +556,12 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     displayLogMessage("Building simulation...");
 
     QString return_msg;
+
+    if (sim_creator.isGazeboRunning())
+    {
+        displayLogMessage("A gazebo simulation process is already running. Restart the Swarmathon GUI to clear.");
+        return;
+    }
 
     return_msg = sim_creator.startGazebo();
 
