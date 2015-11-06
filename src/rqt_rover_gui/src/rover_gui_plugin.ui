@@ -485,7 +485,9 @@ border-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+</string>
       </property>
       <item>
        <property name="text">
@@ -494,7 +496,12 @@ border-color: rgb(255, 255, 255);</string>
       </item>
       <item>
        <property name="text">
-        <string>Tarmac</string>
+        <string>Car park</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Concrete</string>
        </property>
       </item>
      </widget>

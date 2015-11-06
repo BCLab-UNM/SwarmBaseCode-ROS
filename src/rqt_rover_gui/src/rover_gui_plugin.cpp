@@ -20,6 +20,7 @@
 #include <QProgressDialog>
 #include <QStringList>
 #include <QLCDNumber>
+#include <QComboBox>
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
 
@@ -93,6 +94,8 @@ namespace rqt_rover_gui
     ui.joystick_frame->setHidden(false);
 
     ui.tab_widget->setCurrentIndex(0);
+
+    ui.texture_combobox->setItemData(0, Qt::white, Qt::TextColorRole);
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
@@ -547,9 +550,28 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     cout << return_msg.toStdString() << endl;
     displayLogMessage(return_msg);
 
-    displayLogMessage("Adding ground plane...");
+    if (ui.texture_combobox->currentText() == "Gravel")
+    {
+    displayLogMessage("Adding gravel ground plane...");
     return_msg = sim_creator.addGroundPlane("mars_ground_plane");
     displayLogMessage(return_msg);
+    }
+    else if (ui.texture_combobox->currentText() == "Concrete")
+    {
+    displayLogMessage("Adding concrete ground plane...");
+    return_msg = sim_creator.addGroundPlane("concrete_ground_plane");
+    displayLogMessage(return_msg);
+    }
+    else if (ui.texture_combobox->currentText() == "Car park")
+    {
+    displayLogMessage("Adding carpark ground plane...");
+    return_msg = sim_creator.addGroundPlane("carpark_ground_plane");
+    displayLogMessage(return_msg);
+    }
+    else
+    {
+        displayLogMessage("Unknown ground plane...");
+    }
 
     displayLogMessage("Adding rover alpha...");
     return_msg = sim_creator.addRover("alpha", -1, 0, 0);
@@ -637,8 +659,9 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     return_msg = sim_creator.stopGazebo();
     displayLogMessage(return_msg);
 
-    return_msg = sim_creator.stopGazebo();
-    displayLogMessage(return_msg);
+    ui.rover_list->clear();
+    rover_names.clear();
+    rover_control_state.clear();
 }
 
 QString RoverGUIPlugin::startROSJoyNode()

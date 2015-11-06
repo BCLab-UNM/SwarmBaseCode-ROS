@@ -130,8 +130,8 @@ void IMUFrame::paintEvent(QPaintEvent* event)
 
 
     // Setup camera transform inputs
-     tuple<float, float, float> eye = make_tuple(0, 500, 1000);
-     tuple<float, float, float> camera_position = make_tuple(0, 500, 1080);
+     tuple<float, float, float> eye = make_tuple(0, 0, 1000);
+     tuple<float, float, float> camera_position = make_tuple(0, 0, 1080);
      tuple<float, float, float> camera_angle = make_tuple(0, 0, M_PI/2);
 
     // Project 3D points into 2D
