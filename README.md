@@ -147,7 +147,7 @@ To close the simulation and the GUI, click the red exit button in the top left-h
 
 ##### 7. Editing the simulation GUI via Qt Creator
 
-1. Install QT IDE:
+1. Install Qt Creator:
 
   ```
   sudo apt-get install qtcreator
