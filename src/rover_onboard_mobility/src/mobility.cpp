@@ -6,6 +6,7 @@
 #include <tf/transform_datatypes.h>
 
 //ROS messages
+#include <std_msgs/Int16.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/Joy.h>
@@ -28,10 +29,11 @@ void setVelocity(double linearVel, double angularVel);
 //Numeric Variables
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D goalLocation;
-uint currentMode = 0;
-uint targetDetected = 0xFFFFFFFF; //id of the target detected and being harvested
+int currentMode = 0;
 float mobilityLoopTimeStep = 0.125; //time between the mobility loop calls
 float status_publish_interval = 5;
+std_msgs::Int16 targetDetected; //ID of the detected target
+bool targetsCollected [256] = {0}; //array of booleans indicating whether each target ID has been found
 
 // state machine states
 #define STATE_MACHINE_TRANSFORM	0
@@ -48,6 +50,7 @@ char prev_state_machine[128];
 ros::Publisher mobilityPublish;
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
+ros::Publisher targetCollectedPublish;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -55,6 +58,7 @@ ros::Subscriber modeSubscriber;
 ros::Subscriber targetSubscriber;
 ros::Subscriber obstacleSubscriber;
 ros::Subscriber odometrySubscriber;
+ros::Subscriber targetsCollectedSubscriber;
 
 //Timers
 ros::Timer stateMachineTimer;
@@ -69,6 +73,7 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent&);
+void targetsCollectedHandler(const std_msgs::Int16::ConstPtr& message);
 
 int main(int argc, char **argv) {
 
@@ -77,6 +82,8 @@ int main(int argc, char **argv) {
 
     rng = new random_numbers::RandomNumberGenerator(); //instantiate random number generator
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
+    
+    targetDetected.data = -1; //initialize target detected
     
     //select initial search position 50 cm from center (0,0)
 	goalLocation.x = 0.5 * cos(goalLocation.theta);
@@ -98,10 +105,12 @@ int main(int argc, char **argv) {
     targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
     obstacleSubscriber = mNH.subscribe((publishedName + "/obstacle"), 10, obstacleHandler);
     odometrySubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, odometryHandler);
+    targetsCollectedSubscriber = mNH.subscribe(("targetsCollected"), 10, targetsCollectedHandler);
 
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     mobilityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/mobility"), 10);
-    stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true); //publishes the current state of the state machine, in human readable form
+    stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
+    targetCollectedPublish = mNH.advertise<std_msgs::Int16>(("targetsCollected"), 1, true);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
@@ -131,7 +140,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
 				//If returning with a target
-				else if (targetDetected != 0xFFFFFFFF) {
+				else if (targetDetected.data != -1) {
 					//If goal has not yet been reached
 					if (hypot(0.0 - currentLocation.x, 0.0 - currentLocation.y) > 0.2) {
 				        //set angle to center as goal heading
@@ -143,7 +152,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					}
 					//Otherwise, reset target and select new random uniform heading
 					else {
-						targetDetected = 0xFFFFFFFF;
+						targetDetected.data = -1;
 						goalLocation.theta = rng->uniformReal(0, 2 * M_PI);
 					}
 				}
@@ -223,18 +232,24 @@ void setVelocity(double linearVel, double angularVel) {
  ************************/
 
 void targetHandler(const rover_onboard_target_detection::ATag tagInfo) {
-    if (tagInfo.tagsFound && (targetDetected == 0xFFFFFFFF)) {
-        targetDetected = *tagInfo.tagID.begin();
+    if (tagInfo.tagsFound && (targetDetected.data == -1)) {
+        targetDetected.data = *tagInfo.tagID.begin();
         
-        //set angle to center as goal heading
-		goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
-						
-		//set center as goal position
-		goalLocation.x = 0.0;
-		goalLocation.y = 0.0;
-
-		//switch to transform state to trigger return to center
-		stateMachineState = STATE_MACHINE_TRANSFORM;
+        //check if target has not yet been collected
+        if (!targetsCollected[targetDetected.data]) { 
+	        //set angle to center as goal heading
+			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+			
+			//set center as goal position
+			goalLocation.x = 0.0;
+			goalLocation.y = 0.0;
+			
+			//publish detected target
+			targetCollectedPublish.publish(targetDetected);
+			
+			//switch to transform state to trigger return to center
+			stateMachineState = STATE_MACHINE_TRANSFORM;
+		}
     }
 }
 
@@ -295,5 +310,6 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&)
   status_publisher.publish(msg);
 }
 
-
-
+void targetsCollectedHandler(const std_msgs::Int16::ConstPtr& message) {
+	targetsCollected[message->data] = 1;
+}
