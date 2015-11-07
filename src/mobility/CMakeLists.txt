@@ -1,27 +1,24 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rover_onboard_abridge)
+project(mobility)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   sensor_msgs
   std_msgs
+  random_numbers
 )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs
-)
-
-include_directories(
-  include
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs random_numbers
 )
 
 add_executable(
-  abridge src/abridge.cpp src/usbSerial.cpp
+  mobility src/mobility.cpp
 )
 
 target_link_libraries(
-  abridge
+  mobility
   ${catkin_LIBRARIES}
 )
 

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>rover_onboard_target_detection</name>
-  <version>0.0.0</version>
-  <description>The rover_onboard_target_detection package</description>
+  <name>target_detection</name>
+  <version>0.2.0</version>
+  <description>Image processing to identify AprilTag fiducial markers in webcam video stream</description>
 
   <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
 

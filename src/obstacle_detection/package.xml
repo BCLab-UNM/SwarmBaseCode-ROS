@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>rover_onboard_mobility</name>
-  <version>0.0.0</version>
-  <description>The rover_onboard_mobility package</description>
+  <name>obstacle_detection</name>
+  <version>0.2.0</version>
+  <description>Integration of sonar sensor data to determine rudimentary obstacle positioning</description>
 
   <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
 
@@ -13,13 +13,13 @@
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>random_numbers</build_depend>
+  <build_depend>message_filters</build_depend>
 
   <run_depend>geometry_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
-  <run_depend>random_numbers</run_depend>
+  <run_depend>message_filters</run_depend>
 
   <export>
 

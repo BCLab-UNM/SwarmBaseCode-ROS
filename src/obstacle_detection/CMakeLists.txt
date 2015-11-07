@@ -1,24 +1,25 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rover_onboard_mobility)
+project(obstacle_detection)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   sensor_msgs
   std_msgs
-  random_numbers
+  message_filters
 )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs random_numbers
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs message_filters
 )
 
 add_executable(
-  mobility src/mobility.cpp
+  obstacle src/obstacle.cpp
 )
 
 target_link_libraries(
-  mobility
+  obstacle
   ${catkin_LIBRARIES}
 )
+
 
