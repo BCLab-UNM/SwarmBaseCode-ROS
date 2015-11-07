@@ -38,7 +38,7 @@ QString GazeboSimCreator::stopGazebo()
 
     if (gazebo_process == NULL) return "Gazebo is not running";
 
-    QString argument = "~/rover_workspace/src/rover_driver_gazebo_launch/cleanup.sh";
+    QString argument = "~/rover_workspace/cleanup.sh";
 
     QProcess sh;
 
@@ -63,7 +63,7 @@ QString GazeboSimCreator::stopGazebo()
 
 QString GazeboSimCreator::startRoverNode( QString rover_name )
 {
-    QString argument = "roslaunch ~/rover_workspace/src/rover_driver_gazebo_launch/launch_files/"+rover_name+".launch name:="+rover_name;
+    QString argument = "roslaunch ~/rover_workspace/launch/"+rover_name+".launch name:="+rover_name;
 
     QProcess* rover_process = new QProcess();
 
@@ -78,7 +78,7 @@ QString GazeboSimCreator::addGroundPlane( QString ground_name )
 {
     model_locations.insert(make_tuple(0,0)); // Nest location
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + ground_name + "/model.sdf -model " + ground_name;
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/misc/models/" + ground_name + "/model.sdf -model " + ground_name;
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
@@ -95,7 +95,7 @@ QString GazeboSimCreator::addRover(QString rover_name, float x, float y, float z
 {
     model_locations.insert(make_tuple(x, y));
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + rover_name + "/model.sdf -model " + rover_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/misc/models/" + rover_name + "/model.sdf -model " + rover_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
@@ -145,7 +145,7 @@ QString GazeboSimCreator::addModel(QString model_name, float x, float y, float z
 {
     model_locations.insert(make_tuple(x, y));
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/src/rover_misc/gazebo/models/" + model_name + "/model.sdf -model " + model_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/misc/models/" + model_name + "/model.sdf -model " + model_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
