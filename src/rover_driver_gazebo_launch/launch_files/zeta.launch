@@ -1,7 +1,7 @@
 <launch>
-  <node name="zeta_MOBILITY" pkg="rover_onboard_mobility" type="mobility" args="$(arg name)" />
-  <node name="zeta_TARGET" pkg="rover_onboard_target_detection" type="target" args="$(arg name)" />
-  <node name="zeta_OBSTACLE" pkg="rover_onboard_obstacle_detection" type="obstacle" args="$(arg name)" />
+  <node name="zeta_MOBILITY" pkg="mobility" type="mobility" args="$(arg name)" />
+  <node name="zeta_TARGET" pkg="target_detection" type="target" args="$(arg name)" />
+  <node name="zeta_OBSTACLE" pkg="obstacle_detection" type="obstacle" args="$(arg name)" />
 
   <node pkg="robot_localization" type="navsat_transform_node" name="zeta_NAVSAT" respawn="true">
 
