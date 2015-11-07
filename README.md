@@ -145,7 +145,7 @@ The map view shows the path taken by the currently selected rover. Green is the 
 
 To close the simulation and the GUI, click the red exit button in the top left-hand corner.
 
-##### 7. Editing the simulation GUI via Qt Creator
+### How to use Qt Creator to edit the simulation GUI
 
 1. Install Qt Creator:
 
