@@ -8,7 +8,7 @@ This repository contains:
 2. 3D .STL models for the physical Swarmie build 
 3. Bash shell scripts for initializing simulated Swarmies in the Gazebo simulator, as well as physical Swarmies
 
-Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For any other other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
+Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
 ### Quick Start Installation Guide
 
