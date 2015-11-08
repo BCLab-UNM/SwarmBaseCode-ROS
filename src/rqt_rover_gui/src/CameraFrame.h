@@ -1,5 +1,14 @@
-#ifndef rtq_rover_gui_CAMERAFRAME_H
-#define rtq_rover_gui_CAMERAFRAME_H
+/*!
+ * \brief   This frame draws the images recieved from the ROS
+ *          camera subscriber.
+ * \author  Matthew Fricke
+ * \date    November 11th 2015
+ * \todo    Code works properly.
+ * \class   CameraFrame
+ */
+
+#ifndef CAMERAFRAME_H
+#define CAMERAFRAME_H
 
 #include <QTime> // for frame rate
 #include <QFrame>

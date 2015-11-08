@@ -1,5 +1,14 @@
-#ifndef rtq_rover_gui_GPSFrame_H
-#define rtq_rover_gui_GPSFrame_H
+/*!
+ * \brief   This frame is intended to show information about the quality of the GPS sensor data,
+ *          for example, the number of satellites current sending data.
+ * \author  Matthew Fricke
+ * \date    November 11th 2015
+ * \todo    This frame is not currently being used and is currently just a place holder class.
+ * \class   GPSFrame
+ */
+
+#ifndef GPSFRAME_H
+#define GPSFRAME_H
 
 #include <QTime> // for frame rate
 #include <QFrame>

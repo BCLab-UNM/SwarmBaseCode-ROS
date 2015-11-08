@@ -1,3 +1,20 @@
+/*!
+ * \brief   This class is intended as an interface to the Gazebo Simulation. This is acheived
+ *          by calling shell commands. A single gazebo process is created that lasts the life of the
+ *          program. Other opererations on the simulation are performed by creating a shell process that only
+ *          exists as long as the command takes to complete.
+ * \author  Matthew Fricke
+ * \date    November 11th 2015
+ * \todo    A better solution would be to write a gazebo plugin that would pass on gazebo commands.
+ *          Using a plugin would reduce the need to manage the shell processes spawned to manipulate models
+ *          in the simulation.
+ *          addModel can add any model including rovers and ground planes. The addRover and addGroundPlane
+ *          functions should just call addModel to avoid duplication of code.
+ *          stopGazebo is buggy. It needs to be rewritten so gazebo is closed and the rover nodes shutdown
+ *          without closing the GUI nodes.
+ * \class   GazeboSimCreator
+ */
+
 #ifndef GAZEBOSIMCREATOR_H
 #define GAZEBOSIMCREATOR_H
 

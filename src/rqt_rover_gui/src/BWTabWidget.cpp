@@ -3,6 +3,11 @@
 #include <QPalette>
 #include <QTabBar>
 
+/*!
+ *  Constructor. This function sets the color of the tabs at the
+ *  top of the GUI. The stylesheets method does not allow changing
+ *  the color of tab bars.
+ */
 BWTabWidget::BWTabWidget(QWidget *p) : QTabWidget(p)
 {
   QPalette pal = tabBar()->palette();

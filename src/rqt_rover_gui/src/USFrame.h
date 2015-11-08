@@ -1,5 +1,18 @@
-#ifndef rtq_rover_gui_USFrame_H
-#define rtq_rover_gui_USFrame_H
+/*!
+ * \brief   This USFrame (ultrasound frame) class visualizes the position output
+ *          from the three ultrasound sensors. The ultrasound output is shown as three white rays,
+ *          one for each ultrasound. The length of the rays indicates the distance to any objects
+ *          in front of the ultrasound. The distance in meters is displayed in text below these rays.
+ *          The maximum distance reported by the ultrasounds is 3 meters.
+ *
+ * \author  Matthew Fricke
+ * \date    November 11th 2015
+ * \todo    Code works properly.
+ * \class   USFrame
+ */
+
+#ifndef USFRAME_H
+#define USFRAME_H
 
 #include <QTime> // for frame rate
 #include <QFrame>

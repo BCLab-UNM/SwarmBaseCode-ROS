@@ -1,5 +1,18 @@
-#ifndef rtq_rover_gui_MapFrame_H
-#define rtq_rover_gui_MapFrame_H
+/*!
+ * \brief   This class visualizes the position output from the odometry, GPS, and IMU sensors. The extended Kalman filter (EKF)
+ *          integrates the position data and transmits it on the appropraite ROS topics. The map view shows the path taken by
+ *          the currently selected rover. In simulation, the encoder position data
+ *          comes from the odometry topic being published by Gazebo's skid steer controller plugin.
+ *          In the real robots, it is the encoder output. GPS points are shown as red dots.
+ *          The EKF is the output of an extended Kalman filter which fuses data from the IMU, GPS, and encoder sensors.
+ * \author  Matthew Fricke
+ * \date    November 11th 2015
+ * \todo    Code works properly.
+ * \class   MapFrame
+ */
+
+#ifndef MAPFRAME_H
+#define MAPFRAME_H
 
 #include <QTime> // for frame rate
 #include <QFrame>

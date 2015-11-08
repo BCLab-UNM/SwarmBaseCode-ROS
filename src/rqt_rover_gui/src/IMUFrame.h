@@ -1,5 +1,19 @@
-#ifndef rtq_rover_gui_IMUFrame_H
-#define rtq_rover_gui_IMUFrame_H
+/*!
+ * \brief   This class visualizes the output from the rover's Inertial Measurement Unit (IMU).
+ *          Currently the orientation and acceleration of the rover are displayed.
+ *          The IMU sensor display consists of a cube where the red face is the bottom of the rover,
+ *          the blue face is the top of the rover, and the red and blue bars are the front and back of the rover.
+ *          The cube is viewed from the top down. The cube is positioned according to the IMU orientation data.
+ *          For example, if the rover flips over, the red side will be closest to the observer.
+ *          Accelerometer data is shown as a 3D vector projected into 2D space pointing towards the sum of the accelerations in 3D space.
+ * \author  Matthew Fricke
+ * \date    November 11th 2015
+ * \todo
+ * \class   IMUFrame
+ */
+
+#ifndef IMUFRAME_H
+#define IMUFRAME_H
 
 #include <QTime> // for frame rate
 #include <QFrame>

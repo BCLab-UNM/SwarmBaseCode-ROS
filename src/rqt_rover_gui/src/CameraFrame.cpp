@@ -1,6 +1,3 @@
-#ifndef rqt_rover_gui_CameraFrame
-#define rqt_rover_gui_CameraFrame
-
 #include <CameraFrame.h>
 
 namespace rqt_rover_gui
@@ -61,4 +58,3 @@ void CameraFrame::setImage(const QImage& img)
 }
 
 }
-#endif
