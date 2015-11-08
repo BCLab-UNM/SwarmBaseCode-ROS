@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rqt_rover_gui)
 
+execute_process(COMMAND git describe --tags --abbrev=0
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_VERSION)
+string(STRIP ${GIT_VERSION} GIT_VERSION)
+
+execute_process(COMMAND date "+%Y-%m-%d-%H:%M"
+    OUTPUT_VARIABLE BUILD_TIME)
+string(STRIP ${BUILD_TIME} BUILD_TIME)
+
+set_source_files_properties(src/rover_gui_plugin.cpp PROPERTIES COMPILE_DEFINITIONS "GIT_VERSION=\"${GIT_VERSION}\";BUILD_TIME=\"${BUILD_TIME}\"")
+
 set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS 

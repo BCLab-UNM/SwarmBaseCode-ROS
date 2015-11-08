@@ -59,9 +59,11 @@ namespace rqt_rover_gui
     
     context.addWidget(widget);
 
-    ui.version_number_label->setText("<font color='white'>0.1.0</font>");
+    // GIT_VERSION is passed in as a compile time definition (see CMakeLists.txt). The version is taken from the last git tag.
+    QString version_qstr("<font color='white'>"+QString::fromUtf8(GIT_VERSION)+"</font>");
+    ui.version_number_label->setText(version_qstr);
 
-    widget->setWindowTitle("Rover Interface");
+    widget->setWindowTitle("Rover Interface: Built on " + QString::fromUtf8(BUILD_TIME) );
 
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
