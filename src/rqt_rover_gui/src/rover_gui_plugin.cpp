@@ -277,7 +277,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     std::map<string, int>::iterator it = rover_control_state.find(selected_rover_name);
 
     // No entry for this rover name
-    if (it == rover_control_state.end())
+    if ( 0 == rover_control_state.count(selected_rover_name) )
     {
         // Default to joystick
         ui.joystick_control_radio_button->setChecked(true);
@@ -285,29 +285,30 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         ui.all_autonomous_control_radio_button->setChecked(false);
         joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
         rover_control_state[selected_rover_name]=1;
+        displayLogMessage("New rover selected");
     }
     else
     {
-    int control_state = it->second;
+        int control_state = it->second;
 
-    switch (control_state)
-    {
-    case 1: ui.joystick_control_radio_button->setChecked(true);
-        ui.autonomous_control_radio_button->setChecked(false);
-        ui.all_autonomous_control_radio_button->setChecked(false);
-        break;
-    case 2: ui.joystick_control_radio_button->setChecked(false);
-        ui.autonomous_control_radio_button->setChecked(true);
-        ui.all_autonomous_control_radio_button->setChecked(false);
-        break;
-    case 3: ui.joystick_control_radio_button->setChecked(false);
-        ui.autonomous_control_radio_button->setChecked(false);
-        ui.all_autonomous_control_radio_button->setChecked(true);
-        break;
-    default:
-        displayLogMessage("Unknown control state");
+        switch (control_state)
+        {
+        case 1: ui.joystick_control_radio_button->setChecked(true);
+            ui.autonomous_control_radio_button->setChecked(false);
+            ui.all_autonomous_control_radio_button->setChecked(false);
+            break;
+        case 2: ui.joystick_control_radio_button->setChecked(false);
+            ui.autonomous_control_radio_button->setChecked(true);
+            ui.all_autonomous_control_radio_button->setChecked(false);
+            break;
+        case 3: ui.joystick_control_radio_button->setChecked(false);
+            ui.autonomous_control_radio_button->setChecked(false);
+            ui.all_autonomous_control_radio_button->setChecked(true);
+            break;
+        default:
+            displayLogMessage("Unknown control state: "+QString::number(control_state));
+        }
     }
-}
 
     // Clear map
     ui.map_frame->clearMap();
@@ -535,6 +536,7 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
      for (it = rover_names.begin(); it != rover_names.end(); it++)
      {
          if (rover_control_state[*it]==3) rover_control_state[*it]=2;
+         else if (rover_control_state[*it]==0) rover_control_state[*it] = 1;
      }
     rover_control_state[selected_rover_name] = 1;
 
