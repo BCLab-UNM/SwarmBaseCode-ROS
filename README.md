@@ -46,7 +46,7 @@ sudo apt-get install git
 
   ```
   cd ~
-  git clone git@github.com:BCLab-UNM/Swarmathon-ROS.git
+  git clone https://github.com/BCLab-UNM/Swarmathon-ROS.git
   ```
 
 2. Rename the downloaded repo so it can be properly identified by ROS and catkin:
