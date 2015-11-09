@@ -320,7 +320,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.joystick_control_radio_button->setEnabled(true);
     ui.all_autonomous_control_radio_button->setEnabled(true);
 
-    QString model_path = "~/rover_workspace/src/rover_misc/gazebo/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
+    QString model_path = "~/rover_workspace/misc/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
     readXML(model_path);
 }
 

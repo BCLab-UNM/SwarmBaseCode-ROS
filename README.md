@@ -8,7 +8,7 @@ This repository contains:
 2. 3D .STL models for the physical Swarmie build 
 3. Bash shell scripts for initializing simulated Swarmies in the Gazebo simulator, as well as physical Swarmies
 
-Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For any other other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
+Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
 ### Quick Start Installation Guide
 
@@ -84,7 +84,7 @@ sudo apt-get install git
 7. Update your bash session to automatically export the enviromental variable that stores the location of Gazebo's model files:
 
   ```
-  echo "export GAZEBO_MODEL_PATH=~/rover_workspace/src/rover_misc/gazebo/models" >> ~/.bashrc
+  echo "export GAZEBO_MODEL_PATH=~/rover_workspace/misc/models" >> ~/.bashrc
   source ~/.bashrc
   ```
 
@@ -145,7 +145,7 @@ The map view shows the path taken by the currently selected rover. Green is the 
 
 To close the simulation and the GUI, click the red exit button in the top left-hand corner.
 
-##### 7. Editing the simulation GUI via Qt Creator
+### How to use Qt Creator to edit the simulation GUI
 
 1. Install Qt Creator:
 
