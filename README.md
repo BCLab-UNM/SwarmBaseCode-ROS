@@ -34,22 +34,20 @@ Our simulated Swarmies use existing Gazebo plugins, external to this repo, to re
 sudo apt-get install ros-indigo-hector-gazebo-plugins
 ```
 
-##### 4. Install Joystick Support
-
-Swarmathon rovers may be controlled with an XBox 360 controller. The rover is controlled with the right thumb stick.
+Our Swarmies can receive mobility commands from the right thumb stick on a Microsoft Xbox 360 controller. The ROS [joystick_drivers](http://wiki.ros.org/joystick_drivers) package, which contains a generic Linux joystick driver compatible with this controller, should also be installed using the apt-get tool:
 
 ```
  sudo apt-get install ros-indigo-joystick-drivers
  rosdep install joy
   ```
 
-##### 5. Install git (if git is already installed, skip to step 5):
+##### 4. Install git (if git is already installed, skip to step 5):
 
 ```
 sudo apt-get install git
 ```
 
-##### 6. Install Swarmathon-ROS
+##### 5. Install Swarmathon-ROS
 
 1. Clone this GitHub repository to your home directory (~):
 
@@ -97,7 +95,7 @@ sudo apt-get install git
   source ~/.bashrc
   ```
 
-##### 7. Run the Swarmathon-ROS simulation:
+##### 6. Run the Swarmathon-ROS simulation:
 
 1. Change the permissions on the simulation run script to make it exectuatable:
   
