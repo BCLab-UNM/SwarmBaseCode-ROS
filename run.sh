@@ -10,6 +10,7 @@ roscore &
 sleep 2
 rqt -s rqt_rover_gui
 echo Cleaning up ROS and Gazebo Processes
+rosnode kill -a 
 echo Killing rosmaster
 pkill rosmaster
 echo Killing roscore
