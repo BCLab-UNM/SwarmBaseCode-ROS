@@ -191,7 +191,7 @@ To close the simulation and the GUI, click the red exit button in the top left-h
 
 11. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box
 
-12. Click the Edit toolbox icon on the left
+12. Click the "Edit" toolbox icon on the left
 
 13. Double-click CMakeLists.txt
 
