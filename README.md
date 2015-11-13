@@ -34,6 +34,13 @@ Our simulated Swarmies use existing Gazebo plugins, external to this repo, to re
 sudo apt-get install ros-indigo-hector-gazebo-plugins
 ```
 
+Our Swarmies can receive mobility commands from the right thumb stick on a Microsoft Xbox 360 controller. The ROS [joystick_drivers](http://wiki.ros.org/joystick_drivers) package, which contains a generic Linux joystick driver compatible with this controller, should also be installed using the apt-get tool:
+
+```
+ sudo apt-get install ros-indigo-joystick-drivers
+ rosdep install joy
+  ```
+
 ##### 4. Install git (if git is already installed, skip to step 5):
 
 ```
@@ -46,7 +53,7 @@ sudo apt-get install git
 
   ```
   cd ~
-  git clone git@github.com:BCLab-UNM/Swarmathon-ROS.git
+  git clone https://github.com/BCLab-UNM/Swarmathon-ROS.git
   ```
 
 2. Rename the downloaded repo so it can be properly identified by ROS and catkin:
@@ -182,7 +189,7 @@ To close the simulation and the GUI, click the red exit button in the top left-h
 
 11. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box
 
-12. Click the Edit toolbox icon on the left
+12. Click the "Edit" toolbox icon on the left
 
 13. Double-click CMakeLists.txt
 
