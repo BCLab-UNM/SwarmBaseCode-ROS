@@ -58,18 +58,18 @@ IMUFrame::IMUFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 
         tuple<float,float,float,float> quaternion = make_tuple(cos(angle/2),x*sin(angle/2)/mag,y*sin(angle/2)/mag,z*sin(angle/2)/mag);
         for (int i = 0; i < 8; i++)
-        cube[i] = rotateByQuaternion(cube[i], quaternion);
+        cube[i] = inverseRotateByQuaternion(cube[i], quaternion);
 
         // Initialize the rotated_cube
         for (int i = 0; i < 8; i++)
         rotated_cube[i] = cube[i];
 
         // Rotate the lines coming out of the cube
-        line1_start = rotateByQuaternion(line1_start, quaternion);
-        rotated_line2_start = rotateByQuaternion(line2_start, quaternion);
+        line1_start = inverseRotateByQuaternion(line1_start, quaternion);
+        rotated_line2_start = inverseRotateByQuaternion(line2_start, quaternion);
 
-        line1_end = rotateByQuaternion(line1_end, quaternion);
-        line2_end = rotateByQuaternion(line2_end, quaternion);
+        line1_end = inverseRotateByQuaternion(line1_end, quaternion);
+        line2_end = inverseRotateByQuaternion(line2_end, quaternion);
 
         rotated_line1_start = line1_start;
         rotated_line2_start = line2_start;
@@ -356,13 +356,13 @@ void IMUFrame::setOrientation(float w, float x, float y, float z)
     tuple<float,float,float,float> quaternion = make_tuple(w,x,y,z);
 
     for (int i = 0; i < 8; i++)
-        rotated_cube[i] = rotateByQuaternion(cube[i], quaternion);
+        rotated_cube[i] = inverseRotateByQuaternion(cube[i], quaternion);
 
-    rotated_line1_start = rotateByQuaternion(line1_start, quaternion);
-    rotated_line2_start = rotateByQuaternion(line2_start, quaternion);
+    rotated_line1_start = inverseRotateByQuaternion(line1_start, quaternion);
+    rotated_line2_start = inverseRotateByQuaternion(line2_start, quaternion);
 
-    rotated_line1_end = rotateByQuaternion(line1_end, quaternion);
-    rotated_line2_end = rotateByQuaternion(line2_end, quaternion);
+    rotated_line1_end = inverseRotateByQuaternion(line1_end, quaternion);
+    rotated_line2_end = inverseRotateByQuaternion(line2_end, quaternion);
 
 
     emit delayedUpdate();
@@ -499,6 +499,12 @@ float** IMUFrame::setUpRotationMatrix(float angle, tuple<float, float, float> ax
                                    2.0f * dot_uv * get<2>(u) + (s*s - dot_uu) * get<2>(v) + 2.0f * s * get<2>(cross_uv));
 
         return rotated_point;
+    }
+
+    tuple<float, float, float> IMUFrame::inverseRotateByQuaternion(tuple<float, float, float> v, tuple<float, float, float, float>  quaternion)
+    {
+        // Make the vector component of the quaternion negative. This reverses the rotation.
+        return rotateByQuaternion(v,  make_tuple(get<0>(quaternion), -get<1>(quaternion), -get<2>(quaternion), -get<3>(quaternion)));
     }
 
 }

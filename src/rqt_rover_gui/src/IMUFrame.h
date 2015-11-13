@@ -52,6 +52,7 @@ protected:
 private:
     QPoint cameraTransform( tuple<float, float, float> point_3D, tuple<float, float, float> eye, tuple<float, float, float> camera_position, tuple<float, float, float> camera_angle );
     tuple<float, float, float> rotateByQuaternion( tuple<float, float, float> point,  tuple<float, float, float, float> quaternion);
+    tuple<float, float, float> inverseRotateByQuaternion( tuple<float, float, float> point,  tuple<float, float, float, float> quaternion);
     tuple<float, float, float> rotateAboutAxis(tuple<float, float, float> point, float angle,  tuple<float, float, float> axis_of_rotation);
     float** setUpRotationMatrix(float angle, tuple<float, float, float> axis_rotation); // angle in radians   
 
