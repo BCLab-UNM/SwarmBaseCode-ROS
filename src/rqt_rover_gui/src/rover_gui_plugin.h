@@ -112,7 +112,7 @@ namespace rqt_rover_gui {
   private:
 
     void checkAndRepositionRover(QString rover_name, float x, float y);
-    void readXML(QString path);
+    void readRoverModelXML(QString path);
 
     map<string,ros::Publisher> control_mode_publishers;
     ros::Publisher joystick_publisher;

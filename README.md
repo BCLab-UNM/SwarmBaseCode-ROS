@@ -8,7 +8,9 @@ This repository contains:
 2. 3D .STL models for the physical Swarmie build 
 3. Bash shell scripts for initializing simulated Swarmies in the Gazebo simulator, as well as physical Swarmies
 
-Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
+- Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
+
+- Please consult [git best practices](https://sethrobertson.github.io/GitBestPractices/) for guidelines on the most effective approaches to maintaining code. Teams will be expected to commit new code at least every two weeks, and ideally commit one or more times per week. Consult the [NASA Swarmathon Timeline](http://www.nasaswarmathon.com) for specifics on how often code should be committed, as well as the cutoff date for final code revision before the competition.
 
 ### Quick Start Installation Guide
 
@@ -38,7 +40,6 @@ Our Swarmies can receive mobility commands from the right thumb stick on a Micro
 
 ```
  sudo apt-get install ros-indigo-joystick-drivers
- rosdep install joy
   ```
 
 ##### 4. Install git (if git is already installed, skip to step 5):
@@ -68,7 +69,7 @@ sudo apt-get install git
   cd ~/rover_workspace
   ```
 
-4. Set up GPS submodule:
+4. Set up [ublox](http://wiki.ros.org/ublox) GPS submodule:
 
   ```
   git submodule init
@@ -151,6 +152,20 @@ The IMU sensor display consists of a cube where the red face is the bottom of th
 The map view shows the path taken by the currently selected rover. Green is the encoder position data. In simulation, the encoder position data comes from the odometry topic being published by Gazebo's skid steer controller plugin. In the real robots, it is the encoder output. GPS points are shown as red dots. The EKF is the output of an extended Kalman filter which fuses data from the IMU, GPS, and encoder sensors.
 
 To close the simulation and the GUI, click the red exit button in the top left-hand corner.
+
+### Software Documentation
+
+Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` directory. This diretory contains severals subdirectories, each of which contain a single ROS package. Here we present a high-level description of each package.
+
+- ```abridge```: A serial interface between Swarmathon-ROS and the A-Star 32U4 microcontroller onboard the physical robot. In the Swarmathon-ROS simulation, ```abridge``` functionality is supplanted by [gazebo_ros_skid_steer_drive](http://docs.ros.org/indigo/api/gazebo_plugins/html/classgazebo_1_1GazeboRosSkidSteerDrive.html) (motor and encoders) and [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) (sonar and IMU; see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
+- ```mobility```: The top-level controller class for the physical and simulated robots. This package receives messages on the status of targets and/or obstacles in front of the robot and autonomously makes decisions based on these factors. This packages also receives pose updates from [robot_localization](http://wiki.ros.org/robot_localization) (see [step 2](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#2-install-additional-ros-plugins) of the Quick Start guide) and commands from [joystick_drivers](http://wiki.ros.org/joystick_drivers) (see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
+- ```obstacle_detection```: A logic processor that converts sonar signals into a ternary collision value. This package receives sonar messages from ```abridge``` (for physical robots) or [hector_gazebo_ros_sonar](http://wiki.ros.org/hector_gazebo_plugins) (for simulated robots), and returns a status message to differentiate between three possible cases:
+  1. No collision
+  2. A collision on the right side of the robot
+  3. A collision in front or on the left side of the robot
+- ```rqt_rover_gui```: A Qt-based graphical interface for the physical and simulated robots. See [How to use Qt Creator](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#how-to-use-qt-creator-to-edit-the-simulation-gui) for details on this package.
+- ```target_detection```: An image processor that detects [AprilTag](https://april.eecs.umich.edu/wiki/index.php/AprilTags) fiducial markers in the onboard camera's video stream. This package receives images from the ```usbCamera``` class (for physical robots) or [gazebo_ros_camera](http://docs.ros.org/indigo/api/gazebo_plugins/html/classgazebo_1_1GazeboRosCamera.html) (for simulated robots), and, if an AprilTag is detected in the image, returns the integer value encoded in the tag.
+- ```ublox```: A serial interface to the ublox GPS receiver onboard the physical robot. This package is installed as a git submodule in the Swarmathon-ROS repo. See the [ublox ROS wiki page](http://wiki.ros.org/ublox) for more information.
 
 ### How to use Qt Creator to edit the simulation GUI
 
