@@ -38,7 +38,6 @@ Our Swarmies can receive mobility commands from the right thumb stick on a Micro
 
 ```
  sudo apt-get install ros-indigo-joystick-drivers
- rosdep install joy
   ```
 
 ##### 4. Install git (if git is already installed, skip to step 5):
