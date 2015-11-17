@@ -26,12 +26,18 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
 
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
+
 //#include <regex> // For regex expressions
 
 #include <cv_bridge/cv_bridge.h>
 #include <opencv/cv.h>
 
 using namespace std;
+
+using boost::property_tree::ptree;
 
 namespace rqt_rover_gui 
 {
@@ -105,8 +111,6 @@ namespace rqt_rover_gui
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
-
-
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -273,6 +277,10 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
 
+    //QString model_path = "~/rover_workspace/misc/models/"++"/model.sdf";
+    QString model_path = QDir::homePath()+"/rover_workspace/misc/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
+    readRoverModelXML(model_path);
+
     setupSubscribers();
     setupPublishers();
 
@@ -310,6 +318,8 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         default:
             displayLogMessage("Unknown control state: "+QString::number(control_state));
         }
+
+        displayLogMessage("Existing rover selected");
     }
 
     // Clear map
@@ -320,8 +330,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.joystick_control_radio_button->setEnabled(true);
     ui.all_autonomous_control_radio_button->setEnabled(true);
 
-    QString model_path = "~/rover_workspace/misc/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
-    readXML(model_path);
+
 }
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
@@ -331,7 +340,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     // Wait for a rover to connect
     if (new_rover_names.empty())
     {
-        displayLogMessage("Waiting for rover to connect...");
+        //displayLogMessage("Waiting for rover to connect...");
         ui.map_frame->clearMap();
         selected_rover_name = "";
         // Disable control mode radio group since no rover has been selected
@@ -901,21 +910,156 @@ void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float 
     }
 }
 
-void RoverGUIPlugin::readXML(QString path)
+void RoverGUIPlugin::readRoverModelXML(QString path)
 {
-    return;
-    QDomDocument xml_doc;
-    QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    ifstream model_file;
+    model_file.open(path.toStdString(), ios::in);
+    if (model_file.is_open())
+        displayLogMessage("Read model file at " + path );
+    else
     {
-        displayLogMessage("Error: could not open " + path );
+        displayLogMessage("Could not read model file at " + path );
         return;
     }
 
-    if(!xml_doc.setContent(&file))
+    ptree property_tree;
+    read_xml(model_file, property_tree);
+
+    BOOST_FOREACH( ptree::value_type const& v, property_tree.get_child("sdf.model") )
     {
-        displayLogMessage("Error: could not parse " + path );
-        return;
+        if (v.first == "link")
+        {
+            BOOST_FOREACH( ptree::value_type const& w, v.second )
+            {
+                if (w.first == "sensor")
+                {
+                    BOOST_FOREACH( ptree::value_type const& x, w.second )
+                    {
+                        if ( x.first == "ray" )
+                        {
+                            BOOST_FOREACH( ptree::value_type const& y, x.second.get_child("scan.horizontal") )
+                            {
+                                if (y.first == "samples")
+                                {
+                                    //ui.sonar_horz_res->setText( QString::fromStdString(y.second.data()) );
+                                }
+                                else if (y.first == "resolution")
+                                {
+                                    ui.sonar_horz_res->setText( QString::fromStdString(y.second.data()) );
+                                }
+                                else if (y.first == "min_angle")
+                                {
+                                    ui.sonar_min_angle->setText( QString::fromStdString(y.second.data()) );
+                                }
+                                else if (y.first == "max_angle")
+                                {
+                                    ui.sonar_max_angle->setText( QString::fromStdString(y.second.data()) );
+                                }
+                            }
+
+                            BOOST_FOREACH( ptree::value_type const& y, x.second.get_child("range") )
+                            {
+                                if (y.first == "min")
+                                {
+                                    ui.sonar_min->setText( QString::fromStdString(y.second.data()) );
+                                }
+                                else if (y.first == "max")
+                                {
+                                    ui.sonar_max->setText( QString::fromStdString(y.second.data()) );
+                                }
+                                else if (y.first == "resolution")
+                                {
+                                    ui.sonar_range_res->setText( QString::fromStdString(y.second.data()) );
+                                }
+                            }
+                        }
+                        else if ( x.first == "plugin" )
+                        {
+
+                            BOOST_FOREACH( ptree::value_type const& y, x.second )
+                            {
+                                if (y.first == "gaussianNoise")
+                                {
+                                    ui.sonar_gaussian_noise->setText( QString::fromStdString(y.second.data()) );
+                                }
+                            }
+                        }
+                        else if ( x.first == "camera" )
+                        {
+                            BOOST_FOREACH( ptree::value_type const& x, w.second )
+                            {
+                                if (x.first == "update_rate")
+                                ui.camera_update_rate->setText( QString::fromStdString(x.second.data()) );
+                            }
+
+                            BOOST_FOREACH( ptree::value_type const& y, x.second )
+                            {
+                                if (y.first == "noise")
+                                {
+                                    BOOST_FOREACH( ptree::value_type const& z, y.second )
+                                    {
+                                         if (z.first == "mean") ui.camera_noise_mean->setText( QString::fromStdString(z.second.data()) );
+                                         else if (z.first == "stddev") ui.camera_noise_stdev->setText( QString::fromStdString(z.second.data()) );
+                                    }
+                                }
+                                else if (y.first == "image")
+                                {
+                                    BOOST_FOREACH( ptree::value_type const& z, y.second )
+                                    {
+                                         if (z.first == "width") ui.camera_width->setText( QString::fromStdString(z.second.data()) );
+                                         else if (z.first == "height") ui.camera_height->setText( QString::fromStdString(z.second.data()) );
+                                         else if (z.first == "format") ui.camera_format->setText( QString::fromStdString(z.second.data()) );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if (v.first == "plugin")
+        {
+            cout << v.first << std::endl;
+            BOOST_FOREACH( ptree::value_type const& w, v.second.get_child("<xmlattr>"))
+            {
+                 if (w.first == "name")
+                    if (w.second.data() == "imu_sim")
+                    {
+                        BOOST_FOREACH( ptree::value_type const& x, v.second)
+                        {
+                            if (x.first == "updateRate") ui.imu_update_rate->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "rpyOffsets") ui.imu_rpy_offsets->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "gaussianNoise") ui.imu_noise->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "accelDrift") ui.imu_accel_drift->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "accelGaussianNoise") ui.imu_accel_noise->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "rateDrift") ui.imu_rate_drift->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "rateGaussianNoise") ui.imu_rate_noise->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "headingDrift") ui.imu_heading_drift->setText(QString::fromStdString(x.second.data()));
+                            else if (x.first == "headingGaussianNoise") ui.imu_heading_noise->setText(QString::fromStdString(x.second.data()));
+                        }
+                    }
+                 else if (w.second.data() == "gps_sim")
+                    {
+                        BOOST_FOREACH( ptree::value_type const& x, v.second)
+                        {
+                             if (x.first == "updateRate") ui.gps_update_rate->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "referenceLatitude") ui.gps_ref_lat->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "referenceLongitude") ui.gps_ref_long->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "referenceAltitude") ui.gps_ref_alt->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "referenceHeading") ui.gps_ref_heading->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "drift") ui.gps_drift->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "driftFrequency") ui.gps_drift_freq->setText(QString::fromStdString(x.second.data()));
+                             else if (x.first == "gaussianNoise") ui.gps_noise->setText(QString::fromStdString(x.second.data()));
+
+                        }
+                    }
+                }
+
+            }
+        else
+        {
+            cout << v.first << std::endl;
+        }
     }
 
 //    QDomElement root = xml_doc.documentElement();
