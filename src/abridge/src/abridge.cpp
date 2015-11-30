@@ -7,6 +7,7 @@
 #include <std_msgs/String.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Range.h>
 
@@ -23,6 +24,7 @@ void parseData(string data);
 
 //Globals
 sensor_msgs::Imu imu;
+nav_msgs::Odometry odom;
 sensor_msgs::Range sonarLeft;
 sensor_msgs::Range sonarCenter;
 sensor_msgs::Range sonarRight;
@@ -39,6 +41,7 @@ const float deltaTime = 0.25;
 
 //Publishers
 ros::Publisher imuPublish;
+ros::Publisher odomPublish;
 ros::Publisher sonarLeftPublish;
 ros::Publisher sonarCenterPublish;
 ros::Publisher sonarRightPublish;
@@ -73,7 +76,8 @@ int main(int argc, char **argv) {
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
 
-    imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);    
+    imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);
+    odomPublish = aNH.advertise<nav_msgs::Odometry>((publishedName + "/odom"), 10);
     sonarLeftPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarLeft"), 10);
     sonarCenterPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarCenter"), 10);
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
@@ -113,10 +117,11 @@ void serialActivityTimer(const ros::TimerEvent& e) {
 }
 
 void publishRosTopics() {
-    sonarLeftPublish.publish(sonarLeft);
-    sonarCenterPublish.publish(sonarCenter);
-    sonarRightPublish.publish(sonarRight);
-    imuPublish.publish(imu);
+	imuPublish.publish(imu);
+	odomPublish.publish(odom);
+	sonarLeftPublish.publish(sonarLeft);
+	sonarCenterPublish.publish(sonarCenter);
+	sonarRightPublish.publish(sonarRight);
 }
 
 void parseData(string str) {
@@ -125,7 +130,7 @@ void parseData(string str) {
     while (getline(oss, word, delimiter)) {
         dataSet.push_back(word);
     }
-    if (dataSet.size() == 12) {
+    if (dataSet.size() == 14) {
         imu.linear_acceleration.x = atof(dataSet.at(0).c_str());
         imu.linear_acceleration.y = atof(dataSet.at(1).c_str());
         imu.linear_acceleration.z = atof(dataSet.at(2).c_str());
@@ -133,9 +138,11 @@ void parseData(string str) {
         imu.angular_velocity.y = atof(dataSet.at(4).c_str());
         imu.angular_velocity.z = atof(dataSet.at(5).c_str());
         imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(6).c_str()), atof(dataSet.at(7).c_str()), atof(dataSet.at(8).c_str()));
-        sonarLeft.range = atof(dataSet.at(9).c_str()) / 100.0;
-        sonarCenter.range = atof(dataSet.at(10).c_str()) / 100.0;
-        sonarRight.range = atof(dataSet.at(11).c_str()) / 100.0;
+        odom.pose.pose.position.x = atof(dataSet.at(9).c_str());
+        odom.pose.pose.position.y = atof(dataSet.at(10).c_str());
+        sonarLeft.range = atof(dataSet.at(11).c_str()) / 100.0;
+        sonarCenter.range = atof(dataSet.at(12).c_str()) / 100.0;
+        sonarRight.range = atof(dataSet.at(13).c_str()) / 100.0;
     }
     
     dataSet.clear();
