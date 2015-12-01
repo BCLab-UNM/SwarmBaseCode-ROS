@@ -30,27 +30,17 @@ findDevicePath() {
 
 
 #Startup ROS packages/processes
-nohup rosrun rover_onboard_target_detection camera &
-nohup rosrun rover_onboard_mobility mobility &
-nohup rosrun rover_onboard_obstacle_detection obstacle &
-nohup rosrun rover_onboard_target_detection target &
-
-nohup rosrun robot_localization navsat_transform_node __name:=navsat _world_frame:=map _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
-
-rosparam set /ekf_localization_node/odom0 /$HOSTNAME/odom/navsat
-rosparam set /ekf_localization_node/odom1 /$HOSTNAME/odom
-rosparam set /ekf_localization_node/imu0 /$HOSTNAME/imu
-rosparam set /ekf_localization_node/odom0_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
-rosparam set /ekf_localization_node/odom1_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
-rosparam set /ekf_localization_node/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
-nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true __name:=ekf /odometry/filtered:=/$HOSTNAME/odom/ekf &
+nohup rosrun target_detection camera &
+nohup rosrun mobility mobility &
+nohup rosrun obstacle_detection obstacle &
+nohup rosrun target_detection target &
 
 microcontrollerDevicePath=$(findDevicePath Arduino)
 if [ -z "$microcontrollerDevicePath" ]
 then
     echo "Error: Microcontroller device not found"
 else
-    nohup rosrun rover_onboard_abridge abridge _device:=/dev/$microcontrollerDevicePath &
+    nohup rosrun abridge abridge _device:=/dev/$microcontrollerDevicePath &
 fi
 
 gpsDevicePath=$(findDevicePath u-blox)
@@ -60,6 +50,16 @@ then
 else
     nohup rosrun ublox_gps ublox_gps /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath &
 fi
+
+nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
+
+rosparam set /$HOSTNAME\_EKF/odom0 /$HOSTNAME/odom/navsat
+rosparam set /$HOSTNAME\_EKF/odom1 /$HOSTNAME/odom
+rosparam set /$HOSTNAME\_EKF/imu0 /$HOSTNAME/imu
+rosparam set /$HOSTNAME\_EKF/odom0_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
+rosparam set /$HOSTNAME\_EKF/odom1_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
+rosparam set /$HOSTNAME\_EKF/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
+nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true __name:=$HOSTNAME\_EKF /odometry/filtered:=/$HOSTNAME/odom/ekf &
 
 
 #Wait for user input to terminate processes
