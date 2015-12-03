@@ -54,19 +54,19 @@ ros::Subscriber moveSubscriber;
 ros::Timer publishTimer;
 
 int main(int argc, char **argv) {
-
+    
     gethostname(host, sizeof (host));
     string hostname(host);
     string publishedName;
     ros::init(argc, argv, (hostname + "_ABRIDGE"));
-
+    
     ros::NodeHandle param("~");
     string devicePath;
     param.param("device", devicePath, string("/dev/ttyUSB0"));
     usb.openUSBPort(devicePath, baud);
-
+    
     sleep(5);
-
+    
     ros::NodeHandle aNH;
     
     if (argc >= 2) {
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
         publishedName = hostname;
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
-
+    
     imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);
     odomPublish = aNH.advertise<nav_msgs::Odometry>((publishedName + "/odom"), 10);
     sonarLeftPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarLeft"), 10);
@@ -86,15 +86,15 @@ int main(int argc, char **argv) {
     moveSubscriber = aNH.subscribe((publishedName + "/mobility"), 10, cmdHandler);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
-
+    
     imu.header.frame_id = "base_link";
-
+    
     odom.header.frame_id = "odom";
     odom.child_frame_id = "base_link";
     odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
-
+    
     ros::spin();
-
+    
     return EXIT_SUCCESS;
 }
 
@@ -113,7 +113,7 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
         sprintf(moveCmd, "s\n");
         usb.sendData(moveCmd);
     }
-
+    
     memset(&moveCmd, '\0', sizeof (moveCmd));
 }
 
@@ -124,22 +124,22 @@ void serialActivityTimer(const ros::TimerEvent& e) {
 }
 
 void publishRosTopics() {
-	imuPublish.publish(imu);
-	odomPublish.publish(odom);
-	sonarLeftPublish.publish(sonarLeft);
-	sonarCenterPublish.publish(sonarCenter);
-	sonarRightPublish.publish(sonarRight);
-
-	tf::TransformBroadcaster odomTransformPublish;
-	geometry_msgs::TransformStamped odomTransform;
-	odomTransform.header.stamp = ros::Time::now();
-	odomTransform.header.frame_id = "odom";
-	odomTransform.child_frame_id = "base_link";
-	odomTransform.transform.translation.x = odom.pose.pose.position.x;
-	odomTransform.transform.translation.y = odom.pose.pose.position.y;
-	odomTransform.transform.translation.z = 0.0;
-	odomTransform.transform.rotation = odom.pose.pose.orientation;
-	odomTransformPublish.sendTransform(odomTransform);
+    imuPublish.publish(imu);
+    odomPublish.publish(odom);
+    sonarLeftPublish.publish(sonarLeft);
+    sonarCenterPublish.publish(sonarCenter);
+    sonarRightPublish.publish(sonarRight);
+    
+    tf::TransformBroadcaster odomTransformPublish;
+    geometry_msgs::TransformStamped odomTransform;
+    odomTransform.header.stamp = ros::Time::now();
+    odomTransform.header.frame_id = "odom";
+    odomTransform.child_frame_id = "base_link";
+    odomTransform.transform.translation.x = odom.pose.pose.position.x;
+    odomTransform.transform.translation.y = odom.pose.pose.position.y;
+    odomTransform.transform.translation.z = 0.0;
+    odomTransform.transform.rotation = odom.pose.pose.orientation;
+    odomTransformPublish.sendTransform(odomTransform);
 }
 
 void parseData(string str) {
@@ -149,7 +149,7 @@ void parseData(string str) {
         dataSet.push_back(word);
     }
     if (dataSet.size() == 18) {
-      imu.header.stamp = ros::Time::now();
+        imu.header.stamp = ros::Time::now();
         imu.linear_acceleration.x = atof(dataSet.at(0).c_str());
         imu.linear_acceleration.y = atof(dataSet.at(1).c_str());
         imu.linear_acceleration.z = atof(dataSet.at(2).c_str());
@@ -157,19 +157,16 @@ void parseData(string str) {
         imu.angular_velocity.y = atof(dataSet.at(4).c_str());
         imu.angular_velocity.z = atof(dataSet.at(5).c_str());
         imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(6).c_str()), atof(dataSet.at(7).c_str()), atof(dataSet.at(8).c_str()));
-
-	odom.header.stamp = ros::Time::now();
+        
+        odom.header.stamp = ros::Time::now();
         odom.pose.pose.position.x += atof(dataSet.at(9).c_str()) / 100.0;
         odom.pose.pose.position.y += atof(dataSet.at(10).c_str()) / 100.0;
-	odom.pose.pose.position.z = 0.0;
-	tf::Quaternion q;
-	tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
-	q *= tf::createQuaternionFromYaw(atof(dataSet.at(11).c_str()));
-	tf::quaternionTFToMsg(q, odom.pose.pose.orientation);
+        odom.pose.pose.position.z = 0.0;
+        odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(atof(dataSet.at(11).c_str()));
         odom.twist.twist.linear.x = atof(dataSet.at(12).c_str()) / 100.0;
         odom.twist.twist.linear.y = atof(dataSet.at(13).c_str()) / 100.0;
         odom.twist.twist.angular.z = atof(dataSet.at(14).c_str());
-
+        
         sonarLeft.range = atof(dataSet.at(15).c_str()) / 100.0;
         sonarCenter.range = atof(dataSet.at(16).c_str()) / 100.0;
         sonarRight.range = atof(dataSet.at(17).c_str()) / 100.0;
