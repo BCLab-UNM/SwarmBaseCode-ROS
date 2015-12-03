@@ -91,7 +91,6 @@ int main(int argc, char **argv) {
     
     odom.header.frame_id = "odom";
     odom.child_frame_id = "base_link";
-    odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     
     ros::spin();
     
