@@ -68,13 +68,14 @@ while true; do
     read choice;
 
     if [ "$choice" == "q" ];then
-	pkill abridge
-	pkill camera
-	pkill mobility
-	pkill obstacle
-	pkill path
-	pkill target
-	pkill ublox_gps
+	rosnode kill $HOSTNAME\_NAVSAT
+	rosnode kill $HOSTNAME\_EKF
+	rosnode kill $HOSTNAME\_ABRIDGE
+	rosnode kill $HOSTNAME\_CAMERA
+	rosnode kill $HOSTNAME\_MOBILITY
+	rosnode kill $HOSTNAME\_OBSTACLE
+	rosnode kill $HOSTNAME\_TARGET
+	rosnode kill ublox_gps
 	exit 1
     fi
 done
