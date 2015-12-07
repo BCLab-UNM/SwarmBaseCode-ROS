@@ -38,7 +38,7 @@ char delimiter = ',';
 vector<string> dataSet;
 float linearSpeed = 0.;
 float turnSpeed = 0.;
-const float deltaTime = 0.25;
+const float deltaTime = 0.1;
 
 //Publishers
 ros::Publisher imuPublish;
