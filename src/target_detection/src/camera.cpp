@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
 
-    USBCamera usbCam1(1, cameraIndex, publishedName);
+    USBCamera usbCam1(10, cameraIndex, publishedName);
 
     while (ros::ok()) {
         ros::spin();
