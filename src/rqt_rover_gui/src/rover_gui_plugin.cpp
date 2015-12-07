@@ -231,6 +231,11 @@ void RoverGUIPlugin::GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
      cols_stream << image_cols;
      rows_stream << image_rows;
 
+     // For debugging
+     //QString debug_msg = "Received image ";
+     //debug_msg += "(" + QString::number(image_rows) + " x " + QString::number(image_cols) +")";
+     //cout << debug_msg.toStdString() << endl;
+
     // ROS_INFO_STREAM("Image received Size:" + rows_stream.str() + "x" + cols_stream.str());
 
      // Create QImage to hold the image
@@ -386,7 +391,7 @@ void RoverGUIPlugin::setupSubscribers()
     image_transport::ImageTransport it(nh);
     int frame_rate = 1;
     // Theroa codex results in the least information being transmitted
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this);//, image_transport::TransportHints("theora"));
+    camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
 
     // Odometry and GPS subscribers
     encoder_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
