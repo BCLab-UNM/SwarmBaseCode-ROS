@@ -10,7 +10,7 @@ This repository contains:
 
 - Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
-- Please consult [git best practices](https://sethrobertson.github.io/GitBestPractices/) for guidelines on the most effective approaches to maintaining code. Teams will be expected to commit new code at least every two weeks, and ideally commit one or more times per week. Consult the [NASA Swarmathon Timeline](http://www.nasaswarmathon.com) for specifics on how often code should be committed, as well as the cutoff date for final code revision before the competition.
+- Please consult the [git scm](https://git-scm.com/) and [git best practices](https://sethrobertson.github.io/GitBestPractices/) for guidelines on the most effective approaches to maintaining code. Teams will be expected to commit new code at least every two weeks, and ideally commit one or more times per week. Consult the [NASA Swarmathon Timeline](http://www.nasaswarmathon.com) for specifics on how often code should be committed, as well as the cutoff date for final code revision before the competition.
 
 ### Quick Start Installation Guide
 
