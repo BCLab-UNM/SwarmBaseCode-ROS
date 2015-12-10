@@ -29,7 +29,6 @@ private:
 
     cv::VideoCapture videoStream;
     cv::Mat cvImageColor;
-    cv::Mat cvImageBW;
     cv::Mat cvImageLR;
     cv_bridge::CvImagePtr rosImage;
 

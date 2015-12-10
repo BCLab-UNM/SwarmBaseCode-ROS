@@ -22,16 +22,15 @@ USBCamera::USBCamera(int frameRate, int cameraIndex, string hostname):
         rawImgPublish = it.advertise((hostname + "/camera/image"), 2);
 
         rosImage = boost::make_shared<cv_bridge::CvImage>();
-        rosImage->encoding = sensor_msgs::image_encodings::MONO8;
+        rosImage->encoding = sensor_msgs::image_encodings::RGB8;
 
         timer = nh.createTimer(period, &USBCamera::capture, this);
 }
 
 void USBCamera::capture(const ros::TimerEvent& te) {
         videoStream >> cvImageColor;
-        cv::cvtColor(cvImageColor, cvImageBW, cv::COLOR_BGR2GRAY);  
         
-        cv::resize(cvImageBW, cvImageLR, cv::Size(320,240), cv::INTER_LINEAR);
+        cv::resize(cvImageColor, cvImageLR, cv::Size(320,240), cv::INTER_LINEAR);
         
         rosImage->image = cvImageLR;
         if (not rosImage->image.empty()) {
