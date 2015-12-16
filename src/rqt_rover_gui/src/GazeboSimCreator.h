@@ -41,7 +41,8 @@ public:
     QString startGazebo();
     QString stopGazebo();
     QString removeModel( QString model_name );
-    QString addModel(QString model_name, float x, float y, float z);
+    QString addModel(QString model_name, QString unique_id, float x, float y, float z);
+    QString addModel(QString model_name, QString unique_id, float x, float y, float z, float R, float P, float Y);
     QString moveRover(QString rover_name, float x, float y, float z);
     QString applyForceToRover(QString rover_name, float x, float y, float z, float duration);
     bool isLocationOccupied(float x, float y, float clearence);
