@@ -681,6 +681,18 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
        displayLogMessage(return_msg);
    }
 
+   // add walls given nw corner (x,y) and height and width (in meters)
+   if (ui.final_radio_button->isChecked())
+   {
+        arena_height = 23.1;
+        arena_width = 23.1;
+   }
+   else
+   {
+       arena_height = 15;
+       arena_width = 15;
+   }
+   addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
 //   // Test rover movement
 //   displayLogMessage("Moving alpha");
 //   return_msg = sim_creator.moveRover("alpha", 10, 0, 0);
@@ -768,7 +780,7 @@ QString RoverGUIPlugin::addUniformTargets()
        }
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
-        output = sim_creator.addModel(QString("at")+QString::number(i), proposed_x, proposed_y, 0);
+        output = sim_creator.addModel(QString("at")+QString::number(i),  QString("at")+QString::number(i), proposed_x, proposed_y, 0);
 
        progress_dialog.setValue(i*100.0f/256);
     }
@@ -807,7 +819,7 @@ QString RoverGUIPlugin::addClusteredTargets()
 
         progress_dialog.setValue(i*100.0f/4);
 
-        output = sim_creator.addModel(QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0);
+        output = sim_creator.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0);
         displayLogMessage(output);
     }
 
@@ -844,7 +856,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
     while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
     progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
-    output+= sim_creator.addModel("atags64_0", arena_width/2-rand()%boost::math::iround(arena_width), 10-rand()%boost::math::iround(arena_height), 0);
+    output+= sim_creator.addModel("atags64_0", "atags64_0", arena_width/2-rand()%boost::math::iround(arena_width), 10-rand()%boost::math::iround(arena_height), 0);
 
     // Four piles of 16
     for (int i = 0; i < 4; i++)
@@ -859,7 +871,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
-        output+= sim_creator.addModel(QString("atags16_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
+        output+= sim_creator.addModel(QString("atags16_")+QString::number(i), QString("atags16_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
     // Sixteen piles of 4
@@ -875,7 +887,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
-        output+= sim_creator.addModel(QString("atags4_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
+        output+= sim_creator.addModel(QString("atags4_")+QString::number(i), QString("atags4_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
     // Sixty-four piles of 1
@@ -891,11 +903,48 @@ QString RoverGUIPlugin::addPowerLawTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
-        output+= sim_creator.addModel(QString("at")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
+        output+= sim_creator.addModel(QString("at")+QString::number(i), QString("at")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
     return output;
 }
+
+// Add a cinder block wall to the simulation
+QString RoverGUIPlugin::addWalls(float x, float y, float width, float height)
+{
+    QString output;
+
+        float spacing = 0.45;
+
+        // North wall
+        int cinder_block_count = 0;
+        for (float i = x; i <= x+width; i+=spacing)
+        {
+            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), i, y, 0);
+        }
+
+        // South wall
+        for (float i = x; i <= x+width; i+=spacing)
+        {
+            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), i, y+height, 0);
+        }
+
+        // West wall
+        for (float i = y+spacing; i < y+height; i+=spacing)
+        {
+            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), x, i, 0, 0, 0, M_PI/2);
+        }
+
+
+        // East wall
+        for (float i = y+spacing; i < y+height; i+=spacing)
+        {
+            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), x+width, i, 0, 0, 0, M_PI/2);
+        }
+
+    return output;
+}
+
 
 void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float y)
 {

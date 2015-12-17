@@ -141,17 +141,31 @@ QString GazeboSimCreator::removeGroundPlane( QString ground_name )
     return return_msg;
 }
 
-QString GazeboSimCreator::addModel(QString model_name, float x, float y, float z)
+QString GazeboSimCreator::addModel(QString model_name, QString unique_id, float x, float y, float z)
+{
+    return addModel(model_name, unique_id, x, y, z, 0, 0, 0);
+}
+
+QString GazeboSimCreator::addModel(QString model_name, QString unique_id, float x, float y, float z, float roll, float pitch, float yaw)
 {
     model_locations.insert(make_tuple(x, y));
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/misc/models/" + model_name + "/model.sdf -model " + model_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/misc/models/" + model_name + "/model.sdf "
+            + "-model " + unique_id
+            + " -x "    + QString::number(x)
+            + " -y "    + QString::number(y)
+            + " -z "    + QString::number(z)
+            + " -R "    + QString::number(roll)
+            + " -P "    + QString::number(pitch)
+            + " -Y "    + QString::number(yaw);
+
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
     sh.waitForFinished();
     QByteArray output = sh.readAll();
     sh.close();
+
 
     QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
 
