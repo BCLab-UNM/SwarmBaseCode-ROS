@@ -51,6 +51,8 @@ namespace rqt_rover_gui
     arena_height = 20;
     arena_width = 20;
 
+    number_of_targets_found = 0;
+
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -275,6 +277,34 @@ set<string> RoverGUIPlugin::findConnectedRovers()
     return rovers;
 }
 
+void RoverGUIPlugin::targetFoundEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const std_msgs::Int16ConstPtr& msg = event.getMessage();
+
+    //QString displ = QString("Target number ") + QString::number(msg->data) + QString(" found.");
+
+    int target_id = msg->data;
+
+    if(std::find(targets_found.begin(), targets_found.end(), target_id) != targets_found.end())
+    {
+        // This target was already found
+    }
+    else
+    {
+        targets_found.push_back(target_id);
+        cout << "New Target Found: " << QString::number(target_id).toStdString() << endl;
+        number_of_targets_found++;
+        ui.num_targets_detected_label->setText(QString::number(number_of_targets_found));
+    }
+
+    //displayLogMessage(displ);
+
+}
+
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
     selected_rover_name = current->text().toStdString();
@@ -363,7 +393,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     rover_names = new_rover_names;
 
    displayLogMessage("List of connected rovers has changed");
-
+   selected_rover_name = "";
+    ui.rover_list->clearSelection();
     ui.rover_list->clear();
 
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
@@ -371,8 +402,9 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         QListWidgetItem* new_item = new QListWidgetItem(QString::fromStdString(*i));
         new_item->setForeground(Qt::red);
         ui.rover_list->addItem(new_item);
-
     }
+
+    setupSubscribers();
 }
 
 void RoverGUIPlugin::setupPublishers()
@@ -387,6 +419,10 @@ void RoverGUIPlugin::setupPublishers()
 
 void RoverGUIPlugin::setupSubscribers()
 {
+    // Subscriptions for the selected rover
+
+    if (!selected_rover_name.empty())
+    {
     // Create a subscriber to listen for camera events
     image_transport::ImageTransport it(nh);
     int frame_rate = 1;
@@ -408,10 +444,16 @@ void RoverGUIPlugin::setupSubscribers()
 
     // IMU Subscriptions
     imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
+    }
 
-    // Target detected topic
-   // target_detection_subscriber = nh.subscribe("/"+selected_rover_name+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
+    // Subscriptions for all rovers
 
+    // Target detected topic - subscribe to all known rovers
+    set<string>::iterator rover_it;
+    for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
+    {
+        target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetFoundEventHandler, this);
+    }
 }
 
 void RoverGUIPlugin::centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
@@ -581,6 +623,19 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         return;
     }
 
+    if (ui.final_radio_button->isChecked())
+    {
+         arena_height = 23.1;
+         arena_width = 23.1;
+    }
+    else
+    {
+        arena_height = 15;
+        arena_width = 15;
+    }
+
+    displayLogMessage(QString("Set arena size to ")+QString::number(arena_width)+"x"+QString::number(arena_height));
+
     return_msg = sim_creator.startGazebo();
 
     cout << return_msg.toStdString() << endl;
@@ -682,18 +737,12 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    }
 
    // add walls given nw corner (x,y) and height and width (in meters)
-   if (ui.final_radio_button->isChecked())
-   {
-        arena_height = 23.1;
-        arena_width = 23.1;
-   }
-   else
-   {
-       arena_height = 15;
-       arena_width = 15;
-   }
+
+   displayLogMessage("Building walls...");
    addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
-//   // Test rover movement
+
+
+   //   // Test rover movement
 //   displayLogMessage("Moving alpha");
 //   return_msg = sim_creator.moveRover("alpha", 10, 0, 0);
 //   displayLogMessage(return_msg);
@@ -812,8 +861,8 @@ QString RoverGUIPlugin::addClusteredTargets()
         do
         {
             displayLogMessage("Tried to place cluster "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
-            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+            proposed_x = arena_width/2.0 - (((float) rand()) / RAND_MAX)*arena_width;
+            proposed_y = arena_height/2.0 - (((float) rand()) / RAND_MAX)*arena_height;
         }
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
@@ -912,27 +961,39 @@ QString RoverGUIPlugin::addPowerLawTargets()
 // Add a cinder block wall to the simulation
 QString RoverGUIPlugin::addWalls(float x, float y, float width, float height)
 {
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Building walls");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
     QString output;
 
-        float spacing = 0.45;
+        float spacing = 0.45; //cm
+
+        int cinder_block_count = 0;
+        int total_number_of_cinder_blocks = 2*(width+height)/spacing;
 
         // North wall
-        int cinder_block_count = 0;
         for (float i = x; i <= x+width; i+=spacing)
         {
             output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), i, y, 0);
+            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
         }
 
         // South wall
         for (float i = x; i <= x+width; i+=spacing)
         {
             output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), i, y+height, 0);
+            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
         }
 
         // West wall
         for (float i = y+spacing; i < y+height; i+=spacing)
         {
             output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), x, i, 0, 0, 0, M_PI/2);
+            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
         }
 
 
@@ -940,6 +1001,7 @@ QString RoverGUIPlugin::addWalls(float x, float y, float width, float height)
         for (float i = y+spacing; i < y+height; i+=spacing)
         {
             output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), x+width, i, 0, 0, 0, M_PI/2);
+            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
         }
 
     return output;

@@ -1727,25 +1727,25 @@ border: 1px solid white;
       <rect>
        <x>30</x>
        <y>60</y>
-       <width>181</width>
+       <width>201</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Number of Tags Detected:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Number of Targets Detected:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLabel" name="tags_detected_label">
+    <widget class="QLabel" name="num_targets_detected_label">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>240</x>
        <y>60</y>
        <width>67</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>

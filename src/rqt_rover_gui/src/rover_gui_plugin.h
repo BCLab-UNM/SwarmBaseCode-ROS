@@ -32,6 +32,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/Imu.h>
+#include <std_msgs/Int16.h>
 #include <pluginlib/class_list_macros.h>
 
 #include <QProcess>
@@ -74,6 +75,7 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
     void GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
     void encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+    void targetFoundEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -127,6 +129,7 @@ namespace rqt_rover_gui {
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
     ros::Subscriber target_detection_subscriber;
+    map<string,ros::Subscriber> target_detection_subscribers;
 
     image_transport::Subscriber camera_subscriber;
 
@@ -146,6 +149,9 @@ namespace rqt_rover_gui {
 
     int arena_width; // in meters
     int arena_height; // in meters
+
+    int number_of_targets_found;
+    vector<int> targets_found;
   };
 } // end namespace
 
