@@ -75,7 +75,9 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
     void GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
     void encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
-    void targetFoundEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
+    void targetDetectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
+    void targetCollectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
+
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -130,7 +132,7 @@ namespace rqt_rover_gui {
     ros::Subscriber imu_subscriber;
     ros::Subscriber target_detection_subscriber;
     map<string,ros::Subscriber> target_detection_subscribers;
-
+    ros::Subscriber target_collection_subscriber;
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
@@ -150,8 +152,9 @@ namespace rqt_rover_gui {
     int arena_width; // in meters
     int arena_height; // in meters
 
-    int number_of_targets_found;
-    vector<int> targets_found;
+    vector<int> targets_detected;
+    vector<int> targets_collected;
+
   };
 } // end namespace
 

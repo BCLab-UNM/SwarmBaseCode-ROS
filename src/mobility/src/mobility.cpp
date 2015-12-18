@@ -156,7 +156,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				//Otherwise, assign a new goal
 				else {
 					 //select new heading from Gaussian distribution around current heading
-					goalLocation.theta = rng->gaussian(currentLocation.theta, 1.0);
+					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
 					
 					//select new position 50 cm from current location
 					goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));

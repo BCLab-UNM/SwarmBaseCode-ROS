@@ -50,9 +50,6 @@ namespace rqt_rover_gui
 
     arena_height = 20;
     arena_width = 20;
-
-    number_of_targets_found = 0;
-
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -277,7 +274,29 @@ set<string> RoverGUIPlugin::findConnectedRovers()
     return rovers;
 }
 
-void RoverGUIPlugin::targetFoundEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
+void RoverGUIPlugin::targetCollectedEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const std_msgs::Int16ConstPtr& msg = event.getMessage();
+
+    int target_id = msg->data;
+
+    if(std::find(targets_collected.begin(), targets_collected.end(), target_id) != targets_collected.end())
+    {
+        // This target was already collected
+    }
+    else
+    {
+        targets_collected.push_back(target_id);
+        cout << "New Target Collected: " << QString::number(target_id).toStdString() << endl;
+        ui.num_targets_detected_label->setText(QString::number(targets_collected.size()));
+    }
+}
+
+void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
 {
     const std::string& publisher_name = event.getPublisherName();
     const ros::M_string& header = event.getConnectionHeader();
@@ -289,16 +308,15 @@ void RoverGUIPlugin::targetFoundEventHandler(const ros::MessageEvent<const std_m
 
     int target_id = msg->data;
 
-    if(std::find(targets_found.begin(), targets_found.end(), target_id) != targets_found.end())
+    if(std::find(targets_detected.begin(), targets_detected.end(), target_id) != targets_detected.end())
     {
         // This target was already found
     }
     else
     {
-        targets_found.push_back(target_id);
-        cout << "New Target Found: " << QString::number(target_id).toStdString() << endl;
-        number_of_targets_found++;
-        ui.num_targets_detected_label->setText(QString::number(number_of_targets_found));
+        targets_detected.push_back(target_id);
+        cout << "New Target Detected: " << QString::number(target_id).toStdString() << endl;
+        ui.num_targets_detected_label->setText(QString::number(targets_detected.size()));
     }
 
     //displayLogMessage(displ);
@@ -452,8 +470,10 @@ void RoverGUIPlugin::setupSubscribers()
     set<string>::iterator rover_it;
     for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
     {
-        target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetFoundEventHandler, this);
+        target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
     }
+
+    target_collection_subscriber = nh.subscribe("/targetsCollected", 10, &RoverGUIPlugin::targetCollectedEventHandler, this);
 }
 
 void RoverGUIPlugin::centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
