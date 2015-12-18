@@ -1720,7 +1720,7 @@ border: 1px solid white;
    </widget>
    <widget class="QWidget" name="stats_tab">
     <attribute name="title">
-     <string>Page</string>
+     <string>Task Status</string>
     </attribute>
     <widget class="QLabel" name="label_6">
      <property name="geometry">
@@ -1771,7 +1771,7 @@ border: 1px solid white;
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Number of Targets Collected:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>

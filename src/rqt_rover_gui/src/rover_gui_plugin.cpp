@@ -291,8 +291,8 @@ void RoverGUIPlugin::targetCollectedEventHandler(const ros::MessageEvent<const s
     else
     {
         targets_collected.push_back(target_id);
-        cout << "New Target Collected: " << QString::number(target_id).toStdString() << endl;
-        ui.num_targets_detected_label->setText(QString::number(targets_collected.size()));
+        cout << "New Collected Detected: " << QString::number(target_id).toStdString() << "(" << QString::number(targets_collected.size()).toStdString() << ")" << endl;
+        ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targets_collected.size())+QString("</font>"));
     }
 }
 
@@ -315,8 +315,8 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
     else
     {
         targets_detected.push_back(target_id);
-        cout << "New Target Detected: " << QString::number(target_id).toStdString() << endl;
-        ui.num_targets_detected_label->setText(QString::number(targets_detected.size()));
+        cout << "New Target Detected: " << QString::number(target_id).toStdString() << "(" << QString::number(targets_detected.size()).toStdString() << ")" << endl;
+        ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targets_detected.size())+QString("</font>"));
     }
 
     //displayLogMessage(displ);
