@@ -14,7 +14,7 @@ This repository contains:
 
 ### Quick Start Installation Guide
 
-Swarmathon-ROS is designed and tested exclusively on Ubuntu 14.04 LTS (Trusty Tahr) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported at this time.
+Swarmathon-ROS is designed and tested exclusively on the 64 bit version of Ubuntu 14.04 LTS (Trusty Tahr) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported at this time.
 
 ##### 1. Install ROS Indigo
 
@@ -196,7 +196,7 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 
 7. Click "Yes" to creating a .pro file
 
-8. Enter ```~/rover_workspace/build``` as the default build path
+8. Enter ```~/rover_workspace/build``` in the text box, this is the default build path. 
 
 9. Click Configure Project
 
