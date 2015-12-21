@@ -240,6 +240,7 @@ void RoverGUIPlugin::GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
      // Create QImage to hold the image
      //const uchar* image_buffer = (const uchar*)cv_image_ptr->image.data; // extract the raw data
      QImage qimg(&(image->data[0]), image_cols, image_rows, image_step, QImage::Format_RGB888);
+     qimg = qimg.rgbSwapped(); // Convert from RGB to BGR which is the output format for the rovers.
      ui.camera_frame->setImage(qimg);
  }
 
@@ -764,8 +765,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    // add walls given nw corner (x,y) and height and width (in meters)
 
    displayLogMessage("Building walls...");
-   addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
-
+   //addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
 
    //   // Test rover movement
 //   displayLogMessage("Moving alpha");
