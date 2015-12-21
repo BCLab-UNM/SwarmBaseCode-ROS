@@ -635,6 +635,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 {
     displayLogMessage("Building simulation...");
 
+
     QString return_msg;
 
     if (sim_creator.isGazeboRunning())
@@ -683,6 +684,10 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     {
         displayLogMessage("Unknown ground plane...");
     }
+
+    displayLogMessage("Adding collection disk...");
+    sim_creator.addModel("collection_disk", "collection_disk", 0, 0, 0);
+
 
     displayLogMessage("Adding rover alpha...");
     return_msg = sim_creator.addRover("alpha", -1, 0, 0);

@@ -100,7 +100,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -423,17 +423,17 @@ border: 1px solid white; </string>
       </property>
       <item>
        <property name="text">
+        <string>Concrete</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>Gravel</string>
        </property>
       </item>
       <item>
        <property name="text">
         <string>Car park</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Concrete</string>
        </property>
       </item>
      </widget>

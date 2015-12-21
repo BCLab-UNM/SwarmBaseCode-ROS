@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="Collection Disk">
+    <static>true</static>
+    <link name="link">
+      <inertial>
+	<mass>1.0</mass>
+	<inertia>
+	  <ixx>0.083</ixx>
+	  <ixy>0</ixy>
+	  <ixz>0</ixz>
+	  <iyy>0</iyy>
+	  <iyz>0</iyz>
+	  <izz>0.083</izz>
+	</inertia>
+	</inertial>
+
+     <collision name=’collision’>
+              <geometry>    
+          <cylinder>
+            <radius>0.5</radius>
+            <length>0.0001</length>
+          </cylinder>
+        </geometry>
+     <surface>
+              <friction>
+                <ode>
+                  <mu>1</mu>
+                  <mu2>1</mu2>
+                  <slip1>0.0</slip1>
+                  <slip2>0.0</slip2>
+                </ode>
+              </friction>
+            </surface>
+
+            </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.5</radius>
+            <length>0.0001</length>
+          </cylinder>
+        </geometry>
+      </visual>
+     </link>
+  </model>
+</sdf>
