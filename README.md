@@ -211,3 +211,19 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 14. Click the "Build Now" button to build the project
 
 Qt Creator can now be used to build the rover_workspace
+
+### Debugging with GDB and Qt Creator
+
+Debuggers are particularly useful for tracking down segfaults and for tracing through the logic of your programs. In order to use the GNU debugger (GDB) with the swarmathon competition add the following line to the CMakelist.txt file for the project you want to debug.
+
+```set(CMAKE_BUILD_TYPE Debug)```
+
+This will compile your code with debugging symbols enabled.
+
+Since ROS is multithreaded you may need to attach the debugger to threads that have been spawned by your program. To enable this enter the following in a terminal:
+
+```sudo apt-get install libcap2-bin```
+
+```sudo setcap cap_sys_ptrace=eip /usr/bin/gdb```
+
+To use QT Creator to debug your already running program click the "Debug" menu. Choose "Start Debugging" and then "Attach to Running Application...". You will be able to use the graphical interface to GDB from here. 

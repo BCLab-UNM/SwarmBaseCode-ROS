@@ -186,7 +186,6 @@ void RoverGUIPlugin::EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
 
 void RoverGUIPlugin::encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
 {
-
     float x = msg->pose.pose.position.x;
     float y = msg->pose.pose.position.y;
 
@@ -326,6 +325,8 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
+    if (!current ) return; // Check to make sure the current selection isn't null
+
     selected_rover_name = current->text().toStdString();
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
@@ -336,6 +337,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     readRoverModelXML(model_path);
 
     setupSubscribers();
+
     setupPublishers();
 
     std::map<string, int>::iterator it = rover_control_state.find(selected_rover_name);
@@ -384,18 +386,29 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.joystick_control_radio_button->setEnabled(true);
     ui.all_autonomous_control_radio_button->setEnabled(true);
 
-
 }
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
 {
     set<string>new_rover_names = findConnectedRovers();
 
+    cout << "Detected rovers: ";
+    set<string>::iterator it;
+    for (it = new_rover_names.begin(); it != new_rover_names.end(); ++it)
+    {
+        cout <<  *it;
+    }
+    cout << endl;
+
     // Wait for a rover to connect
     if (new_rover_names.empty())
     {
+        cout << "Rover name list empty" << endl;
         //displayLogMessage("Waiting for rover to connect...");
+        rover_names.clear();
         ui.map_frame->clearMap();
+        ui.rover_list->clearSelection();
+        ui.rover_list->clear();
         selected_rover_name = "";
         // Disable control mode radio group since no rover has been selected
         ui.autonomous_control_radio_button->setEnabled(false);
@@ -439,9 +452,8 @@ void RoverGUIPlugin::setupPublishers()
 void RoverGUIPlugin::setupSubscribers()
 {
     // Subscriptions for the selected rover
-
-    if (!selected_rover_name.empty())
-    {
+        if (!selected_rover_name.empty())
+        {
     // Create a subscriber to listen for camera events
     image_transport::ImageTransport it(nh);
     int frame_rate = 1;
@@ -450,9 +462,13 @@ void RoverGUIPlugin::setupSubscribers()
 
     // Odometry and GPS subscribers
     encoder_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
+
+
+    // IMU Subscriptions
+    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
+
     ekf_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
     gps_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-
 
     // Ultrasound Subscriptions
 
@@ -461,9 +477,8 @@ void RoverGUIPlugin::setupSubscribers()
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
 
-    // IMU Subscriptions
-    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
     }
+
 
     // Subscriptions for all rovers
 
@@ -475,21 +490,43 @@ void RoverGUIPlugin::setupSubscribers()
     }
 
     target_collection_subscriber = nh.subscribe("/targetsCollected", 10, &RoverGUIPlugin::targetCollectedEventHandler, this);
+
+
 }
 
 void RoverGUIPlugin::centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
-    ui.us_frame->setCenterRange(msg->range, msg->min_range, msg->max_range);
+    // Temp hardcode max and min because setting the max and min on the controller side causes a problem
+    float min_range = 0.01;; // meters
+    float max_range = 3;
+
+
+    //ui.us_frame->setCenterRange(msg->range, msg->min_range, msg->max_range);
+    ui.us_frame->setCenterRange(msg->range, min_range, max_range);
  }
 
 void RoverGUIPlugin::rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
-    ui.us_frame->setRightRange(msg->range, msg->min_range, msg->max_range);
+    // Temp hardcode max and min because setting the max and min on the controller side causes a problem
+    float min_range = 0.01;
+    float max_range = 3;
+    //ui.us_frame->setCenterRange(msg->range, min_range, max_range);
+
+    ui.us_frame->setRightRange(msg->range, min_range, max_range);
+
+//    ui.us_frame->setRightRange(msg->range, msg->min_range, msg->max_range);
+
 }
 
 void RoverGUIPlugin::leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
 {
-    ui.us_frame->setLeftRange(msg->range, msg->min_range, msg->max_range);
+    // Temp hardcode max and min because setting the max and min on the controller side causes a problem
+    float min_range = 0.01;;
+    float max_range = 3;
+
+
+    //ui.us_frame->setLeftRange(msg->range, msg->min_range, msg->max_range);
+    ui.us_frame->setLeftRange(msg->range, min_range, max_range);
 }
 
 void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)

@@ -1,4 +1,4 @@
-<?xml version='1.0'?>
+<?xml version="1.0" encoding="utf-8"?>
 <sdf version='1.4'>
 
     <model name="epsilon">
@@ -365,7 +365,7 @@
                     </scan>
                     <range>
                         <min>0.010</min>
-                        <max>1</max>
+                        <max>3</max>
                         <resolution>0.01</resolution>
                     </range>
                 </ray>
@@ -419,7 +419,7 @@
                     </scan>
                     <range>
                         <min>0.010</min>
-                        <max>1</max>
+                        <max>3</max>
                         <resolution>0.01</resolution>
                     </range>
                 </ray>
@@ -473,7 +473,7 @@
                     </scan>
                     <range>
                         <min>0.010</min>
-                        <max>1</max>
+                        <max>3</max>
                         <resolution>0.01</resolution>
                     </range>
                 </ray>
