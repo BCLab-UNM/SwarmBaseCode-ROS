@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rqt_rover_gui)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 execute_process(COMMAND git describe --tags --abbrev=0
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_VERSION)
