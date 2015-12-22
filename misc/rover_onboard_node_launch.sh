@@ -1,4 +1,12 @@
 #!/bin/bash
+pkill camera
+pkill mobility
+pkill obstacle
+pkill target
+pkill abridge
+pkill ublox_gps
+pkill navsat_transfor
+pkill ekf_localizatio
 
 
 #Point to ROS master on the network
@@ -77,6 +85,16 @@ while true; do
 	rosnode kill $HOSTNAME\_OBSTACLE
 	rosnode kill $HOSTNAME\_TARGET
 	rosnode kill ublox_gps
+
+	pkill camera
+	pkill mobility
+	pkill obstacle
+	pkill target
+	pkill abridge
+	pkill ublox_gps
+	pkill navsat_transfor
+	pkill ekf_localizatio
+
 	exit 1
     fi
 done

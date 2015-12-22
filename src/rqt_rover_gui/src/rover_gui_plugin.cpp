@@ -394,6 +394,14 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 {
     set<string>new_rover_names = findConnectedRovers();
 
+    cout << "Detected rovers: ";
+    set<string>::iterator it;
+    for (it = new_rover_names.begin(); it != new_rover_names.end(); ++it)
+    {
+        cout <<  *it;
+    }
+    cout << endl;
+
     // Wait for a rover to connect
     if (new_rover_names.empty())
     {
