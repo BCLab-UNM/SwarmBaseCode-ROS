@@ -169,11 +169,11 @@ void MapFrame::paintEvent(QPaintEvent* event)
     // painter.setPen(Qt::green);
 
     // Check encoder has any values in it
-   // if (ekf_rover_path.empty())
-   //       {
-   //         painter.drawText(QPoint(50,50), "Map Frame: No encoder data received.");
-   //        return;
-   //     }
+    if (ekf_rover_path.empty())
+          {
+            painter.drawText(QPoint(50,50), "Map Frame: No encoder data received.");
+           return;
+        }
 
     float initial_x = ekf_rover_path.begin()->first;
     float initial_y = ekf_rover_path.begin()->second;
