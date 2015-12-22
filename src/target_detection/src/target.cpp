@@ -97,12 +97,12 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 
     //Create Mat image for processing
     cv::Mat matImage = cvImage->image;
+    cv::cvtColor(matImage, matImage, cv::COLOR_BGR2GRAY);
 
     //Force greyscale and force image size.  This is only for Gazebo.
     //TODO: fix model so Gazebo publishes the correct format
     //TODO: if Mat is only used here, why not use the cvImage format here and skip the Mat image completely?
     if (matImage.cols != 320 && matImage.rows != 240) {
-        cv::cvtColor(matImage, matImage, cv::COLOR_BGR2GRAY);
         cv::resize(matImage, matImage, cv::Size(320, 240), cv::INTER_LINEAR);
     }
 
