@@ -97,6 +97,7 @@ void IMUFrame::rotateTimerEventHandler()
 
 void IMUFrame::paintEvent(QPaintEvent* event)
 {
+
     QPainter painter(this);
     painter.setPen(Qt::white);
     painter.setRenderHint(QPainter::Antialiasing, true);

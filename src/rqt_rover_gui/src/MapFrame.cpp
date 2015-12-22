@@ -167,10 +167,18 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
     // Draw rover origin crosshairs
     // painter.setPen(Qt::green);
-    float intial_x = ekf_rover_path.begin()->first;
-    float intial_y = ekf_rover_path.begin()->second;
-    float rover_origin_x = map_origin_x+((intial_x-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
-    float rover_origin_y = map_origin_y+((intial_y-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+
+    // Check encoder has any values in it
+    if (encoder_rover_path.empty())
+          {
+            painter.drawText(QPoint(50,50), "Map Frame: No encoder data received.");
+            return;
+        }
+
+    float initial_x = encoder_rover_path.begin()->first;
+    float initial_y = encoder_rover_path.begin()->second;
+    float rover_origin_x = map_origin_x+((initial_x-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+    float rover_origin_y = map_origin_y+((initial_y-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
     painter.setPen(Qt::gray);
     painter.drawLine(QPoint(rover_origin_x, map_origin_y), QPoint(rover_origin_x, map_height));
     painter.drawLine(QPoint(map_origin_x, rover_origin_y), QPoint(map_width, rover_origin_y));
