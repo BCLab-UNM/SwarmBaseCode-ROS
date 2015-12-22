@@ -325,19 +325,16 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    if (!current || !previous ) return; // Check to make sure the items arnt null
+    if (!current ) return; // Check to make sure the current selection isn't null
+
     selected_rover_name = current->text().toStdString();
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
 
-
-
     //QString model_path = "~/rover_workspace/misc/models/"++"/model.sdf";
     QString model_path = QDir::homePath()+"/rover_workspace/misc/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
     readRoverModelXML(model_path);
-
-
 
     setupSubscribers();
 
