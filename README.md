@@ -214,7 +214,7 @@ Qt Creator can now be used to build the rover_workspace
 
 ### Debugging with GDB and Qt Creator
 
-Debuggers are particularly useful for tracking down segfaults and for tracing through the logic of your programs. In order to use the GNU debugger (GDB) with the swarmathon competition add the following line to the CMakelist.txt file for the project you want to debug.
+Debuggers are particularly useful for tracking down segfaults and for tracing through the logic of your programs. In order to use the GNU debugger (GDB) with the swarmathon competition add the following line to the CMakelists.txt file for the project you want to debug.
 
 ```set(CMAKE_BUILD_TYPE Debug)```
 
