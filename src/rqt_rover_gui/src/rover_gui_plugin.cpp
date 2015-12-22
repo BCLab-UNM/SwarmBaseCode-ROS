@@ -682,16 +682,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         return;
     }
 
-    if (ui.final_radio_button->isChecked())
-    {
-         arena_height = 23.1;
-         arena_width = 23.1;
-    }
-    else
-    {
-        arena_height = 15;
-        arena_width = 15;
-    }
 
     displayLogMessage(QString("Set arena size to ")+QString::number(arena_width)+"x"+QString::number(arena_height));
 
@@ -699,6 +689,19 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
     cout << return_msg.toStdString() << endl;
     displayLogMessage(return_msg);
+
+    if (ui.final_radio_button->isChecked())
+    {
+         arena_height = 23.1;
+         arena_width = 23.1;
+         addFinalsWalls();
+    }
+    else
+    {
+        arena_height = 15;
+        arena_width = 15;
+        addPrelimsWalls();
+    }
 
     if (ui.texture_combobox->currentText() == "Gravel")
     {
@@ -801,7 +804,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    // add walls given nw corner (x,y) and height and width (in meters)
 
-   displayLogMessage("Building walls...");
    //addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
 
    //   // Test rover movement
@@ -1021,52 +1023,24 @@ QString RoverGUIPlugin::addPowerLawTargets()
 }
 
 // Add a cinder block wall to the simulation
-QString RoverGUIPlugin::addWalls(float x, float y, float width, float height)
+QString RoverGUIPlugin::addFinalsWalls()
 {
-    QProgressDialog progress_dialog;
-    progress_dialog.setWindowTitle("Building walls");
-    progress_dialog.setCancelButton(NULL); // no cancel button
-    progress_dialog.setWindowModality(Qt::ApplicationModal);
-    progress_dialog.resize(500, 50);
-    progress_dialog.show();
-
     QString output;
+    output += sim_creator.addModel("barrier_final_round", "Barrier_West", -arena_width/2, 0, 0 );
+   output += sim_creator.addModel("barrier_final_round", "Barrier_North", 0, -arena_width/2, 0, 0, 0, M_PI/2);
+   output += sim_creator.addModel("barrier_final_round", "Barrier_East", arena_width/2, 0, 0 );
+   output += sim_creator.addModel("barrier_final_round", "Barrier_South", 0, arena_width/2, 0, 0, 0, M_PI/2);
+   return output;
+}
 
-        float spacing = 0.45; //cm
-
-        int cinder_block_count = 0;
-        int total_number_of_cinder_blocks = 2*(width+height)/spacing;
-
-        // North wall
-        for (float i = x; i <= x+width; i+=spacing)
-        {
-            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), i, y, 0);
-            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
-        }
-
-        // South wall
-        for (float i = x; i <= x+width; i+=spacing)
-        {
-            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), i, y+height, 0);
-            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
-        }
-
-        // West wall
-        for (float i = y+spacing; i < y+height; i+=spacing)
-        {
-            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), x, i, 0, 0, 0, M_PI/2);
-            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
-        }
-
-
-        // East wall
-        for (float i = y+spacing; i < y+height; i+=spacing)
-        {
-            output+= sim_creator.addModel("cinder_block", QString("cinder_block")+QString::number(cinder_block_count++), x+width, i, 0, 0, 0, M_PI/2);
-            progress_dialog.setValue(cinder_block_count*100.0f/total_number_of_cinder_blocks);
-        }
-
-    return output;
+QString RoverGUIPlugin::addPrelimsWalls()
+{
+   QString output;
+   output += sim_creator.addModel("barrier_prelim_round", "Barrier_West", -arena_width/2, 0, 0 );
+   output += sim_creator.addModel("barrier_prelim_round", "Barrier_North", 0, -arena_width/2, 0, 0, 0, M_PI/2);
+   output += sim_creator.addModel("barrier_prelim_round", "Barrier_East", arena_width/2, 0, 0 );
+   output += sim_creator.addModel("barrier_prelim_round", "Barrier_South", 0, arena_width/2, 0, 0, 0, M_PI/2);
+   return output;
 }
 
 

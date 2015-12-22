@@ -88,7 +88,9 @@ namespace rqt_rover_gui {
     QString addPowerLawTargets();
     QString addUniformTargets();
     QString addClusteredTargets();
-    QString addWalls(float x, float y, float width, float height);
+    QString addFinalsWalls();
+    QString addPrelimsWalls();
+
 
    // void targetDetectedEventHandler( rover_onboard_target_detection::ATag tagInfo ); //rover_onboard_target_detection::ATag msg );
 
