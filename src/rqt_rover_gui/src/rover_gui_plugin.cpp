@@ -325,6 +325,7 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
+    if (!current || !previous ) return; // Check to make sure the items arnt null
     selected_rover_name = current->text().toStdString();
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
@@ -405,8 +406,12 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     // Wait for a rover to connect
     if (new_rover_names.empty())
     {
+        cout << "Rover name list empty" << endl;
         //displayLogMessage("Waiting for rover to connect...");
+        rover_names.clear();
         ui.map_frame->clearMap();
+        ui.rover_list->clearSelection();
+        ui.rover_list->clear();
         selected_rover_name = "";
         // Disable control mode radio group since no rover has been selected
         ui.autonomous_control_radio_button->setEnabled(false);
