@@ -738,6 +738,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.setWindowTitle("Creating rovers");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
@@ -904,6 +905,7 @@ QString RoverGUIPlugin::addUniformTargets()
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
     progress_dialog.resize(500, 50);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
     progress_dialog.show();
 
     QString output;
@@ -939,6 +941,7 @@ QString RoverGUIPlugin::addClusteredTargets()
     progress_dialog.setWindowTitle("Placing 256 Targets into 4 Clusters (64 targets each)");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
@@ -979,6 +982,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
     progress_dialog.setWindowTitle("Placing 256 Targets into 85 Clusters (Power Law pattern)");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
@@ -1064,6 +1068,7 @@ QString RoverGUIPlugin::addFinalsWalls()
     progress_dialog.setWindowTitle("Placing Barriers");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
@@ -1093,6 +1098,7 @@ QString RoverGUIPlugin::addPrelimsWalls()
     progress_dialog.setWindowTitle("Placing Barriers");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
