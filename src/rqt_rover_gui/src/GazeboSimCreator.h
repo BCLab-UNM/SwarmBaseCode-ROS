@@ -38,18 +38,20 @@ public:
     QString addRover(QString rover_name, float x, float y, float z);
     QString removeRover(QString rover_name);
     QString startRoverNode(QString rover_name);
-    QString startGazebo();
-    QString stopGazebo();
+    QString startGazeboServer();
+    QString startGazeboClient();
+    QString stopGazeboServer();
     QString removeModel( QString model_name );
     QString addModel(QString model_name, QString unique_id, float x, float y, float z);
     QString addModel(QString model_name, QString unique_id, float x, float y, float z, float R, float P, float Y);
     QString moveRover(QString rover_name, float x, float y, float z);
     QString applyForceToRover(QString rover_name, float x, float y, float z, float duration);
     bool isLocationOccupied(float x, float y, float clearence);
-    bool isGazeboRunning();
+    bool isGazeboServerRunning();
 
 private:
-    QProcess* gazebo_process;
+    QProcess* gazebo_server_process;
+    QProcess* gazebo_client_process;
     QProcess* command_process;
     map<QString, QProcess*> rover_processes;
     set< tuple<float, float> > model_locations;

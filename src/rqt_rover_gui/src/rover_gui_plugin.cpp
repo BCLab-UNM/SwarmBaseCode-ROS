@@ -6,7 +6,7 @@
 
 #include <rover_gui_plugin.h>
 #include <pluginlib/class_list_macros.h>
-
+#include <QDir>
 #include <QtXml>
 #include <QFile>
 #include <QListWidget>
@@ -114,7 +114,7 @@ namespace rqt_rover_gui
 
   void RoverGUIPlugin::shutdownPlugin()
   {
-    sim_creator.stopGazebo();
+   // sim_creator.stopGazebo();
     stopROSJoyNode();
 
     //ros::shutdown();
@@ -676,16 +676,16 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
     QString return_msg;
 
-    if (sim_creator.isGazeboRunning())
+    if (sim_creator.isGazeboServerRunning())
     {
-        displayLogMessage("A gazebo simulation process is already running. Restart the Swarmathon GUI to clear.");
+        displayLogMessage("A gazebo server simulation process is already running. Restart the Swarmathon GUI to clear.");
         return;
     }
 
 
     displayLogMessage(QString("Set arena size to ")+QString::number(arena_width)+"x"+QString::number(arena_height));
 
-    return_msg = sim_creator.startGazebo();
+    return_msg = sim_creator.startGazeboServer();
 
     cout << return_msg.toStdString() << endl;
     displayLogMessage(return_msg);
@@ -726,62 +726,89 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         displayLogMessage("Unknown ground plane...");
     }
 
+
     displayLogMessage("Adding collection disk...");
     sim_creator.addModel("collection_disk", "collection_disk", 0, 0, 0);
 
+    int n_rovers_created = 0;
+    int n_rovers = 3;
+    if (ui.final_radio_button->isChecked()) n_rovers = 6;
+
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Creating rovers");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
 
     displayLogMessage("Adding rover alpha...");
     return_msg = sim_creator.addRover("alpha", -1, 0, 0);
     displayLogMessage(return_msg);
 
+    displayLogMessage("Starting rover node for alpha...");
+    return_msg = sim_creator.startRoverNode("alpha");
+    displayLogMessage(return_msg);
+
+    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
     displayLogMessage("Adding rover beta...");
     return_msg = sim_creator.addRover("beta", 0, 1, 0);
     displayLogMessage(return_msg);
+
+    displayLogMessage("Starting rover node for beta...");
+    return_msg = sim_creator.startRoverNode("beta");
+    displayLogMessage(return_msg);
+
+        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
     displayLogMessage("Adding rover gamma...");
     return_msg = sim_creator.addRover("gamma", 1, 0, 0);
     displayLogMessage(return_msg);
 
-
-   displayLogMessage("Starting rover node for alpha...");
-   return_msg = sim_creator.startRoverNode("alpha");
-   displayLogMessage(return_msg);
-
-   displayLogMessage("Starting rover node for beta...");
-   return_msg = sim_creator.startRoverNode("beta");
-   displayLogMessage(return_msg);
-
    displayLogMessage("Starting rover node for gamma...");
    return_msg = sim_creator.startRoverNode("gamma");
    displayLogMessage(return_msg);
 
+       progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    if (ui.final_radio_button->isChecked())
    {
+       displayLogMessage("Adding rover delta...");
+       return_msg = sim_creator.addRover("delta", -1, -1, 0);
+       displayLogMessage(return_msg);
+
+       displayLogMessage("Starting rover node for delta...");
+       return_msg = sim_creator.startRoverNode("delta");
+       displayLogMessage(return_msg);
+
+        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
        displayLogMessage("Adding rover epsilon...");
        return_msg = sim_creator.addRover("epsilon", 1, 1, 0);
        displayLogMessage(return_msg);
 
-       displayLogMessage("Adding rover delta...");
-       return_msg = sim_creator.addRover("delta", -1, -1, 0);
+       displayLogMessage("Starting rover node for episilon...");
+       return_msg = sim_creator.startRoverNode("epsilon");
        displayLogMessage(return_msg);
+
+        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
        displayLogMessage("Adding rover zeta...");
        return_msg = sim_creator.addRover("zeta", 1, -1, 0);
        displayLogMessage(return_msg);
 
+       displayLogMessage("Starting rover node for zeta...");
+       return_msg = sim_creator.startRoverNode("zeta");
+       displayLogMessage(return_msg);
 
-   displayLogMessage("Starting rover node for delta...");
-   return_msg = sim_creator.startRoverNode("delta");
-   displayLogMessage(return_msg);
+        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   displayLogMessage("Starting rover node for episilon...");
-   return_msg = sim_creator.startRoverNode("epsilon");
-   displayLogMessage(return_msg);
-
-   displayLogMessage("Starting rover node for zeta...");
-   return_msg = sim_creator.startRoverNode("zeta");
-   displayLogMessage(return_msg);
 }
    if (ui.powerlaw_distribution_radio_button->isChecked())
    {
@@ -810,6 +837,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 //   displayLogMessage("Moving alpha");
 //   return_msg = sim_creator.moveRover("alpha", 10, 0, 0);
 //   displayLogMessage(return_msg);
+
+   displayLogMessage("Starting the gazebo client to visualise the simulation.");
+   sim_creator.startGazeboClient();
 }
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
@@ -817,7 +847,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     displayLogMessage("Clearing simulation...");
 
     QString return_msg;
-    return_msg = sim_creator.stopGazebo();
+    return_msg = sim_creator.stopGazeboServer();
     displayLogMessage(return_msg);
 
     ui.rover_list->clear();
@@ -896,6 +926,7 @@ QString RoverGUIPlugin::addUniformTargets()
         output = sim_creator.addModel(QString("at")+QString::number(i),  QString("at")+QString::number(i), proposed_x, proposed_y, 0);
 
        progress_dialog.setValue(i*100.0f/256);
+       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     }
     displayLogMessage("Placed 256 single targets");
 
@@ -931,6 +962,7 @@ QString RoverGUIPlugin::addClusteredTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(i*100.0f/4);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
         output = sim_creator.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0);
         displayLogMessage(output);
@@ -984,6 +1016,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         output+= sim_creator.addModel(QString("atags16_")+QString::number(i), QString("atags16_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
@@ -1000,6 +1033,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         output+= sim_creator.addModel(QString("atags4_")+QString::number(i), QString("atags4_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
@@ -1016,6 +1050,7 @@ QString RoverGUIPlugin::addPowerLawTargets()
         while (sim_creator.isLocationOccupied(proposed_x, proposed_y, clearance));
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         output+= sim_creator.addModel(QString("at")+QString::number(i), QString("at")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
     }
 
@@ -1025,21 +1060,59 @@ QString RoverGUIPlugin::addPowerLawTargets()
 // Add a cinder block wall to the simulation
 QString RoverGUIPlugin::addFinalsWalls()
 {
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing Barriers");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
     QString output;
     output += sim_creator.addModel("barrier_final_round", "Barrier_West", -arena_width/2, 0, 0 );
+    progress_dialog.setValue(1*100.0f/4);
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    output += sim_creator.addModel("barrier_final_round", "Barrier_North", 0, -arena_width/2, 0, 0, 0, M_PI/2);
+       progress_dialog.setValue(2*100.0f/4);
+       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    output += sim_creator.addModel("barrier_final_round", "Barrier_East", arena_width/2, 0, 0 );
+       progress_dialog.setValue(3*100.0f/4);
+       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    output += sim_creator.addModel("barrier_final_round", "Barrier_South", 0, arena_width/2, 0, 0, 0, M_PI/2);
+       progress_dialog.setValue(4*100.0f/4);
+       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    return output;
 }
 
 QString RoverGUIPlugin::addPrelimsWalls()
 {
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing Barriers");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
    QString output;
    output += sim_creator.addModel("barrier_prelim_round", "Barrier_West", -arena_width/2, 0, 0 );
+   progress_dialog.setValue(1*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    output += sim_creator.addModel("barrier_prelim_round", "Barrier_North", 0, -arena_width/2, 0, 0, 0, M_PI/2);
+   progress_dialog.setValue(2*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    output += sim_creator.addModel("barrier_prelim_round", "Barrier_East", arena_width/2, 0, 0 );
+   progress_dialog.setValue(3*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    output += sim_creator.addModel("barrier_prelim_round", "Barrier_South", 0, arena_width/2, 0, 0, 0, M_PI/2);
+   progress_dialog.setValue(4*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
    return output;
 }
 
