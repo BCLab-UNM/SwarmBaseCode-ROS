@@ -396,7 +396,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     set<string>::iterator it;
     for (it = new_rover_names.begin(); it != new_rover_names.end(); ++it)
     {
-        cout <<  *it;
+        cout <<  *it << " ";
     }
     cout << endl;
 

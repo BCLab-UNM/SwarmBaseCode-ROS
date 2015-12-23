@@ -3,8 +3,10 @@
 
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 #include <MapFrame.h>
+
 
 namespace rqt_rover_gui
 {
@@ -16,13 +18,29 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     frame_width = this->width();
     frame_height = this->height();
 
-    max_seen_x = -1000000;
-    max_seen_y = -1000000;
-    min_seen_x = 1000000;
-    min_seen_y = 1000000;
+    max_gps_seen_x = -std::numeric_limits<float>::max();
+    max_gps_seen_y = -std::numeric_limits<float>::max();
+    min_gps_seen_x = std::numeric_limits<float>::max();
+    min_gps_seen_y = std::numeric_limits<float>::max();
 
-    max_seen_width = 0;
-    max_seen_height = 0;
+    max_ekf_seen_x = -std::numeric_limits<float>::max();
+    max_ekf_seen_y = -std::numeric_limits<float>::max();
+    min_ekf_seen_x = std::numeric_limits<float>::max();
+    min_ekf_seen_y = std::numeric_limits<float>::max();
+
+    max_encoder_seen_x = -std::numeric_limits<float>::max();
+    max_encoder_seen_y = -std::numeric_limits<float>::max();
+    min_encoder_seen_x = std::numeric_limits<float>::max();
+    min_encoder_seen_y = std::numeric_limits<float>::max();
+
+    max_gps_seen_width = 0;
+    max_gps_seen_height = 0;
+
+    max_ekf_seen_width = 0;
+    max_ekf_seen_height = 0;
+
+    max_encoder_seen_width = 0;
+    max_encoder_seen_height = 0;
 
     display_ekf_data = false;
     display_gps_data = false;
@@ -35,14 +53,14 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 void MapFrame::addToGPSRoverPath(float x, float y)
 { 
 
-    if (x > max_seen_x) max_seen_x = x;
-    if (y > max_seen_y) max_seen_y = y;
-    if (x < min_seen_x) min_seen_x = x;
-    if (y < min_seen_y) min_seen_y = y;
+    if (x > max_gps_seen_x) max_gps_seen_x = x;
+    if (y > max_gps_seen_y) max_gps_seen_y = y;
+    if (x < min_gps_seen_x) min_gps_seen_x = x;
+    if (y < min_gps_seen_y) min_gps_seen_y = y;
 
     // Normalize the displayed coordinates to the largest coordinates seen since we don't know the coordinate system.
-    max_seen_width = max_seen_x-min_seen_x;
-    max_seen_height = max_seen_y-min_seen_y;
+    max_gps_seen_width = max_gps_seen_x-min_gps_seen_x;
+    max_gps_seen_height = max_gps_seen_y-min_gps_seen_y;
 
     update_mutex.lock();
     gps_rover_path.push_back(pair<float,float>(x,y));
@@ -52,14 +70,14 @@ void MapFrame::addToGPSRoverPath(float x, float y)
 
 void MapFrame::addToEncoderRoverPath(float x, float y)
 {
-    if (x > max_seen_x) max_seen_x = x;
-    if (y > max_seen_y) max_seen_y = y;
-    if (x < min_seen_x) min_seen_x = x;
-    if (y < min_seen_y) min_seen_y = y;
+    if (x > max_encoder_seen_x) max_encoder_seen_x = x;
+    if (y > max_encoder_seen_y) max_encoder_seen_y = y;
+    if (x < min_encoder_seen_x) min_encoder_seen_x = x;
+    if (y < min_encoder_seen_y) min_encoder_seen_y = y;
 
     // Normalize the displayed coordinates to the largest coordinates seen since we don't know the coordinate system.
-    max_seen_width = max_seen_x-min_seen_x;
-    max_seen_height = max_seen_y-min_seen_y;
+    max_encoder_seen_width = max_encoder_seen_x-min_encoder_seen_x;
+    max_encoder_seen_height = max_encoder_seen_y-min_encoder_seen_y;
 
     update_mutex.lock();
     encoder_rover_path.push_back(pair<float,float>(x,y));
@@ -70,14 +88,14 @@ void MapFrame::addToEncoderRoverPath(float x, float y)
 
 void MapFrame::addToEKFRoverPath(float x, float y)
 {
-    if (x > max_seen_x) max_seen_x = x;
-    if (y > max_seen_y) max_seen_y = y;
-    if (x < min_seen_x) min_seen_x = x;
-    if (y < min_seen_y) min_seen_y = y;
+    if (x > max_ekf_seen_x) max_ekf_seen_x = x;
+    if (y > max_ekf_seen_y) max_ekf_seen_y = y;
+    if (x < min_ekf_seen_x) min_ekf_seen_x = x;
+    if (y < min_ekf_seen_y) min_ekf_seen_y = y;
 
     // Normalize the displayed coordinates to the largest coordinates seen since we don't know the coordinate system.
-    max_seen_width = max_seen_x-min_seen_x;
-    max_seen_height = max_seen_y-min_seen_y;
+    max_ekf_seen_width = max_ekf_seen_x-min_ekf_seen_x;
+    max_ekf_seen_height = max_ekf_seen_y-min_ekf_seen_y;
 
     update_mutex.lock();
     ekf_rover_path.push_back(pair<float,float>(x,y));
@@ -115,6 +133,39 @@ void MapFrame::addCollectionPoint(float x, float y)
 
 void MapFrame::paintEvent(QPaintEvent* event)
 {
+    float max_seen_height = -std::numeric_limits<float>::max(); // std::numeric_limits<float>::max() is the max possible floating point value
+    float max_seen_width = -std::numeric_limits<float>::max();
+
+    float min_seen_x = std::numeric_limits<float>::max();
+    float min_seen_y = std::numeric_limits<float>::max();
+
+    // Set the max and min seen values depending on which data the user has selected to view
+    // Check each of the display data options and choose the most extreme value from those selected by the user
+    if (display_ekf_data)
+    {
+        min_seen_x = min_ekf_seen_x;
+        min_seen_y = min_ekf_seen_y;
+        max_seen_height = max_ekf_seen_height;
+        max_seen_width = max_ekf_seen_height;
+    }
+
+    if (display_gps_data)
+    {
+        if (min_seen_x > min_gps_seen_x) min_seen_x = min_gps_seen_x;
+        if (min_seen_y > min_gps_seen_y) min_seen_y = min_gps_seen_y;
+        if (max_seen_height < max_gps_seen_height) max_seen_height = max_gps_seen_height;
+        if (max_seen_width < max_gps_seen_width) max_seen_width = max_gps_seen_width;
+    }
+
+    if (display_encoder_data)
+    {
+        if (min_seen_x > min_encoder_seen_x) min_seen_x = min_encoder_seen_x;
+        if (min_seen_y > min_encoder_seen_y) min_seen_y = min_encoder_seen_y;
+        if (max_seen_height < max_encoder_seen_height) max_seen_height = max_encoder_seen_height;
+        if (max_seen_width < max_encoder_seen_width) max_seen_width = max_encoder_seen_width;
+    }
+
+    // Begin drawing the map
     QPainter painter(this);
     painter.setPen(Qt::white);
 

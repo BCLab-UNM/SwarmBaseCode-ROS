@@ -69,13 +69,29 @@ private:
     int frame_width;
     int frame_height;
 
-    float max_seen_x;
-    float max_seen_y;
-    float min_seen_x;
-    float min_seen_y;
+    float max_gps_seen_x;
+    float max_gps_seen_y;
+    float min_gps_seen_x;
+    float min_gps_seen_y;
 
-    float max_seen_width;
-    float max_seen_height;
+    float max_encoder_seen_x;
+    float max_encoder_seen_y;
+    float min_encoder_seen_x;
+    float min_encoder_seen_y;
+
+    float max_ekf_seen_x;
+    float max_ekf_seen_y;
+    float min_ekf_seen_x;
+    float min_ekf_seen_y;
+
+    float max_gps_seen_width;
+    float max_gps_seen_height;
+
+    float max_ekf_seen_width;
+    float max_ekf_seen_height;
+
+    float max_encoder_seen_width;
+    float max_encoder_seen_height;
 
     bool display_gps_data;
     bool display_ekf_data;
