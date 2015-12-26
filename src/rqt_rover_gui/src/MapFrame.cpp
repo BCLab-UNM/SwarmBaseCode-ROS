@@ -58,6 +58,8 @@ void MapFrame::setRoverMapToDisplay(string rover)
 void MapFrame::addToGPSRoverPath(string rover, float x, float y)
 { 
 
+
+
     if (x > max_gps_seen_x[rover]) max_gps_seen_x[rover] = x;
     if (y > max_gps_seen_y[rover]) max_gps_seen_y[rover] = y;
     if (x < min_gps_seen_x[rover]) min_gps_seen_x[rover] = x;
@@ -75,6 +77,8 @@ void MapFrame::addToGPSRoverPath(string rover, float x, float y)
 
 void MapFrame::addToEncoderRoverPath(string rover, float x, float y)
 {
+
+
     if (x > max_encoder_seen_x[rover]) max_encoder_seen_x[rover] = x;
     if (y > max_encoder_seen_y[rover]) max_encoder_seen_y[rover] = y;
     if (x < min_encoder_seen_x[rover]) min_encoder_seen_x[rover] = x;
@@ -93,6 +97,7 @@ void MapFrame::addToEncoderRoverPath(string rover, float x, float y)
 
 void MapFrame::addToEKFRoverPath(string rover, float x, float y)
 {
+
     if (x > max_ekf_seen_x[rover]) max_ekf_seen_x[rover] = x;
     if (y > max_ekf_seen_y[rover]) max_ekf_seen_y[rover] = y;
     if (x < min_ekf_seen_x[rover]) min_ekf_seen_x[rover] = x;
@@ -125,6 +130,9 @@ void MapFrame::clearMap(string rover)
 
 void MapFrame::addTargetLocation(string rover, float x, float y)
 {
+    // The QT drawing coordinate system is reversed from the robot coordinate system in the y direction
+    //y = -y;
+
     update_mutex.lock();
     target_locations[rover].push_back(pair<float,float>(x,y));
     update_mutex.unlock();
@@ -134,6 +142,9 @@ void MapFrame::addTargetLocation(string rover, float x, float y)
 
 void MapFrame::addCollectionPoint(string rover, float x, float y)
 {
+    // The QT drawing coordinate system is reversed from the robot coordinate system in the y direction
+    //y = -y;
+
     update_mutex.lock();
     collection_points[rover_to_display].push_back(pair<float,float>(x,y));
     update_mutex.unlock();
@@ -143,6 +154,7 @@ void MapFrame::addCollectionPoint(string rover, float x, float y)
 
 void MapFrame::paintEvent(QPaintEvent* event)
 {
+
     float max_seen_height = -std::numeric_limits<float>::max(); // std::numeric_limits<float>::max() is the max possible floating point value
     float max_seen_width = -std::numeric_limits<float>::max();
 
@@ -186,7 +198,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
     QFontMetrics fm(painter.font());
     painter.drawText(this->width()-fm.width(frames_per_second), fm.height(), frames_per_second);
 
-     frames++;
+    frames++;
 
     if (!(frames % 100)) // time how long it takes to dispay 100 frames
     {

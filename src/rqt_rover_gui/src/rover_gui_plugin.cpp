@@ -807,8 +807,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     return_msg = sim_creator.startRoverNode("beta");
     displayLogMessage(return_msg);
 
-        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
     displayLogMessage("Adding rover gamma...");
     return_msg = sim_creator.addRover("gamma", 1, 0, 0);
@@ -818,8 +818,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    return_msg = sim_creator.startRoverNode("gamma");
    displayLogMessage(return_msg);
 
-       progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+   progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
    if (ui.final_radio_button->isChecked())
    {

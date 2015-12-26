@@ -119,7 +119,13 @@ QString GazeboSimCreator::addRover(QString rover_name, float x, float y, float z
 {
     model_locations.insert(make_tuple(x, y));
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + rover_name + "/model.sdf -model " + rover_name + " -x " + QString::number(x) + " -y " + QString::number(y)+ " -z " + QString::number(z);
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + rover_name + "/model.sdf "
+            + "-model " + rover_name
+            + " -x " + QString::number(x)
+            + " -y " + QString::number(y)
+            + " -z " + QString::number(z);
+            + " -Y " + QString::number(M_PI);
+
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
