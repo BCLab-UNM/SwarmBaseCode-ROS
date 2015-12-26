@@ -72,9 +72,9 @@ namespace rqt_rover_gui {
 
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
-    void EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
-    void GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
-    void encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg);
+    void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
+    void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
+    void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void targetDetectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
     void targetCollectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
 
@@ -125,9 +125,9 @@ namespace rqt_rover_gui {
     ros::Publisher joystick_publisher;
 
     ros::Subscriber joystick_subscriber;
-    ros::Subscriber encoder_subscriber;
-    ros::Subscriber gps_subscriber;
-    ros::Subscriber ekf_subscriber;
+    map<string,ros::Subscriber> encoder_subscriber;
+    map<string,ros::Subscriber> gps_subscriber;
+    map<string,ros::Subscriber> ekf_subscriber;
     ros::Subscriber us_center_subscriber;
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;

@@ -25,6 +25,7 @@
 #include <QComboBox>
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
+#include <algorithm>
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -171,41 +172,71 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 
 }
 
-void RoverGUIPlugin::EKFEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
+void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event)
 {
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const boost::shared_ptr<const nav_msgs::Odometry> msg = event.getMessage();
 
     float x = msg->pose.pose.position.x;
     float y = msg->pose.pose.position.y;
 
     QString x_str; x_str.setNum(x);
     QString y_str; y_str.setNum(y);
+    // Extract rover name from the message source. Publisher is in the format /*rover_name*_GPS
+    size_t found = publisher_name.find("_EKF");
+    string rover_name = publisher_name.substr(1,found-1);
 
-   ui.map_frame->addToEKFRoverPath(x,y);
+    // Store map info for the appropriate rover name
+    ui.map_frame->addToEKFRoverPath(rover_name, x, y);
 }
 
 
-void RoverGUIPlugin::encoderEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
+void RoverGUIPlugin::encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event)
 {
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    string topic = header.at("topic");
+
+    const boost::shared_ptr<const nav_msgs::Odometry> msg = event.getMessage();
     float x = msg->pose.pose.position.x;
     float y = msg->pose.pose.position.y;
 
     QString x_str; x_str.setNum(x);
     QString y_str; y_str.setNum(y);
 
-   ui.map_frame->addToEncoderRoverPath(x,y);
+    // Extract rover name from the message source. Get the topic name from the event header. Can't use publisher_name here because it is just /gazebo.
+    size_t found = topic.find("/odom");
+    string rover_name = topic.substr(1,found-1);
+
+    // Store map info for the appropriate rover name
+   ui.map_frame->addToEncoderRoverPath(rover_name, x, y);
 }
 
 
-void RoverGUIPlugin::GPSEventHandler(const nav_msgs::Odometry::ConstPtr& msg)
+void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event)
 {
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
 
+    const boost::shared_ptr<const nav_msgs::Odometry> msg = event.getMessage();
     float x = msg->pose.pose.position.x;
     float y = msg->pose.pose.position.y;
 
     QString x_str; x_str.setNum(x);
     QString y_str; y_str.setNum(y);
 
-   ui.map_frame->addToGPSRoverPath(x,y);
+    // Extract rover name from the message source. Publisher is in the format /*rover_name*_NAVSAT
+    size_t found = publisher_name.find("_NAVSAT");
+    string rover_name = publisher_name.substr(1,found-1);
+
+    // Store map info for the appropriate rover name
+    ui.map_frame->addToGPSRoverPath(rover_name, x, y);
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)
@@ -340,6 +371,9 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     setupPublishers();
 
+    displayLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
+    ui.map_frame->setRoverMapToDisplay(selected_rover_name);
+
     std::map<string, int>::iterator it = rover_control_state.find(selected_rover_name);
 
     // No entry for this rover name
@@ -379,7 +413,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     }
 
     // Clear map
-    ui.map_frame->clearMap();
+    // ui.map_frame->clearMap();
 
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
@@ -393,10 +427,24 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     set<string>new_rover_names = findConnectedRovers();
 
     cout << "Detected rovers: ";
-    set<string>::iterator it;
-    for (it = new_rover_names.begin(); it != new_rover_names.end(); ++it)
+
+    for (set<string>::iterator it = new_rover_names.begin(); it != new_rover_names.end(); ++it)
     {
         cout <<  *it << " ";
+    }
+    cout << endl;
+
+    std::set<string> orphaned_rover_names;
+
+    // Calculate which of the old rover names are not in the new list of rovers then clear their maps.
+    std::set_difference(rover_names.begin(), rover_names.end(), new_rover_names.begin(), new_rover_names.end(),
+        std::inserter(orphaned_rover_names, orphaned_rover_names.end()));
+
+    cout << "Orphaned rover names: ";
+    for (set<string>::iterator it = orphaned_rover_names.begin(); it != orphaned_rover_names.end(); ++it)
+    {
+        cout << *it << " ";
+        ui.map_frame->clearMap(*it);
     }
     cout << endl;
 
@@ -405,8 +453,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     {
         cout << "Rover name list empty" << endl;
         //displayLogMessage("Waiting for rover to connect...");
-        rover_names.clear();
-        ui.map_frame->clearMap();
+        rover_names.clear();        
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
         selected_rover_name = "";
@@ -460,18 +507,12 @@ void RoverGUIPlugin::setupSubscribers()
     // Theroa codex results in the least information being transmitted
     camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
 
-    // Odometry and GPS subscribers
-    encoder_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
 
 
     // IMU Subscriptions
     imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
 
-    ekf_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
-    gps_subscriber = nh.subscribe("/"+selected_rover_name+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-
     // Ultrasound Subscriptions
-
     us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
     us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
@@ -487,6 +528,11 @@ void RoverGUIPlugin::setupSubscribers()
     for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
     {
         target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
+
+        // Odometry and GPS subscribers
+        encoder_subscriber[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
+        ekf_subscriber[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
+        gps_subscriber[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
     }
 
     target_collection_subscriber = nh.subscribe("/targetsCollected", 10, &RoverGUIPlugin::targetCollectedEventHandler, this);
