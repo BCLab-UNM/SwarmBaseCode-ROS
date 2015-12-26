@@ -364,7 +364,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.rover_name->setText(rover_name_msg_qstr);
 
     //QString model_path = "~/rover_workspace/misc/models/"++"/model.sdf";
-    QString model_path = QDir::homePath()+"/rover_workspace/misc/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
+    QString model_path = QDir::homePath()+"/rover_workspace/simulation/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
     readRoverModelXML(model_path);
 
     setupSubscribers();
