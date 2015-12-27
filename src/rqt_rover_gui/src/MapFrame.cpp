@@ -154,6 +154,9 @@ void MapFrame::addCollectionPoint(string rover, float x, float y)
 
 void MapFrame::paintEvent(QPaintEvent* event)
 {
+    // Colorblind friendly colors
+    QColor green(17, 192, 131);
+    QColor red(255, 65, 30);
 
     float max_seen_height = -std::numeric_limits<float>::max(); // std::numeric_limits<float>::max() is the max possible floating point value
     float max_seen_width = -std::numeric_limits<float>::max();
@@ -239,7 +242,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
     painter.drawLine(QPoint(map_origin_x, map_height), QPoint(map_width, map_height));
 
     // Draw rover origin crosshairs
-    // painter.setPen(Qt::green);
+    // painter.setPen(green);
 
     // Check encoder has any values in it
     if (ekf_rover_path[rover_to_display].empty())
@@ -365,20 +368,20 @@ void MapFrame::paintEvent(QPaintEvent* event)
     }
 
 
-    painter.setPen(Qt::red);
+    painter.setPen(red);
     if (display_gps_data) painter.drawPoints(&scaled_gps_rover_points[0], scaled_gps_rover_points.size());
    // if (display_gps_data) painter.drawPath(scaled_gps_rover_path);
 
     painter.setPen(Qt::white);
     if (display_ekf_data) painter.drawPath(scaled_ekf_rover_path);
-    painter.setPen(Qt::green);
+    painter.setPen(green);
     if (display_encoder_data) painter.drawPath(scaled_encoder_rover_path);
 
 
-    painter.setPen(Qt::red);
+    painter.setPen(red);
     QPoint* point_array = &scaled_collection_points[0];
     painter.drawPoints(point_array, scaled_collection_points.size());
-    painter.setPen(Qt::green);
+    painter.setPen(green);
     point_array = &scaled_target_locations[0];
     painter.drawPoints(point_array, scaled_target_locations.size());
 
