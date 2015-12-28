@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -743,7 +743,7 @@ border: 1px solid white;
     </widget>
     <widget class="QPushButton" name="clear_simulation_button">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -760,7 +760,7 @@ border: 1px solid white;
 </string>
      </property>
      <property name="text">
-      <string>Clear Simulation</string>
+      <string>End Simulation</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_10">
@@ -1703,6 +1703,28 @@ border: 1px solid white;
      <zorder>label_45</zorder>
      <zorder>camera_noise_stdev</zorder>
     </widget>
+    <widget class="QPushButton" name="visualize_simulation_button">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>420</y>
+       <width>161</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+     </property>
+     <property name="text">
+      <string>Toggle Visualization</string>
+     </property>
+    </widget>
     <zorder>simulation_setup_frame</zorder>
     <zorder>label_7</zorder>
     <zorder>rover_image_label</zorder>
@@ -1716,6 +1738,7 @@ border: 1px solid white;
     <zorder>label_12</zorder>
     <zorder>frame_6</zorder>
     <zorder>label_17</zorder>
+    <zorder>visualize_simulation_button</zorder>
    </widget>
    <widget class="QWidget" name="stats_tab">
     <attribute name="title">
@@ -1778,9 +1801,9 @@ border: 1px solid white;
   <widget class="QTextBrowser" name="log">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>20</x>
      <y>540</y>
-     <width>441</width>
+     <width>561</width>
      <height>171</height>
     </rect>
    </property>
@@ -1791,7 +1814,7 @@ border: 1px solid white;
    </property>
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>600</x>
      <y>560</y>
      <width>201</width>
      <height>131</height>
@@ -1892,7 +1915,7 @@ border: 1px solid white;
   <widget class="QFrame" name="joystick_frame">
    <property name="geometry">
     <rect>
-     <x>730</x>
+     <x>810</x>
      <y>570</y>
      <width>201</width>
      <height>111</height>
@@ -2044,7 +2067,7 @@ border: 1px solid white;
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>320</y>
+     <y>330</y>
      <width>191</width>
      <height>20</height>
     </rect>

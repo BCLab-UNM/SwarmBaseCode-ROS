@@ -69,7 +69,7 @@ include_directories(
 
 add_library(
   rqt_rover_gui
-  src/GazeboSimCreator.cpp
+  src/GazeboSimManager.cpp
   src/rover_gui_plugin.cpp
   src/CameraFrame.cpp
   src/MapFrame.cpp

@@ -15,6 +15,10 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 
+// To handle shutdown signals so the node quits properly in response to "rosnode kill"
+#include <ros/ros.h>
+#include <signal.h>
+
 using namespace std;
 
 //Random number generator
@@ -61,6 +65,8 @@ ros::Subscriber targetsCollectedSubscriber;
 ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 
+// OS Signal Handler
+void sigintEventHandler(int signal);
 
 //Callback handlers
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
@@ -94,8 +100,11 @@ int main(int argc, char **argv) {
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
 
-    ros::init(argc, argv, (publishedName + "_MOBILITY"));
+    // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
+    ros::init(argc, argv, (publishedName + "_MOBILITY"), ros::init_options::NoSigintHandler);
     ros::NodeHandle mNH;
+
+    signal(SIGINT, sigintEventHandler); // Register the SIGINT event handler so the node can shutdown properly
 
     joySubscriber = mNH.subscribe((publishedName + "/joystick"), 10, joyCmdHandler);
     modeSubscriber = mNH.subscribe((publishedName + "/mode"), 1, modeHandler);
@@ -310,4 +319,10 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&)
 
 void targetsCollectedHandler(const std_msgs::Int16::ConstPtr& message) {
 	targetsCollected[message->data] = 1;
+}
+
+void sigintEventHandler(int sig)
+{
+     // All the default sigint handler does is call shutdown()
+     ros::shutdown();
 }

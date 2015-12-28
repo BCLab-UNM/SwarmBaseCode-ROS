@@ -1,4 +1,4 @@
-#include "GazeboSimCreator.h"
+#include "GazeboSimManager.h"
 #include <QDir>
 #include <string>
 #include <unistd.h>
@@ -7,62 +7,81 @@
 
 using namespace std;
 
-GazeboSimCreator::GazeboSimCreator()
+GazeboSimManager::GazeboSimManager()
 {
     gazebo_client_process = NULL;
     gazebo_server_process = NULL;
     command_process = NULL;
 }
 
-QString GazeboSimCreator::startGazeboServer()
+QProcess* GazeboSimManager::startGazeboServer()
 {
-    if (gazebo_server_process != NULL)
-        return "Gazebo already running";
+    if (gazebo_server_process != NULL) return gazebo_server_process;
 
     gazebo_server_process = new QProcess();
 
     QString command = QString("rosrun gazebo_ros gzserver ") + QDir::homePath() + QString("/rover_workspace/simulation/worlds/swarmathon.world");
 
-    cout << "running " + command.toStdString() << endl;
-
     gazebo_server_process->startDetached(command);//QStringList() << "/home/oDx/Documents/a.txt");
 
     gazebo_server_process->waitForStarted();
-    QString return_msg = ""; //command_process->readAll();
-    return return_msg;
+
+    return gazebo_server_process;
 }
 
-QString GazeboSimCreator::startGazeboClient()
+QProcess* GazeboSimManager::startGazeboClient()
 {
-    if (gazebo_client_process != NULL)
-        return "Gazebo already running";
+    if (gazebo_client_process != NULL) return gazebo_client_process;
 
     gazebo_client_process = new QProcess();
 
     QString command = QString("rosrun gazebo_ros gzclient");
 
-    gazebo_server_process->startDetached(command);
+    gazebo_client_process->start(command);
 
-    gazebo_client_process->waitForStarted();
-    QString return_msg = ""; //command_process->readAll();
+   // gazebo_client_process->waitForStarted();
+
+    return gazebo_client_process;
+}
+
+QString GazeboSimManager::stopGazeboServer()
+{
+    if (gazebo_server_process == NULL) return "Gazebo server is not running";
+
+    QString argument = "pkill gzserver";
+    QProcess sh;
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    QString output = sh.readAll();
+    sh.close();
+
+    gazebo_server_process->close();
+    cleanUpGazeboServer();
+
+    QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
+
     return return_msg;
 }
 
-
-QString GazeboSimCreator::stopGazeboServer()
+void GazeboSimManager::cleanUpGazeboServer()
 {
-    // Close rover processes
-    for(map<QString, QProcess*>::iterator it = rover_processes.begin(); it != rover_processes.end(); it++)
-    {
-        it->second->close();
-        it->second->waitForFinished();
-    }
+    // Use delete later here because this function is called by a slot connected to a signal from this object which will segfault if delete directely with "delete gazebo_client_process;"
+    gazebo_server_process->deleteLater();
+    gazebo_server_process = NULL;
+}
 
-    rover_processes.clear(); // calls destructors for us.
+void GazeboSimManager::cleanUpGazeboClient()
+{
+    // Use delete later here because this function is called by a slot connected to a signal from this object which will segfault if delete directely with "delete gazebo_client_process;"
+    gazebo_client_process->deleteLater();
+    gazebo_client_process = NULL;
+}
 
-    if (gazebo_server_process == NULL) return "Gazebo is not running";
+QString GazeboSimManager::stopGazeboClient()
+{
+    if (gazebo_client_process == NULL) return "Gazebo client is not running";
 
-    QString argument = "~/rover_workspace/cleanup.sh";
+    QString argument = "pkill gzclient";
 
     QProcess sh;
 
@@ -74,31 +93,71 @@ QString GazeboSimCreator::stopGazeboServer()
 
     QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
 
-    cout << return_msg.toStdString() << endl;
+    gazebo_client_process->close();
 
-    gazebo_server_process->close();
-//    gazebo_server_process->waitForFinished();
-//    gazebo_server_process->terminate();
-//    delete gazebo_server_process;
-    delete gazebo_server_process;
-    gazebo_server_process = NULL;
-      return return_msg;
+    cleanUpGazeboClient();
+
+    return "Simulation visualization ended";
 }
 
-QString GazeboSimCreator::startRoverNode( QString rover_name )
+
+QString GazeboSimManager::stopRoverNode( QString rover_name )
+{
+    if (rover_processes.find(rover_name) == rover_processes.end()) return "Could not stop " + rover_name + " rover process since it does not exist.";
+
+    rover_processes[rover_name]->terminate();
+    rover_processes[rover_name]->waitForFinished();
+    rover_processes.erase(rover_name);
+
+    // Kill nodes
+    QString argument = "rosnode kill "+rover_name+"_MOBILITY";
+    QProcess sh;
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    QString output = sh.readAll();
+    sh.close();
+
+    argument = "rosnode kill "+rover_name+"_NAVSAT";
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    output += "<br>" + sh.readAll();
+    sh.close();
+
+    argument = "rosnode kill "+rover_name+"_TARGET";
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    output += "<br>" + sh.readAll();
+    sh.close();
+
+    argument = "rosnode kill "+rover_name+"_OBSTACLE";
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    output += "<br>" + sh.readAll();
+    sh.close();
+
+    argument = "rosnode kill "+rover_name+"_EKF";
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    output += "<br>" + sh.readAll();
+    sh.close();
+
+    return output+"<br>rover process " + rover_name + " terminated along with <font color='green'>navsat, target, obstacle, and mobility</font> nodes";
+}
+
+QString GazeboSimManager::startRoverNode( QString rover_name )
 {
     QString argument = "roslaunch ~/rover_workspace/launch/"+rover_name+".launch name:="+rover_name;
 
     QProcess* rover_process = new QProcess();
 
-    rover_processes.insert(pair<QString, QProcess*>(rover_name, rover_process));
+    rover_processes[rover_name] = rover_process;
 
     rover_process->start("sh", QStringList() << "-c" << argument);
 
     return "rover process spawned";
 }
 
-QString GazeboSimCreator::addGroundPlane( QString ground_name )
+QString GazeboSimManager::addGroundPlane( QString ground_name )
 {
     model_locations.insert(make_tuple(0,0)); // Nest location
 
@@ -115,7 +174,7 @@ QString GazeboSimCreator::addGroundPlane( QString ground_name )
     return return_msg;
 }
 
-QString GazeboSimCreator::addRover(QString rover_name, float x, float y, float z)
+QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z)
 {
     model_locations.insert(make_tuple(x, y));
 
@@ -138,7 +197,7 @@ QString GazeboSimCreator::addRover(QString rover_name, float x, float y, float z
     return return_msg;
 }
 
-QString GazeboSimCreator::removeRover( QString rover_name)
+QString GazeboSimManager::removeRover( QString rover_name)
 {
     QString argument;
     argument = "rosservice call gazebo/delete_model '{model_name: "+rover_name+"}'";
@@ -155,7 +214,7 @@ QString GazeboSimCreator::removeRover( QString rover_name)
     return return_msg;
 }
 
-QString GazeboSimCreator::removeGroundPlane( QString ground_name )
+QString GazeboSimManager::removeGroundPlane( QString ground_name )
 {
     QString argument = "rosservice call gazebo/delete_model '{model_name: "+ground_name+"}'";
 
@@ -171,12 +230,12 @@ QString GazeboSimCreator::removeGroundPlane( QString ground_name )
     return return_msg;
 }
 
-QString GazeboSimCreator::addModel(QString model_name, QString unique_id, float x, float y, float z)
+QString GazeboSimManager::addModel(QString model_name, QString unique_id, float x, float y, float z)
 {
     return addModel(model_name, unique_id, x, y, z, 0, 0, 0);
 }
 
-QString GazeboSimCreator::addModel(QString model_name, QString unique_id, float x, float y, float z, float roll, float pitch, float yaw)
+QString GazeboSimManager::addModel(QString model_name, QString unique_id, float x, float y, float z, float roll, float pitch, float yaw)
 {
     model_locations.insert(make_tuple(x, y));
 
@@ -202,7 +261,7 @@ QString GazeboSimCreator::addModel(QString model_name, QString unique_id, float 
     return return_msg;
 }
 
-QString GazeboSimCreator::removeModel( QString model_name )
+QString GazeboSimManager::removeModel( QString model_name )
 {
     QString argument = "rosservice call gazebo/delete_model '{model_name: "+model_name+"}'";
 
@@ -218,7 +277,7 @@ QString GazeboSimCreator::removeModel( QString model_name )
     return return_msg;
 }
 
-QString GazeboSimCreator::moveRover(QString rover_name, float x, float y, float z)
+QString GazeboSimManager::moveRover(QString rover_name, float x, float y, float z)
 {
             QString x_str = QString::number(x,'f',1);
             QString y_str = QString::number(y,'f',1);
@@ -239,7 +298,7 @@ QString GazeboSimCreator::moveRover(QString rover_name, float x, float y, float 
             return return_msg;
 }
 
-QString GazeboSimCreator::applyForceToRover(QString rover_name, float x, float y, float z, float duration)
+QString GazeboSimManager::applyForceToRover(QString rover_name, float x, float y, float z, float duration)
 {
             QString x_str = QString::number(x,'f',1);
             QString y_str = QString::number(y,'f',1);
@@ -260,7 +319,7 @@ QString GazeboSimCreator::applyForceToRover(QString rover_name, float x, float y
             return return_msg;
 }
 
-bool GazeboSimCreator::isLocationOccupied(float x, float y, float clearance)
+bool GazeboSimManager::isLocationOccupied(float x, float y, float clearance)
 {
     set<tuple<float, float>>::iterator it;
     for (it = model_locations.begin(); it != model_locations.end(); it++)
@@ -277,14 +336,21 @@ bool GazeboSimCreator::isLocationOccupied(float x, float y, float clearance)
     return false;
 }
 
-bool GazeboSimCreator::isGazeboServerRunning()
+bool GazeboSimManager::isGazeboServerRunning()
 {
     return gazebo_server_process != NULL;
 }
 
-GazeboSimCreator::~GazeboSimCreator()
+
+bool GazeboSimManager::isGazeboClientRunning()
 {
-    //stopGazeboServer();
+    return gazebo_server_process != NULL;
+}
+
+GazeboSimManager::~GazeboSimManager()
+{
+    stopGazeboServer();
+    stopGazeboClient();
     if (gazebo_server_process) gazebo_server_process->close();
     if (gazebo_client_process) gazebo_server_process->close();
     if (command_process) command_process->close();

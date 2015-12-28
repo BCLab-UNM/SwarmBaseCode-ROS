@@ -6,7 +6,7 @@
  *          by selecting it from within rtq or by running rtq -s rtq_rover_gui
  *          RoverGUIPlugin is event driven. The events either come from the ROS system or from QT. Event handlers process these events and update
  *          the GUI or send commands to the rovers as needed.
- *          This class also interfaces with GazeboSimCreator in order to manipulate models in simulation.
+ *          This class also interfaces with GazeboSimManager in order to manipulate models in simulation.
  *
  * \author  Matthew Fricke
  * \date    November 11th 2015
@@ -48,7 +48,7 @@
 #include <QTimer>
 #include <QLabel>
 
-#include "GazeboSimCreator.h"
+#include "GazeboSimManager.h"
 
 using namespace std;
 
@@ -115,6 +115,9 @@ namespace rqt_rover_gui {
     void joystickRadioButtonEventHandler(bool marked);
     void buildSimulationButtonEventHandler();
     void clearSimulationButtonEventHandler();
+    void visualizeSimulationButtonEventHandler();
+    void gazeboClientFinishedEventHandler();
+    void gazeboServerFinishedEventHandler();
 
   private:
 
@@ -125,9 +128,9 @@ namespace rqt_rover_gui {
     ros::Publisher joystick_publisher;
 
     ros::Subscriber joystick_subscriber;
-    map<string,ros::Subscriber> encoder_subscriber;
-    map<string,ros::Subscriber> gps_subscriber;
-    map<string,ros::Subscriber> ekf_subscriber;
+    map<string,ros::Subscriber> encoder_subscribers;
+    map<string,ros::Subscriber> gps_subscribers;
+    map<string,ros::Subscriber> ekf_subscribers;
     ros::Subscriber us_center_subscriber;
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;
@@ -144,9 +147,10 @@ namespace rqt_rover_gui {
     Ui::RoverGUI ui;
 
     QProcess* joy_process;
+    QTimer* timer; // for rover polling
 
     QString log_messages;
-    GazeboSimCreator sim_creator;
+    GazeboSimManager sim_mgr;
 
     map<string,int> rover_control_state;
     bool all_autonomous;
@@ -156,6 +160,8 @@ namespace rqt_rover_gui {
 
     vector<int> targets_detected;
     vector<int> targets_collected;
+
+    bool display_sim_visualization;
 
   };
 } // end namespace

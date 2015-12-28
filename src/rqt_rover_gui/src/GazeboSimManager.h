@@ -12,11 +12,11 @@
  *          functions should just call addModel to avoid duplication of code.
  *          stopGazebo is buggy. It needs to be rewritten so gazebo is closed and the rover nodes shutdown
  *          without closing the GUI nodes.
- * \class   GazeboSimCreator
+ * \class   GazeboSimManager
  */
 
-#ifndef GAZEBOSIMCREATOR_H
-#define GAZEBOSIMCREATOR_H
+#ifndef GazeboSimManager_H
+#define GazeboSimManager_H
 
 #include <QProcess>
 #include <QString>
@@ -27,20 +27,22 @@
 
 using namespace std;
 
-class GazeboSimCreator
+class GazeboSimManager
 {
 public:
-    GazeboSimCreator();
-    ~GazeboSimCreator();
+    GazeboSimManager();
+    ~GazeboSimManager();
 
     QString addGroundPlane( QString ground_name );
     QString removeGroundPlane( QString ground_name );
     QString addRover(QString rover_name, float x, float y, float z);
     QString removeRover(QString rover_name);
     QString startRoverNode(QString rover_name);
-    QString startGazeboServer();
-    QString startGazeboClient();
+    QString stopRoverNode(QString rover_name);
+    QProcess* startGazeboServer();
+    QProcess* startGazeboClient();
     QString stopGazeboServer();
+    QString stopGazeboClient();
     QString removeModel( QString model_name );
     QString addModel(QString model_name, QString unique_id, float x, float y, float z);
     QString addModel(QString model_name, QString unique_id, float x, float y, float z, float R, float P, float Y);
@@ -48,6 +50,9 @@ public:
     QString applyForceToRover(QString rover_name, float x, float y, float z, float duration);
     bool isLocationOccupied(float x, float y, float clearence);
     bool isGazeboServerRunning();
+    bool isGazeboClientRunning();
+    void cleanUpGazeboClient();
+    void cleanUpGazeboServer();
 
 private:
     QProcess* gazebo_server_process;
@@ -57,4 +62,4 @@ private:
     set< tuple<float, float> > model_locations;
 };
 
-#endif // GAZEBOSIMCREATOR_H
+#endif // GazeboSimManager_H
