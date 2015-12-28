@@ -22,7 +22,7 @@ USBCamera::USBCamera(int frameRate, int cameraIndex, string hostname):
         rawImgPublish = it.advertise((hostname + "/camera/image"), 2);
 
         rosImage = boost::make_shared<cv_bridge::CvImage>();
-        rosImage->encoding = sensor_msgs::image_encodings::RGB8;
+        rosImage->encoding = sensor_msgs::image_encodings::BGR8;
 
         timer = nh.createTimer(period, &USBCamera::capture, this);
 }
