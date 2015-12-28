@@ -251,7 +251,7 @@ QTabBar::tab:only-one {
    </widget>
    <widget class="QWidget" name="simulation_parameters_tab">
     <attribute name="title">
-     <string>Simulation Parameters</string>
+     <string>Simulation Control</string>
     </attribute>
     <widget class="QFrame" name="simulation_setup_frame">
      <property name="geometry">

@@ -125,6 +125,7 @@ namespace rqt_rover_gui
     clearSimulationButtonEventHandler();
     timer->stop();
     stopROSJoyNode();
+    ros::shutdown();
   }
 
 void RoverGUIPlugin::saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const
