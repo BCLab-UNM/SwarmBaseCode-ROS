@@ -69,7 +69,7 @@ ros::Timer publish_status_timer;
 void sigintEventHandler(int signal);
 
 //Callback handlers
-void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
+void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const std_msgs::Int16::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
@@ -301,10 +301,10 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 	currentLocation.theta = yaw;
 }
 
-void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
+void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     if (currentMode == 0 || currentMode == 1) {
-        mobility.angular.z = message->axes[0] * 8;
-        mobility.linear.x = message->axes[1] * 1.5;
+        mobility.angular.z = message->angular.z * 8;
+        mobility.linear.x = message->linear.x * 1.5;
         mobilityPublish.publish(mobility);
     } 
 }
