@@ -57,8 +57,8 @@ void MapFrame::setRoverMapToDisplay(string rover)
 
 void MapFrame::addToGPSRoverPath(string rover, float x, float y)
 { 
-
-
+  // Negate the y direction to orient the map so up is north.
+  y = -y;
 
     if (x > max_gps_seen_x[rover]) max_gps_seen_x[rover] = x;
     if (y > max_gps_seen_y[rover]) max_gps_seen_y[rover] = y;
@@ -77,7 +77,8 @@ void MapFrame::addToGPSRoverPath(string rover, float x, float y)
 
 void MapFrame::addToEncoderRoverPath(string rover, float x, float y)
 {
-
+  // Negate the y direction to orient the map so up is north.
+  y = -y;
 
     if (x > max_encoder_seen_x[rover]) max_encoder_seen_x[rover] = x;
     if (y > max_encoder_seen_y[rover]) max_encoder_seen_y[rover] = y;
@@ -97,6 +98,8 @@ void MapFrame::addToEncoderRoverPath(string rover, float x, float y)
 
 void MapFrame::addToEKFRoverPath(string rover, float x, float y)
 {
+  // Negate the y direction to orient the map so up is north.
+  y = -y;
 
     if (x > max_ekf_seen_x[rover]) max_ekf_seen_x[rover] = x;
     if (y > max_ekf_seen_y[rover]) max_ekf_seen_y[rover] = y;
@@ -130,8 +133,8 @@ void MapFrame::clearMap(string rover)
 
 void MapFrame::addTargetLocation(string rover, float x, float y)
 {
-    // The QT drawing coordinate system is reversed from the robot coordinate system in the y direction
-    //y = -y;
+  //The QT drawing coordinate system is reversed from the robot coordinate system in the y direction
+    y = -y;
 
     update_mutex.lock();
     target_locations[rover].push_back(pair<float,float>(x,y));
@@ -143,7 +146,7 @@ void MapFrame::addTargetLocation(string rover, float x, float y)
 void MapFrame::addCollectionPoint(string rover, float x, float y)
 {
     // The QT drawing coordinate system is reversed from the robot coordinate system in the y direction
-    //y = -y;
+    y = -y;
 
     update_mutex.lock();
     collection_points[rover_to_display].push_back(pair<float,float>(x,y));
