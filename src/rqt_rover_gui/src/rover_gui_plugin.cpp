@@ -67,6 +67,10 @@ namespace rqt_rover_gui
     
     context.addWidget(widget);
 
+    // Next two lines allow us to catch keyboard input
+    widget->installEventFilter(this);
+    widget->setFocus();
+
     // GIT_VERSION is passed in as a compile time definition (see CMakeLists.txt). The version is taken from the last git tag.
     QString version_qstr("<font color='white'>"+QString::fromUtf8(GIT_VERSION)+"</font>");
     ui.version_number_label->setText(version_qstr);
@@ -359,6 +363,9 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
+    // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
+    widget->setFocus();
+
     if (!current ) return; // Check to make sure the current selection isn't null
 
     selected_rover_name = current->text().toStdString();
@@ -905,6 +912,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
 
    displayLogMessage("Finished building simulation.");
+
+  // Visualize the simulation by default call button event handler
+   visualizeSimulationButtonEventHandler();
 
 }
 
@@ -1518,6 +1528,79 @@ void RoverGUIPlugin::gazeboServerFinishedEventHandler()
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
+}
+
+bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
+{
+
+    geometry_msgs::Twist standardized_joy_msg;
+    if (joystick_publisher)
+    {
+
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+            bool direction_key = true;
+
+            float speed = 0.5;
+
+            switch( keyEvent->key() )
+            {
+            case Qt::Key_I:
+                standardized_joy_msg.linear.x = speed;
+                ui.joy_lcd_forward->display(speed);
+                break;
+            case Qt::Key_K:
+                standardized_joy_msg.linear.x = -speed;
+                ui.joy_lcd_back->display(speed);
+                break;
+            case Qt::Key_J:
+                standardized_joy_msg.angular.z = speed;
+                ui.joy_lcd_left->display(speed);
+                break;
+            case Qt::Key_L:
+                standardized_joy_msg.angular.z = -speed;
+                ui.joy_lcd_right->display(speed);
+                break;
+            default:
+                // Not a direction key so ignore
+                direction_key = false;
+            }
+
+            if (direction_key )
+            {
+                joystick_publisher.publish(standardized_joy_msg);
+                return true;
+            }
+        }
+
+        // Stop the rover when key is released
+        if (event->type() == QEvent::KeyRelease)
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+            if (keyEvent->key() == Qt::Key_I || keyEvent->key() == Qt::Key_J || keyEvent->key() == Qt::Key_K || keyEvent->key() == Qt::Key_L )
+            {
+                standardized_joy_msg.linear.x = 0;
+                standardized_joy_msg.angular.z = 0;
+                ui.joy_lcd_forward->display(0);
+                ui.joy_lcd_back->display(0);
+                ui.joy_lcd_left->display(0);
+                ui.joy_lcd_right->display(0);
+
+                joystick_publisher.publish(standardized_joy_msg);
+                return true;
+
+            }
+            else
+            {
+                return rqt_gui_cpp::Plugin::eventFilter(target, event);
+            }
+        }
+    }
+        // Pass on the event since it wasn't handled by us
+    return rqt_gui_cpp::Plugin::eventFilter(target, event);
 }
 
 } // End namespace

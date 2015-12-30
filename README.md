@@ -42,6 +42,8 @@ Our Swarmies can receive mobility commands from the right thumb stick on a Micro
  sudo apt-get install ros-indigo-joystick-drivers
 ```
 
+Joystick commands can also be simulated using the direction keys (Up=I, Down=K, Left=J, Right=L) on the keyboard. The Rover GUI window must have focus for keyboard control to work.
+
 ##### 4. Install git (if git is already installed, skip to step 5):
 
 ```

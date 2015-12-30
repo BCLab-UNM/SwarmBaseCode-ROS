@@ -1817,7 +1817,7 @@ border: 1px solid white;
      <x>600</x>
      <y>560</y>
      <width>201</width>
-     <height>131</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -1832,7 +1832,7 @@ border: 1px solid white;
       <x>10</x>
       <y>10</y>
       <width>181</width>
-      <height>111</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -1879,7 +1879,7 @@ border: 1px solid white;
       <string notr="true">color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Joystick</string>
+      <string>Manual</string>
      </property>
      <property name="checked">
       <bool>true</bool>
