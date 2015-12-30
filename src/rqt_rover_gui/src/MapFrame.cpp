@@ -254,8 +254,8 @@ void MapFrame::paintEvent(QPaintEvent* event)
            return;
         }
 
-    float initial_x = ekf_rover_path[rover_to_display].begin()->first;
-    float initial_y = ekf_rover_path[rover_to_display].begin()->second;
+    float initial_x = 0.0; //ekf_rover_path[rover_to_display].begin()->first;
+    float initial_y = 0.001; //ekf_rover_path[rover_to_display].begin()->second;
     float rover_origin_x = map_origin_x+((initial_x-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
     float rover_origin_y = map_origin_y+((initial_y-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
     painter.setPen(Qt::gray);
@@ -263,7 +263,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
     painter.drawLine(QPoint(map_origin_x, rover_origin_y), QPoint(map_width, rover_origin_y));
     painter.setPen(Qt::white);
 
-    int n_ticks = 5;
+    int n_ticks = 6;
     float tick_length = 5;
     QPoint x_axis_ticks[n_ticks];
     QPoint y_axis_ticks[n_ticks];
@@ -286,7 +286,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
     for (int i = 0; i < n_ticks-1; i++)
     {
         float fraction_of_map_to_rover_x = (rover_origin_x-map_origin_x)/map_width;
-        float fraction_of_map_to_rover_y = (rover_origin_y-map_origin_y)/map_width;
+        float fraction_of_map_to_rover_y = (rover_origin_y-map_origin_y)/map_height;
         float x_label_f = (i+1)*max_seen_width/n_ticks-fraction_of_map_to_rover_x*max_seen_width;
         float y_label_f = (i+1)*max_seen_height/n_ticks-fraction_of_map_to_rover_y*max_seen_height;
 
