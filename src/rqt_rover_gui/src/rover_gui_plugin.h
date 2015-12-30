@@ -34,7 +34,9 @@
 #include <sensor_msgs/Imu.h>
 #include <std_msgs/Int16.h>
 #include <pluginlib/class_list_macros.h>
-
+#include <QGraphicsView>
+#include <QEvent>
+#include <QKeyEvent>
 #include <QProcess>
 
 #include <map>
@@ -54,8 +56,7 @@ using namespace std;
 
 namespace rqt_rover_gui {
 
-  class RoverGUIPlugin 
-    : public rqt_gui_cpp::Plugin
+  class RoverGUIPlugin : public rqt_gui_cpp::Plugin
   {
     Q_OBJECT
       
@@ -66,6 +67,8 @@ namespace rqt_rover_gui {
     virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const;
     virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
     
+    bool eventFilter(QObject *target, QEvent *event);
+
     // Handles output from the joystick node
     QString startROSJoyNode();
     QString stopROSJoyNode();
