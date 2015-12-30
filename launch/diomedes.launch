@@ -1,9 +1,9 @@
 <launch>
-  <node name="alpha_MOBILITY" pkg="mobility" type="mobility" args="$(arg name)" />
-  <node name="alpha_TARGET" pkg="target_detection" type="target" args="$(arg name)" />
-  <node name="alpha_OBSTACLE" pkg="obstacle_detection" type="obstacle" args="$(arg name)" />
+  <node name="diomedes_MOBILITY" pkg="mobility" type="mobility" args="$(arg name)" />
+  <node name="diomedes_TARGET" pkg="target_detection" type="target" args="$(arg name)" />
+  <node name="diomedes_OBSTACLE" pkg="obstacle_detection" type="obstacle" args="$(arg name)" />
 
-  <node pkg="robot_localization" type="navsat_transform_node" name="alpha_NAVSAT" respawn="false">
+  <node pkg="robot_localization" type="navsat_transform_node" name="diomedes_NAVSAT" respawn="false">
 
       <param name="magnetic_declination_radians" value="0.1530654"/>
       <param name="yaw_offset" value="1.57079632679"/>
@@ -17,7 +17,7 @@
 
   </node>
 
-  <node pkg="robot_localization" type="ekf_localization_node" name="alpha_EKF" respawn="false">
+  <node pkg="robot_localization" type="ekf_localization_node" name="diomedes_EKF" respawn="false">
 
       <param name="odom0" value="/$(arg name)/odom/navsat" />
       <param name="odom1" value="/$(arg name)/odom" />

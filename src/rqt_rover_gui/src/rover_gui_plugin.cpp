@@ -795,34 +795,34 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
-    displayLogMessage("Adding rover alpha...");
-    return_msg = sim_mgr.addRover("alpha", -1, 0, 0);
+    displayLogMessage("Adding rover achilles...");
+    return_msg = sim_mgr.addRover("achilles", 0, 1, 0);
     displayLogMessage(return_msg);
 
-    displayLogMessage("Starting rover node for alpha...");
-    return_msg = sim_mgr.startRoverNode("alpha");
+    displayLogMessage("Starting rover node for achilles...");
+    return_msg = sim_mgr.startRoverNode("achilles");
     displayLogMessage(return_msg);
 
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-    displayLogMessage("Adding rover beta...");
-    return_msg = sim_mgr.addRover("beta", 0, 1, 0);
+    displayLogMessage("Adding rover aeneas...");
+    return_msg = sim_mgr.addRover("aeneas", -1, 0, 0);
     displayLogMessage(return_msg);
 
-    displayLogMessage("Starting rover node for beta...");
-    return_msg = sim_mgr.startRoverNode("beta");
+    displayLogMessage("Starting rover node for aeneas...");
+    return_msg = sim_mgr.startRoverNode("aeneas");
     displayLogMessage(return_msg);
 
     progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-    displayLogMessage("Adding rover gamma...");
-    return_msg = sim_mgr.addRover("gamma", 1, 0, 0);
+    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+    displayLogMessage("Adding rover ajax...");
+    return_msg = sim_mgr.addRover("ajax", 1, 0, 0);
     displayLogMessage(return_msg);
 
-   displayLogMessage("Starting rover node for gamma...");
-   return_msg = sim_mgr.startRoverNode("gamma");
+   displayLogMessage("Starting rover node for ajax...");
+   return_msg = sim_mgr.startRoverNode("ajax");
    displayLogMessage(return_msg);
 
    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
@@ -830,34 +830,36 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    if (ui.final_radio_button->isChecked())
    {
-       displayLogMessage("Adding rover delta...");
-       return_msg = sim_mgr.addRover("delta", -1, -1, 0);
+
+       displayLogMessage("Adding rover diomedes...");
+       return_msg = sim_mgr.addRover("diomedes", 1, 1, 0);
        displayLogMessage(return_msg);
 
-       displayLogMessage("Starting rover node for delta...");
-       return_msg = sim_mgr.startRoverNode("delta");
+       displayLogMessage("Starting rover node for diomedes...");
+       return_msg = sim_mgr.startRoverNode("diomedes");
+       displayLogMessage(return_msg);
+
+
+       displayLogMessage("Adding rover hector...");
+       return_msg = sim_mgr.addRover("hector", -1, -1, 0);
+       displayLogMessage(return_msg);
+
+       displayLogMessage("Starting rover node for hector...");
+       return_msg = sim_mgr.startRoverNode("hector");
        displayLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-       displayLogMessage("Adding rover epsilon...");
-       return_msg = sim_mgr.addRover("epsilon", 1, 1, 0);
-       displayLogMessage(return_msg);
-
-       displayLogMessage("Starting rover node for episilon...");
-       return_msg = sim_mgr.startRoverNode("epsilon");
-       displayLogMessage(return_msg);
-
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-       displayLogMessage("Adding rover zeta...");
-       return_msg = sim_mgr.addRover("zeta", 1, -1, 0);
+       displayLogMessage("Adding rover paris...");
+       return_msg = sim_mgr.addRover("paris", 1, -1, 0);
        displayLogMessage(return_msg);
 
-       displayLogMessage("Starting rover node for zeta...");
-       return_msg = sim_mgr.startRoverNode("zeta");
+       displayLogMessage("Starting rover node for paris...");
+       return_msg = sim_mgr.startRoverNode("paris");
        displayLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
@@ -888,8 +890,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    //addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
 
    //   // Test rover movement
-//   displayLogMessage("Moving alpha");
-//   return_msg = sim_mgr.moveRover("alpha", 10, 0, 0);
+//   displayLogMessage("Moving aeneas");
+//   return_msg = sim_mgr.moveRover("aeneas", 10, 0, 0);
 //   displayLogMessage(return_msg);
 
    //displayLogMessage("Starting the gazebo client to visualize the simulation.");
