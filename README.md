@@ -196,7 +196,7 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 
 7. Click "Open" to continue.
 
-8. Enter ```~/rover_workspace/build``` in the text box, this is the default build path. 
+8. Enter ```path to your home directory /rover_workspace/build``` in the text box, this is the default build path. You cannot use the ~ as a shorthand to your home directory here.
 
 9. Click Configure Project
 
