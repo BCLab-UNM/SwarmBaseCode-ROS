@@ -991,6 +991,11 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+
+    // Clear the task status values
+    ui.num_targets_collected_label->setText("<font color='white'>0</font>");
+    ui.num_targets_detected_label->setText("<font color='white'>0</font>");
+
 }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
