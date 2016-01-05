@@ -214,6 +214,8 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 
 Qt Creator can now be used to build the rover_workspace
 
+Note: start qtcreator in your terminal with rover_workspace as the current directory. Source the ~/.bashrc if the catkin environment variables are not set so that QT Creator can properly build the project.
+
 ### Debugging with GDB and Qt Creator
 
 Debuggers are particularly useful for tracking down segfaults and for tracing through the logic of your programs. In order to use the GNU debugger (GDB) with the swarmathon competition add the following line to the CMakelists.txt file for the project you want to debug.
