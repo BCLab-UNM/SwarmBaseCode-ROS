@@ -166,6 +166,14 @@ namespace rqt_rover_gui {
 
     bool display_sim_visualization;
 
+    // Object clearance. These values are used to quickly determine where objects can be placed int time simulatio
+    float target_cluster_size_64_clearance;
+    float target_cluster_size_16_clearance;
+    float target_cluster_size_4_clearance;
+    float target_cluster_size_1_clearance;
+    float rover_clearance;
+    float collection_disk_clearance;
+
   };
 } // end namespace
 

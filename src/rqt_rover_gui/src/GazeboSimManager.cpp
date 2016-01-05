@@ -159,8 +159,6 @@ QString GazeboSimManager::startRoverNode( QString rover_name )
 
 QString GazeboSimManager::addGroundPlane( QString ground_name )
 {
-    model_locations.insert(make_tuple(0,0)); // Nest location
-
     QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + ground_name + "/model.sdf -model " + ground_name;
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
@@ -176,7 +174,8 @@ QString GazeboSimManager::addGroundPlane( QString ground_name )
 
 QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z)
 {
-    model_locations.insert(make_tuple(x, y));
+    float rover_clearance = 0.45; //meters
+    model_locations.insert(make_tuple(x, y, rover_clearance));
 
     QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + rover_name + "/model.sdf "
             + "-model " + rover_name
@@ -230,14 +229,14 @@ QString GazeboSimManager::removeGroundPlane( QString ground_name )
     return return_msg;
 }
 
-QString GazeboSimManager::addModel(QString model_name, QString unique_id, float x, float y, float z)
+QString GazeboSimManager::addModel(QString model_name, QString unique_id, float x, float y, float z, float clearance)
 {
-    return addModel(model_name, unique_id, x, y, z, 0, 0, 0);
+    return addModel(model_name, unique_id, x, y, z, 0, 0, 0, clearance);
 }
 
-QString GazeboSimManager::addModel(QString model_name, QString unique_id, float x, float y, float z, float roll, float pitch, float yaw)
+QString GazeboSimManager::addModel(QString model_name, QString unique_id, float x, float y, float z, float roll, float pitch, float yaw, float clearance)
 {
-    model_locations.insert(make_tuple(x, y));
+    model_locations.insert(make_tuple(x, y, clearance));
 
     QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + model_name + "/model.sdf "
             + "-model " + unique_id
@@ -254,7 +253,6 @@ QString GazeboSimManager::addModel(QString model_name, QString unique_id, float 
     sh.waitForFinished();
     QByteArray output = sh.readAll();
     sh.close();
-
 
     QString return_msg = "<br><font color='yellow'>" + output + "</font><br>";
 
@@ -319,15 +317,19 @@ QString GazeboSimManager::applyForceToRover(QString rover_name, float x, float y
             return return_msg;
 }
 
+// Takes the center x and center y positions of an object along with its clearance and checks if any objects are within that area
 bool GazeboSimManager::isLocationOccupied(float x, float y, float clearance)
 {
-    set<tuple<float, float>>::iterator it;
+    set<tuple<float, float, float>>::iterator it;
     for (it = model_locations.begin(); it != model_locations.end(); it++)
     {
         float used_x = get<0>(*it);
         float used_y = get<1>(*it);
+        float used_clearance = get<2>(*it);
 
-        if (fabs(used_x - x) < clearance || fabs(used_y - y) < clearance)
+        // Distance between circle centers
+        float d = sqrt(pow(x-used_x,2)+pow(y-used_y,2));
+        if (d < clearance+used_clearance)
         {
             return true;
         }
@@ -357,5 +359,6 @@ GazeboSimManager::~GazeboSimManager()
     delete gazebo_client_process;
     delete gazebo_server_process;
     delete command_process;
+    model_locations.clear();
 }
 
