@@ -97,6 +97,7 @@ void IMUFrame::rotateTimerEventHandler()
 
 void IMUFrame::paintEvent(QPaintEvent* event)
 {
+
     QPainter painter(this);
     painter.setPen(Qt::white);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -173,6 +174,11 @@ void IMUFrame::paintEvent(QPaintEvent* event)
     // Draw lines connecting the projected points
 
     // Draw the axes
+
+    // Colorblind friendly colors
+    QColor green(17, 192, 131);
+    QColor red(255, 65, 30);
+
     painter.setPen(Qt::red);
     painter.drawLine(projected_axes_origin, projected_x_axis);
 
@@ -243,11 +249,11 @@ void IMUFrame::paintEvent(QPaintEvent* event)
         painter.fillPath(top_path,Qt::blue);
         painter.setPen(Qt::blue);
         painter.drawLine(projected_line1_start, projected_line1_end);
-        painter.setPen(Qt::red);
+        painter.setPen(red);
         painter.drawLine(projected_line2_start, projected_line2_end);
         painter.setPen(Qt::white);
         painter.drawPolygon(projected_cube_bottom,4);
-        painter.fillPath(bottom_path,Qt::red);
+        painter.fillPath(bottom_path,red);
     }
     else
     {

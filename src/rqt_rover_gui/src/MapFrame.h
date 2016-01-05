@@ -21,6 +21,7 @@
 #include <QPainter>
 #include <vector>
 #include <utility> // For STL pair
+#include <map>
 
 using namespace std;
 
@@ -33,18 +34,20 @@ class MapFrame : public QFrame
 public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
+    void setRoverMapToDisplay(string rover);
+
     void setDisplayEncoderData(bool display);
     void setDisplayGPSData(bool display);
     void setDisplayEKFData(bool display);
 
-    void addToGPSRoverPath(float x, float y);
-    void addToEncoderRoverPath(float x, float y);
-    void addToEKFRoverPath(float x, float y);
+    void addToGPSRoverPath(string rover, float x, float y);
+    void addToEncoderRoverPath(string rover, float x, float y);
+    void addToEKFRoverPath(string rover, float x, float y);
 
 
-    void addTargetLocation(float x, float y);
-    void addCollectionPoint(float x, float y);
-    void clearMap();
+    void addTargetLocation(string rover, float x, float y);
+    void addCollectionPoint(string rover, float x, float y);
+    void clearMap(string rover);
 
 signals:
 
@@ -59,23 +62,11 @@ protected:
 
 private:
 
-    vector< pair<float,float> > gps_rover_path;
-    vector< pair<float,float> > ekf_rover_path;
-    vector< pair<float,float> > encoder_rover_path;
+    string rover_to_display;
 
-    vector< pair<float,float> > collection_points;
-    vector< pair<float,float> > target_locations;
     mutable QMutex update_mutex;
     int frame_width;
     int frame_height;
-
-    float max_seen_x;
-    float max_seen_y;
-    float min_seen_x;
-    float min_seen_y;
-
-    float max_seen_width;
-    float max_seen_height;
 
     bool display_gps_data;
     bool display_ekf_data;
@@ -83,6 +74,37 @@ private:
 
     QTime frame_rate_timer;
     int frames;
+
+    map<string, vector< pair<float,float> > > gps_rover_path;
+    map<string, vector< pair<float,float> > >  ekf_rover_path;
+    map<string, vector< pair<float,float> > >  encoder_rover_path;
+
+    map<string, vector< pair<float,float> > >  collection_points;
+    map<string, vector< pair<float,float> > >  target_locations;
+
+    map<string, float> max_gps_seen_x;
+    map<string, float> max_gps_seen_y;
+    map<string, float> min_gps_seen_x;
+    map<string, float> min_gps_seen_y;
+
+    map<string, float> max_encoder_seen_x;
+    map<string, float> max_encoder_seen_y;
+    map<string, float> min_encoder_seen_x;
+    map<string, float> min_encoder_seen_y;
+
+    map<string, float> max_ekf_seen_x;
+    map<string, float> max_ekf_seen_y;
+    map<string, float> min_ekf_seen_x;
+    map<string, float> min_ekf_seen_y;
+
+    map<string, float> max_gps_seen_width;
+    map<string, float> max_gps_seen_height;
+
+    map<string, float> max_ekf_seen_width;
+    map<string, float> max_ekf_seen_height;
+
+    map<string, float> max_encoder_seen_width;
+    map<string, float> max_encoder_seen_height;
 
 };
 

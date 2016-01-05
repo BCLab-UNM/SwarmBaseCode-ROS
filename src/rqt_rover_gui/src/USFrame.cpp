@@ -12,12 +12,12 @@ namespace rqt_rover_gui
 USFrame::USFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 {
     connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()), Qt::QueuedConnection);
-    left_range = 1.0;
-    right_range = 1.0;
-    center_range = 1.0;
-    left_max_range = 1.0;
-    right_max_range = 1.0;
-    center_max_range = 1.0;
+    left_range = 3.0;
+    right_range = 3.0;
+    center_range = 3.0;
+    left_max_range = 3.0;
+    right_max_range = 3.0;
+    center_max_range = 3.0;
     left_min_range = 0.0;
     right_min_range = 0.0;
     center_min_range = 0.0;
@@ -63,9 +63,9 @@ void USFrame::paintEvent(QPaintEvent* event)
 
     QPoint start_point(frame_width/2, frame_height-20);
 
-    float left_scale = left_range/(left_max_range-left_min_range);
-    float right_scale = right_range/(right_max_range-right_min_range);
-    float center_scale = center_range/(center_max_range-center_min_range);
+    float left_scale = left_range/left_max_range;
+    float right_scale = right_range/right_max_range;
+    float center_scale = center_range/center_max_range;
 
     // Equation of a line from two points. The cooefficent (*_scale) scales the line.
     // Presumes the range is on the interval [0,1]
@@ -83,13 +83,9 @@ void USFrame::paintEvent(QPaintEvent* event)
     float center_range_rounded = roundf(center_range * 100) / 100;
 
 
-    QString left_range_in_meters_qstr = QString::number(left_range_rounded*3)+"m";
-    QString right_range_in_meters_qstr = QString::number(right_range_rounded*3)+"m";
-    QString center_range_in_meters_qstr = QString::number(center_range_rounded*3)+"m";
-
-    QString left_range_qstr = QString::number(left_range_rounded);
-    QString right_range_qstr = QString::number(right_range_rounded);
-    QString center_range_qstr = QString::number(center_range_rounded);
+    QString left_range_in_meters_qstr = QString::number(left_range_rounded)+"m";
+    QString right_range_in_meters_qstr = QString::number(right_range_rounded)+"m";
+    QString center_range_in_meters_qstr = QString::number(center_range_rounded)+"m";
 
     painter.drawText(QPoint(frame_center_x-frame_width/4-fm.width(left_range_in_meters_qstr)/2,frame_height), left_range_in_meters_qstr);
     painter.drawText(QPoint(frame_center_x-fm.width(center_range_in_meters_qstr)/2,frame_height), center_range_in_meters_qstr);

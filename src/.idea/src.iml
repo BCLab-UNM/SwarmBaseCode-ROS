@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_CameraFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_CameraFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_GPSFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_GPSFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_IMUFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_IMUFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_MapFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_MapFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_USFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_USFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_rover_gui_plugin.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_CameraFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_CameraFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_GPSFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_GPSFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_IMUFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_IMUFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_MapFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_MapFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_USFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_USFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_rover_gui_plugin.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_CameraFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_CameraFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_GPSFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_GPSFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_IMUFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_IMUFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_MapFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_MapFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_USFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_USFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_rover_gui_plugin.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_CameraFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_CameraFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_GPSFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_GPSFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_IMUFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_IMUFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_MapFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_MapFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_USFrame.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_USFrame.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_rover_gui_plugin.cxx">
+      <sourceFolder url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/GPSFrame.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/MapFrame.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/MapFrame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/rover_gui_plugin.ui" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/BWTabWidget.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/GPSFrame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/rover_gui_plugin.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/IMUFrame.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/CameraFrame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/USFrame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/CameraFrame.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/USFrame.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/rover_gui_plugin.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/BWTabWidget.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/GazeboSimCreator.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/GazeboSimCreator.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/src/IMUFrame.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/setup.py" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/resources/resources.qrc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/rqt_rover_gui/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/mobility/src/mobility.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/mobility/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/mobility/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_gps/src/node.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_gps/src/gps.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_gps/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_gps/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_msgs/src/ublox_msgs.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_msgs/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_msgs/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_serialization/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox_serialization/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ublox/ublox/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/obstacle_detection/src/obstacle.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/obstacle_detection/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/obstacle_detection/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target_detection/src/camera.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target_detection/src/usbCamera.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target_detection/src/target.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target_detection/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target_detection/package.xml" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/abridge/src/usbSerial.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/abridge/src/abridge.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/abridge/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/abridge/package.xml" isTestSource="false" />
+    </content>
+    <content url="file:///usr/src/gtest">
+      <sourceFolder url="file:///usr/src/gtest/src/gtest_main.cc" isTestSource="false" />
+      <sourceFolder url="file:///usr/src/gtest/src/gtest-all.cc" isTestSource="false" />
+      <sourceFolder url="file:///usr/src/gtest/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file:///usr/src/gtest/cmake/internal_utils.cmake" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Header Search Paths">
+        <CLASSES>
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+          <root url="file:///usr/include" />
+          <root url="file:///usr/local/include" />
+          <root url="file:///opt/ros/indigo/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src" />
+          <root url="file://$MODULE_DIR$/ublox/ublox_gps/include" />
+          <root url="file://$MODULE_DIR$/ublox/ublox_msgs/include" />
+          <root url="file://$MODULE_DIR$/ublox/ublox_serialization/include" />
+          <root url="file://$MODULE_DIR$/target_detection/include" />
+          <root url="file://$MODULE_DIR$/abridge/include" />
+          <root url="file://$MODULE_DIR$/../devel/include" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+          <root url="file:///usr/include" />
+          <root url="file:///usr/local/include" />
+          <root url="file:///opt/ros/indigo/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/devel/include" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src" />
+          <root url="file://$MODULE_DIR$/ublox/ublox_gps/include" />
+          <root url="file://$MODULE_DIR$/ublox/ublox_msgs/include" />
+          <root url="file://$MODULE_DIR$/ublox/ublox_serialization/include" />
+          <root url="file://$MODULE_DIR$/target_detection/include" />
+          <root url="file://$MODULE_DIR$/abridge/include" />
+          <root url="file://$MODULE_DIR$/../devel/include" />
+        </SOURCES>
+        <excluded>
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_GPSFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_MapFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_CameraFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_IMUFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Release/rqt_rover_gui/src/moc_USFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_GPSFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_MapFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_CameraFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_IMUFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/Debug/rqt_rover_gui/src/moc_USFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_GPSFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_MapFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_CameraFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_IMUFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/RelWithDebInfo/rqt_rover_gui/src/moc_USFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_GPSFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_CameraFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_MapFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_USFrame.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_rover_gui_plugin.cxx" />
+          <root url="file://$USER_HOME$/.CLion12/system/cmake/generated/1fd85454/1fd85454/MinSizeRel/rqt_rover_gui/src/moc_IMUFrame.cxx" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/GPSFrame.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/MapFrame.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/MapFrame.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/rover_gui_plugin.ui" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/BWTabWidget.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/GPSFrame.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/rover_gui_plugin.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/IMUFrame.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/CameraFrame.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/USFrame.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/CameraFrame.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/USFrame.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/rover_gui_plugin.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/BWTabWidget.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/GazeboSimCreator.h" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/GazeboSimCreator.cpp" />
+          <root url="file://$MODULE_DIR$/rqt_rover_gui/src/IMUFrame.h" />
+        </excluded>
+      </library>
+    </orderEntry>
+  </component>
+</module>

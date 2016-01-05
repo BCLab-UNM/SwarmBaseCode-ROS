@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rqt_rover_gui)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 execute_process(COMMAND git describe --tags --abbrev=0
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_VERSION)
@@ -67,7 +69,7 @@ include_directories(
 
 add_library(
   rqt_rover_gui
-  src/GazeboSimCreator.cpp
+  src/GazeboSimManager.cpp
   src/rover_gui_plugin.cpp
   src/CameraFrame.cpp
   src/MapFrame.cpp
@@ -89,3 +91,5 @@ target_link_libraries(
 )
 
 catkin_python_setup()
+
+set(CMAKE_BUILD_TYPE Debug)

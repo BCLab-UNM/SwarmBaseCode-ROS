@@ -15,6 +15,10 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 
+// To handle shutdown signals so the node quits properly in response to "rosnode kill"
+#include <ros/ros.h>
+#include <signal.h>
+
 using namespace std;
 
 //Random number generator
@@ -61,9 +65,11 @@ ros::Subscriber targetsCollectedSubscriber;
 ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 
+// OS Signal Handler
+void sigintEventHandler(int signal);
 
 //Callback handlers
-void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
+void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const std_msgs::Int16::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
@@ -94,8 +100,11 @@ int main(int argc, char **argv) {
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
 
-    ros::init(argc, argv, (publishedName + "_MOBILITY"));
+    // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
+    ros::init(argc, argv, (publishedName + "_MOBILITY"), ros::init_options::NoSigintHandler);
     ros::NodeHandle mNH;
+
+    signal(SIGINT, sigintEventHandler); // Register the SIGINT event handler so the node can shutdown properly
 
     joySubscriber = mNH.subscribe((publishedName + "/joystick"), 10, joyCmdHandler);
     modeSubscriber = mNH.subscribe((publishedName + "/mode"), 1, modeHandler);
@@ -156,7 +165,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				//Otherwise, assign a new goal
 				else {
 					 //select new heading from Gaussian distribution around current heading
-					goalLocation.theta = rng->gaussian(currentLocation.theta, 1.0);
+					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
 					
 					//select new position 50 cm from current location
 					goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
@@ -172,10 +181,10 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			case STATE_MACHINE_ROTATE: {
 				stateMachineMsg.data = "ROTATING";
 			    if (angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta) > 0.1) {
-					setVelocity(0.0, 0.3); //rotate left
+					setVelocity(0.0, 0.2); //rotate left
 			    }
 			    else if (angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta) < -0.1) {
-					setVelocity(0.0, -0.3); //rotate right
+					setVelocity(0.0, -0.2); //rotate right
 				}
 				else {
 					setVelocity(0.0, 0.0); //stop
@@ -292,10 +301,10 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 	currentLocation.theta = yaw;
 }
 
-void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
+void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     if (currentMode == 0 || currentMode == 1) {
-        mobility.angular.z = message->axes[0] * 8;
-        mobility.linear.x = message->axes[1] * 1.5;
+        mobility.angular.z = message->angular.z * 8;
+        mobility.linear.x = message->linear.x * 1.5;
         mobilityPublish.publish(mobility);
     } 
 }
@@ -310,4 +319,10 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&)
 
 void targetsCollectedHandler(const std_msgs::Int16::ConstPtr& message) {
 	targetsCollected[message->data] = 1;
+}
+
+void sigintEventHandler(int sig)
+{
+     // All the default sigint handler does is call shutdown()
+     ros::shutdown();
 }

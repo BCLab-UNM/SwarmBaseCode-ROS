@@ -42,6 +42,8 @@ Our Swarmies can receive mobility commands from the right thumb stick on a Micro
  sudo apt-get install ros-indigo-joystick-drivers
 ```
 
+Joystick commands can also be simulated using the direction keys (Up=I, Down=K, Left=J, Right=L) on the keyboard. The Rover GUI window must have focus for keyboard control to work.
+
 ##### 4. Install git (if git is already installed, skip to step 5):
 
 ```
@@ -92,7 +94,7 @@ sudo apt-get install git
 7. Update your bash session to automatically export the enviromental variable that stores the location of Gazebo's model files:
 
   ```
-  echo "export GAZEBO_MODEL_PATH=~/rover_workspace/misc/models" >> ~/.bashrc
+  echo "export GAZEBO_MODEL_PATH=~/rover_workspace/simulation/models" >> ~/.bashrc
   source ~/.bashrc
   ```
 
@@ -194,9 +196,9 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 
 6. Select CMakeLists.txt
 
-7. Click "Yes" to creating a .pro file
+7. Click "Open" to continue.
 
-8. Enter ```~/rover_workspace/build``` in the text box, this is the default build path. 
+8. Enter ```path to your home directory /rover_workspace/build``` in the text box, this is the default build path. You cannot use the ~ as a shorthand to your home directory here.
 
 9. Click Configure Project
 

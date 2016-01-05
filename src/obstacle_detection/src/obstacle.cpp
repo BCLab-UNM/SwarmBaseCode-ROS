@@ -62,6 +62,6 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
 		obstacleMode.data = 2; //collision in front or on left side
 	}
 	
-	obstaclePublish.publish(obstacleMode);
+        obstaclePublish.publish(obstacleMode);
 }
 
