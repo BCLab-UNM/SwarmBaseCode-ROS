@@ -959,6 +959,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
         return_msg += sim_mgr.stopRoverNode(QString::fromStdString(*i));
         return_msg += "<br>";
         progress_dialog.setValue((++count)*100.0f/rover_names_copy.size());
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     }
 
     // Unsubscribe from topics
