@@ -44,8 +44,8 @@ public:
     QString stopGazeboServer();
     QString stopGazeboClient();
     QString removeModel( QString model_name );
-    QString addModel(QString model_name, QString unique_id, float x, float y, float z);
-    QString addModel(QString model_name, QString unique_id, float x, float y, float z, float R, float P, float Y);
+    QString addModel(QString model_name, QString unique_id, float x, float y, float z, float clearance);
+    QString addModel(QString model_name, QString unique_id, float x, float y, float z, float R, float P, float Y, float clearance);
     QString moveRover(QString rover_name, float x, float y, float z);
     QString applyForceToRover(QString rover_name, float x, float y, float z, float duration);
     bool isLocationOccupied(float x, float y, float clearence);
@@ -59,7 +59,10 @@ private:
     QProcess* gazebo_client_process;
     QProcess* command_process;
     map<QString, QProcess*> rover_processes;
-    set< tuple<float, float> > model_locations;
+
+    // Contains the positions of objects in the simulation and clearance value (the xy plane radius of the object)
+    // center x, center y, clearance
+    set< tuple<float, float, float> > model_locations;
 };
 
 #endif // GazeboSimManager_H
