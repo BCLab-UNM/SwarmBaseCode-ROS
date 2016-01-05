@@ -158,8 +158,7 @@ namespace rqt_rover_gui {
     map<string,int> rover_control_state;
     bool all_autonomous;
 
-    int arena_width; // in meters
-    int arena_height; // in meters
+    int arena_dim; // in meters
 
     vector<int> targets_detected;
     vector<int> targets_collected;
@@ -173,6 +172,7 @@ namespace rqt_rover_gui {
     float target_cluster_size_1_clearance;
     float rover_clearance;
     float collection_disk_clearance;
+    float barrier_clearance;
 
   };
 } // end namespace
