@@ -1365,7 +1365,7 @@ void RoverGUIPlugin::readRoverModelXML(QString path)
         displayLogMessage("Read model file at " + path );
     else
     {
-        displayLogMessage("Could not read model file at " + path );
+        displayLogMessage(QString::fromStdString(selected_rover_name) + " appears to be a physical rover.");
         return;
     }
 
