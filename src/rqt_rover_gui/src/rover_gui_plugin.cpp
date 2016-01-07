@@ -49,6 +49,8 @@ namespace rqt_rover_gui
     all_autonomous = false;
     joy_process = NULL;
 
+    obstacle_call_count = 0;
+
     arena_dim = 20;
 
     display_sim_visualization = false;
@@ -65,6 +67,7 @@ namespace rqt_rover_gui
     collection_disk_clearance = 0.5;
 
     barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
+
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -104,6 +107,7 @@ namespace rqt_rover_gui
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
     connect(ui.visualize_simulation_button, SIGNAL(pressed()), this, SLOT(visualizeSimulationButtonEventHandler()));
+    connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -373,6 +377,26 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
 
 }
 
+// Counts the number of obstacle avoidance calls
+void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs::UInt8> &event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const std_msgs::UInt8ConstPtr& msg = event.getMessage();
+
+    //QString displ = QString("Target number ") + QString::number(msg->data) + QString(" found.");
+
+    // 0 for no obstacle, 1 for right side obstacle, and 2 for left side obsticle
+    int code = msg->data;
+
+    if (code != 0)
+    {
+        emit updateObstacleCallCount("<font color='white'>"+QString::number(++obstacle_call_count)+"</font>");
+    }
+}
+
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
     // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
@@ -535,8 +559,6 @@ void RoverGUIPlugin::setupSubscribers()
     us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
     us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
-
-
     }
 
 
@@ -547,6 +569,7 @@ void RoverGUIPlugin::setupSubscribers()
     for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
     {
         target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
+        obstacle_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
 
         // Odometry and GPS subscribers
         encoder_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
@@ -779,7 +802,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     return_msg = sim_mgr.addGroundPlane("mars_ground_plane");
     displayLogMessage(return_msg);
     }
-    else if (ui.texture_combobox->currentText() == "Concrete")
+    else if (ui.texture_combobox->currentText() == "KSC Concrete")
     {
     displayLogMessage("Adding concrete ground plane...");
     return_msg = sim_mgr.addGroundPlane("concrete_ground_plane");
@@ -977,9 +1000,11 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     us_left_subscriber.shutdown();
     us_right_subscriber.shutdown();
     imu_subscriber.shutdown();
-    target_detection_subscriber.shutdown();
     for (map<string,ros::Subscriber>::iterator it=target_detection_subscribers.begin(); it!=target_detection_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
+
     target_detection_subscribers.clear();
+    obstacle_subscribers.clear();
     target_collection_subscriber.shutdown();
     camera_subscriber.shutdown();
 
@@ -1009,8 +1034,9 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Clear the task status values
     ui.num_targets_collected_label->setText("<font color='white'>0</font>");
     ui.num_targets_detected_label->setText("<font color='white'>0</font>");
-
-}
+    obstacle_call_count = 0;
+    emit updateObstacleCallCount("<font color='white'>0</font>");
+ }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
 {

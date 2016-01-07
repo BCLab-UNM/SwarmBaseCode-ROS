@@ -95,6 +95,7 @@ sudo apt-get install git
 
   ```
   echo "export GAZEBO_MODEL_PATH=~/rover_workspace/simulation/models" >> ~/.bashrc
+  echo "export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:~/rover_workspace/devel/lib/" >> ~/.bashrc
   source ~/.bashrc
   ```
 
