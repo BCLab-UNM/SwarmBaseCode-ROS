@@ -33,6 +33,7 @@
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/Imu.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/UInt8.h>
 #include <pluginlib/class_list_macros.h>
 #include <QGraphicsView>
 #include <QEvent>
@@ -80,7 +81,7 @@ namespace rqt_rover_gui {
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void targetDetectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
     void targetCollectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
-
+    void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -106,6 +107,10 @@ namespace rqt_rover_gui {
     // Display log message to the text frame in the GUI
     void displayLogMessage(QString msg);
 
+  signals:
+
+    void updateObstacleCallCount(QString text);
+
   private slots:
 
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
@@ -120,7 +125,8 @@ namespace rqt_rover_gui {
     void clearSimulationButtonEventHandler();
     void visualizeSimulationButtonEventHandler();
     void gazeboClientFinishedEventHandler();
-    void gazeboServerFinishedEventHandler();
+    void gazeboServerFinishedEventHandler();  
+
 
   private:
 
@@ -138,7 +144,8 @@ namespace rqt_rover_gui {
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
-    ros::Subscriber target_detection_subscriber;
+
+    map<string,ros::Subscriber> obstacle_subscribers;
     map<string,ros::Subscriber> target_detection_subscribers;
     ros::Subscriber target_collection_subscriber;
     image_transport::Subscriber camera_subscriber;
@@ -174,6 +181,7 @@ namespace rqt_rover_gui {
     float collection_disk_clearance;
     float barrier_clearance;
 
+    unsigned long obstacle_call_count;
   };
 } // end namespace
 
