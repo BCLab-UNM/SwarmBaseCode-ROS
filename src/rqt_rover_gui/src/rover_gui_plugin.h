@@ -158,7 +158,7 @@ namespace rqt_rover_gui {
     map<string,int> rover_control_state;
     bool all_autonomous;
 
-    int arena_dim; // in meters
+    float arena_dim; // in meters
 
     vector<int> targets_detected;
     vector<int> targets_collected;
