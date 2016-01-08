@@ -33,6 +33,7 @@
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/Imu.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/UInt8.h>
 #include <pluginlib/class_list_macros.h>
 #include <QGraphicsView>
 #include <QEvent>
@@ -80,7 +81,7 @@ namespace rqt_rover_gui {
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void targetDetectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
     void targetCollectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
-
+    void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -112,6 +113,7 @@ namespace rqt_rover_gui {
     void joystickBackUpdate(double);
     void joystickLeftUpdate(double);
     void joystickRightUpdate(double);
+    void updateObstacleCallCount(QString text);
 
   private slots:
 
@@ -127,7 +129,8 @@ namespace rqt_rover_gui {
     void clearSimulationButtonEventHandler();
     void visualizeSimulationButtonEventHandler();
     void gazeboClientFinishedEventHandler();
-    void gazeboServerFinishedEventHandler();
+    void gazeboServerFinishedEventHandler();  
+
 
   private:
 
@@ -145,7 +148,8 @@ namespace rqt_rover_gui {
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
-    ros::Subscriber target_detection_subscriber;
+
+    map<string,ros::Subscriber> obstacle_subscribers;
     map<string,ros::Subscriber> target_detection_subscribers;
     ros::Subscriber target_collection_subscriber;
     image_transport::Subscriber camera_subscriber;
@@ -165,14 +169,23 @@ namespace rqt_rover_gui {
     map<string,int> rover_control_state;
     bool all_autonomous;
 
-    int arena_width; // in meters
-    int arena_height; // in meters
+    float arena_dim; // in meters
 
     vector<int> targets_detected;
     vector<int> targets_collected;
 
     bool display_sim_visualization;
 
+    // Object clearance. These values are used to quickly determine where objects can be placed int time simulatio
+    float target_cluster_size_64_clearance;
+    float target_cluster_size_16_clearance;
+    float target_cluster_size_4_clearance;
+    float target_cluster_size_1_clearance;
+    float rover_clearance;
+    float collection_disk_clearance;
+    float barrier_clearance;
+
+    unsigned long obstacle_call_count;
   };
 } // end namespace
 

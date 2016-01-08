@@ -95,6 +95,7 @@ sudo apt-get install git
 
   ```
   echo "export GAZEBO_MODEL_PATH=~/rover_workspace/simulation/models" >> ~/.bashrc
+  echo "export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:~/rover_workspace/devel/lib/" >> ~/.bashrc
   source ~/.bashrc
   ```
 
@@ -213,6 +214,8 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 14. Click the "Build Now" button to build the project
 
 Qt Creator can now be used to build the rover_workspace
+
+Note: start qtcreator in your terminal with rover_workspace as the current directory. Source the ~/.bashrc if the catkin environment variables are not set so that QT Creator can properly build the project.
 
 ### Debugging with GDB and Qt Creator
 

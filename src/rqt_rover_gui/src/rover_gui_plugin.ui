@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -411,18 +411,20 @@ border-color: rgb(255, 255, 255);</string>
        <rect>
         <x>30</x>
         <y>170</y>
-        <width>111</width>
+        <width>131</width>
         <height>27</height>
        </rect>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);
 border-color: rgb(255, 255, 255);
-border: 1px solid white; </string>
+border: 1px solid white; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
       </property>
       <item>
        <property name="text">
-        <string>Concrete</string>
+        <string>KSC Concrete</string>
        </property>
       </item>
       <item>
@@ -1788,6 +1790,32 @@ border: 1px solid white;
       <rect>
        <x>240</x>
        <y>90</y>
+       <width>67</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>150</y>
+       <width>181</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Obstacle Avoidance Calls:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="perc_of_time_avoiding_obstacles">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>150</y>
        <width>67</width>
        <height>17</height>
       </rect>

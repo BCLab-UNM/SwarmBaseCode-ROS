@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
 
-    <model name="delta">
+    <model name="achilles">
         <static>false</static>
 
         <link name='base_link'>
@@ -31,7 +31,7 @@
                         <size>.308 .180 .136</size>
                     </box> -->
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Chassis_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Chassis_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -68,12 +68,12 @@
                         <size>.209 .298 .001</size>
                     </box> -->
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Top_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Top_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
                     <script>
-                        <name>Gazebo/Yellow</name>
+                        <name>Gazebo/Grey</name>
                     </script>
                 </material>
             </visual>
@@ -130,7 +130,7 @@
                         <length>.064</length>
                     </cylinder> -->
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Tire_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Tire_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -188,7 +188,7 @@
                         <length>.064</length>
                     </cylinder> -->
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Tire_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Tire_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -246,7 +246,7 @@
                         <length>.064</length>
                     </cylinder> -->
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Tire_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Tire_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -304,7 +304,7 @@
                         <length>.064</length>
                     </cylinder> -->
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Tire_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Tire_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -340,7 +340,7 @@
                 <pose>0.11 0 .122 0 0 -1.5708</pose>
                 <geometry>
                     <mesh>
-                        <uri>model://delta/meshes/SwarmieUS_V2.dae</uri>
+                        <uri>model://achilles/meshes/SwarmieUS_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -371,7 +371,7 @@
                 </ray>
                 <plugin name="us" filename="libhector_gazebo_ros_sonar.so">
                     <gaussianNoise>0.005</gaussianNoise>
-                    <topicName>/delta/sonarCenter</topicName>
+                    <topicName>/achilles/sonarCenter</topicName>
                     <frameId>us_center_link</frameId>
                 </plugin>
             </sensor>
@@ -394,7 +394,7 @@
                 <pose>0.1 -.048 .122 0 0 -2.0071</pose>
                 <geometry>
                     <mesh>
-                        <uri>model://delta/meshes/SwarmieUS_V2.dae</uri>
+                        <uri>model://achilles/meshes/SwarmieUS_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -425,7 +425,7 @@
                 </ray>
                 <plugin name="us" filename="libhector_gazebo_ros_sonar.so">
                     <gaussianNoise>0.005</gaussianNoise>
-                    <topicName>/delta/sonarRight</topicName>
+                    <topicName>/achilles/sonarRight</topicName>
                     <frameId>us_center_link</frameId>
                 </plugin>
             </sensor>
@@ -448,7 +448,7 @@
                 <pose>0.1 0.048 .122 0 0 -1.1345</pose>
                 <geometry>
                     <mesh>
-                        <uri>model://delta/meshes/SwarmieUS_V2.dae</uri>
+                        <uri>model://achilles/meshes/SwarmieUS_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -479,7 +479,7 @@
                 </ray>
                 <plugin name="us" filename="libhector_gazebo_ros_sonar.so">
                     <gaussianNoise>0.005</gaussianNoise>
-                    <topicName>/delta/sonarLeft</topicName>
+                    <topicName>/achilles/sonarLeft</topicName>
                     <frameId>us_center_link</frameId>
                 </plugin>
             </sensor>
@@ -502,7 +502,7 @@
                 <pose>0.072 0 .185 0 0 1.5708</pose>
                 <geometry>
                     <mesh>
-                        <uri>model://delta/meshes/Swarmie_Camera_V2.dae</uri>
+                        <uri>model://achilles/meshes/Swarmie_Camera_V2.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -550,9 +550,9 @@
                 <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
                     <alwaysOn>true</alwaysOn>
                     <updateRate>0.0</updateRate>
-                    <cameraName>/delta/camera</cameraName>
-                    <imageTopicName>/delta/camera/image</imageTopicName>
-                    <cameraInfoTopicName>/delta/camera/info</cameraInfoTopicName>
+                    <cameraName>/achilles/camera</cameraName>
+                    <imageTopicName>/achilles/camera/image</imageTopicName>
+                    <cameraInfoTopicName>/achilles/camera/info</cameraInfoTopicName>
                     <frameName>camera_link</frameName>
                     <hackBaseline>0.1</hackBaseline>
                     <distortionK1>.0</distortionK1>
@@ -575,8 +575,8 @@
             <wheelDiameter>0.120</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
-            <commandTopic>/delta/mobility</commandTopic>
-            <odometryTopic>/delta/odom</odometryTopic>
+            <commandTopic>/achilles/mobility</commandTopic>
+            <odometryTopic>/achilles/odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
         </plugin>
         
@@ -585,8 +585,8 @@
             <alwaysOn>1</alwaysOn>
             <updateRate>5</updateRate>
             <bodyName>base_link</bodyName>
-            <topicName>/delta/fix</topicName>
-            <!--<velocityTopicName>/delta/fix_velocity</velocityTopicName>-->
+            <topicName>/achilles/fix</topicName>
+            <!--<velocityTopicName>/achilles/fix_velocity</velocityTopicName>-->
             <referenceLatitude>28.584810</referenceLatitude>
             <referenceLongitude>-80.649650</referenceLongitude>
             <referenceHeading>0.0</referenceHeading>
@@ -606,7 +606,7 @@
         <plugin name="imu_sim" filename="libhector_gazebo_ros_imu.so">
             <updateRate>10</updateRate>
             <bodyName>base_link</bodyName>
-            <topicName>/delta/imu</topicName>
+            <topicName>/achilles/imu</topicName>
             <rpyOffsets>0 0 0</rpyOffsets> 
             <gaussianNoise>0</gaussianNoise>  
             <accelDrift>0.5 0.5 0.5</accelDrift>

@@ -9,6 +9,6 @@
       <uri>model://sun</uri>
     </include>
 
-    <plugin name="SetupWorld" filename="build/gazebo_plugins/libgazebo_plugins.so"/>
+    <plugin name="SetupWorld" filename="libgazebo_plugins.so"/>
   </world>
 </sdf>

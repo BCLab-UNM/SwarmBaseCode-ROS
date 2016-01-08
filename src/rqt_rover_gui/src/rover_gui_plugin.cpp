@@ -49,10 +49,25 @@ namespace rqt_rover_gui
     all_autonomous = false;
     joy_process = NULL;
 
-    arena_height = 20;
-    arena_width = 20;
+    obstacle_call_count = 0;
+
+    arena_dim = 20;
 
     display_sim_visualization = false;
+
+    // Set object clearance values: radius in meters. Values taken from the max dimension of the gazebo collision box for the object.
+    // So one half the distance from two opposing corners of the bounding box.
+    // In the case of the collection disk a bounding circle is used which gives the radius directly.
+    // Values are rounded up to the nearest 10cm.
+    target_cluster_size_64_clearance = 0.8;
+    target_cluster_size_16_clearance = 0.6;
+    target_cluster_size_4_clearance = 0.2;
+    target_cluster_size_1_clearance = 0.1;
+    rover_clearance = 0.4;
+    collection_disk_clearance = 0.5;
+
+    barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
+
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -96,6 +111,7 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(joystickBackUpdate(double)), ui.joy_lcd_back, SLOT(display(double)));
     connect(this, SIGNAL(joystickLeftUpdate(double)), ui.joy_lcd_left, SLOT(display(double)));
     connect(this, SIGNAL(joystickRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
+    connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -367,6 +383,26 @@ void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const st
 
 }
 
+// Counts the number of obstacle avoidance calls
+void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs::UInt8> &event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const std_msgs::UInt8ConstPtr& msg = event.getMessage();
+
+    //QString displ = QString("Target number ") + QString::number(msg->data) + QString(" found.");
+
+    // 0 for no obstacle, 1 for right side obstacle, and 2 for left side obsticle
+    int code = msg->data;
+
+    if (code != 0)
+    {
+        emit updateObstacleCallCount("<font color='white'>"+QString::number(++obstacle_call_count)+"</font>");
+    }
+}
+
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
     // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
@@ -529,8 +565,6 @@ void RoverGUIPlugin::setupSubscribers()
     us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
     us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
-
-
     }
 
 
@@ -541,6 +575,7 @@ void RoverGUIPlugin::setupSubscribers()
     for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
     {
         target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
+        obstacle_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
 
         // Odometry and GPS subscribers
         encoder_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
@@ -750,24 +785,22 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     ui.num_targets_collected_label->setText(QString("<font color='white'>0</font>"));
     ui.num_targets_detected_label->setText(QString("<font color='white'>0</font>"));
 
-    displayLogMessage(QString("Set arena size to ")+QString::number(arena_width)+"x"+QString::number(arena_height));
-
     QProcess* sim_server_process = sim_mgr.startGazeboServer();
     connect(sim_server_process, SIGNAL(finished(int)), this, SLOT(gazeboServerFinishedEventHandler()));
 
 
     if (ui.final_radio_button->isChecked())
     {
-         arena_height = 23.1;
-         arena_width = 23.1;
+         arena_dim = 23.1;
          addFinalsWalls();
     }
     else
     {
-        arena_height = 15;
-        arena_width = 15;
+        arena_dim = 15;
         addPrelimsWalls();
     }
+
+    displayLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
 
     if (ui.texture_combobox->currentText() == "Gravel")
     {
@@ -775,7 +808,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     return_msg = sim_mgr.addGroundPlane("mars_ground_plane");
     displayLogMessage(return_msg);
     }
-    else if (ui.texture_combobox->currentText() == "Concrete")
+    else if (ui.texture_combobox->currentText() == "KSC Concrete")
     {
     displayLogMessage("Adding concrete ground plane...");
     return_msg = sim_mgr.addGroundPlane("concrete_ground_plane");
@@ -794,7 +827,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
 
     displayLogMessage("Adding collection disk...");
-    sim_mgr.addModel("collection_disk", "collection_disk", 0, 0, 0);
+    float collection_disk_radius = 0.5; // meters
+    sim_mgr.addModel("collection_disk", "collection_disk", 0, 0, 0, collection_disk_radius);
 
     int n_rovers_created = 0;
     int n_rovers = 3;
@@ -808,34 +842,34 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
-    displayLogMessage("Adding rover alpha...");
-    return_msg = sim_mgr.addRover("alpha", -1, 0, 0);
+    displayLogMessage("Adding rover achilles...");
+    return_msg = sim_mgr.addRover("achilles", 0, 1, 0);
     displayLogMessage(return_msg);
 
-    displayLogMessage("Starting rover node for alpha...");
-    return_msg = sim_mgr.startRoverNode("alpha");
+    displayLogMessage("Starting rover node for achilles...");
+    return_msg = sim_mgr.startRoverNode("achilles");
     displayLogMessage(return_msg);
 
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-    displayLogMessage("Adding rover beta...");
-    return_msg = sim_mgr.addRover("beta", 0, 1, 0);
+    displayLogMessage("Adding rover aeneas...");
+    return_msg = sim_mgr.addRover("aeneas", -1, 0, 0);
     displayLogMessage(return_msg);
 
-    displayLogMessage("Starting rover node for beta...");
-    return_msg = sim_mgr.startRoverNode("beta");
+    displayLogMessage("Starting rover node for aeneas...");
+    return_msg = sim_mgr.startRoverNode("aeneas");
     displayLogMessage(return_msg);
 
     progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-    displayLogMessage("Adding rover gamma...");
-    return_msg = sim_mgr.addRover("gamma", 1, 0, 0);
+    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+    displayLogMessage("Adding rover ajax...");
+    return_msg = sim_mgr.addRover("ajax", 1, 0, 0);
     displayLogMessage(return_msg);
 
-   displayLogMessage("Starting rover node for gamma...");
-   return_msg = sim_mgr.startRoverNode("gamma");
+   displayLogMessage("Starting rover node for ajax...");
+   return_msg = sim_mgr.startRoverNode("ajax");
    displayLogMessage(return_msg);
 
    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
@@ -843,34 +877,36 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    if (ui.final_radio_button->isChecked())
    {
-       displayLogMessage("Adding rover delta...");
-       return_msg = sim_mgr.addRover("delta", -1, -1, 0);
+
+       displayLogMessage("Adding rover diomedes...");
+       return_msg = sim_mgr.addRover("diomedes", 1, 1, 0);
        displayLogMessage(return_msg);
 
-       displayLogMessage("Starting rover node for delta...");
-       return_msg = sim_mgr.startRoverNode("delta");
+       displayLogMessage("Starting rover node for diomedes...");
+       return_msg = sim_mgr.startRoverNode("diomedes");
+       displayLogMessage(return_msg);
+
+
+       displayLogMessage("Adding rover hector...");
+       return_msg = sim_mgr.addRover("hector", -1, -1, 0);
+       displayLogMessage(return_msg);
+
+       displayLogMessage("Starting rover node for hector...");
+       return_msg = sim_mgr.startRoverNode("hector");
        displayLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-       displayLogMessage("Adding rover epsilon...");
-       return_msg = sim_mgr.addRover("epsilon", 1, 1, 0);
-       displayLogMessage(return_msg);
-
-       displayLogMessage("Starting rover node for episilon...");
-       return_msg = sim_mgr.startRoverNode("epsilon");
-       displayLogMessage(return_msg);
-
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-       displayLogMessage("Adding rover zeta...");
-       return_msg = sim_mgr.addRover("zeta", 1, -1, 0);
+       displayLogMessage("Adding rover paris...");
+       return_msg = sim_mgr.addRover("paris", 1, -1, 0);
        displayLogMessage(return_msg);
 
-       displayLogMessage("Starting rover node for zeta...");
-       return_msg = sim_mgr.startRoverNode("zeta");
+       displayLogMessage("Starting rover node for paris...");
+       return_msg = sim_mgr.startRoverNode("paris");
        displayLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
@@ -898,11 +934,11 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    // add walls given nw corner (x,y) and height and width (in meters)
 
-   //addWalls(-arena_width/2, -arena_height/2, arena_width, arena_height);
+   //addWalls(-arena_dim/2, -arena_dim/2, arena_dim, arena_dim);
 
    //   // Test rover movement
-//   displayLogMessage("Moving alpha");
-//   return_msg = sim_mgr.moveRover("alpha", 10, 0, 0);
+//   displayLogMessage("Moving aeneas");
+//   return_msg = sim_mgr.moveRover("aeneas", 10, 0, 0);
 //   displayLogMessage(return_msg);
 
    //displayLogMessage("Starting the gazebo client to visualize the simulation.");
@@ -952,6 +988,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
         return_msg += sim_mgr.stopRoverNode(QString::fromStdString(*i));
         return_msg += "<br>";
         progress_dialog.setValue((++count)*100.0f/rover_names_copy.size());
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     }
 
     // Unsubscribe from topics
@@ -969,9 +1006,11 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     us_left_subscriber.shutdown();
     us_right_subscriber.shutdown();
     imu_subscriber.shutdown();
-    target_detection_subscriber.shutdown();
     for (map<string,ros::Subscriber>::iterator it=target_detection_subscribers.begin(); it!=target_detection_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
+
     target_detection_subscribers.clear();
+    obstacle_subscribers.clear();
     target_collection_subscriber.shutdown();
     camera_subscriber.shutdown();
 
@@ -996,7 +1035,13 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-}
+
+    // Clear the task status values
+    ui.num_targets_collected_label->setText("<font color='white'>0</font>");
+    ui.num_targets_detected_label->setText("<font color='white'>0</font>");
+    obstacle_call_count = 0;
+    emit updateObstacleCallCount("<font color='white'>0</font>");
+ }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
 {
@@ -1081,23 +1126,30 @@ QString RoverGUIPlugin::addUniformTargets()
     progress_dialog.show();
 
     QString output;
-    float clearance = 0; //meters
+
     float proposed_x;
     float proposed_y;
 
     // 256 piles of 1 tag
+
+    // d is the distance from the center of the arena to the boundary minus the barrier clearance, i.e. the region where tags can be placed
+    // is d - U(0,2d) where U(a,b) is a uniform distribition bounded by a and b.
+    // (before checking for collisions including the collection disk at the center)
+    float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_1_clearance);
+
     for (int i = 0; i < 256; i++)
     {
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
         {
-            displayLogMessage("Tried to place target "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
-            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+            displayLogMessage("Tried to place target "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y) + "...");
+            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
        }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, clearance));
+       while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
+       displayLogMessage("<font color=green>Succeeded.</font>");
 
-        output = sim_mgr.addModel(QString("at")+QString::number(i),  QString("at")+QString::number(i), proposed_x, proposed_y, 0);
+        output = sim_mgr.addModel(QString("at")+QString::number(i),  QString("at")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_1_clearance);
 
        progress_dialog.setValue(i*100.0f/256);
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1118,9 +1170,11 @@ QString RoverGUIPlugin::addClusteredTargets()
     progress_dialog.show();
 
     QString output;
-    float clearance = 0.5; //meters
+
     float proposed_x;
     float proposed_y;
+
+    float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_64_clearance);
 
     // Four piles of 64
     for (int i = 0; i < 4; i++)
@@ -1131,15 +1185,16 @@ QString RoverGUIPlugin::addClusteredTargets()
         do
         {
             displayLogMessage("Tried to place cluster "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = arena_width/2.0 - (((float) rand()) / RAND_MAX)*arena_width;
-            proposed_y = arena_height/2.0 - (((float) rand()) / RAND_MAX)*arena_height;
+            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, clearance));
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
+        displayLogMessage("<font color=green>Succeeded.</font>");
 
         progress_dialog.setValue(i*100.0f/4);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-        output = sim_mgr.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0);
+        output = sim_mgr.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_64_clearance);
         displayLogMessage(output);
     }
 
@@ -1164,20 +1219,25 @@ QString RoverGUIPlugin::addPowerLawTargets()
 
     QString output = "";
     // One pile of 64
-    float clearance = 0.075; //meters
+
     float proposed_x;
     float proposed_y;
+
+    float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_64_clearance);
 
     do
     {
         displayLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-        proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
-        proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+        proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+        proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
     }
-    while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, clearance));
+    while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
+    displayLogMessage("<font color=green>Succeeded.</font>");
 
     progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
-    output+= sim_mgr.addModel("atags64_0", "atags64_0", arena_width/2-rand()%boost::math::iround(arena_width), 10-rand()%boost::math::iround(arena_height), 0);
+    output+= sim_mgr.addModel("atags64_0", "atags64_0", arena_dim/2-rand()%boost::math::iround(arena_dim), 10-rand()%boost::math::iround(arena_dim), 0, target_cluster_size_64_clearance);
+
+    d = arena_dim/2.0-(barrier_clearance+target_cluster_size_16_clearance);
 
     // Four piles of 16
     for (int i = 0; i < 4; i++)
@@ -1185,16 +1245,20 @@ QString RoverGUIPlugin::addPowerLawTargets()
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
         {
-            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
-            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
             displayLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
         }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, clearance));
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_16_clearance));
+        displayLogMessage("<font color=green>Succeeded.</font>");
+
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        output+= sim_mgr.addModel(QString("atags16_")+QString::number(i), QString("atags16_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
+        output+= sim_mgr.addModel(QString("atags16_")+QString::number(i), QString("atags16_")+QString::number(i), arena_dim/2-rand()%boost::math::iround(arena_dim), arena_dim/2-rand()%boost::math::iround(arena_dim), 0, target_cluster_size_64_clearance);
     }
+
+    d = arena_dim/2.0-(barrier_clearance+target_cluster_size_4_clearance);
 
     // Sixteen piles of 4
     for (int i = 0; i < 16; i++)
@@ -1203,15 +1267,18 @@ QString RoverGUIPlugin::addPowerLawTargets()
         do
         {
             displayLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
-            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, clearance));
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_4_clearance));
+        displayLogMessage("<font color=green>Succeeded.</font>");
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        output+= sim_mgr.addModel(QString("atags4_")+QString::number(i), QString("atags4_")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
+        output+= sim_mgr.addModel(QString("atags4_")+QString::number(i), QString("atags4_")+QString::number(i), arena_dim/2-rand()%boost::math::iround(arena_dim), arena_dim/2-rand()%boost::math::iround(arena_dim), 0, target_cluster_size_4_clearance);
     }
+
+    d = arena_dim/2.0-(barrier_clearance+target_cluster_size_1_clearance);
 
     // Sixty-four piles of 1
     for (int i = 0; i < 64; i++)
@@ -1220,14 +1287,15 @@ QString RoverGUIPlugin::addPowerLawTargets()
         do
         {
             displayLogMessage("Tried to place target "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = arena_width/2.0 - ((float) rand()) / RAND_MAX*arena_width;
-            proposed_y = arena_height/2.0 - ((float) rand()) / RAND_MAX*arena_height;
+            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, clearance));
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
+        displayLogMessage("<font color=green>Succeeded.</font>");
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        output+= sim_mgr.addModel(QString("at")+QString::number(i), QString("at")+QString::number(i), arena_width/2-rand()%boost::math::iround(arena_width), arena_height/2-rand()%boost::math::iround(arena_height), 0);
+        output+= sim_mgr.addModel(QString("at")+QString::number(i), QString("at")+QString::number(i), arena_dim/2-rand()%boost::math::iround(arena_dim), arena_dim/2-rand()%boost::math::iround(arena_dim), 0, target_cluster_size_1_clearance);
     }
 
     return output;
@@ -1245,19 +1313,21 @@ QString RoverGUIPlugin::addFinalsWalls()
     progress_dialog.show();
 
     QString output;
-    output += sim_mgr.addModel("barrier_final_round", "Barrier_West", -arena_width/2, 0, 0 );
+
+    // Setting wall clearance to zero - radius of a wall does not make sense. Barrier clearance values ensure models are not placed on the walls.
+    output += sim_mgr.addModel("barrier_final_round", "Barrier_West", -arena_dim/2, 0, 0, 0 );
     progress_dialog.setValue(1*100.0f/4);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   output += sim_mgr.addModel("barrier_final_round", "Barrier_North", 0, -arena_width/2, 0, 0, 0, M_PI/2);
+   output += sim_mgr.addModel("barrier_final_round", "Barrier_North", 0, -arena_dim/2, 0, 0, 0, M_PI/2, 0);
        progress_dialog.setValue(2*100.0f/4);
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   output += sim_mgr.addModel("barrier_final_round", "Barrier_East", arena_width/2, 0, 0 );
+   output += sim_mgr.addModel("barrier_final_round", "Barrier_East", arena_dim/2, 0, 0, 0 );
        progress_dialog.setValue(3*100.0f/4);
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   output += sim_mgr.addModel("barrier_final_round", "Barrier_South", 0, arena_width/2, 0, 0, 0, M_PI/2);
+   output += sim_mgr.addModel("barrier_final_round", "Barrier_South", 0, arena_dim/2, 0, 0, 0, M_PI/2, 0);
        progress_dialog.setValue(4*100.0f/4);
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
@@ -1274,20 +1344,22 @@ QString RoverGUIPlugin::addPrelimsWalls()
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
+    // Setting wall clearance to zero - radius of a wall does not make sense. Barrier clearance values ensure models are not placed on the walls.
+
    QString output;
-   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_West", -arena_width/2, 0, 0 );
+   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_West", -arena_dim/2, 0, 0, 0 );
    progress_dialog.setValue(1*100.0f/4);
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_North", 0, -arena_width/2, 0, 0, 0, M_PI/2);
+   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_North", 0, -arena_dim/2, 0, 0, 0, M_PI/2, 0);
    progress_dialog.setValue(2*100.0f/4);
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_East", arena_width/2, 0, 0 );
+   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_East", arena_dim/2, 0, 0, 0 );
    progress_dialog.setValue(3*100.0f/4);
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_South", 0, arena_width/2, 0, 0, 0, M_PI/2);
+   output += sim_mgr.addModel("barrier_prelim_round", "Barrier_South", 0, arena_dim/2, 0, 0, 0, M_PI/2, 0);
    progress_dialog.setValue(4*100.0f/4);
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
@@ -1297,10 +1369,12 @@ QString RoverGUIPlugin::addPrelimsWalls()
 
 void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float y)
 {
+    // Currently disabled.
     return;
-    float arena_width = 20;
-    float arena_height = 20;
-    if (x < -arena_width/2)
+
+    float arena_dim = 20;
+
+    if (x < -arena_dim/2)
     {
         float duration = 10; //seconds
         float x_comp, y_comp, z_comp;
@@ -1321,7 +1395,7 @@ void RoverGUIPlugin::readRoverModelXML(QString path)
         displayLogMessage("Read model file at " + path );
     else
     {
-        displayLogMessage("Could not read model file at " + path );
+        displayLogMessage(QString::fromStdString(selected_rover_name) + " appears to be a physical rover.");
         return;
     }
 
