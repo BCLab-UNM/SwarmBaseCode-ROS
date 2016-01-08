@@ -106,6 +106,13 @@ namespace rqt_rover_gui {
     // Display log message to the text frame in the GUI
     void displayLogMessage(QString msg);
 
+  signals:
+
+    void joystickForwardUpdate(double);
+    void joystickBackUpdate(double);
+    void joystickLeftUpdate(double);
+    void joystickRightUpdate(double);
+
   private slots:
 
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
