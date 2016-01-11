@@ -79,7 +79,18 @@ sudo apt-get install git
   ```
 
 5. Compile Swarmathon-ROS as a ROS catkin workspace:
-
+ 
+  Make sure bash is aware of the location of the ROS environment:
+  ```
+  if ! grep -q "source /opt/ros/indigo/setup.bash" ~/.bashrc
+  then 
+    echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+  fi
+  source ~/.bashrc
+  ```
+  
+  Run catkin_make to build the Swarmathon code:
+  
   ```
   catkin_make
   ```
