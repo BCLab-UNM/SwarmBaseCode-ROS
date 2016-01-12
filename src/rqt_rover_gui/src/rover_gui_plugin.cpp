@@ -358,15 +358,15 @@ void RoverGUIPlugin::targetCollectedEventHandler(const ros::MessageEvent<const s
 
     int target_id = msg->data;
 
-    if(std::find(targets_collected.begin(), targets_collected.end(), target_id) != targets_collected.end())
-    {
+    //if(std::find(targets_collected.begin(), targets_collected.end(), target_id) != targets_collected.end())
+    //{
         // This target was already collected
-    }
-    else
-    {
+    //}
+    //else
+    //{
         targets_collected.push_back(target_id);
         ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targets_collected.size())+QString("</font>"));
-    }
+    //}
 }
 
 void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
@@ -796,6 +796,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     // Initialize the target counts
     ui.num_targets_collected_label->setText(QString("<font color='white'>0</font>"));
     ui.num_targets_detected_label->setText(QString("<font color='white'>0</font>"));
+    targets_collected.clear();
+    targets_detected.clear();
 
     QProcess* sim_server_process = sim_mgr.startGazeboServer();
     connect(sim_server_process, SIGNAL(finished(int)), this, SLOT(gazeboServerFinishedEventHandler()));
@@ -1051,6 +1053,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Clear the task status values
     ui.num_targets_collected_label->setText("<font color='white'>0</font>");
     ui.num_targets_detected_label->setText("<font color='white'>0</font>");
+    targets_detected.clear();
+    targets_collected.clear();
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
  }
