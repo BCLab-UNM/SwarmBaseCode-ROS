@@ -129,31 +129,31 @@ The GUI will now launch. The run script kills a number of gazebo and ROS process
 
 This is the first screen of the GUI:
 
-![Alt text](http://swarmathon.cs.unm.edu/img/GUI2.png "Opening Screen")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/guiFirstScreen.png "Opening Screen")
 
-Click the simulation paramenters tab:
+Click the "Simulation Control" tab:
 
-![Alt text](http://swarmathon.cs.unm.edu/img/GUI3.png "Simulation Parameters")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/simControlTab.png "Simulation Parameters")
 
 Choose the ground texture, whether this is a preliminary or final round (3 or 6 robots), and the distribution of targets.
 
-Click the "build simulation" button when ready.
+Click the "Build Simulation" button when ready.
 
 The gazebo physics simulator will open.
 
-![Alt text](http://swarmathon.cs.unm.edu/img/GUI4.png "Gazebo Simulator")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/buildSim.png "Gazebo Simulator")
 
-Click back to the Swarmathon GUI and select the "sensor display" tab.
+Click back to the Swarmathon GUI and select the "Sensor Display" tab.
 
-![Alt text](http://swarmathon.cs.unm.edu/img/GUI5.png "Gazebo Simulator")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/sensorDisplayTab.png "Sesnor display")
 
 Any active rovers, simulated or real will be displayed in the rover list on the left side.
 
-![Alt text](http://swarmathon.cs.unm.edu/img/GUI6.png "Rover sensor display")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/activeRovers.png "Active rovers")
 
 Select a rover to view its sensor outputs. 
 
-![Alt text](http://swarmathon.cs.unm.edu/img/GUI9.png "Rover sensor display")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/roverSensorOutputs.png "Rover sensor outputs")
 
 There are four sensor display frames:
 
@@ -164,6 +164,12 @@ The ultrasound output is shown as three white rays, one for each ultrasound. The
 The IMU sensor display consists of a cube where the red face is the bottom of the rover, the blue face is the top of the rover, and the red and blue bars are the front and back of the rover. The cube is viewed from the top down. The cube is positioned according to the IMU orientation data. For example, if the rover flips over, the red side will be closest to the observer. Accelerometer data is shown as a 3D vector projected into 2D space pointing towards the sum of the accelerations in 3D space.
  
 The map view shows the path taken by the currently selected rover. Green is the encoder position data. In simulation, the encoder position data comes from the odometry topic being published by Gazebo's skid steer controller plugin. In the real robots, it is the encoder output. GPS points are shown as red dots. The EKF is the output of an extended Kalman filter which fuses data from the IMU, GPS, and encoder sensors.
+
+Click on the "Task Status" tab.
+
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/taskStatusTab.png "Task Status tab")
+
+This tab displays the number of targets detected, the number of targets collected, and the number of obstacle avoidance calls.
 
 To close the simulation and the GUI, click the red exit button in the top left-hand corner.
 
