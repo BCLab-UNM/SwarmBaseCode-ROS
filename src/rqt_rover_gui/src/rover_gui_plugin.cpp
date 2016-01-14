@@ -358,15 +358,16 @@ void RoverGUIPlugin::targetCollectedEventHandler(const ros::MessageEvent<const s
 
     int target_id = msg->data;
 
-    //if(std::find(targets_collected.begin(), targets_collected.end(), target_id) != targets_collected.end())
-    //{
+    // Don't allow duplicates
+    if(std::find(targets_collected.begin(), targets_collected.end(), target_id) != targets_collected.end())
+    {
         // This target was already collected
-    //}
-    //else
-    //{
+    }
+    else
+    {
         targets_collected.push_back(target_id);
         ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targets_collected.size())+QString("</font>"));
-    //}
+    }
 }
 
 void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
