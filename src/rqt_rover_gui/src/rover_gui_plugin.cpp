@@ -864,6 +864,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     return_msg = sim_mgr.startRoverNode("achilles");
     displayLogMessage(return_msg);
 
+    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
     displayLogMessage("Adding rover aeneas...");
     return_msg = sim_mgr.addRover("aeneas", -1, 0, 0);
     displayLogMessage(return_msg);
@@ -871,9 +874,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     displayLogMessage("Starting rover node for aeneas...");
     return_msg = sim_mgr.startRoverNode("aeneas");
     displayLogMessage(return_msg);
-
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
     progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -900,6 +900,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
        return_msg = sim_mgr.startRoverNode("diomedes");
        displayLogMessage(return_msg);
 
+       progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
+       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
        displayLogMessage("Adding rover hector...");
        return_msg = sim_mgr.addRover("hector", -1, -1, 0);
@@ -908,9 +910,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
        displayLogMessage("Starting rover node for hector...");
        return_msg = sim_mgr.startRoverNode("hector");
        displayLogMessage(return_msg);
-
-        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
