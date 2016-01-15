@@ -575,7 +575,7 @@
             <wheelDiameter>0.120</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
-            <commandTopic>/paris/mobility</commandTopic>
+            <commandTopic>/paris/velocity</commandTopic>
             <odometryTopic>/paris/odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
         </plugin>

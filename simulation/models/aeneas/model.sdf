@@ -575,7 +575,7 @@
             <wheelDiameter>0.120</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
-            <commandTopic>/aeneas/mobility</commandTopic>
+            <commandTopic>/aeneas/velocity</commandTopic>
             <odometryTopic>/aeneas/odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
         </plugin>
