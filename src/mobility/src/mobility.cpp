@@ -43,13 +43,13 @@ bool targetsCollected [256] = {0}; //array of booleans indicating whether each t
 #define STATE_MACHINE_TRANSLATE	2
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
-geometry_msgs::Twist mobility;
+geometry_msgs::Twist velocity;
 char host[128];
 string publishedName;
 char prev_state_machine[128];
 
 //Publishers
-ros::Publisher mobilityPublish;
+ros::Publisher velocityPublish;
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
 ros::Publisher targetCollectedPublish;
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
     targetsCollectedSubscriber = mNH.subscribe(("targetsCollected"), 10, targetsCollectedHandler);
 
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
-    mobilityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/mobility"), 10);
+    velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
     targetCollectedPublish = mNH.advertise<std_msgs::Int16>(("targetsCollected"), 1, true);
 
@@ -239,9 +239,9 @@ void setVelocity(double linearVel, double angularVel)
   //killSwitchTimer.stop();
   //killSwitchTimer.start();
   
-  mobility.linear.x = linearVel * 1.5;
-  mobility.angular.z = angularVel * 8; //scaling factor for sim; removed by aBridge node
-  mobilityPublish.publish(mobility);
+  velocity.linear.x = linearVel * 1.5;
+  velocity.angular.z = angularVel * 8; //scaling factor for sim; removed by aBridge node
+  velocityPublish.publish(velocity);
 }
 
 /***********************

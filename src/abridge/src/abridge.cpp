@@ -48,7 +48,7 @@ ros::Publisher sonarCenterPublish;
 ros::Publisher sonarRightPublish;
 
 //Subscribers
-ros::Subscriber moveSubscriber;
+ros::Subscriber velocitySubscriber;
 
 //Timers
 ros::Timer publishTimer;
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
     sonarCenterPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarCenter"), 10);
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     
-    moveSubscriber = aNH.subscribe((publishedName + "/mobility"), 10, cmdHandler);
+    velocitySubscriber = aNH.subscribe((publishedName + "/velocity"), 10, cmdHandler);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     

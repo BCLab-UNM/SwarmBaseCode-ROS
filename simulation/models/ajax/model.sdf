@@ -575,7 +575,7 @@
             <wheelDiameter>0.120</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
-            <commandTopic>/ajax/mobility</commandTopic>
+            <commandTopic>/ajax/velocity</commandTopic>
             <odometryTopic>/ajax/odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
         </plugin>

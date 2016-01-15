@@ -575,7 +575,7 @@
             <wheelDiameter>0.120</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
-            <commandTopic>/achilles/mobility</commandTopic>
+            <commandTopic>/achilles/velocity</commandTopic>
             <odometryTopic>/achilles/odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
         </plugin>
