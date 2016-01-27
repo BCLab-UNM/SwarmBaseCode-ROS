@@ -108,7 +108,7 @@
                 <geometry>
                     <cylinder>
                         <radius>.06</radius>
-                        <length>.01</length>
+                        <length>.067</length>
                     </cylinder>
                 </geometry>
 		<surface>
@@ -166,7 +166,7 @@
                 <geometry>
                     <cylinder>
                         <radius>.06</radius>
-                        <length>.01</length>
+                        <length>.067</length>
                     </cylinder>
                 </geometry>
 		<surface>
@@ -224,7 +224,7 @@
                 <geometry>
                     <cylinder>
                         <radius>.06</radius>
-                        <length>.01</length>
+                        <length>.067</length>
                     </cylinder>
                 </geometry>
 		<surface>
@@ -282,7 +282,7 @@
                 <geometry>
                     <cylinder>
                         <radius>.06</radius>
-                        <length>.01</length>
+                        <length>.067</length>
                     </cylinder>
                 </geometry>
 		<surface>
@@ -575,7 +575,7 @@
             <wheelDiameter>0.120</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
             <torque>2.8</torque>
-            <commandTopic>/paris/mobility</commandTopic>
+            <commandTopic>/paris/velocity</commandTopic>
             <odometryTopic>/paris/odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
         </plugin>
