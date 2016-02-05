@@ -3,7 +3,7 @@
     <description>The Rover GUI</description>
     <qtgui>
       <label>Rover GUI</label>
-      <icon type="theme">system-help</icon>
+      <icon type="theme"></icon>
       <statustip>Rover GUI</statustip>
     </qtgui>
   </class>
