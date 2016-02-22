@@ -68,6 +68,13 @@ namespace rqt_rover_gui
 
     barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
 
+	//Initialize AprilTag detection apparatus
+	tf = tag36h11_create();
+    td = apriltag_detector_create();
+    apriltag_detector_add_family(td, tf);
+
+    //Allocate image memory up front so it doesn't need to be done for every image frame
+    u8_image = image_u8_create(320, 240);
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -348,52 +355,49 @@ set<string> RoverGUIPlugin::findConnectedRovers()
     return rovers;
 }
 
-void RoverGUIPlugin::targetCollectedEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
+void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event)
 {
     const std::string& publisher_name = event.getPublisherName();
     const ros::M_string& header = event.getConnectionHeader();
     ros::Time receipt_time = event.getReceiptTime();
+    
+    const sensor_msgs::ImageConstPtr& image = event.getMessage();
 
-    const std_msgs::Int16ConstPtr& msg = event.getMessage();
-
-    int target_id = msg->data;
+    int targetID = targetDetect(image);
 
     // Don't allow duplicates
-    if(std::find(targets_collected.begin(), targets_collected.end(), target_id) != targets_collected.end())
-    {
-        // This target was already collected
+    if((targetID < 0) || (targetID == collectionZoneID) || (std::find(targetsDroppedOff.begin(), targetsDroppedOff.end(), targetID) != targetsDroppedOff.end())) {
+        // No target was found in the image, or the target was the collection zone ID, or the target was already collected
     }
-    else
-    {
-        targets_collected.push_back(target_id);
-        ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targets_collected.size())+QString("</font>"));
+    else {
+        targetsPickedUp[publisher_name] = targetID;
+        ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
     }
 }
 
-void RoverGUIPlugin::targetDetectedEventHandler(const ros::MessageEvent<const std_msgs::Int16> &event)
+void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event)
 {
     const std::string& publisher_name = event.getPublisherName();
     const ros::M_string& header = event.getConnectionHeader();
     ros::Time receipt_time = event.getReceiptTime();
 
-    const std_msgs::Int16ConstPtr& msg = event.getMessage();
+    const sensor_msgs::ImageConstPtr& image = event.getMessage();
 
-    //QString displ = QString("Target number ") + QString::number(msg->data) + QString(" found.");
+    int targetID = targetDetect(image);
 
-    int target_id = msg->data;
-
-    if(std::find(targets_detected.begin(), targets_detected.end(), target_id) != targets_detected.end())
-    {
-        // This target was already found
+    if(targetID != collectionZoneID) {
+        // This target does not match the official collection zone ID
     }
-    else
-    {
-        targets_detected.push_back(target_id);
-        ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targets_detected.size())+QString("</font>"));
+    else {
+		try {
+			targetsDroppedOff.push_back(targetsPickedUp.at(publisher_name));
+			targetsPickedUp.erase(publisher_name);
+			ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
+		}
+		catch(const std::out_of_range& oor) {
+			ROS_ERROR("Rover '%s' was not carrying a target", publisher_name.c_str());
+		}
     }
-
-    //displayLogMessage(displ);
-
 }
 
 // Counts the number of obstacle avoidance calls
@@ -583,11 +587,9 @@ void RoverGUIPlugin::setupSubscribers()
 
     // Subscriptions for all rovers
 
-    // Target detected topic - subscribe to all known rovers
     set<string>::iterator rover_it;
     for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
     {
-        target_detection_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targets", 10, &RoverGUIPlugin::targetDetectedEventHandler, this);
         obstacle_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
 
         // Odometry and GPS subscribers
@@ -595,8 +597,10 @@ void RoverGUIPlugin::setupSubscribers()
         ekf_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
     }
-
-    target_collection_subscriber = nh.subscribe("/targetsCollected", 10, &RoverGUIPlugin::targetCollectedEventHandler, this);
+    
+    // Target subscribers
+    targetPickUpSubscriber = nh.subscribe("/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
+    targetDropOffSubscriber = nh.subscribe("/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
 
 
 }
@@ -797,8 +801,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     // Initialize the target counts
     ui.num_targets_collected_label->setText(QString("<font color='white'>0</font>"));
     ui.num_targets_detected_label->setText(QString("<font color='white'>0</font>"));
-    targets_collected.clear();
-    targets_detected.clear();
+    targetsPickedUp.clear();
+    targetsDroppedOff.clear();
 
     QProcess* sim_server_process = sim_mgr.startGazeboServer();
     connect(sim_server_process, SIGNAL(finished(int)), this, SLOT(gazeboServerFinishedEventHandler()));
@@ -1020,12 +1024,11 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     us_left_subscriber.shutdown();
     us_right_subscriber.shutdown();
     imu_subscriber.shutdown();
-    for (map<string,ros::Subscriber>::iterator it=target_detection_subscribers.begin(); it!=target_detection_subscribers.end(); ++it) it->second.shutdown();
     for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
 
-    target_detection_subscribers.clear();
     obstacle_subscribers.clear();
-    target_collection_subscriber.shutdown();
+    targetPickUpSubscriber.shutdown();
+    targetDropOffSubscriber.shutdown();
     camera_subscriber.shutdown();
 
     displayLogMessage("Shutting down publishers...");
@@ -1053,8 +1056,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Clear the task status values
     ui.num_targets_collected_label->setText("<font color='white'>0</font>");
     ui.num_targets_detected_label->setText("<font color='white'>0</font>");
-    targets_detected.clear();
-    targets_collected.clear();
+    targetsPickedUp.clear();
+    targetsDroppedOff.clear();
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
  }
@@ -1382,6 +1385,61 @@ QString RoverGUIPlugin::addPrelimsWalls()
    return output;
 }
 
+int RoverGUIPlugin::targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
+
+    cv_bridge::CvImagePtr cvImage;
+
+	//Convert from MONO8 to BGR8
+	//TODO: consider whether we should let the camera publish as BGR8 and skip this conversion
+    try {
+        cvImage = cv_bridge::toCvCopy(rawImage); //, sensor_msgs::image_encodings::MONO8);
+    } catch (cv_bridge::Exception& e) {
+        ROS_ERROR("Could not convert from '%s' to 'bgr8'.", rawImage->encoding.c_str());
+        return -1;
+    }
+
+    //Create Mat image for processing
+    cv::Mat matImage = cvImage->image;
+    cv::cvtColor(matImage, matImage, cv::COLOR_BGR2GRAY);
+
+    //Force greyscale and force image size.  This is only for Gazebo.
+    //TODO: fix model so Gazebo publishes the correct format
+    //TODO: if Mat is only used here, why not use the cvImage format here and skip the Mat image completely?
+    if (matImage.cols != 320 && matImage.rows != 240) {
+        cv::resize(matImage, matImage, cv::Size(320, 240), cv::INTER_LINEAR);
+    }
+
+    //Copy all image data into an array that AprilTag library expects
+    image_u8_t *im = copy_image_data_into_u8_container(	matImage.cols, 
+							matImage.rows, 
+							(uint8_t *) matImage.data, 
+							matImage.step);
+
+    //Detect AprilTags
+    zarray_t *detections = apriltag_detector_detect(td, im);
+    
+    //Check result for valid tag
+    if (zarray_size(detections) > 0) {
+	    apriltag_detection_t *det;
+	    zarray_get(detections, 0, &det); //use the first tag detected in the image
+	
+	    //Publish detected tag
+	    return det->id;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+image_u8_t* RoverGUIPlugin::copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride) {
+    for (int y = 0; y < u8_image->height; y++) {
+        for (int x = 0; x < u8_image->width; x++) {
+            u8_image->buf[y * u8_image->stride + x] = rgb[y * stride + x + 0];
+        }
+    }
+    return u8_image;
+}
 
 void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float y)
 {

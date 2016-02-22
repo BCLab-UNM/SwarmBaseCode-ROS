@@ -53,6 +53,19 @@
 
 #include "GazeboSimManager.h"
 
+//AprilTag headers
+#include "apriltag.h"
+#include "image_u8.h"
+#include "tag36h11.h"
+#include "tag36h10.h"
+#include "tag36artoolkit.h"
+#include "tag25h9.h"
+#include "tag25h7.h"
+#include "image_u8.h"
+#include "pnm.h"
+#include "zarray.h"
+#include "getopt.h"
+
 using namespace std;
 
 namespace rqt_rover_gui {
@@ -79,8 +92,8 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
-    void targetDetectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
-    void targetCollectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
+    void targetPickUpEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
+    void targetDropOffEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -106,6 +119,12 @@ namespace rqt_rover_gui {
 
     // Display log message to the text frame in the GUI
     void displayLogMessage(QString msg);
+    
+    //Image converter
+	image_u8_t *copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride);
+
+	//AprilTag detector
+	int targetDetect(const sensor_msgs::ImageConstPtr& rawImage);
 
   signals:
 
@@ -150,8 +169,8 @@ namespace rqt_rover_gui {
     ros::Subscriber imu_subscriber;
 
     map<string,ros::Subscriber> obstacle_subscribers;
-    map<string,ros::Subscriber> target_detection_subscribers;
-    ros::Subscriber target_collection_subscriber;
+    ros::Subscriber targetDropOffSubscriber;
+    ros::Subscriber targetPickUpSubscriber;
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
@@ -171,8 +190,8 @@ namespace rqt_rover_gui {
 
     float arena_dim; // in meters
 
-    vector<int> targets_detected;
-    vector<int> targets_collected;
+    map<string,int> targetsPickedUp;
+    vector<int> targetsDroppedOff;
 
     bool display_sim_visualization;
 
@@ -186,6 +205,16 @@ namespace rqt_rover_gui {
     float barrier_clearance;
 
     unsigned long obstacle_call_count;
+    
+    //AprilTag objects
+	apriltag_family_t *tf = NULL; //tag family
+	apriltag_detector_t *td = NULL; //tag detector
+
+	//Image container
+	image_u8_t *u8_image = NULL;
+	
+	//AprilTag assigned to collection zone
+	int collectionZoneID = 0;
   };
 } // end namespace
 

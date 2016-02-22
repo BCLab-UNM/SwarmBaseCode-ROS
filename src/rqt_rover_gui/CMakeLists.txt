@@ -63,8 +63,13 @@ include(
 )
 
 include_directories(
+  include
   src
   ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+link_directories(
+  lib
 )
 
 add_library(
@@ -86,6 +91,7 @@ add_library(
 
 target_link_libraries(
   rqt_rover_gui
+  libapriltag.a	
   ${GAZEBO_libraries}
   ${catkin_LIBRARIES}
 )
