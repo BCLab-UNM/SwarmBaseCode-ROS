@@ -68,6 +68,7 @@ void GazeboSimManager::cleanUpGazeboServer()
     // Use delete later here because this function is called by a slot connected to a signal from this object which will segfault if delete directely with "delete gazebo_client_process;"
     gazebo_server_process->deleteLater();
     gazebo_server_process = NULL;
+    model_locations.clear();
 }
 
 void GazeboSimManager::cleanUpGazeboClient()
@@ -359,6 +360,5 @@ GazeboSimManager::~GazeboSimManager()
     delete gazebo_client_process;
     delete gazebo_server_process;
     delete command_process;
-    model_locations.clear();
 }
 
