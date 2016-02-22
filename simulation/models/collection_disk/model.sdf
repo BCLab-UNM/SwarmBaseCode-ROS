@@ -41,6 +41,13 @@
             <length>0.0001</length>
           </cylinder>
         </geometry>
+        <material>
+          <script>
+            <uri>model://media/materials/scripts</uri>
+            <uri>model://media/materials/textures</uri>
+            <name>collectionZone/Image</name>
+          </script>
+        </material>
       </visual>
      </link>
   </model>
