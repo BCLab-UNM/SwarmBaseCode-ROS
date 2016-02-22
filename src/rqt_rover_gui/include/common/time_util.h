@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -47,7 +47,7 @@ int64_t utime_get_useconds(int64_t v);
 void    utime_to_timeval(int64_t v, struct timeval *tv);
 void    utime_to_timespec(int64_t v, struct timespec *ts);
 
-int32_t  timeutil_usleep(useconds_t useconds);
+int32_t  timeutil_usleep(int64_t useconds);
 uint32_t timeutil_sleep(unsigned int seconds);
 
 

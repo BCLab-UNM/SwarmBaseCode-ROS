@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -32,7 +32,6 @@ either expressed or implied, of the FreeBSD Project.
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
-#include <regex.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -46,15 +45,6 @@ struct string_buffer
     char *s;
     int alloc;
     size_t size; // as if strlen() was called; not counting terminating \0
-};
-
-struct string_feeder
-{
-    char *s;
-    size_t len;
-    size_t pos;
-
-    int line, col;
 };
 
 #define MIN_PRINTF_ALLOC 16
@@ -100,6 +90,7 @@ char *vsprintf_alloc(const char *fmt, va_list orig_args)
     returnsize = vsnprintf(buf, size, fmt, args);
     va_end(args);
 
+    assert(returnsize <= size);
     return buf;
 }
 
@@ -146,10 +137,10 @@ int str_diff_idx(const char * a, const char * b)
 
     int i = 0;
 
-    int lena = strlen(a);
-    int lenb = strlen(b);
+    size_t lena = strlen(a);
+    size_t lenb = strlen(b);
 
-    int minlen = lena < lenb ? lena : lenb;
+    size_t minlen = lena < lenb ? lena : lenb;
 
     for (; i < minlen; i++)
         if (a[i] != b[i])
@@ -195,185 +186,6 @@ zarray_t *str_split(const char *str, const char *delim)
     return parts;
 }
 
-zarray_t *str_match_regex(const char *str, const char *regex)
-{
-    assert(str != NULL);
-    assert(regex != NULL);
-
-    regex_t regex_comp;
-    if (regcomp(&regex_comp, regex, REG_EXTENDED) != 0)
-        return NULL;
-
-    zarray_t *matches = zarray_create(sizeof(char*));
-
-    void *ptr = (void*) str;
-    regmatch_t match;
-    while (regexec(&regex_comp, ptr, 1, &match, 0) != REG_NOMATCH)
-    {
-        if (match.rm_so == -1)
-            break;
-
-        if (match.rm_so == match.rm_eo) // ambiguous regex
-            break;
-
-        int   length = match.rm_eo - match.rm_so;
-        char *substr = malloc(length+1);
-        bzero(substr, length+1);
-
-        memcpy(substr, ptr+match.rm_so, length);
-
-        ptr = ptr + match.rm_eo;
-
-        zarray_add(matches, &substr);
-    }
-
-    regfree(&regex_comp);
-    return matches;
-}
-
-zarray_t *str_split_regex(const char *str, const char *regex)
-{
-    assert(str != NULL);
-    assert(regex != NULL);
-
-    regex_t regex_comp;
-    if (regcomp(&regex_comp, regex, REG_EXTENDED) != 0)
-        return NULL;
-
-    zarray_t *matches = zarray_create(sizeof(char*));
-
-    int origlen = strlen(str);
-    void *end = ((void*) str) + origlen;
-    void *ptr = (void*) str;
-
-    regmatch_t match;
-    while (regexec(&regex_comp, ptr, 1, &match, 0) != REG_NOMATCH)
-    {
-        //printf("so %3d eo %3d\n", match.rm_so, match.rm_eo);
-
-        if (match.rm_so == -1)
-            break;
-
-        if (match.rm_so == match.rm_eo) // ambiguous regex
-            break;
-
-        void *so = ((void*) ptr) + match.rm_so;
-
-        int length = so - ptr;
-
-        if (length > 0) {
-            char *substr = malloc(length+1);
-            bzero(substr, length+1);
-            memcpy(substr, ptr, length);
-
-            //printf("match '%s'\n", substr);
-            //fflush(stdout);
-
-            zarray_add(matches, &substr);
-        }
-
-        ptr = ptr + match.rm_eo;
-    }
-
-    if (ptr - (void*) str != origlen) {
-        int length = end - ptr;
-        char *substr = malloc(length+1);
-        bzero(substr, length+1);
-
-        memcpy(substr, ptr, length);
-
-        zarray_add(matches, &substr);
-    }
-
-
-    regfree(&regex_comp);
-    return matches;
-}
-
-zarray_t *str_split_regex_all(const char *str, const char *regex)
-{
-    assert(str != NULL);
-    assert(regex != NULL);
-
-    regex_t regex_comp;
-    if (regcomp(&regex_comp, regex, REG_EXTENDED) != 0)
-        return NULL;
-
-    zarray_t *matches = zarray_create(sizeof(char*));
-
-    int origlen = strlen(str);
-    void *end = ((void*) str) + origlen;
-    void *ptr = (void*) str;
-
-    regmatch_t match;
-    while (regexec(&regex_comp, ptr, 1, &match, 0) != REG_NOMATCH)
-    {
-        //printf("so %3d eo %3d\n", match.rm_so, match.rm_eo);
-
-        if (match.rm_so == -1)
-            break;
-
-        if (match.rm_so == match.rm_eo) // ambiguous regex
-            break;
-
-        void *so = ((void*) ptr) + match.rm_so;
-        int length = so - ptr;
-
-        // Copy the token
-        if (match.rm_so > 0 && length > 0) {
-            char *substr = malloc(length+1);
-            bzero(substr, length+1);
-            memcpy(substr, ptr, length);
-
-            //printf("match '%s'\n", substr);
-            //fflush(stdout);
-
-            zarray_add(matches, &substr);
-        }
-
-        // Copy the delimeters
-        length = match.rm_eo-match.rm_so;
-        if (length > 0) {
-            char *substr = malloc(length+1);
-            bzero(substr, length+1);
-            memcpy(substr, ptr+match.rm_so, length);
-            zarray_add(matches, &substr);
-        }
-
-
-        ptr = ptr + match.rm_eo;
-    }
-
-    if (ptr - (void*) str != origlen) {
-        int length = end - ptr;
-        char *substr = malloc(length+1);
-        bzero(substr, length+1);
-
-        memcpy(substr, ptr, length);
-
-        zarray_add(matches, &substr);
-    }
-
-
-    regfree(&regex_comp);
-    return matches;
-}
-
-int str_regcmp(const char *str, const char *regex)
-{
-    assert(str != NULL);
-    assert(regex != NULL);
-
-    regex_t regex_comp;
-    if (regcomp(&regex_comp, regex, REG_EXTENDED) != 0)
-        return 1; // default to no match on error
-
-    int result = regexec(&regex_comp, str, 0, NULL, 0);
-
-    regfree(&regex_comp);
-    return result;
-}
-
 char *str_trim(char *str)
 {
     assert(str != NULL);
@@ -408,8 +220,9 @@ int str_indexof(const char *haystack, const char *needle)
 	assert(haystack != NULL);
 	assert(needle != NULL);
 
-    int hlen = strlen(haystack);
-    int nlen = strlen(needle);
+    // use signed types for hlen/nlen because hlen - nlen can be negative.
+    int hlen = (int) strlen(haystack);
+    int nlen = (int) strlen(needle);
 
     for (int i = 0; i <= hlen - nlen; i++) {
         if (!strncmp(&haystack[i], needle, nlen))
@@ -424,8 +237,9 @@ int str_last_indexof(const char *haystack, const char *needle)
 	assert(haystack != NULL);
 	assert(needle != NULL);
 
-    int hlen = strlen(haystack);
-    int nlen = strlen(needle);
+    // use signed types for hlen/nlen because hlen - nlen can be negative.
+    int hlen = (int) strlen(haystack);
+    int nlen = (int) strlen(needle);
 
     int last_index = -1;
     for (int i = 0; i <= hlen - nlen; i++) {
@@ -441,7 +255,7 @@ char *str_tolowercase(char *s)
 {
 	assert(s != NULL);
 
-    int slen = strlen(s);
+    size_t slen = strlen(s);
     for (int i = 0; i < slen; i++) {
         if (s[i] >= 'A' && s[i] <= 'Z')
             s[i] = s[i] + 'a' - 'A';
@@ -454,7 +268,7 @@ char *str_touppercase(char *s)
 {
     assert(s != NULL);
 
-    int slen = strlen(s);
+    size_t slen = strlen(s);
     for (int i = 0; i < slen; i++) {
         if (s[i] >= 'a' && s[i] <= 'z')
             s[i] = s[i] - ('a' - 'A');
@@ -531,6 +345,8 @@ void string_buffer_appendf(string_buffer_t *sb, const char *fmt, ...)
         va_start(args, fmt);
         returnsize = vsnprintf(buf, size, fmt, args);
         va_end(args);
+
+        assert(returnsize <= size);
     }
 
     string_buffer_append_string(sb, buf);
@@ -643,28 +459,6 @@ char string_feeder_next(string_feeder_t *sf)
     return c;
 }
 
-char * string_feeder_next_regex(string_feeder_t *sf, const char *regex)
-{
-    assert(sf != NULL);
-    assert(regex != NULL);
-
-    regex_t regex_comp;
-    if (regcomp(&regex_comp, regex, REG_EXTENDED) != 0)
-        return NULL;
-
-    regmatch_t match;
-    if (regexec(&regex_comp, &sf->s[sf->pos], 1, &match, 0) == REG_NOMATCH)
-        return NULL;
-
-    int length = match.rm_eo;
-
-    char *s = malloc(length + 1);
-    memcpy(s, &sf->s[sf->pos], length);
-    s[length] = 0;
-    sf->pos += length;
-    return s;
-}
-
 char *string_feeder_next_length(string_feeder_t *sf, int length)
 {
     assert(sf != NULL);
@@ -717,7 +511,7 @@ void string_feeder_require(string_feeder_t *sf, const char *str)
     assert(str != NULL);
     assert(sf->pos <= sf->len);
 
-    int len = strlen(str);
+    size_t len = strlen(str);
 
     for (int i = 0; i < len; i++) {
         char c = string_feeder_next(sf);

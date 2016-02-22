@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -94,6 +94,8 @@ double g2d_line_segment_closest_point_distance(const g2d_line_segment_t *seg, co
 // Polygons
 
 zarray_t *g2d_polygon_create_data(double v[][2], int sz);
+
+zarray_t *g2d_polygon_create_zeros(int sz);
 
 // Takes a polygon in either CW or CCW and modifies it (if necessary)
 // to be CCW.

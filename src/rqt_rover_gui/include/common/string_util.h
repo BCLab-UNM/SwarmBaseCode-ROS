@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -46,6 +46,14 @@ extern "C" {
 typedef struct string_buffer string_buffer_t;
 
 typedef struct string_feeder string_feeder_t;
+struct string_feeder
+{
+    char *s;
+    size_t len;
+    size_t pos;
+
+    int line, col;
+};
 
 /**
  * Similar to sprintf(), except that it will malloc() enough space for the
@@ -88,50 +96,7 @@ int str_diff_idx(const char * a, const char * b);
  */
 zarray_t *str_split(const char *str, const char *delim);
 
-/**
- * Identical to str_split() except that the delimiter can be an extended
- * regular expression, e.g.:
- *   '[[:space:]]+' or '\\s' will tokenize on any whitespace character
- *
- * Note: using an asterisk anywhere in the regex will assume a ^ at the beginning
- *
- * Returns NULL if 'regex' is not a valid regular expression.
- */
-zarray_t *str_split_regex(const char *str, const char *regex);
 
-/**
- * Identical to str_split_regex() except that delimeters matched by
- * the regex will also be returned as tokens, e.g.:
- *   zarray_t *za = str_split_regex_all(" this  is a   haystack  ", "\\s+");
- *      => [" ", "this", "  ", "is", " ", "a", "   ", "haystack", "  "]
- *
- * Returns NULL if 'regex' is not a valid regular expression.
- */
-zarray_t *str_split_regex_all(const char *str, const char *regex);
-
-/**
- * Returns an array of all of the substrings within 'str' which match the
- * supplied extended regular expression 'regex'. The original string will remain
- * unchanged, and all strings contained within the array will be newly-allocated.
- *
- * Note: using an asterisk anywhere in the regex will assume a ^ at the beginning
- *
- * It is the caller's responsibilty to free the returned zarray, as well as
- * the strings contained within it, e.g.:
- *
- *   zarray_t *za = str_match_regex("needles in a haystack", "[aeioyu]{2}");
- *      => ["ee", "ay"]
- *   zarray_vmap(za, free);
- *   zarray_destroy(za);
- */
-zarray_t *str_match_regex(const char *str, const char *regex);
-
-/**
- * Wrapper to regcomp and regexec to check if 'str' matches POSIX extended
- * regular expression 'regex'.
- * Returns 0 if a match exists (same sense as strcmp)
- */
-int str_regcmp(const char *str, const char *regex);
 /*
  * Determines if str1 exactly matches str2 (more efficient than strcmp(...) == 0)
  */
@@ -384,13 +349,6 @@ bool string_feeder_has_next(string_feeder_t *sf);
 char string_feeder_next(string_feeder_t *sf);
 
 /**
- * Returns the string up to and including the next matching string. If
- * no match is found, NULL is returned. Usually, the regular
- * expression will begin with '^', forcing the next token to match the
- * regex exactly. **/
-char* string_feeder_next_regex(string_feeder_t *sf, const char *s);
-
-/**
  * Retrieves a series of characters from the supplied string feeder. The number
  * of characters returned will be 'length' or the number of characters
  * remaining in the string, whichever is shorter. The string feeder's position
@@ -473,6 +431,16 @@ bool string_feeder_starts_with(string_feeder_t *sf, const char *str);
  * contents of the supplied string.
  */
 void string_feeder_require(string_feeder_t *sf, const char *str);
+
+/*#ifndef strdup
+    static inline char *strdup(const char *s) {
+        int len = strlen(s);
+        char *out = malloc(len+1);
+        memcpy(out, s, len + 1);
+        return out;
+    }
+#endif
+*/
 
 #ifdef __cplusplus
 }

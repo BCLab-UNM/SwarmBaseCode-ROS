@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -34,6 +34,7 @@ either expressed or implied, of the FreeBSD Project.
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include "zhash.h"
 #include "zarray.h"
@@ -165,7 +166,7 @@ int getopt_parse(getopt_t *gopt, int argc, char *argv[], int showErrors)
             // if the part after the equal sign is
             // enclosed by quotation marks, strip them.
             if (val[0]=='\"') {
-                int last = strlen(val) - 1;
+                size_t last = strlen(val) - 1;
                 if (val[last]=='\"')
                     val[last] = 0;
                 char *valclean = strdup(&val[1]);
@@ -242,7 +243,7 @@ int getopt_parse(getopt_t *gopt, int argc, char *argv[], int showErrors)
         }
 
         if (!strncmp(tok,"-",1) && strncmp(tok,"--",2)) {
-            int len = strlen(tok);
+            size_t len = strlen(tok);
             int pos;
             for (pos = 1; pos < len; pos++) {
                 char sopt[2];
@@ -424,9 +425,9 @@ int getopt_get_int(getopt_t *getopt, const char *lname)
     const char *v = getopt_get_string(getopt, lname);
     assert(v != NULL);
 
-    int errno = 0;
+    errno = 0;
     char *endptr = (char *) v;
-    int val = strtol(v, &endptr, 10);
+    long val = strtol(v, &endptr, 10);
 
     if (errno != 0) {
         fprintf (stderr, "--%s argument: strtol failed: %s\n", lname, strerror(errno));
@@ -438,7 +439,7 @@ int getopt_get_int(getopt_t *getopt, const char *lname)
         exit (EXIT_FAILURE);
     }
 
-    return val;
+    return (int) val;
 }
 
 int getopt_get_bool(getopt_t *getopt, const char *lname)
@@ -454,7 +455,7 @@ double getopt_get_double (getopt_t *getopt, const char *lname)
     const char *v = getopt_get_string (getopt, lname);
     assert (v!=NULL);
 
-    int errno = 0;
+    errno = 0;
     char *endptr = (char *) v;
     double d = strtod (v, &endptr);
 
@@ -513,10 +514,10 @@ char * getopt_get_usage(getopt_t *gopt)
         if (goo->spacer)
             continue;
 
-        longwidth = max(longwidth, strlen(goo->lname));
+        longwidth = max(longwidth, (int) strlen(goo->lname));
 
         if (goo->type == GOO_STRING_TYPE)
-            valuewidth = max(valuewidth, strlen(goo->svalue));
+            valuewidth = max(valuewidth, (int) strlen(goo->svalue));
     }
 
     for (unsigned int i = 0; i < zarray_size(gopt->options); i++) {

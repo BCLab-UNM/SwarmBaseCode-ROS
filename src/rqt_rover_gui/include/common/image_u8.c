@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -102,8 +102,12 @@ void image_u8_destroy(image_u8_t *im)
 
 ////////////////////////////////////////////////////////////
 // PNM file i/o
-
 image_u8_t *image_u8_create_from_pnm(const char *path)
+{
+    return image_u8_create_from_pnm_alignment(path, DEFAULT_ALIGNMENT);
+}
+
+image_u8_t *image_u8_create_from_pnm_alignment(const char *path, int alignment)
 {
     pnm_t *pnm = pnm_create_from_file(path);
     if (pnm == NULL)
@@ -113,7 +117,7 @@ image_u8_t *image_u8_create_from_pnm(const char *path)
 
     switch (pnm->format) {
         case PNM_FORMAT_GRAY: {
-            im = image_u8_create(pnm->width, pnm->height);
+            im = image_u8_create_alignment(pnm->width, pnm->height, alignment);
 
             for (int y = 0; y < im->height; y++)
                 memcpy(&im->buf[y*im->stride], &pnm->buf[y*im->width], im->width);
@@ -122,7 +126,7 @@ image_u8_t *image_u8_create_from_pnm(const char *path)
         }
 
         case PNM_FORMAT_RGB: {
-            im = image_u8_create(pnm->width, pnm->height);
+            im = image_u8_create_alignment(pnm->width, pnm->height, alignment);
 
             // Gray conversion for RGB is gray = (r + g + g + b)/4
             for (int y = 0; y < im->height; y++) {
@@ -261,7 +265,7 @@ static void convolve(const uint8_t *x, uint8_t *y, int sz, const uint8_t *k, int
 {
     assert((ksz&1)==1);
 
-    for (int i = 0; i < ksz/2; i++)
+    for (int i = 0; i < ksz/2 && i < sz; i++)
         y[i] = x[i];
 
     for (int i = 0; i < sz - ksz; i++) {
@@ -283,10 +287,13 @@ void image_u8_gaussian_blur(image_u8_t *im, double sigma, int ksz)
 
     // build the kernel.
     double dk[ksz];
-    for (int i = 0; i <= ksz / 2; i++) {
-        double v = exp(-.5*sq(i/sigma));
-        dk[ksz/2 - i] = v;
-        dk[ksz/2 + i] = v;
+
+    // for kernel of length 5:
+    // dk[0] = f(-2), dk[1] = f(-1), dk[2] = f(0), dk[3] = f(1), dk[4] = f(2)
+    for (int i = 0; i < ksz; i++) {
+        int x = -ksz/2 + i;
+        double v = exp(-.5*sq(x / sigma));
+        dk[i] = v;
     }
 
     // normalize
@@ -337,7 +344,7 @@ image_u8_t *image_u8_rotate(const image_u8_t *in, double rad, uint8_t pad)
 
     float p[][2] = { { 0, 0}, { iwidth, 0 }, { iwidth, iheight }, { 0, iheight} };
 
-    float xmin = HUGE, xmax = -HUGE, ymin = HUGE, ymax = -HUGE;
+    float xmin = HUGE_VALF, xmax = -HUGE_VALF, ymin = HUGE_VALF, ymax = -HUGE_VALF;
     float icx = iwidth / 2.0, icy = iheight / 2.0;
 
     for (int i = 0; i < 4; i++) {
