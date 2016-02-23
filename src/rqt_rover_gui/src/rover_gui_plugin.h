@@ -53,6 +53,18 @@
 
 #include "GazeboSimManager.h"
 
+//AprilTag headers
+#include "apriltag.h"
+#include "tag36h11.h"
+#include "tag36h10.h"
+#include "tag36artoolkit.h"
+#include "tag25h9.h"
+#include "tag25h7.h"
+#include "common/pnm.h"
+#include "common/image_u8.h"
+#include "common/zarray.h"
+#include "common/getopt.h"
+
 using namespace std;
 
 namespace rqt_rover_gui {
@@ -79,8 +91,8 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
-    void targetDetectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
-    void targetCollectedEventHandler(const ros::MessageEvent<std_msgs::Int16 const>& event);
+    void targetPickUpEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
+    void targetDropOffEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -103,9 +115,12 @@ namespace rqt_rover_gui {
 
     // Detect rovers that are broadcasting information
     set<string> findConnectedRovers();
+    
+    //Image converter
+	image_u8_t *copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride);
 
-    // Display log message to the text frame in the GUI
-    void displayLogMessage(QString msg);
+	//AprilTag detector
+	int targetDetect(const sensor_msgs::ImageConstPtr& rawImage);
 
   signals:
 
@@ -114,6 +129,7 @@ namespace rqt_rover_gui {
     void joystickLeftUpdate(double);
     void joystickRightUpdate(double);
     void updateObstacleCallCount(QString text);
+    void updateLog(QString text);
 
   private slots:
 
@@ -130,6 +146,7 @@ namespace rqt_rover_gui {
     void visualizeSimulationButtonEventHandler();
     void gazeboClientFinishedEventHandler();
     void gazeboServerFinishedEventHandler();  
+    void displayLogMessage(QString msg);
 
 
   private:
@@ -150,8 +167,8 @@ namespace rqt_rover_gui {
     ros::Subscriber imu_subscriber;
 
     map<string,ros::Subscriber> obstacle_subscribers;
-    map<string,ros::Subscriber> target_detection_subscribers;
-    ros::Subscriber target_collection_subscriber;
+    map<string,ros::Subscriber> targetDropOffSubscribers;
+    map<string,ros::Subscriber> targetPickUpSubscribers;
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
@@ -171,8 +188,8 @@ namespace rqt_rover_gui {
 
     float arena_dim; // in meters
 
-    vector<int> targets_detected;
-    vector<int> targets_collected;
+    map<string,int> targetsPickedUp;
+    vector<int> targetsDroppedOff;
 
     bool display_sim_visualization;
 
@@ -186,6 +203,16 @@ namespace rqt_rover_gui {
     float barrier_clearance;
 
     unsigned long obstacle_call_count;
+    
+    //AprilTag objects
+	apriltag_family_t *tf = NULL; //tag family
+	apriltag_detector_t *td = NULL; //tag detector
+
+	//Image container
+	image_u8_t *u8_image = NULL;
+	
+	//AprilTag assigned to collection zone
+	int collectionZoneID = 256;
   };
 } // end namespace
 
