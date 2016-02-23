@@ -115,9 +115,6 @@ namespace rqt_rover_gui {
 
     // Detect rovers that are broadcasting information
     set<string> findConnectedRovers();
-
-    // Display log message to the text frame in the GUI
-    void displayLogMessage(QString msg);
     
     //Image converter
 	image_u8_t *copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride);
@@ -132,6 +129,7 @@ namespace rqt_rover_gui {
     void joystickLeftUpdate(double);
     void joystickRightUpdate(double);
     void updateObstacleCallCount(QString text);
+    void updateLog(QString text);
 
   private slots:
 
@@ -148,6 +146,7 @@ namespace rqt_rover_gui {
     void visualizeSimulationButtonEventHandler();
     void gazeboClientFinishedEventHandler();
     void gazeboServerFinishedEventHandler();  
+    void displayLogMessage(QString msg);
 
 
   private:
@@ -168,8 +167,8 @@ namespace rqt_rover_gui {
     ros::Subscriber imu_subscriber;
 
     map<string,ros::Subscriber> obstacle_subscribers;
-    ros::Subscriber targetDropOffSubscriber;
-    ros::Subscriber targetPickUpSubscriber;
+    map<string,ros::Subscriber> targetDropOffSubscribers;
+    map<string,ros::Subscriber> targetPickUpSubscribers;
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
@@ -213,7 +212,7 @@ namespace rqt_rover_gui {
 	image_u8_t *u8_image = NULL;
 	
 	//AprilTag assigned to collection zone
-	int collectionZoneID = 0;
+	int collectionZoneID = 256;
   };
 } // end namespace
 

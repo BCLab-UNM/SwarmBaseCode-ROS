@@ -119,6 +119,7 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(joystickLeftUpdate(double)), ui.joy_lcd_left, SLOT(display(double)));
     connect(this, SIGNAL(joystickRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
+    connect(this, SIGNAL(updateLog(QString)), this, SLOT(displayLogMessage(QString)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -363,6 +364,11 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
     
     const sensor_msgs::ImageConstPtr& image = event.getMessage();
 
+    // Extract rover name from the message source
+    string topic = header.at("topic");
+    size_t found = topic.find("/targetPickUpImage");
+    string rover_name = topic.substr(1,found-1);
+
     int targetID = targetDetect(image);
 
     // Don't allow duplicates
@@ -370,7 +376,8 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
         // No target was found in the image, or the target was the collection zone ID, or the target was already collected
     }
     else {
-        targetsPickedUp[publisher_name] = targetID;
+        targetsPickedUp[rover_name] = targetID;
+        emit updateLog("Resource " + QString::number(targetID) + " picked up by " + QString::fromStdString(rover_name));
         ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
     }
 }
@@ -383,20 +390,26 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
 
     const sensor_msgs::ImageConstPtr& image = event.getMessage();
 
+    // Extract rover name from the message source
+    string topic = header.at("topic");
+    size_t found = topic.find("/targetDropOffImage");
+    string rover_name = topic.substr(1,found-1);
+
     int targetID = targetDetect(image);
 
     if(targetID != collectionZoneID) {
         // This target does not match the official collection zone ID
     }
     else {
-		try {
-			targetsDroppedOff.push_back(targetsPickedUp.at(publisher_name));
-			targetsPickedUp.erase(publisher_name);
-			ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
-		}
-		catch(const std::out_of_range& oor) {
-			ROS_ERROR("Rover '%s' was not carrying a target", publisher_name.c_str());
-		}
+        try {
+            targetsDroppedOff.push_back(targetsPickedUp.at(rover_name));
+            emit updateLog("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
+            targetsPickedUp.erase(rover_name);
+            ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
+        }
+        catch(const std::out_of_range& oor) {
+            emit updateLog(QString::fromStdString(rover_name) + "attempted a drop off but was not carrying a target");
+        }
     }
 }
 
@@ -596,12 +609,11 @@ void RoverGUIPlugin::setupSubscribers()
         encoder_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-    }
-    
-    // Target subscribers
-    targetPickUpSubscriber = nh.subscribe("/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
-    targetDropOffSubscriber = nh.subscribe("/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
 
+        // Target subscribers
+        targetPickUpSubscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
+        targetDropOffSubscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
+    }
 
 }
 
@@ -1027,8 +1039,10 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
 
     obstacle_subscribers.clear();
-    targetPickUpSubscriber.shutdown();
-    targetDropOffSubscriber.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=targetPickUpSubscribers.begin(); it!=targetPickUpSubscribers.end(); ++it) it->second.shutdown();
+    targetPickUpSubscribers.clear();
+    for (map<string,ros::Subscriber>::iterator it=targetDropOffSubscribers.begin(); it!=targetDropOffSubscribers.end(); ++it) it->second.shutdown();
+    targetDropOffSubscribers.clear();
     camera_subscriber.shutdown();
 
     displayLogMessage("Shutting down publishers...");
