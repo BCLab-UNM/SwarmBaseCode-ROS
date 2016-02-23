@@ -408,7 +408,7 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
             ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
         }
         catch(const std::out_of_range& oor) {
-            emit updateLog(QString::fromStdString(rover_name) + "attempted a drop off but was not carrying a target");
+            emit updateLog(QString::fromStdString(rover_name) + " attempted a drop off but was not carrying a target");
         }
     }
 }
