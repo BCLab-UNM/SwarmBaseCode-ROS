@@ -1,0 +1,15 @@
+material collection_disk/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture collection_disk.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+    }
+  }
+}

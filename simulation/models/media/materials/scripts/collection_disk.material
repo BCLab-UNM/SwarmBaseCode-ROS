@@ -1,4 +1,4 @@
-material collectionZone/Image
+material collection_disk/Image
     {
       technique
       {
@@ -10,7 +10,7 @@ material collectionZone/Image
 
           texture_unit
           {
-            texture collectionZone.png
+            texture collection_disk.png
             filtering trilinear
 	    scale 0.1 0.1
           }
