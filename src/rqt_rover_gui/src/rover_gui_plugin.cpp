@@ -1296,8 +1296,8 @@ QString RoverGUIPlugin::addPowerLawTargets()
 
     d = arena_dim/2.0-(barrier_clearance+target_cluster_size_1_clearance);
 
-    // Sixty-four piles of 1
-    for (int i = 0; i < 64; i++)
+    // Sixty-four piles of 1 (using tags 192 through 255 to avoid duplication with piles above)
+    for (int i = 192; i < 256; i++)
     {
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
