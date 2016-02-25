@@ -235,7 +235,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
     //painter.drawLine(QPoint(map_origin_x, map_center_y), QPoint(map_width, map_center_y));
     //painter.setPen(Qt::white);
 
-    // cross hairs at map display center
+    // Cross hairs at map display center
     QPoint axes_origin(map_origin_x,map_origin_y);
     QPoint x_axis(map_width,map_origin_y);
     QPoint y_axis(map_origin_x,map_height);
@@ -243,6 +243,16 @@ void MapFrame::paintEvent(QPaintEvent* event)
     painter.drawLine(axes_origin, y_axis);
     painter.drawLine(QPoint(map_width, map_origin_y), QPoint(map_width, map_height));
     painter.drawLine(QPoint(map_origin_x, map_height), QPoint(map_width, map_height));
+
+    // Draw north arrow
+    QPoint northArrow_point(map_center_x, 0);
+    QPoint northArrow_left(map_center_x - 5, 5);
+    QPoint northArrow_right(map_center_x + 5, 5);
+    QRect northArrow_textBox(northArrow_left.x(), northArrow_left.y(), 10, 15);
+    painter.drawLine(northArrow_left, northArrow_right);
+    painter.drawLine(northArrow_left, northArrow_point);
+    painter.drawLine(northArrow_right, northArrow_point);
+    painter.drawText(northArrow_textBox, QString("N"));
 
     // Draw rover origin crosshairs
     // painter.setPen(green);
