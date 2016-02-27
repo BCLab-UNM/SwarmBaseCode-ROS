@@ -46,7 +46,6 @@ namespace rqt_rover_gui
   {
     setObjectName("RoverGUI");
     log_messages = "";
-    all_autonomous = false;
     joy_process = NULL;
 
     obstacle_call_count = 0;
@@ -109,8 +108,9 @@ namespace rqt_rover_gui
     connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
     connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
-    connect(ui.all_autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(allAutonomousRadioButtonEventHandler(bool)));
     connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
+    connect(ui.all_autonomous_button, SIGNAL(pressed()), this, SLOT(allAutonomousButtonEventHandler()));
+    connect(ui.all_stop_button, SIGNAL(pressed()), this, SLOT(allStopButtonEventHandler()));
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
     connect(ui.visualize_simulation_button, SIGNAL(pressed()), this, SLOT(visualizeSimulationButtonEventHandler()));
@@ -136,7 +136,7 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
-    ui.joystick_frame->setHidden(false);
+    ui.joystick_frame->setHidden(true);
 
     ui.tab_widget->setCurrentIndex(0);
 
@@ -144,9 +144,13 @@ namespace rqt_rover_gui
 
     ui.visualize_simulation_button->setEnabled(false);
     ui.clear_simulation_button->setEnabled(false);
+    ui.all_autonomous_button->setEnabled(false);
+    ui.all_stop_button->setEnabled(false);
 
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
@@ -438,7 +442,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
     widget->setFocus();
 
-    if (!current ) return; // Check to make sure the current selection isn't null
+    if (!current) return; // Check to make sure the current selection isn't null
 
     selected_rover_name = current->text().toStdString();
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
@@ -465,7 +469,6 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         // Default to joystick
         ui.joystick_control_radio_button->setChecked(true);
         ui.autonomous_control_radio_button->setChecked(false);
-        ui.all_autonomous_control_radio_button->setChecked(false);
         joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
         rover_control_state[selected_rover_name]=1;
         displayLogMessage("New rover selected");
@@ -476,17 +479,16 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
         switch (control_state)
         {
-        case 1: ui.joystick_control_radio_button->setChecked(true);
+        case 1: // manual
+            ui.joystick_control_radio_button->setChecked(true);
             ui.autonomous_control_radio_button->setChecked(false);
-            ui.all_autonomous_control_radio_button->setChecked(false);
+            ui.joystick_frame->setHidden(false);
+            joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
             break;
-        case 2: ui.joystick_control_radio_button->setChecked(false);
+        case 2: // autonomous
+            ui.joystick_control_radio_button->setChecked(false);
             ui.autonomous_control_radio_button->setChecked(true);
-            ui.all_autonomous_control_radio_button->setChecked(false);
-            break;
-        case 3: ui.joystick_control_radio_button->setChecked(false);
-            ui.autonomous_control_radio_button->setChecked(false);
-            ui.all_autonomous_control_radio_button->setChecked(true);
+            ui.joystick_frame->setHidden(true);
             break;
         default:
             displayLogMessage("Unknown control state: "+QString::number(control_state));
@@ -501,8 +503,6 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setEnabled(true);
-    ui.all_autonomous_control_radio_button->setEnabled(true);
-
 }
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
@@ -536,7 +536,6 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         // Disable control mode radio group since no rover has been selected
         ui.autonomous_control_radio_button->setEnabled(false);
         ui.joystick_control_radio_button->setEnabled(false);
-        ui.all_autonomous_control_radio_button->setEnabled(false);
         return;
     }
 
@@ -578,23 +577,21 @@ void RoverGUIPlugin::setupPublishers()
 void RoverGUIPlugin::setupSubscribers()
 {
     // Subscriptions for the selected rover
-        if (!selected_rover_name.empty())
-        {
-    // Create a subscriber to listen for camera events
-    image_transport::ImageTransport it(nh);
-    int frame_rate = 1;
-    // Theroa codex results in the least information being transmitted
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
+    if (!selected_rover_name.empty())
+    {
+        // Create a subscriber to listen for camera events
+        image_transport::ImageTransport it(nh);
+        int frame_rate = 1;
+        // Theroa codex results in the least information being transmitted
+        camera_subscriber = it.subscribe("/"+selected_rover_name+"/camera/image", frame_rate, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
 
+        // IMU Subscriptions
+        imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
 
-
-    // IMU Subscriptions
-    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
-
-    // Ultrasound Subscriptions
-    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
-    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
-    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
+        // Ultrasound Subscriptions
+        us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
+        us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
+        us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
     }
 
 
@@ -609,12 +606,10 @@ void RoverGUIPlugin::setupSubscribers()
         encoder_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-
         // Target subscribers
         targetPickUpSubscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
         targetDropOffSubscribers[*rover_it] = nh.subscribe("/"+*rover_it+"/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
     }
-
 }
 
 void RoverGUIPlugin::centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg)
@@ -713,52 +708,14 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
 
-    // Remember that this rover was set to single rover autonomous control
-    set<string>::iterator it;
-    // And for rovers with all autonomous as their state should now be just autonomous
-     for (it = rover_names.begin(); it != rover_names.end(); it++)
-     {
-         if (rover_control_state[*it]==3) rover_control_state[*it]=2;
-     }
     rover_control_state[selected_rover_name] = 2;
-
-    ui.joystick_frame->setHidden(true);
     setupPublishers();
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 2; // 2 indicates autonomous control
 
     control_mode_publishers[selected_rover_name].publish(control_mode_msg);
-    if (control_mode_msg.data == 2) displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
-
-    QString return_msg = stopROSJoyNode();
-    displayLogMessage(return_msg);
-
-
-}
-
-void RoverGUIPlugin::allAutonomousRadioButtonEventHandler(bool marked)
-{
-    if (!marked) return;
-
-    all_autonomous = true;
-
-    ui.joystick_frame->setHidden(true);
-
-    string remember_selected_rover_name = selected_rover_name;
-
-    set<string>::iterator it;
-     for (it = rover_names.begin(); it != rover_names.end(); it++)
-     {
-         selected_rover_name = *it;
-         rover_control_state[*it]=3;
-         setupPublishers();
-         std_msgs::UInt8 control_mode_msg;
-         control_mode_msg.data = 2; // 2 indicates autonomous control
-         control_mode_publishers[selected_rover_name].publish(control_mode_msg);
-     }
-
-     selected_rover_name = remember_selected_rover_name;
+    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
 
     QString return_msg = stopROSJoyNode();
     displayLogMessage(return_msg);
@@ -768,30 +725,89 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
 
-    all_autonomous = false;
-
-    // Remember that this rover was set to joystick control
-    set<string>::iterator it;
-    // And for rovers with all autonomous as their state should now be just autonomous
-     for (it = rover_names.begin(); it != rover_names.end(); it++)
-     {
-         if (rover_control_state[*it]==3) rover_control_state[*it]=2;
-         else if (rover_control_state[*it]==0) rover_control_state[*it] = 1;
-     }
     rover_control_state[selected_rover_name] = 1;
-
     setupPublishers();
-    ui.joystick_frame->setHidden(false);
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control
 
     control_mode_publishers[selected_rover_name].publish(control_mode_msg);
+    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");\
 
     QString return_msg = startROSJoyNode();
     displayLogMessage(return_msg);
+}
 
-    displayLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");\
+void RoverGUIPlugin::allAutonomousButtonEventHandler()
+{
+    displayLogMessage("changing all rovers to autonomous control...");
+
+    std::string remember_selected_rover_name = selected_rover_name;
+    int remember_selected_index = ui.rover_list->currentRow();
+    int selected_index = -1; // zero array indexing, ensure last selected index is in range
+
+    // manually trigger the autonomous radio button event for all rovers
+    for (set<string>::iterator it = rover_names.begin(); it != rover_names.end(); it++)
+    {
+        selected_index++;
+        selected_rover_name = *it;
+        autonomousRadioButtonEventHandler(true);
+    }
+
+    // trigger the current rover changed event:
+    // if we previously selected a rover, keep that rover selected
+    if (remember_selected_index >= 0)
+    {
+        selected_rover_name = remember_selected_rover_name;
+        ui.rover_list->setCurrentItem(ui.rover_list->item(remember_selected_index));
+    }
+    // otherwise, default to the last rover in the rover list
+    else
+    {
+        ui.rover_list->setCurrentItem(ui.rover_list->item(selected_index));
+    }
+
+    ui.joystick_control_radio_button->setEnabled(true);
+    ui.autonomous_control_radio_button->setEnabled(true);
+    ui.joystick_control_radio_button->setChecked(false);
+    ui.autonomous_control_radio_button->setChecked(true);
+    ui.joystick_frame->setHidden(true);
+}
+
+void RoverGUIPlugin::allStopButtonEventHandler()
+{
+    displayLogMessage("changing all rovers to manual control...");
+
+    std::string remember_selected_rover_name = selected_rover_name;
+    int remember_selected_index = ui.rover_list->currentRow();
+    int selected_index = -1; // zero array indexing, ensure last selected index is in range
+
+    // manually trigger the manual radio button event for all rovers
+    for (set<string>::iterator it = rover_names.begin(); it != rover_names.end(); it++)
+    {
+        selected_index++;
+        selected_rover_name = *it;
+        joystickRadioButtonEventHandler(true);
+    }
+
+    // trigger the current rover changed event:
+    // if we previously selected a rover, keep that rover selected
+    if (remember_selected_index >= 0)
+    {
+        selected_rover_name = remember_selected_rover_name;
+        ui.rover_list->setCurrentItem(ui.rover_list->item(remember_selected_index));
+    }
+    // otherwise, default to the last rover in the rover list
+    else
+    {
+        ui.rover_list->setCurrentItem(ui.rover_list->item(selected_index));
+    }
+
+    ui.joystick_control_radio_button->setEnabled(true);
+    ui.autonomous_control_radio_button->setEnabled(true);
+    ui.joystick_control_radio_button->setChecked(true);
+    ui.autonomous_control_radio_button->setChecked(false);
+    ui.joystick_frame->setHidden(false);
 }
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
@@ -976,10 +992,13 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    ui.visualize_simulation_button->setEnabled(true);
    ui.clear_simulation_button->setEnabled(true);
+   ui.all_autonomous_button->setEnabled(true);
+   ui.all_stop_button->setEnabled(true);
 
    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white;");
-
    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
+   ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
+   ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
 
    displayLogMessage("Finished building simulation.");
 
@@ -1060,12 +1079,16 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     ui.visualize_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
     ui.clear_simulation_button->setEnabled(false);
+    ui.all_autonomous_button->setEnabled(false);
+    ui.all_stop_button->setEnabled(false);
     display_sim_visualization = false;
 
 
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     // Clear the task status values
     ui.num_targets_collected_label->setText("<font color='white'>0</font>");
@@ -1687,14 +1710,18 @@ void RoverGUIPlugin::gazeboServerFinishedEventHandler()
     ui.visualize_simulation_button->setEnabled(false);
     ui.clear_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
+    ui.all_autonomous_button->setEnabled(false);
+    ui.all_stop_button->setEnabled(false);
+
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 }
 
 bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 {
-
     geometry_msgs::Twist standardized_joy_msg;
     if (joystick_publisher)
     {
