@@ -189,7 +189,7 @@ namespace rqt_rover_gui {
     float arena_dim; // in meters
 
     map<string,int> targetsPickedUp;
-    vector<int> targetsDroppedOff;
+    map<int,bool> targetsDroppedOff;
 
     bool display_sim_visualization;
 
