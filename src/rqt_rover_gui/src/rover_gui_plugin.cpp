@@ -375,9 +375,8 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
 
     int targetID = targetDetect(image);
 
-    // Don't allow duplicates
-    if((targetID < 0) || (targetID == collectionZoneID) || (std::find(targetsDroppedOff.begin(), targetsDroppedOff.end(), targetID) != targetsDroppedOff.end())) {
-        // No target was found in the image, or the target was the collection zone ID, or the target was already collected
+    if((targetID < 0) || (targetID == collectionZoneID)) {
+        // No valid target was found in the image, or the target was the collection zone ID
     }
     else {
         targetsPickedUp[rover_name] = targetID;
@@ -406,7 +405,7 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
     }
     else {
         try {
-            targetsDroppedOff.push_back(targetsPickedUp.at(rover_name));
+            targetsDroppedOff[targetsPickedUp.at(rover_name)] = true;
             emit updateLog("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
             targetsPickedUp.erase(rover_name);
             ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
@@ -1456,17 +1455,19 @@ int RoverGUIPlugin::targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
     zarray_t *detections = apriltag_detector_detect(td, im);
     
     //Check result for valid tag
-    if (zarray_size(detections) > 0) {
+    for (int i = 0; i < zarray_size(detections); i++) {
 	    apriltag_detection_t *det;
-	    zarray_get(detections, 0, &det); //use the first tag detected in the image
+	    zarray_get(detections, i, &det);
 	
-	    //Publish detected tag
-	    return det->id;
+	    int tag = det->id;
+	    
+	    //Return first tag that has not been collected
+	    if (targetsDroppedOff.count(tag) == 0){
+			return tag;
+		}
 	}
-	else
-	{
-		return -1;
-	}
+	
+	return -1;
 }
 
 image_u8_t* RoverGUIPlugin::copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride) {
