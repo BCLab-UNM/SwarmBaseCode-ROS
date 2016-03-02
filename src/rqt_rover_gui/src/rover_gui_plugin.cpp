@@ -370,9 +370,18 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
     string rover_name = topic.substr(1,found-1);
 
     int targetID = targetDetect(image);
-
-    if((targetID < 0) || (targetID == collectionZoneID)) {
-        // No valid target was found in the image, or the target was the collection zone ID
+    
+    //Check all robots to ensure that no one is already holding the target
+    bool targetPreviouslyCollected = false;
+	for (map<string,int>::iterator it=targetsPickedUp.begin(); it!=targetsPickedUp.end(); ++it) {
+		if (it->second == targetID) {
+			targetPreviouslyCollected = true;
+			break;
+		}
+	}
+	
+    if((targetID < 0) || (targetID == collectionZoneID) || targetPreviouslyCollected) {
+        // No valid target was found in the image, or the target was the collection zone ID, or the target was already picked up by another robot
     }
     else {
         targetsPickedUp[rover_name] = targetID;
