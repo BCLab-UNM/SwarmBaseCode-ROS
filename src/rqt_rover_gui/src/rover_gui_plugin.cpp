@@ -384,9 +384,15 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
         // No valid target was found in the image, or the target was the collection zone ID, or the target was already picked up by another robot
     }
     else {
+		//Record target ID according to the rover that reported it
         targetsPickedUp[rover_name] = targetID;
         emit updateLog("Resource " + QString::number(targetID) + " picked up by " + QString::fromStdString(rover_name));
         ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
+        
+        //Publish target ID
+        std_msgs::Int16 targetIDMsg;
+        targetIDMsg.data = targetID;
+        targetPickUpPublisher.publish(targetIDMsg);
     }
 }
 
@@ -409,11 +415,18 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
         // This target does not match the official collection zone ID
     }
     else {
+		//Use try-catch here in case a rover reports the collection zone ID without ever having picked up a target
         try {
+			//Add target ID to list of dropped off targets
             targetsDroppedOff[targetsPickedUp.at(rover_name)] = true;
             emit updateLog("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
             targetsPickedUp.erase(rover_name);
             ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
+            
+            //Publish target ID (should always be equal to 256)
+			std_msgs::Int16 targetIDMsg;
+			targetIDMsg.data = targetID;
+			targetDropOffPublisher.publish(targetIDMsg);
         }
         catch(const std::out_of_range& oor) {
             emit updateLog(QString::fromStdString(rover_name) + " attempted a drop off but was not carrying a target");
@@ -581,6 +594,9 @@ void RoverGUIPlugin::setupPublishers()
     string joystick_topic = "/"+selected_rover_name+"/joystick";
     displayLogMessage("Setting up joystick publisher " + QString::fromStdString(joystick_topic));
     joystick_publisher = nh.advertise<geometry_msgs::Twist>(joystick_topic, 10, this);
+    
+    targetPickUpPublisher = nh.advertise<std_msgs::Int16>("/targetPickUpValue", 10, this);
+    targetDropOffPublisher = nh.advertise<std_msgs::Int16>("/targetDropOffValue", 10, this);
 }
 
 void RoverGUIPlugin::setupSubscribers()
