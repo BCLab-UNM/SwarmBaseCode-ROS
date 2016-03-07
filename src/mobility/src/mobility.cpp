@@ -260,9 +260,10 @@ void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
 	//if this is the goal target
 	if (message->tags.data[0] == 256) {
 		//if we were returning with a target
-	    if (targetDetected.data == -1) {
+	    if (targetDetected.data != -1) {
 			//publish to scoring code
 			targetDropOffPublish.publish(message->image);
+			targetDetected.data = -1;
 	    }
 	}
 
