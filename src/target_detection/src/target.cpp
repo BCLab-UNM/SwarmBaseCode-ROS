@@ -7,6 +7,9 @@
 #include <std_msgs/Int16.h>
 #include <sensor_msgs/image_encodings.h>
 
+//Custom messages
+#include <shared_messages/TagsImage.h>
+
 //OpenCV headers
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -71,7 +74,7 @@ int main(int argc, char* argv[]) {
     image_transport::ImageTransport it(tNH);
     image_transport::Subscriber imgSubscribe = it.subscribe((publishedName + "/camera/image"), 2, targetDetect);
 
-    tagPublish = tNH.advertise<std_msgs::Int16>((publishedName + "/targets"), 2, true);
+    tagPublish = tNH.advertise<shared_messages::TagsImage>((publishedName + "/targets"), 2, true);
 
     ros::spin();
 
@@ -84,7 +87,7 @@ int main(int argc, char* argv[]) {
 void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 
     cv_bridge::CvImagePtr cvImage;
-    std_msgs::Int16 tagDetected;
+    shared_messages::TagsImage tagDetected;
 
 	//Convert from MONO8 to BGR8
 	//TODO: consider whether we should let the camera publish as BGR8 and skip this conversion
@@ -119,8 +122,9 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
     if (zarray_size(detections) > 0) {
 	    apriltag_detection_t *det;
 	    zarray_get(detections, 0, &det); //use the first tag detected in the image
-	    tagDetected.data = det->id;
-	
+	    tagDetected.tags.data.push_back(det->id);
+	    tagDetected.image = *rawImage;
+
 	    //Publish detected tag
 	    tagPublish.publish(tagDetected);
 	}
