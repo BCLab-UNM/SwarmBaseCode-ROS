@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -32,6 +32,7 @@ either expressed or implied, of the FreeBSD Project.
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 /** SVD 2x2.
 
@@ -150,8 +151,8 @@ void svd22(const double A[4], double U[4], double S[2], double V[4])
                      U[1]*T[0] + U[3]*T[2],
                      U[1]*T[1] + U[3]*T[3] };
 
-    S[0] = sqrtf(WS[0]*WS[0] + WS[1]*WS[1]);
-    S[1] = sqrtf(WS[2]*WS[2] + WS[3]*WS[3]);
+    S[0] = sqrt(WS[0]*WS[0] + WS[1]*WS[1]);
+    S[1] = sqrt(WS[2]*WS[2] + WS[3]*WS[3]);
 
     // Solve for W from WS, being careful to handle singular cases
     // such that W is unitary.
