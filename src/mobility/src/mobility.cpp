@@ -15,6 +15,9 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 
+//Custom messages
+#include <shared_messages/TagsImage.h>
+
 // To handle shutdown signals so the node quits properly in response to "rosnode kill"
 #include <ros/ros.h>
 #include <signal.h>
@@ -53,6 +56,8 @@ ros::Publisher velocityPublish;
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
 ros::Publisher targetCollectedPublish;
+ros::Publisher targetPickUpPublish;
+ros::Publisher targetDropOffPublish;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -73,7 +78,7 @@ void sigintEventHandler(int signal);
 //Callback handlers
 void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
-void targetHandler(const std_msgs::Int16::ConstPtr& tagInfo);
+void targetHandler(const shared_messages::TagsImage::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
@@ -120,6 +125,8 @@ int main(int argc, char **argv) {
     velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
     targetCollectedPublish = mNH.advertise<std_msgs::Int16>(("targetsCollected"), 1, true);
+    targetPickUpPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetPickUpImage"), 1, true);
+    targetDropOffPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetDropOffImage"), 1, true);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
@@ -248,10 +255,21 @@ void setVelocity(double linearVel, double angularVel)
  * ROS CALLBACK HANDLERS
  ************************/
 
-void targetHandler(const std_msgs::Int16::ConstPtr& message) {
+void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
+
+	//if this is the goal target
+	if (message->tags.data[0] == 256) {
+		//if we were returning with a target
+	    if (targetDetected.data != -1) {
+			//publish to scoring code
+			targetDropOffPublish.publish(message->image);
+			targetDetected.data = -1;
+	    }
+	}
+
 	//if target has not previously been detected 
-    if (targetDetected.data == -1) {
-        targetDetected = *message;
+	else if (targetDetected.data == -1) {
+        targetDetected.data = message->tags.data[0];
         
         //check if target has not yet been collected
         if (!targetsCollected[targetDetected.data]) { 
@@ -264,7 +282,10 @@ void targetHandler(const std_msgs::Int16::ConstPtr& message) {
 			
 			//publish detected target
 			targetCollectedPublish.publish(targetDetected);
-			
+
+			//publish to scoring code
+			targetPickUpPublish.publish(message->image);
+
 			//switch to transform state to trigger return to center
 			stateMachineState = STATE_MACHINE_TRANSFORM;
 		}
