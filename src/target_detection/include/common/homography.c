@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -198,9 +198,9 @@ matd_t *homography_compute(zarray_t *correspondences, int flags)
             matd_t *Ainv = NULL;
 
             if (0) {
-                matd_lu_t *lu = matd_lu(A);
-                Ainv = matd_lu_solve(lu, b);
-                matd_lu_destroy(lu);
+                matd_plu_t *lu = matd_plu(A);
+                Ainv = matd_plu_solve(lu, b);
+                matd_plu_destroy(lu);
             } else {
                 matd_chol_t *chol = matd_chol(A);
                 Ainv = matd_chol_solve(chol, b);
@@ -367,8 +367,6 @@ matd_t *homography_to_pose(const matd_t *H, double fx, double fy, double cx, dou
 
 matd_t *homography_to_model_view(const matd_t *H, double F, double G, double A, double B, double C, double D)
 {
-    matd_t *M = matd_create(4,4);
-
     // Note that every variable that we compute is proportional to the scale factor of H.
     double R20 = -MATD_EL(H, 2, 0);
     double R21 = -MATD_EL(H, 2, 1);
@@ -411,7 +409,6 @@ matd_t *homography_to_model_view(const matd_t *H, double F, double G, double A, 
         R10, R11, R12, TY,
         R20, R21, R22, TZ,
         0, 0, 0, 1 });
-    return M;
 }
 
 // Only uses the upper 3x3 matrix.

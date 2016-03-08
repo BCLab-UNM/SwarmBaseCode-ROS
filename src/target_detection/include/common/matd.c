@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -53,20 +53,18 @@ matd_t *matd_create(int rows, int cols)
     if (rows == 0 || cols == 0)
         return matd_create_scalar(0);
 
-    matd_t *m = calloc(1, sizeof(matd_t));
+    matd_t *m = calloc(1, sizeof(matd_t) + (rows*cols*sizeof(double)));
     m->nrows = rows;
     m->ncols = cols;
-    m->data = calloc(m->nrows * m->ncols, sizeof(TYPE));
 
     return m;
 }
 
 matd_t *matd_create_scalar(TYPE v)
 {
-    matd_t *m = calloc(1, sizeof(matd_t));
+    matd_t *m = calloc(1, sizeof(matd_t) + sizeof(double));
     m->nrows = 0;
     m->ncols = 0;
-    m->data = calloc(1, sizeof(TYPE));
     m->data[0] = v;
 
     return m;
@@ -225,15 +223,10 @@ void matd_print_transpose(const matd_t *m, const char *fmt)
 
 void matd_destroy(matd_t *m)
 {
+    if (!m)
+        return;
+
     assert(m != NULL);
-
-    free(m->data);
-
-    // set data pointer to NULL to cause segfault if used
-    // after the destroy call (hard to catch failure mode)
-    m->data = NULL;
-
-    memset(m, 0, sizeof(matd_t));
     free(m);
 }
 
@@ -400,9 +393,9 @@ static
 double matd_det_general(const matd_t *a)
 {
     // Use LU decompositon to calculate the determinant
-    matd_lu_t *mlu = matd_lu(a);
-    matd_t *L = matd_lu_l(mlu);
-    matd_t *U = matd_lu_u(mlu);
+    matd_plu_t *mlu = matd_plu(a);
+    matd_t *L = matd_plu_l(mlu);
+    matd_t *U = matd_plu_u(mlu);
 
     // The determinants of the L and U matrices are the products of
     // their respective diagonal elements
@@ -420,7 +413,7 @@ double matd_det_general(const matd_t *a)
     double det = mlu->pivsign * detL * detU;
 
     // Cleanup
-    matd_lu_destroy(mlu);
+    matd_plu_destroy(mlu);
     matd_destroy(L);
     matd_destroy(U);
 
@@ -484,63 +477,9 @@ double matd_det(const matd_t *a)
     return 0;
 }
 
-static double make_non_zero(double v)
-{
-    if (fabs(v) < MATD_EPS) {
-        if (v < 0)
-            return -MATD_EPS;
-        return MATD_EPS;
-    }
-
-    return v;
-}
-
-static matd_t *matd_naive_inverse(const matd_t *x, double invdet)
-{
-    // Implementation as described in
-    // http://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html
-
-    // Calculate the matrix of cofactors of x
-    matd_t *cof = matd_create(x->nrows, x->ncols);
-    for (int i = 0; i < x->nrows; i++) {
-        for (int j = 0; j < x->ncols; j++) {
-
-            int nelms = (x->nrows-1)*(x->ncols-1);
-            double *reduced_data = calloc(nelms, sizeof(double));
-            int idx = 0;
-            for (int p = 0; p < x->nrows; p++) {
-                for (int q = 0; q < x->ncols; q++) {
-                    if (p != i && q != j) {
-                        reduced_data[idx] = matd_get(x, p, q);
-                        idx++;
-                    }
-                }
-            }
-            matd_t *reduced = matd_create_data(x->nrows-1, x->ncols-1, reduced_data);
-
-            //printf("reduced matrix:\n");
-            //matd_print(reduced, "%5.2f "); printf("\n");
-            //printf("----------\n");
-
-            free(reduced_data);
-            matd_put(cof, i, j, pow(-1, i+j)*matd_det(reduced));
-            matd_destroy(reduced);
-        }
-    }
-
-    //printf("cofactors matrix: \n"); matd_print(cof, "%5.2f "); printf("\n");
-
-    // Calculate the adjugate (a.k.a. adjoint): just the transposed matrix of cofactors
-    matd_t *adj = matd_transpose(cof);
-    matd_destroy(cof);
-
-    // Multiply each element of adj by 1/det(x) and we are done
-    for (int i = 0; i < adj->nrows; i++)
-        for (int j = 0; j < adj->ncols; j++)
-            matd_put(adj, i, j, matd_get(adj, i, j)*invdet);
-    return adj;
-}
-
+// returns NULL if the matrix is (exactly) singular. Caller is
+// otherwise responsible for knowing how to cope with badly
+// conditioned matrices.
 matd_t *matd_inverse(const matd_t *x)
 {
     matd_t *m = NULL;
@@ -548,78 +487,55 @@ matd_t *matd_inverse(const matd_t *x)
     assert(x != NULL);
     assert(x->nrows == x->ncols);
 
-    if (matd_is_scalar(x))
-        return matd_create_scalar(1.0 / x->data[0]);
+    if (matd_is_scalar(x)) {
+        if (x->data[0] == 0)
+            return NULL;
 
-    double invdet = 1.0 / make_non_zero(matd_det(x));
+        return matd_create_scalar(1.0 / x->data[0]);
+    }
 
     switch(x->nrows) {
-        case 1:
-            // a 1x1 matrix
-            m = matd_create(x->nrows, x->nrows);
-            MATD_EL(m, 0, 0) = invdet;
-            return m;
+        case 1: {
+            double det = x->data[0];
+            if (det == 0)
+                return NULL;
 
-        case 2:
+            double invdet = 1.0 / det;
+
+            m = matd_create(x->nrows, x->nrows);
+            MATD_EL(m, 0, 0) = 1.0 * invdet;
+            return m;
+        }
+
+        case 2: {
+            double det = x->data[0] * x->data[3] - x->data[1] * x->data[2];
+            if (det == 0)
+                return NULL;
+
+            double invdet = 1.0 / det;
+
             m = matd_create(x->nrows, x->nrows);
             MATD_EL(m, 0, 0) = MATD_EL(x, 1, 1) * invdet;
             MATD_EL(m, 0, 1) = - MATD_EL(x, 0, 1) * invdet;
             MATD_EL(m, 1, 0) = - MATD_EL(x, 1, 0) * invdet;
             MATD_EL(m, 1, 1) = MATD_EL(x, 0, 0) * invdet;
             return m;
-
-        case 3:
-            m = matd_create(x->nrows, x->nrows);
-
-            double a = MATD_EL(x, 0, 0), b = MATD_EL(x, 0, 1), c = MATD_EL(x, 0, 2);
-            double d = MATD_EL(x, 1, 0), e = MATD_EL(x, 1, 1), f = MATD_EL(x, 1, 2);
-            double g = MATD_EL(x, 2, 0), h = MATD_EL(x, 2, 1), i = MATD_EL(x, 2, 2);
-
-            MATD_EL(m,0,0) = invdet*(e*i-f*h);
-            MATD_EL(m,0,1) = invdet*(-b*i+c*h);
-            MATD_EL(m,0,2) = invdet*(b*f-c*e);
-            MATD_EL(m,1,0) = invdet*(-d*i+f*g);
-            MATD_EL(m,1,1) = invdet*(a*i-c*g);
-            MATD_EL(m,1,2) = invdet*(-a*f+c*d);
-            MATD_EL(m,2,0) = invdet*(d*h-e*g);
-            MATD_EL(m,2,1) = invdet*(-a*h+b*g);
-            MATD_EL(m,2,2) = invdet*(a*e-b*d);
-            return m;
-
-        case 4: {
-            double m00 = MATD_EL(x,0,0), m01 = MATD_EL(x,0,1), m02 = MATD_EL(x,0,2), m03 = MATD_EL(x,0,3);
-            double m10 = MATD_EL(x,1,0), m11 = MATD_EL(x,1,1), m12 = MATD_EL(x,1,2), m13 = MATD_EL(x,1,3);
-            double m20 = MATD_EL(x,2,0), m21 = MATD_EL(x,2,1), m22 = MATD_EL(x,2,2), m23 = MATD_EL(x,2,3);
-            double m30 = MATD_EL(x,3,0), m31 = MATD_EL(x,3,1), m32 = MATD_EL(x,3,2), m33 = MATD_EL(x,3,3);
-
-            m = matd_create(x->nrows, x->nrows);
-            MATD_EL(m,0,0) =   m11 * m22 * m33 - m11 * m23 * m32 - m21 * m12 * m33 + m21 * m13 * m32 + m31 * m12 * m23 - m31 * m13 * m22;
-            MATD_EL(m,1,0) = - m10 * m22 * m33 + m10 * m23 * m32 + m20 * m12 * m33 - m20 * m13 * m32 - m30 * m12 * m23 + m30 * m13 * m22;
-            MATD_EL(m,2,0) =   m10 * m21 * m33 - m10 * m23 * m31 - m20 * m11 * m33 + m20 * m13 * m31 + m30 * m11 * m23 - m30 * m13 * m21;
-            MATD_EL(m,3,0) = - m10 * m21 * m32 + m10 * m22 * m31 + m20 * m11 * m32 - m20 * m12 * m31 - m30 * m11 * m22 + m30 * m12 * m21;
-            MATD_EL(m,0,1) = - m01 * m22 * m33 + m01 * m23 * m32 + m21 * m02 * m33 - m21 * m03 * m32 - m31 * m02 * m23 + m31 * m03 * m22;
-            MATD_EL(m,1,1) =   m00 * m22 * m33 - m00 * m23 * m32 - m20 * m02 * m33 + m20 * m03 * m32 + m30 * m02 * m23 - m30 * m03 * m22;
-            MATD_EL(m,2,1) = - m00 * m21 * m33 + m00 * m23 * m31 + m20 * m01 * m33 - m20 * m03 * m31 - m30 * m01 * m23 + m30 * m03 * m21;
-            MATD_EL(m,3,1) =   m00 * m21 * m32 - m00 * m22 * m31 - m20 * m01 * m32 + m20 * m02 * m31 + m30 * m01 * m22 - m30 * m02 * m21;
-            MATD_EL(m,0,2) =   m01 * m12 * m33 - m01 * m13 * m32 - m11 * m02 * m33 + m11 * m03 * m32 + m31 * m02 * m13 - m31 * m03 * m12;
-            MATD_EL(m,1,2) = - m00 * m12 * m33 + m00 * m13 * m32 + m10 * m02 * m33 - m10 * m03 * m32 - m30 * m02 * m13 + m30 * m03 * m12;
-            MATD_EL(m,2,2) =   m00 * m11 * m33 - m00 * m13 * m31 - m10 * m01 * m33 + m10 * m03 * m31 + m30 * m01 * m13 - m30 * m03 * m11;
-            MATD_EL(m,3,2) = - m00 * m11 * m32 + m00 * m12 * m31 + m10 * m01 * m32 - m10 * m02 * m31 - m30 * m01 * m12 + m30 * m02 * m11;
-            MATD_EL(m,0,3) = - m01 * m12 * m23 + m01 * m13 * m22 + m11 * m02 * m23 - m11 * m03 * m22 - m21 * m02 * m13 + m21 * m03 * m12;
-            MATD_EL(m,1,3) =   m00 * m12 * m23 - m00 * m13 * m22 - m10 * m02 * m23 + m10 * m03 * m22 + m20 * m02 * m13 - m20 * m03 * m12;
-            MATD_EL(m,2,3) = - m00 * m11 * m23 + m00 * m13 * m21 + m10 * m01 * m23 - m10 * m03 * m21 - m20 * m01 * m13 + m20 * m03 * m11;
-            MATD_EL(m,3,3) =   m00 * m11 * m22 - m00 * m12 * m21 - m10 * m01 * m22 + m10 * m02 * m21 + m20 * m01 * m12 - m20 * m02 * m11;
-
-            for (int i = 0; i < 4; i++)
-                for (int j = 0; j < 4; j++)
-                    MATD_EL(m,i,j) *= invdet;
-
-            return m;
         }
 
-        default:
-            // TODO: implement better inversion method
-            return matd_naive_inverse(x, invdet);
+        default: {
+            matd_plu_t *plu = matd_plu(x);
+
+            matd_t *inv = NULL;
+            if (!plu->singular) {
+                matd_t *ident = matd_identity(x->nrows);
+                inv = matd_plu_solve(plu, ident);
+                matd_destroy(ident);
+            }
+
+            matd_plu_destroy(plu);
+
+            return inv;
+        }
     }
 
     return NULL; // unreachable
@@ -890,6 +806,8 @@ matd_t *matd_op(const char *expr, ...)
         exprlen++;
     }
 
+    assert(nargs > 0);
+
     if (!exprlen) // expr = ""
         return NULL;
 
@@ -968,6 +886,25 @@ double matd_vec_dist_n(const matd_t *a, const matd_t *b, int n)
     for (int i = 0; i < n; i++)
         mag += sq(a->data[i] - b->data[i]);
     return sqrt(mag);
+}
+
+// find the index of the off-diagonal element with the largest mag
+static inline int max_idx(const matd_t *A, int row, int maxcol)
+{
+    int maxi = 0;
+    double maxv = -1;
+
+    for (int i = 0; i < maxcol; i++) {
+        if (i == row)
+            continue;
+        double v = fabs(MATD_EL(A, row, i));
+        if (v > maxv) {
+            maxi = i;
+            maxv = v;
+        }
+    }
+
+    return maxi;
 }
 
 double matd_vec_dot_product(const matd_t *a, const matd_t *b)
@@ -1103,9 +1040,9 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
 
             double oldv0 = v[0];
             if (oldv0 < 0)
-                v[0] -= sqrtf(mag2);
+                v[0] -= sqrt(mag2);
             else
-                v[0] += sqrtf(mag2);
+                v[0] += sqrt(mag2);
 
             mag2 += -oldv0*oldv0 + v[0]*v[0];
 
@@ -1160,14 +1097,18 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
 
             double oldv0 = v[0];
             if (oldv0 < 0)
-                v[0] -= sqrtf(mag2);
+                v[0] -= sqrt(mag2);
             else
-                v[0] += sqrtf(mag2);
+                v[0] += sqrt(mag2);
 
             mag2 += -oldv0*oldv0 + v[0]*v[0];
 
             // compute magnitude of ([1 0 0..]+v)
             double mag = sqrt(mag2);
+
+            // this case can occur when the vectors are already perpendicular
+            if (mag == 0)
+                continue;
 
             for (int i = 0; i < vlen; i++)
                 v[i] /= mag;
@@ -1202,70 +1143,146 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
     // as a function of rows*cols. maxiters ~= 1.5*nrows*ncols
     // we're a bit conservative below.
     int maxiters = 200 + 2*A->nrows*A->ncols;
+    assert(maxiters > 0); // reassure clang
     int iter;
 
-    double max; // maximum non-zero value being reduced this iteration
+    double maxv; // maximum non-zero value being reduced this iteration
 
-    int termination = 0;
+    double tol = 1E-10;
 
-    double tol = 1E-8;
+    // which method will we use to find the largest off-diagonal
+    // element of B?
+    const int find_max_method = 1; //(B->ncols < 6) ? 2 : 1;
+
+    // for each of the first B->ncols rows, which index has the
+    // maximum absolute value? (used by method 1)
+    int maxrowidx[B->ncols];
+    int lastmaxi, lastmaxj;
+
+    if (find_max_method == 1) {
+        for (int i = 2; i < B->ncols; i++)
+            maxrowidx[i] = max_idx(B, i, B->ncols);
+
+        // note that we started the array at 2. That's because by setting
+        // these values below, we'll recompute first two entries on the
+        // first iteration!
+        lastmaxi = 0, lastmaxj = 1;
+    }
 
     for (iter = 0; iter < maxiters; iter++) {
 
-        // find the largest off-diagonal element of B
-        //
-        // XXX this "search from scratch" approach is simple but
-        // wasteful... It contributes significantly to runtime.
-        int maxi = -1, maxj = -1;
-        max = -1;
+        // No diagonalization required for 0x0 and 1x1 matrices.
+        if (B->ncols < 2)
+            break;
 
-        if (1) {
-            // round robin along the rows.
-            maxi = iter % B->ncols;
+        // find the largest off-diagonal element of B, and put its
+        // coordinates in maxi, maxj.
+        int maxi, maxj;
 
-            for (int j = 0; j < B->ncols; j++) {
-                if (maxi == j)
-                    continue;
+        if (find_max_method == 1) {
+            // method 1 is the "smarter" method which does at least
+            // 4*ncols work. More work might be needed (up to
+            // ncols*ncols), depending on data. Thus, this might be a
+            // bit slower than the default method for very small
+            // matrices.
+            maxi = -1;
+            maxv = -1;
 
-                double v = fabs(MATD_EL(B, maxi, j));
+            // every iteration, we must deal with the fact that rows
+            // and columns lastmaxi and lastmaxj have been
+            // modified. Update maxrowidx accordingly.
 
-                if (v > max) {
-                    maxj = j;
-                    max = v;
+            // now, EVERY row also had columns lastmaxi and lastmaxj modified.
+            for (int rowi = 0; rowi < B->ncols; rowi++) {
+
+                // the magnitude of the largest off-diagonal element
+                // in this row.
+                double thismaxv;
+
+                // row 'lastmaxi' and 'lastmaxj' have been completely
+                // changed. compute from scratch.
+                if (rowi == lastmaxi || rowi == lastmaxj) {
+                    maxrowidx[rowi] = max_idx(B, rowi, B->ncols);
+                    thismaxv = fabs(MATD_EL(B, rowi, maxrowidx[rowi]));
+                    goto endrowi;
+                }
+
+                // our maximum entry was just modified. We don't know
+                // if it went up or down, and so we don't know if it
+                // is still the maximum. We have to update from
+                // scratch.
+                if (maxrowidx[rowi] == lastmaxi || maxrowidx[rowi] == lastmaxj) {
+                    maxrowidx[rowi] = max_idx(B, rowi, B->ncols);
+                    thismaxv = fabs(MATD_EL(B, rowi, maxrowidx[rowi]));
+                    goto endrowi;
+                }
+
+                // This row is unchanged, except for columns
+                // 'lastmaxi' and 'lastmaxj', and those columns were
+                // not previously the largest entry...  just check to
+                // see if they are now the maximum entry in their
+                // row. (Remembering to consider off-diagonal entries
+                // only!)
+                thismaxv = fabs(MATD_EL(B, rowi, maxrowidx[rowi]));
+
+                // check column lastmaxi. Is it now the maximum?
+                if (lastmaxi != rowi) {
+                    double v = fabs(MATD_EL(B, rowi, lastmaxi));
+                    if (v > thismaxv) {
+                        thismaxv = v;
+                        maxrowidx[rowi] = lastmaxi;
+                    }
+                }
+
+                // check column lastmaxj
+                if (lastmaxj != rowi) {
+                    double v = fabs(MATD_EL(B, rowi, lastmaxj));
+                    if (v > thismaxv) {
+                        thismaxv = v;
+                        maxrowidx[rowi] = lastmaxj;
+                    }
+                }
+
+                // does this row have the largest value we've seen so far?
+              endrowi:
+                if (thismaxv > maxv) {
+                    maxv = thismaxv;
+                    maxi = rowi;
                 }
             }
 
-            // termination condition. Since we only considered one
-            // row, we require N consecutive iterations to all have
-            // low error.
-            if (max < tol) {
-                termination++;
-                if (termination == B->ncols)
-                    break;
-                continue;
-            } else {
-                termination = 0;
-            }
+            assert(maxi >= 0);
+            maxj = maxrowidx[maxi];
 
-        } else {
+            // save these for the next iteration.
+            lastmaxi = maxi;
+            lastmaxj = maxj;
+
+            if (maxv < tol)
+                break;
+
+        } else if (find_max_method == 2) {
+            // brute-force (reference) version.
+            maxv = -1;
+
             // only search top "square" portion
             for (int i = 0; i < B->ncols; i++) {
                 for (int j = 0; j < B->ncols; j++) {
                     if (i == j)
                         continue;
 
-                    double v = fabs(MATD_EL(B, maxi, j));
+                    double v = fabs(MATD_EL(B, i, j));
 
-                    if (v > max) {
+                    if (v > maxv) {
                         maxi = i;
                         maxj = j;
-                        max = v;
+                        maxv = v;
                     }
                 }
             }
 
             // termination condition.
-            if (max < tol)
+            if (maxv < tol)
                 break;
         }
 
@@ -1351,7 +1368,9 @@ static matd_svd_t matd_svd_tall(matd_t *A, int flags)
 
     if (!(flags & MATD_SVD_NO_WARNINGS) && iter == maxiters) {
         printf("WARNING: maximum iters (maximum = %d, matrix %d x %d, max=%.15f)\n",
-               iter, A->nrows, A->ncols, max);
+               iter, A->nrows, A->ncols, maxv);
+
+        matd_print(A, "%15f");
     }
 
     // them all positive by flipping the corresponding columns of
@@ -1479,13 +1498,16 @@ matd_svd_t matd_svd_flags(matd_t *A, int flags)
 }
 
 
-matd_lu_t *matd_lu(const matd_t *a)
+matd_plu_t *matd_plu(const matd_t *a)
 {
     int *piv = calloc(a->nrows, sizeof(int));
     int pivsign = 1;
     matd_t *lu = matd_copy(a);
 
-    matd_lu_t *mlu = calloc(1, sizeof(matd_lu_t));
+    // only for square matrices.
+    assert(a->nrows == a->ncols);
+
+    matd_plu_t *mlu = calloc(1, sizeof(matd_plu_t));
 
     for (int i = 0; i < a->nrows; i++)
         piv[i] = i;
@@ -1530,13 +1552,14 @@ matd_lu_t *matd_lu(const matd_t *a)
         // singular or nearly singular), replace with a new pivot of the
         // right sign.
         if (fabs(LUjj) < MATD_EPS) {
+/*
             if (LUjj < 0)
                 LUjj = -MATD_EPS;
             else
                 LUjj = MATD_EPS;
 
             MATD_EL(lu, j, j) = LUjj;
-
+*/
             mlu->singular = 1;
         }
 
@@ -1554,15 +1577,15 @@ matd_lu_t *matd_lu(const matd_t *a)
     return mlu;
 }
 
-void matd_lu_destroy(matd_lu_t *mlu)
+void matd_plu_destroy(matd_plu_t *mlu)
 {
     matd_destroy(mlu->lu);
     free(mlu->piv);
-    memset(mlu, 0, sizeof(matd_lu_t));
+    memset(mlu, 0, sizeof(matd_plu_t));
     free(mlu);
 }
 
-double matd_lu_det(const matd_lu_t *mlu)
+double matd_plu_det(const matd_plu_t *mlu)
 {
     matd_t *lu = mlu->lu;
     double det = mlu->pivsign;
@@ -1575,24 +1598,35 @@ double matd_lu_det(const matd_lu_t *mlu)
     return det;
 }
 
-matd_t *matd_lu_l(const matd_lu_t *mlu)
+matd_t *matd_plu_p(const matd_plu_t *mlu)
+{
+    matd_t *lu = mlu->lu;
+    matd_t *P = matd_create(lu->nrows, lu->nrows);
+
+    for (int i = 0; i < lu->nrows; i++) {
+        MATD_EL(P, mlu->piv[i], i) = 1;
+    }
+
+    return P;
+}
+
+matd_t *matd_plu_l(const matd_plu_t *mlu)
 {
     matd_t *lu = mlu->lu;
 
     matd_t *L = matd_create(lu->nrows, lu->ncols);
     for (int i = 0; i < lu->nrows; i++) {
-        for (int j = 0; j < lu->ncols; j++) {
-            if (i > j)
-                MATD_EL(L, i, j) = MATD_EL(lu, i, j);
-            else if (i == j)
-                MATD_EL(L, i, j) = 1;
+        MATD_EL(L, i, i) = 1;
+
+        for (int j = 0; j < i; j++) {
+            MATD_EL(L, i, j) = MATD_EL(lu, i, j);
         }
     }
 
     return L;
 }
 
-matd_t *matd_lu_u(const matd_lu_t *mlu)
+matd_t *matd_plu_u(const matd_plu_t *mlu)
 {
     matd_t *lu = mlu->lu;
 
@@ -1607,13 +1641,17 @@ matd_t *matd_lu_u(const matd_lu_t *mlu)
     return U;
 }
 
-matd_t *matd_lu_solve(const matd_lu_t *mlu, const matd_t *b)
+// PLU = A
+// Ax = B
+// PLUx = B
+// LUx = P'B
+matd_t *matd_plu_solve(const matd_plu_t *mlu, const matd_t *b)
 {
     matd_t *x = matd_copy(b);
 
     // permute right hand side
     for (int i = 0; i < mlu->lu->nrows; i++)
-        memcpy(&MATD_EL(x, mlu->piv[i], 0), &MATD_EL(b, i, 0), sizeof(TYPE) * b->ncols);
+        memcpy(&MATD_EL(x, i, 0), &MATD_EL(b, mlu->piv[i], 0), sizeof(TYPE) * b->ncols);
 
     // solve Ly = b
     for (int k = 0; k < mlu->lu->nrows; k++) {
@@ -1642,10 +1680,10 @@ matd_t *matd_lu_solve(const matd_lu_t *mlu, const matd_t *b)
 
 matd_t *matd_solve(matd_t *A, matd_t *b)
 {
-    matd_lu_t *mlu = matd_lu(A);
-    matd_t *x = matd_lu_solve(mlu, b);
+    matd_plu_t *mlu = matd_plu(A);
+    matd_t *x = matd_plu_solve(mlu, b);
 
-    matd_lu_destroy(mlu);
+    matd_plu_destroy(mlu);
     return x;
 }
 

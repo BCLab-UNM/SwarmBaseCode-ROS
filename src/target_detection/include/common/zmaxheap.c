@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -34,6 +34,7 @@ either expressed or implied, of the FreeBSD Project.
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "zmaxheap.h"
 
@@ -229,9 +230,12 @@ int zmaxheap_remove_index(zmaxheap_t *heap, int idx, void *p, float *v)
 
         // if we got here, then one of the children is bigger than the parent.
         if (left_score >= right_score) {
+            assert(left < heap->size);
             heap->swap(heap, parent, left);
             parent = left;
         } else {
+            // right_score can't be less than left_score if right_score is -INFINITY.
+            assert(right < heap->size);
             heap->swap(heap, parent, right);
             parent = right;
         }
@@ -364,7 +368,7 @@ void zmaxheap_test()
 
         if ((random() & 1) == 0 && sz < cap) {
             // add a value
-            int32_t v = random() / 1000;
+            int32_t v = (int32_t) (random() / 1000);
             float fv = v;
             assert(v == fv);
 

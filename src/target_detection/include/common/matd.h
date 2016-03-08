@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -50,8 +50,11 @@ extern "C" {
 typedef struct
 {
     int nrows, ncols;
-    double *data;
+    double data[];
+//    double *data;
 } matd_t;
+
+#define MATD_ALLOC(name, nrows, ncols) double name ## _storage [nrows*ncols]; matd_t name = { .nrows = nrows, .ncols = ncols, .data = &name ## _storage };
 
 /**
  * Defines a small value which can be used in place of zero for approximating
@@ -231,12 +234,13 @@ double matd_det(const matd_t *a);
 /**
  * Attempts to compute an inverse of the supplied matrix 'a' and return it as
  * a new matrix. This is strictly only possible if the determinant of 'a' is
- * non-zero (matd_det(a) != 0). If the determinant of 'a' is zero or very small,
- * an approximation of the inverse will be returned using MATD_EPS as the
- * determinant. matd_det(a) can be checked beforehand to determine the matrix's
- * suitability for inversion. It is the caller's responsibility to call
- * matd_destroy() on the returned matrix.
- */
+ * non-zero (matd_det(a) != 0).
+ *
+ * If the determinant is zero, NULL is returned. It is otherwise the
+ * caller's responsibility to cope with the results caused by poorly
+ * conditioned matrices. (E.g.., if such a situation is likely to arise, compute
+ * the pseudo-inverse from the SVD.)
+ **/
 matd_t *matd_inverse(const matd_t *a);
 
 static inline void matd_set_data(matd_t *m, const double *data)
@@ -379,33 +383,36 @@ matd_svd_t matd_svd(matd_t *A);
     matd_svd_t matd_svd_flags(matd_t *A, int flags);
 
 ////////////////////////////////
-// LU Decomposition
+// PLU Decomposition
 
+// All square matrices (even singular ones) have a partially-pivoted
+// LU decomposition such that A = PLU, where P is a permutation
+// matrix, L is a lower triangular matrix, and U is an upper
+// triangular matrix.
+//
 typedef struct
 {
-    // was the input matrix singular? When a near-zero pivot is found,
-    // it is replaced with a value of MATD_EPS so that an approximate
-    // inverse can be found. This flag is set to indicate that this
-    // has happened. Relying on this behavior is generally bad design;
-    // LU should only be applied to non-singular matrices.
+    // was the input matrix singular? When a zero pivot is found, this
+    // flag is set to indicate that this has happened.
     int singular;
 
     int *piv; // permutation indices
     int pivsign;
 
-    // The matd_lu_t object returned "owns" the enclosed LU matrix. It
+    // The matd_plu_t object returned "owns" the enclosed LU matrix. It
     // is not expected that the returned object is itself useful to
     // users: it contains the L and U information all smushed
     // together.
-    matd_t *lu; // combined L and U matrices, permuted.
-} matd_lu_t;
+    matd_t *lu; // combined L and U matrices, permuted so they can be triangular.
+} matd_plu_t;
 
-matd_lu_t *matd_lu(const matd_t *a);
-void matd_lu_destroy(matd_lu_t *mlu);
-double matd_lu_det(const matd_lu_t *lu);
-matd_t *matd_lu_l(const matd_lu_t *lu);
-matd_t *matd_lu_u(const matd_lu_t *lu);
-matd_t *matd_lu_solve(const matd_lu_t *mlu, const matd_t *b);
+matd_plu_t *matd_plu(const matd_t *a);
+void matd_plu_destroy(matd_plu_t *mlu);
+double matd_plu_det(const matd_plu_t *lu);
+matd_t *matd_plu_p(const matd_plu_t *lu);
+matd_t *matd_plu_l(const matd_plu_t *lu);
+matd_t *matd_plu_u(const matd_plu_t *lu);
+matd_t *matd_plu_solve(const matd_plu_t *mlu, const matd_t *b);
 
 // uses LU decomposition internally.
 matd_t *matd_solve(matd_t *A, matd_t *b);

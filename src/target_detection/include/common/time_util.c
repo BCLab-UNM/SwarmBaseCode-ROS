@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -50,17 +50,17 @@ int64_t utime_get_useconds(int64_t v)
 
 void utime_to_timeval(int64_t v, struct timeval *tv)
 {
-    tv->tv_sec  = utime_get_seconds(v);
-    tv->tv_usec = utime_get_useconds(v);
+    tv->tv_sec  = (time_t) utime_get_seconds(v);
+    tv->tv_usec = (suseconds_t) utime_get_useconds(v);
 }
 
 void utime_to_timespec(int64_t v, struct timespec *ts)
 {
-    ts->tv_sec  = utime_get_seconds(v);
-    ts->tv_nsec = utime_get_useconds(v)*1000;
+    ts->tv_sec  = (time_t) utime_get_seconds(v);
+    ts->tv_nsec = (suseconds_t) utime_get_useconds(v)*1000;
 }
 
-int32_t timeutil_usleep(useconds_t useconds)
+int32_t timeutil_usleep(int64_t useconds)
 {
     // unistd.h function
     return usleep(useconds);

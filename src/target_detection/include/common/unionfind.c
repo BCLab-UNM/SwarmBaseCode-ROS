@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -32,21 +32,3 @@ either expressed or implied, of the FreeBSD Project.
 #include "unionfind.h"
 #include <stdlib.h>
 #include <assert.h>
-
-unionfind_t *unionfind_create(uint32_t maxid)
-{
-    unionfind_t *uf = (unionfind_t*) calloc(1, sizeof(unionfind_t));
-    uf->maxid = maxid;
-    uf->data = (struct ufrec*) malloc((maxid+1) * sizeof(struct ufrec));
-    for (int i = 0; i <= maxid; i++) {
-        uf->data[i].size = 1;
-        uf->data[i].parent = i;
-    }
-    return uf;
-}
-
-void unionfind_destroy(unionfind_t *uf)
-{
-    free(uf->data);
-    free(uf);
-}

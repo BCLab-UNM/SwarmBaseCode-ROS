@@ -1,4 +1,4 @@
-/* (C) 2013-2014, The Regents of The University of Michigan
+/* (C) 2013-2015, The Regents of The University of Michigan
 All rights reserved.
 
 This software may be available under alternative licensing
@@ -43,6 +43,10 @@ either expressed or implied, of the FreeBSD Project.
 # define M_TWOPI       6.2831853071795862319959  /* 2*pi */
 #endif
 
+#ifndef M_PI
+# define M_PI 3.141592653589793238462643383279502884196
+#endif
+
 #define to_radians(x) ( (x) * (M_PI / 180.0 ))
 #define to_degrees(x) ( (x) * (180.0 / M_PI ))
 
@@ -51,8 +55,8 @@ either expressed or implied, of the FreeBSD Project.
 
 static inline int dequals(double a, double b)
 {
-    int thresh = 1e-9;
-    return (abs(a-b) < thresh);
+    double thresh = 1e-9;
+    return (fabs(a-b) < thresh);
 }
 
 static inline int isq(int v)
@@ -197,16 +201,6 @@ static inline int dblcmp (double d1, double d2)
         return  0;
 }
 
-// if V is null, returns null.
-static inline double *doubles_copy(double *v, int len)
-{
-    if (!v)
-        return NULL;
-
-    double *r = malloc(len * sizeof(double));
-    memcpy(r, v, len * sizeof(double));
-    return r;
-}
 
 
 
