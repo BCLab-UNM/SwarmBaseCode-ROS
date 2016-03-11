@@ -420,8 +420,9 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
 			//Add target ID to list of dropped off targets
             targetsDroppedOff[targetsPickedUp.at(rover_name)] = true;
             emit updateLog("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
-            targetsPickedUp.erase(rover_name);
             ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
+            targetsPickedUp.erase(rover_name);
+            ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
             
             //Publish target ID (should always be equal to 256)
 			std_msgs::Int16 targetIDMsg;
