@@ -269,10 +269,12 @@ void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
 
 	//if target has not previously been detected 
 	else if (targetDetected.data == -1) {
-        targetDetected.data = message->tags.data[0];
         
         //check if target has not yet been collected
-        if (!targetsCollected[targetDetected.data]) { 
+        if (!targetsCollected[message->tags.data[0]]) {
+			//copy target ID to class variable
+			targetDetected.data = message->tags.data[0];
+			
 	        //set angle to center as goal heading
 			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
 			
