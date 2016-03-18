@@ -159,8 +159,8 @@ namespace rqt_rover_gui {
 
     map<string,ros::Publisher> control_mode_publishers;
     ros::Publisher joystick_publisher;
-    ros::Publisher targetPickUpPublisher;
-    ros::Publisher targetDropOffPublisher;
+    map<string,ros::Publisher> targetPickUpPublisher;
+    map<string,ros::Publisher> targetDropOffPublisher;
 
     ros::Subscriber joystick_subscriber;
     map<string,ros::Subscriber> encoder_subscribers;
