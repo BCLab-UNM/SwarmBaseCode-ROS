@@ -382,6 +382,11 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
 	
     if((targetID < 0) || (targetID == collectionZoneID) || targetPreviouslyCollected) {
         // No valid target was found in the image, or the target was the collection zone ID, or the target was already picked up by another robot
+        
+        //Publish -1 to alert robot of failed drop off event
+        std_msgs::Int16 targetIDMsg;
+        targetIDMsg.data = -1;
+        targetPickUpPublisher[rover_name].publish(targetIDMsg);
     }
     else {
 		//Record target ID according to the rover that reported it
@@ -392,7 +397,7 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
         //Publish target ID
         std_msgs::Int16 targetIDMsg;
         targetIDMsg.data = targetID;
-        targetPickUpPublisher.publish(targetIDMsg);
+        targetPickUpPublisher[rover_name].publish(targetIDMsg);
     }
 }
 
@@ -427,10 +432,15 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
             //Publish target ID (should always be equal to 256)
 			std_msgs::Int16 targetIDMsg;
 			targetIDMsg.data = targetID;
-			targetDropOffPublisher.publish(targetIDMsg);
+			targetDropOffPublisher[rover_name].publish(targetIDMsg);
         }
         catch(const std::out_of_range& oor) {
             emit updateLog(QString::fromStdString(rover_name) + " attempted a drop off but was not carrying a target");
+            
+            //Publish -1 to alert robot of failed drop off event
+            std_msgs::Int16 targetIDMsg;
+			targetIDMsg.data = -1;
+			targetDropOffPublisher[rover_name].publish(targetIDMsg);
         }
     }
 }
@@ -596,8 +606,12 @@ void RoverGUIPlugin::setupPublishers()
     displayLogMessage("Setting up joystick publisher " + QString::fromStdString(joystick_topic));
     joystick_publisher = nh.advertise<geometry_msgs::Twist>(joystick_topic, 10, this);
     
-    targetPickUpPublisher = nh.advertise<std_msgs::Int16>("/targetPickUpValue", 10, this);
-    targetDropOffPublisher = nh.advertise<std_msgs::Int16>("/targetDropOffValue", 10, this);
+    set<string>::iterator rover_it;
+    for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
+    {
+		targetPickUpPublisher[*rover_it] = nh.advertise<std_msgs::Int16>("/"+*rover_it+"/targetPickUpValue", 10, this);
+		targetDropOffPublisher[*rover_it] = nh.advertise<std_msgs::Int16>("/"+*rover_it+"/targetDropOffValue", 10, this);
+	}
 }
 
 void RoverGUIPlugin::setupSubscribers()
