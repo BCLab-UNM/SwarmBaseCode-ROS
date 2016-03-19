@@ -1082,7 +1082,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Unsubscribe from topics
 
     displayLogMessage("Shutting down subscribers...");
-    joystick_subscriber.shutdown();
 
     for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) it->second.shutdown();
     encoder_subscribers.clear();
@@ -1107,8 +1106,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it) it->second.shutdown();
     control_mode_publishers.clear();
-
-    joystick_publisher.shutdown();
 
     return_msg += sim_mgr.stopGazeboClient();
     return_msg += "<br>";
