@@ -553,6 +553,14 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         displayLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
         ui.map_frame->clearMap(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
+        
+        if (it->compare(selected_rover_name) == 0) {
+			camera_subscriber.shutdown();
+			imu_subscriber.shutdown();;
+			us_center_subscriber.shutdown();;
+			us_left_subscriber.shutdown();;
+			us_right_subscriber.shutdown();
+		}
     }
 
     // Wait for a rover to connect
