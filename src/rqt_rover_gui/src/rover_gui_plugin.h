@@ -151,6 +151,9 @@ namespace rqt_rover_gui {
     void gazeboServerFinishedEventHandler();  
     void displayLogMessage(QString msg);
 
+    // Needed to refocus the keyboard events when the user clicks on the widget list
+    // to the main widget so keyboard manual control is handled properly
+    void refocusKeyboardEventHandler();
 
   private:
 

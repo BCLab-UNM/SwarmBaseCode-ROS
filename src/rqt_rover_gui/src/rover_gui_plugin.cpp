@@ -104,6 +104,8 @@ namespace rqt_rover_gui
 
     // Setup QT message connections
     connect(ui.rover_list, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentRoverChangedEventHandler(QListWidgetItem*,QListWidgetItem*)));
+    connect(ui.rover_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(refocusKeyboardEventHandler()));
+    connect(ui.rover_list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(refocusKeyboardEventHandler()));
     connect(ui.ekf_checkbox, SIGNAL(toggled(bool)), this, SLOT(EKFCheckboxToggledEventHandler(bool)));
     connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
@@ -471,8 +473,7 @@ void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
-    widget->setFocus();
+    displayLogMessage("Selcted Rover Changed");
 
     if (!current) return; // Check to make sure the current selection isn't null
 
@@ -553,6 +554,14 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         displayLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
         ui.map_frame->clearMap(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
+        
+        if (it->compare(selected_rover_name) == 0) {
+			camera_subscriber.shutdown();
+			imu_subscriber.shutdown();;
+			us_center_subscriber.shutdown();;
+			us_left_subscriber.shutdown();;
+			us_right_subscriber.shutdown();
+		}
     }
 
     // Wait for a rover to connect
@@ -1828,6 +1837,12 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
     }
         // Pass on the event since it wasn't handled by us
     return rqt_gui_cpp::Plugin::eventFilter(target, event);
+}
+
+// Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
+void RoverGUIPlugin::refocusKeyboardEventHandler()
+{
+    widget->setFocus();
 }
 
 } // End namespace
