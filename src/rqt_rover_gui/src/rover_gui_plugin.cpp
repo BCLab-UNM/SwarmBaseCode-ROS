@@ -573,9 +573,13 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
 
-        // Disable control mode radio group since no rover has been selected
+        // Disable control mode group since no rovers are connected
         ui.autonomous_control_radio_button->setEnabled(false);
         ui.joystick_control_radio_button->setEnabled(false);
+        ui.all_autonomous_button->setEnabled(false);
+        ui.all_stop_button->setEnabled(false);
+        ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+        ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
         return;
     }
 
@@ -585,11 +589,15 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     }
 
     rover_names = new_rover_names;
-
-   displayLogMessage("List of connected rovers has changed");
-   selected_rover_name = "";
+    
+    displayLogMessage("List of connected rovers has changed");
+    selected_rover_name = "";
     ui.rover_list->clearSelection();
     ui.rover_list->clear();
+    
+    //Enable all autonomous button
+    ui.all_autonomous_button->setEnabled(true);
+    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
 
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
     {
@@ -766,6 +774,10 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     QString return_msg = stopROSJoyNode();
     displayLogMessage(return_msg);
+    
+    //Enable all stop button
+    ui.all_stop_button->setEnabled(true);
+    ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
 }
 
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
@@ -783,6 +795,10 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     QString return_msg = startROSJoyNode();
     displayLogMessage(return_msg);
+    
+    //Enable all autonomous button
+    ui.all_autonomous_button->setEnabled(true);
+    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
 }
 
 void RoverGUIPlugin::allAutonomousButtonEventHandler()
@@ -819,6 +835,10 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
     ui.joystick_control_radio_button->setChecked(false);
     ui.autonomous_control_radio_button->setChecked(true);
     ui.joystick_frame->setHidden(true);
+    
+    //Disable all autonomous button
+    ui.all_autonomous_button->setEnabled(false);
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
 }
 
 void RoverGUIPlugin::allStopButtonEventHandler()
@@ -855,6 +875,10 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.joystick_control_radio_button->setChecked(true);
     ui.autonomous_control_radio_button->setChecked(false);
     ui.joystick_frame->setHidden(false);
+    
+    //Disable all stop button
+    ui.all_stop_button->setEnabled(false);
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 }
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
@@ -1039,13 +1063,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    ui.visualize_simulation_button->setEnabled(true);
    ui.clear_simulation_button->setEnabled(true);
-   ui.all_autonomous_button->setEnabled(true);
-   ui.all_stop_button->setEnabled(true);
 
    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white;");
    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
-   ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
-   ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
 
    displayLogMessage("Finished building simulation.");
 
@@ -1123,16 +1143,12 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     ui.visualize_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
     ui.clear_simulation_button->setEnabled(false);
-    ui.all_autonomous_button->setEnabled(false);
-    ui.all_stop_button->setEnabled(false);
     display_sim_visualization = false;
 
 
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     // Clear the task status values
     ui.num_targets_collected_label->setText("<font color='white'>0</font>");
@@ -1756,14 +1772,10 @@ void RoverGUIPlugin::gazeboServerFinishedEventHandler()
     ui.visualize_simulation_button->setEnabled(false);
     ui.clear_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
-    ui.all_autonomous_button->setEnabled(false);
-    ui.all_stop_button->setEnabled(false);
 
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
-    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 }
 
 bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
