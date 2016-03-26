@@ -1,5 +1,9 @@
 #!/bin/bash
-source ~/rover_workspace/devel/setup.bash
+echo "Running in $PWD" 
+export SWARMATHON_APP_ROOT="$PWD"
+export GAZEBO_MODEL_PATH="$PWD/simulation/models"
+export GAZEBO_PLUGIN_PATH="$PWD/build/gazebo_plugins"
+source "$PWD/devel/setup.bash"
 echo Cleaning up ROS and Gazebo Processes
 ./cleanup.sh
 echo Killing rosmaster

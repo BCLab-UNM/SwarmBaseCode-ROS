@@ -480,8 +480,14 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     displayLogMessage(QString("Selected rover: ") + QString::fromStdString(selected_rover_name));
 
-    //QString model_path = "~/rover_workspace/misc/models/"++"/model.sdf";
-    QString model_path = QDir::homePath()+"/rover_workspace/simulation/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
+    // Attempt to read the simulation model xml file if it exists. If it does not exist assume this is a physical rover.
+    const char *name = "GAZEBO_MODEL_PATH";
+    char *model_root_cstr;
+    model_root_cstr = getenv(name);
+    QString model_root(model_root_cstr);
+
+    QString model_path = model_root+"/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
+
     readRoverModelXML(model_path);
 
     setupSubscribers();

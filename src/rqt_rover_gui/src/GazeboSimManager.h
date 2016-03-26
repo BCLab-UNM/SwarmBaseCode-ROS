@@ -55,6 +55,7 @@ public:
     void cleanUpGazeboServer();
 
 private:
+    QString app_root; // Path to the application root directory
     QProcess* gazebo_server_process;
     QProcess* gazebo_client_process;
     QProcess* command_process;
