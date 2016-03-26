@@ -1876,9 +1876,9 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>40</y>
        <width>171</width>
-       <height>22</height>
+       <height>30</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1898,9 +1898,9 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>25</y>
        <width>117</width>
-       <height>22</height>
+       <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1916,27 +1916,49 @@ border: 1px solid white;
       <string notr="true">rover_control_button_group</string>
      </attribute>
     </widget>
-    <widget class="QRadioButton" name="all_autonomous_control_radio_button">
+    <widget class="QPushButton" name="all_stop_button">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
-       <width>151</width>
+       <y>95</y>
+       <width>150</width>
        <height>22</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
+      <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+     </property>
+     <property name="text">
+      <string>Stop All Rovers</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="all_autonomous_button">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>150</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
      </property>
      <property name="text">
       <string>All Autonomous</string>
      </property>
-     <attribute name="buttonGroup">
-      <string notr="true">rover_control_button_group</string>
-     </attribute>
     </widget>
    </widget>
   </widget>
