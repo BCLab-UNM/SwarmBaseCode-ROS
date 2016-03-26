@@ -1,5 +1,7 @@
 #!/bin/bash
 echo "Running in $PWD" 
+previous_gazebo_model_path=${GAZEBO_MODEL_PATH}
+previous_gazebo_plugin_path=${GAZEBO_PLUGIN_PATH}
 export SWARMATHON_APP_ROOT="$PWD"
 export GAZEBO_MODEL_PATH="$PWD/simulation/models"
 export GAZEBO_PLUGIN_PATH="$PWD/build/gazebo_plugins"
@@ -21,3 +23,6 @@ pkill rosmaster
 echo Killing roscore
 pkill roscore
 ./cleanup.sh
+# Restore previous environment
+export GAZEBO_MODEL_PATH=$previous_gazebo_model_path
+export GAZEBO_PLUGIN_PATH=$previous_gazebo_plugin_path
