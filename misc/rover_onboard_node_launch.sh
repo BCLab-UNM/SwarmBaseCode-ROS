@@ -5,8 +5,8 @@ pkill obstacle
 pkill target
 pkill abridge
 pkill ublox_gps
-pkill navsat_transfor
-pkill ekf_localizatio
+pkill navsat_transform
+pkill ekf_localization
 
 
 #Point to ROS master on the network
@@ -56,7 +56,7 @@ if [ -z "$gpsDevicePath" ]
 then
     echo "Error: u-blox GPS device not found"
 else
-    nohup rosrun ublox_gps ublox_gps /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath &
+    nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath &
 fi
 
 nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
@@ -84,16 +84,7 @@ while true; do
 	rosnode kill $HOSTNAME\_CAMERA
 	rosnode kill $HOSTNAME\_OBSTACLE
 	rosnode kill $HOSTNAME\_TARGET
-	rosnode kill ublox_gps
-
-	pkill camera
-	pkill mobility
-	pkill obstacle
-	pkill target
-	pkill abridge
-	pkill ublox_gps
-	pkill navsat_transfor
-	pkill ekf_localizatio
+	rosnode kill $HOSTNAME
 
 	exit 1
     fi
