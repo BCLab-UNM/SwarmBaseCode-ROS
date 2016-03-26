@@ -183,7 +183,7 @@ namespace rqt_rover_gui {
     Ui::RoverGUI ui;
 
     QProcess* joy_process;
-    QTimer* timer; // for rover polling
+    QTimer* rover_poll_timer; // for rover polling
 
     QString log_messages;
     GazeboSimManager sim_mgr;

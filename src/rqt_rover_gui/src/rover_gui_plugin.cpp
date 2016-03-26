@@ -129,9 +129,9 @@ namespace rqt_rover_gui
     displayLogMessage("Searching for rovers...");
 
     // Add discovered rovers to the GUI list
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(pollRoversTimerEventHandler()));
-    timer->start(5000);
+    rover_poll_timer = new QTimer(this);
+    connect(rover_poll_timer, SIGNAL(timeout()), this, SLOT(pollRoversTimerEventHandler()));
+    rover_poll_timer->start(5000);
 
     // Setup the initial display parameters for the map
     ui.map_frame->setDisplayGPSData(ui.gps_checkbox->isChecked());
@@ -157,7 +157,7 @@ namespace rqt_rover_gui
   void RoverGUIPlugin::shutdownPlugin()
   {
     clearSimulationButtonEventHandler();
-    timer->stop();
+    rover_poll_timer->stop();
     stopROSJoyNode();
     ros::shutdown();
   }
@@ -1754,6 +1754,8 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 
             float speed = 0.5;
 
+            displayLogMessage("Key press");
+
             switch( keyEvent->key() )
             {
             case Qt::Key_I:
@@ -1788,6 +1790,15 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
         if (event->type() == QEvent::KeyRelease)
         {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+            // Don't process auto repeat release events. Just the actual key release.
+            if (keyEvent->isAutoRepeat())
+            {
+                displayLogMessage("Ignoring auto repeat release.");
+                return rqt_gui_cpp::Plugin::eventFilter(target, event);
+            }
+
+            displayLogMessage("Key release");
 
             if (keyEvent->key() == Qt::Key_I || keyEvent->key() == Qt::Key_J || keyEvent->key() == Qt::Key_K || keyEvent->key() == Qt::Key_L )
             {
