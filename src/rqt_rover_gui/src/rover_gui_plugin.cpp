@@ -555,13 +555,54 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.map_frame->clearMap(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
         
-        if (it->compare(selected_rover_name) == 0) {
+        // If the currently selected rover disconnected shutdown its subscribers and publishers
+        if (it->compare(selected_rover_name) == 0)
+        {
+          //  displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s camera subscriber.");
 			camera_subscriber.shutdown();
-			imu_subscriber.shutdown();;
-			us_center_subscriber.shutdown();;
-			us_left_subscriber.shutdown();;
+          //  displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s IMU subscriber.");
+            imu_subscriber.shutdown();
+          //  displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s central sonar subscriber.");
+            us_center_subscriber.shutdown();
+          //  displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s left sonar subscriber.");
+            us_left_subscriber.shutdown();
+          //  displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s right sonar subscriber.");
 			us_right_subscriber.shutdown();
-		}
+
+            joystick_publisher.shutdown();
+        }
+
+       // For the other rovers that disconnected...
+
+        // Shutdown the subscribers
+        encoder_subscribers[*it].shutdown();
+        gps_subscribers[*it].shutdown();
+        ekf_subscribers[*it].shutdown();
+
+        // Delete the subscribers
+        encoder_subscribers.erase(*it);
+        //displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s encoder subscriber ("+QString::number(encoder_subscribers.size())+" remaining)");
+
+        gps_subscribers.erase(*it);
+        //displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s GPS subscriber ("+QString::number(gps_subscribers.size())+" remaining)");
+
+        ekf_subscribers.erase(*it);
+        //displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s EKF subscriber ("+QString::number(ekf_subscribers.size())+" remaining)");
+
+        // Shudown Publishers
+        control_mode_publishers[*it].shutdown();
+        targetPickUpPublisher[*it].shutdown();
+        targetDropOffPublisher[*it].shutdown();
+
+        // Delete Publishers
+        control_mode_publishers.erase(*it);
+        //displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s control mode publisher ("+QString::number(control_mode_publishers.size())+" remaining)");
+
+        targetPickUpPublisher.erase(*it);
+        //displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s \"pick up\" publisher ("+QString::number(targetPickUpPublisher.size())+" remaining)");
+
+        targetDropOffPublisher.erase(*it);
+        //displayLogMessage("Shutting down and deleting "+QString::fromStdString(*it)+"'s \"drop off\" publisher ("+QString::number(targetDropOffPublisher.size())+" remaining)");
     }
 
     // Wait for a rover to connect
@@ -1754,7 +1795,7 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 
             float speed = 0.5;
 
-            displayLogMessage("Key press");
+            // displayLogMessage("Key press");
 
             switch( keyEvent->key() )
             {
@@ -1794,11 +1835,11 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             // Don't process auto repeat release events. Just the actual key release.
             if (keyEvent->isAutoRepeat())
             {
-                displayLogMessage("Ignoring auto repeat release.");
+                // displayLogMessage("Ignoring auto repeat release.");
                 return rqt_gui_cpp::Plugin::eventFilter(target, event);
             }
 
-            displayLogMessage("Key release");
+            // displayLogMessage("Key release");
 
             if (keyEvent->key() == Qt::Key_I || keyEvent->key() == Qt::Key_J || keyEvent->key() == Qt::Key_K || keyEvent->key() == Qt::Key_L )
             {
