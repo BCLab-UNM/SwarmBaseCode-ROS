@@ -243,8 +243,8 @@ void setVelocity(double linearVel, double angularVel)
   // Stopping and starting the timer causes it to start counting from 0 again.
   // As long as this is called before the kill swith timer reaches killSwitchTimeout seconds
   // the rover's kill switch wont be called.
-  //killSwitchTimer.stop();
-  //killSwitchTimer.start();
+  killSwitchTimer.stop();
+  killSwitchTimer.start();
   
   velocity.linear.x = linearVel * 1.5;
   velocity.angular.z = angularVel * 8; //scaling factor for sim; removed by aBridge node
