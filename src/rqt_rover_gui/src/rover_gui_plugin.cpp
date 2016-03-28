@@ -484,8 +484,8 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     QString model_path = QDir::homePath()+"/rover_workspace/simulation/models/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
     readRoverModelXML(model_path);
 
-    setupSubscribers();
     setupPublishers();
+    setupSubscribers();
 
     displayLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
     ui.map_frame->setRoverMapToDisplay(selected_rover_name);
@@ -641,21 +641,24 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.rover_list->addItem(new_item);
     }
 
+    setupPublishers();
     setupSubscribers();
 }
 
 void RoverGUIPlugin::setupPublishers()
 {
     // Set the robot to accept manual control. Latch so even if the robot connects later it will get the message.
-
-    string control_mode_topic = "/"+selected_rover_name+"/mode";
-
-    control_mode_publishers[selected_rover_name]=nh.advertise<std_msgs::UInt8>(control_mode_topic, 10, true); // last argument sets latch to true
-
-    string joystick_topic = "/"+selected_rover_name+"/joystick";
-    displayLogMessage("Setting up joystick publisher " + QString::fromStdString(joystick_topic));
-    joystick_publisher = nh.advertise<geometry_msgs::Twist>(joystick_topic, 10, this);
     
+    if (!selected_rover_name.empty()) {
+		string control_mode_topic = "/"+selected_rover_name+"/mode";
+
+		control_mode_publishers[selected_rover_name]=nh.advertise<std_msgs::UInt8>(control_mode_topic, 10, true); // last argument sets latch to true
+
+		string joystick_topic = "/"+selected_rover_name+"/joystick";
+		displayLogMessage("Setting up joystick publisher " + QString::fromStdString(joystick_topic));
+		joystick_publisher = nh.advertise<geometry_msgs::Twist>(joystick_topic, 10, this);
+	}
+	    
     set<string>::iterator rover_it;
     for (rover_it = rover_names.begin(); rover_it != rover_names.end(); rover_it++)
     {
