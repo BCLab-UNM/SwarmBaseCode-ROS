@@ -1228,7 +1228,6 @@ void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
         displayLogMessage("Visualizing simulation...");
 
         QProcess* sim_client_process = sim_mgr.startGazeboClient();
-        connect(sim_client_process, SIGNAL(finished(int)), this, SLOT(gazeboClientFinishedEventHandler()));
     }
     else
     {
@@ -1806,14 +1805,6 @@ void RoverGUIPlugin::readRoverModelXML(QString path)
     //cout << "GPS Ref. Lat. " << gps_reference_lat.toStdString() << endl;
 
 }
-
-void RoverGUIPlugin::gazeboClientFinishedEventHandler()
-{
-    displayLogMessage("Gazebo client exited");
-    display_sim_visualization = false;
-    sim_mgr.cleanUpGazeboClient();
-}
-
 
 void RoverGUIPlugin::gazeboServerFinishedEventHandler()
 {
