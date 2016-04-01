@@ -12,6 +12,12 @@ GazeboSimManager::GazeboSimManager()
     gazebo_client_process = NULL;
     gazebo_server_process = NULL;
     command_process = NULL;
+
+    // Set the app_root by reading the evvironment variable SWARMATHON_APP_ROOT ideally set by the run.sh script.
+    const char *name = "SWARMATHON_APP_ROOT";
+    char *app_root_cstr;
+    app_root_cstr = getenv(name);
+    app_root = QString(app_root_cstr);
 }
 
 QProcess* GazeboSimManager::startGazeboServer()
@@ -20,9 +26,9 @@ QProcess* GazeboSimManager::startGazeboServer()
 
     gazebo_server_process = new QProcess();
 
-    QString command = QString("rosrun gazebo_ros gzserver ") + QDir::homePath() + QString("/rover_workspace/simulation/worlds/swarmathon.world");
+    QString command = QString("rosrun gazebo_ros gzserver ") + app_root + "/simulation/worlds/swarmathon.world";
 
-    gazebo_server_process->startDetached(command);//QStringList() << "/home/oDx/Documents/a.txt");
+    gazebo_server_process->startDetached(command);
 
     gazebo_server_process->waitForStarted();
 
@@ -147,7 +153,7 @@ QString GazeboSimManager::stopRoverNode( QString rover_name )
 
 QString GazeboSimManager::startRoverNode( QString rover_name )
 {
-    QString argument = "roslaunch ~/rover_workspace/launch/"+rover_name+".launch name:="+rover_name;
+    QString argument = "roslaunch "+app_root+"/launch/"+rover_name+".launch name:="+rover_name;
 
     QProcess* rover_process = new QProcess();
 
@@ -160,7 +166,7 @@ QString GazeboSimManager::startRoverNode( QString rover_name )
 
 QString GazeboSimManager::addGroundPlane( QString ground_name )
 {
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + ground_name + "/model.sdf -model " + ground_name;
+    QString argument = QString("rosrun gazebo_ros spawn_model -sdf -file ")+app_root+"/simulation/models/" + ground_name + "/model.sdf -model " + ground_name;
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
 
@@ -178,12 +184,12 @@ QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z
     float rover_clearance = 0.45; //meters
     model_locations.insert(make_tuple(x, y, rover_clearance));
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + rover_name + "/model.sdf "
-            + "-model " + rover_name
-            + " -x " + QString::number(x)
-            + " -y " + QString::number(y)
-            + " -z " + QString::number(z);
-            + " -Y " + QString::number(M_PI);
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file "+app_root+"/simulation/models/" + rover_name + "/model.sdf "
+               + "-model " + rover_name
+               + " -x " + QString::number(x)
+               + " -y " + QString::number(y)
+               + " -z " + QString::number(z);
+               + " -Y " + QString::number(M_PI);
 
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
@@ -239,7 +245,7 @@ QString GazeboSimManager::addModel(QString model_name, QString unique_id, float 
 {
     model_locations.insert(make_tuple(x, y, clearance));
 
-    QString argument = "rosrun gazebo_ros spawn_model -sdf -file ~/rover_workspace/simulation/models/" + model_name + "/model.sdf "
+    QString argument = "rosrun gazebo_ros spawn_model -sdf -file "+app_root+"/simulation/models/" + model_name + "/model.sdf "
             + "-model " + unique_id
             + " -x "    + QString::number(x)
             + " -y "    + QString::number(y)
