@@ -1,7 +1,6 @@
 #include <ros/ros.h>
 
 //ROS libraries
-#include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
 
 //ROS messages
@@ -87,10 +86,10 @@ int main(int argc, char **argv) {
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
-    imu.header.frame_id = "base_link";
+    imu.header.frame_id = publishedName+"/base_link";
     
-    odom.header.frame_id = "odom";
-    odom.child_frame_id = "base_link";
+    odom.header.frame_id = publishedName+"/odom";
+    odom.child_frame_id = publishedName+"/base_link";
     
     ros::spin();
     
@@ -128,17 +127,6 @@ void publishRosTopics() {
     sonarLeftPublish.publish(sonarLeft);
     sonarCenterPublish.publish(sonarCenter);
     sonarRightPublish.publish(sonarRight);
-    
-    tf::TransformBroadcaster odomTransformPublish;
-    geometry_msgs::TransformStamped odomTransform;
-    odomTransform.header.stamp = ros::Time::now();
-    odomTransform.header.frame_id = "odom";
-    odomTransform.child_frame_id = "base_link";
-    odomTransform.transform.translation.x = odom.pose.pose.position.x;
-    odomTransform.transform.translation.y = odom.pose.pose.position.y;
-    odomTransform.transform.translation.z = 0.0;
-    odomTransform.transform.rotation = odom.pose.pose.orientation;
-    odomTransformPublish.sendTransform(odomTransform);
 }
 
 void parseData(string str) {

@@ -19,6 +19,11 @@ else
 
 fi
 
+
+#Set prefix to fully qualify transforms for each robot
+rosparam set tf_prefix $HOSTNAME
+
+
 #Function to lookup correct path for a given device
 findDevicePath() {
     for sysdevpath in $(find /sys/bus/usb/devices/usb*/ -name dev); do
