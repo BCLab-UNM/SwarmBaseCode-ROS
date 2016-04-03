@@ -176,57 +176,58 @@ void RoverGUIPlugin::restoreSettings(const qt_gui_cpp::Settings& plugin_settings
 
 void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 {
+     if (joystick_publisher)
+        {
+        //Set the gui values. Filter values to be large enough to move the physical rover.
+        if (joy_msg->axes[4] >= 0.1)
+        {
+            emit joystickForwardUpdate(joy_msg->axes[4]);
+        }
+        if (joy_msg->axes[4] <= -0.1)
+        {
+            emit joystickBackUpdate(-joy_msg->axes[4]);
+        }
+        //If value is too small, display 0.
+        if (abs(joy_msg->axes[4]) < 0.1)
+        {
+            emit joystickForwardUpdate(0);
+            emit joystickBackUpdate(0);
+        }
 
-    //Set the gui values. Filter values to be large enough to move the physical rover.
-    if (joy_msg->axes[4] >= 0.1)
-    {
-        emit joystickForwardUpdate(joy_msg->axes[4]);
-    }
-    if (joy_msg->axes[4] <= -0.1)
-    {
-        emit joystickBackUpdate(-joy_msg->axes[4]);
-    }
-    //If value is too small, display 0.
-    if (abs(joy_msg->axes[4]) < 0.1)
-    {
-        emit joystickForwardUpdate(0);
-        emit joystickBackUpdate(0);
-    }
+        if (joy_msg->axes[3] >= 0.1)
+        {
+            emit joystickLeftUpdate(joy_msg->axes[3]);
+        }
+        if (joy_msg->axes[3] <= -0.1)
+        {
+            emit joystickRightUpdate(-joy_msg->axes[3]);
+        }
+        //If value is too small, display 0.
+        if (abs(joy_msg->axes[3]) < 0.1)
+        {
+            emit joystickLeftUpdate(0);
+            emit joystickRightUpdate(0);
+        }
 
-    if (joy_msg->axes[3] >= 0.1)
-    {
-        emit joystickLeftUpdate(joy_msg->axes[3]);
-    }
-    if (joy_msg->axes[3] <= -0.1)
-    {
-        emit joystickRightUpdate(-joy_msg->axes[3]);
-    }
-    //If value is too small, display 0.
-    if (abs(joy_msg->axes[3]) < 0.1)
-    {
-        emit joystickLeftUpdate(0);
-        emit joystickRightUpdate(0);
-    }
+        // Magic axis values in the code below were taken the rover_driver_rqt_motor code /joystick output for default linear and angular velocities.
+        // Magic indicies are taken from rover_motor.cpp.
+        // This way the code is consistent with the existing GUI joystick.
+        // A better way would be to standardize a manual movement control interface and requre all input mechanisms to take input from the user
+        // and repackage te information according to the interface spec.
+        geometry_msgs::Twist standardized_joy_msg;
 
-// Magic axis values in the code below were taken the rover_driver_rqt_motor code /joystick output for default linear and angular velocities.
-// Magic indicies are taken from rover_motor.cpp.
-// This way the code is consistent with the existing GUI joystick.
-// A better way would be to standardize a manual movement control interface and requre all input mechanisms to take input from the user
-// and repackage te information according to the interface spec.
-    geometry_msgs::Twist standardized_joy_msg;
+        if (abs(joy_msg->axes[4]) >= 0.1)
+        {
+          standardized_joy_msg.linear.x = joy_msg->axes[4];
+        }
 
-    if (abs(joy_msg->axes[4]) >= 0.1)
-    {
-      standardized_joy_msg.linear.x = joy_msg->axes[4];
+        if (abs(joy_msg->axes[3]) >= 0.1)
+        {
+          standardized_joy_msg.angular.z = joy_msg->axes[3];
+        }
+
+        joystick_publisher.publish(standardized_joy_msg);
     }
-
-    if (abs(joy_msg->axes[3]) >= 0.1)
-    {
-      standardized_joy_msg.angular.z = joy_msg->axes[3];
-    }
-
-    joystick_publisher.publish(standardized_joy_msg);
-
 }
 
 void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event)
