@@ -138,7 +138,7 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
-    ui.joystick_frame->setHidden(true);
+    ui.joystick_frame->setHidden(false);
 
     ui.tab_widget->setCurrentIndex(0);
 
@@ -532,6 +532,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
             ui.joystick_control_radio_button->setChecked(false);
             ui.autonomous_control_radio_button->setChecked(true);
             ui.joystick_frame->setHidden(true);
+            autonomousRadioButtonEventHandler(true); // Manually trigger the autonomous selected event
             break;
         default:
             displayLogMessage("Unknown control state: "+QString::number(control_state));
@@ -773,6 +774,9 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
     //Enable all stop button
     ui.all_stop_button->setEnabled(true);
     ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
+
+    //Hide joystick frame
+    ui.joystick_frame->setHidden(true);
 }
 
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
@@ -795,6 +799,9 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
     ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
+    
+    //Show joystick frame
+    ui.joystick_frame->setHidden(false);
 }
 
 void RoverGUIPlugin::allAutonomousButtonEventHandler()
