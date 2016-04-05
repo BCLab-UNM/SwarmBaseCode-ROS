@@ -147,7 +147,6 @@ namespace rqt_rover_gui {
     void buildSimulationButtonEventHandler();
     void clearSimulationButtonEventHandler();
     void visualizeSimulationButtonEventHandler();
-    void gazeboClientFinishedEventHandler();
     void gazeboServerFinishedEventHandler();  
     void displayLogMessage(QString msg);
 
