@@ -3,6 +3,7 @@ project(rqt_rover_gui)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+#Get version info from git and pass it into compiled code
 execute_process(COMMAND git describe --tags --abbrev=0
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_VERSION)
@@ -12,7 +13,8 @@ execute_process(COMMAND date "+%Y-%m-%d-%H:%M"
     OUTPUT_VARIABLE BUILD_TIME)
 string(STRIP ${BUILD_TIME} BUILD_TIME)
 
-set_source_files_properties(src/rover_gui_plugin.cpp PROPERTIES COMPILE_DEFINITIONS "GIT_VERSION=\"${GIT_VERSION}\";BUILD_TIME=\"${BUILD_TIME}\"")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/Version.cpp)
+set(version_file "${CMAKE_CURRENT_BINARY_DIR}/Version.cpp")
 
 set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
@@ -74,6 +76,7 @@ link_directories(
 
 add_library(
   rqt_rover_gui
+  ${version_file}
   src/GazeboSimManager.cpp
   src/rover_gui_plugin.cpp
   src/CameraFrame.cpp

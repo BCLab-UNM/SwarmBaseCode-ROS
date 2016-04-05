@@ -5,6 +5,7 @@
 // License: GPL3
 
 #include <rover_gui_plugin.h>
+#include <Version.h>
 #include <pluginlib/class_list_macros.h>
 #include <QDir>
 #include <QtXml>
@@ -93,10 +94,10 @@ namespace rqt_rover_gui
     widget->setFocus();
 
     // GIT_VERSION is passed in as a compile time definition (see CMakeLists.txt). The version is taken from the last git tag.
-    QString version_qstr("<font color='white'>"+QString::fromUtf8(GIT_VERSION)+"</font>");
+    QString version_qstr("<font color='white'>"+GIT_VERSION+"</font>");
     ui.version_number_label->setText(version_qstr);
 
-    widget->setWindowTitle("Rover Interface: Built on " + QString::fromUtf8(BUILD_TIME) );
+    widget->setWindowTitle("Rover Interface: Built on " + BUILD_TIME );
 
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
