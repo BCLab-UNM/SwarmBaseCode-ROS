@@ -32,6 +32,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Range.h>
 #include <sensor_msgs/Imu.h>
+#include <std_msgs/String.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/UInt8.h>
 #include <pluginlib/class_list_macros.h>
@@ -86,6 +87,7 @@ namespace rqt_rover_gui {
     QString startROSJoyNode();
     QString stopROSJoyNode();
 
+    void statusEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
@@ -173,6 +175,7 @@ namespace rqt_rover_gui {
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
 
+    map<string,ros::Subscriber> status_subscribers;
     map<string,ros::Subscriber> obstacle_subscribers;
     map<string,ros::Subscriber> targetDropOffSubscribers;
     map<string,ros::Subscriber> targetPickUpSubscribers;
@@ -191,6 +194,7 @@ namespace rqt_rover_gui {
     GazeboSimManager sim_mgr;
 
     map<string,int> rover_control_state;
+    map<string,string> rover_statuses;
 
     float arena_dim; // in meters
 
