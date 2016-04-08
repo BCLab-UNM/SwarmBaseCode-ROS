@@ -7,7 +7,7 @@ set(CMAKE_BUILD_TYPE Debug)
 execute_process(COMMAND git describe --tags --abbrev=0
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_VERSION)
-string(STRIP ${GIT_VERSION} GIT_VERSION)
+string(STRIP "${GIT_VERSION}" GIT_VERSION)
 
 execute_process(COMMAND date "+%Y-%m-%d-%H:%M"
     OUTPUT_VARIABLE BUILD_TIME)

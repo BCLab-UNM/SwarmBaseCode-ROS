@@ -453,6 +453,24 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
     }
 }
 
+// Receives and stores the status update messages from rovers
+void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String const> &event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    // Extract rover name from the message source. Publisher is in the format /*rover_name*_MOBILITY
+    size_t found = publisher_name.find("_MOBILITY");
+    string rover_name = publisher_name.substr(1,found-1);
+
+    const std_msgs::StringConstPtr& msg = event.getMessage();
+
+    string status = msg->data;
+
+    rover_statuses[rover_name] = status;
+}
+
 // Counts the number of obstacle avoidance calls
 void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs::UInt8> &event)
 {
@@ -479,7 +497,15 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     if (!current) return; // Check to make sure the current selection isn't null
 
-    selected_rover_name = current->text().toStdString();
+    // Extract rover name
+    string rover_name_and_status = current->text().toStdString();
+
+    // Rover names start at the begining of the rover name and status string and end at the first space
+    size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+    string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+
+    selected_rover_name = ui_rover_name;
+
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
@@ -566,7 +592,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         displayLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
         ui.map_frame->clearMap(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
-        
+        rover_statuses.erase(*it);
+
         // If the currently selected rover disconnected, shutdown its subscribers and publishers
         if (it->compare(selected_rover_name) == 0)
         {
@@ -584,6 +611,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         // For the other rovers that disconnected...
 
         // Shutdown the subscribers
+        status_subscribers[*it].shutdown();
         encoder_subscribers[*it].shutdown();
         gps_subscribers[*it].shutdown();
         ekf_subscribers[*it].shutdown();
@@ -591,6 +619,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         targetDropOffSubscribers[*it].shutdown();
 
         // Delete the subscribers
+        status_subscribers.erase(*it);
         encoder_subscribers.erase(*it);
         gps_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
@@ -630,6 +659,43 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
     if (new_rover_names == rover_names)
     {
+
+        // Just update the statuses in ui rover list
+        for(int row = 0; row < ui.rover_list->count(); row++)
+        {
+            QListWidgetItem *item = ui.rover_list->item(row);
+
+            // Extract rover name
+            string rover_name_and_status = item->text().toStdString();
+
+            // Rover names start at the begining of the rover name and status string and end at the first space
+            size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+            string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+
+            // Get current status
+
+            QString updated_rover_status = "";
+            // Build new ui rover list string
+            try
+            {
+                updated_rover_status = QString::fromStdString(rover_statuses.at(ui_rover_name));
+            }
+            catch (std::out_of_range& e)
+            {
+                emit displayLogMessage("Error: No status entry for rover " + QString::fromStdString(ui_rover_name));
+            }
+
+
+            // Build new ui rover list string
+            QString updated_rover_name_and_status = QString::fromStdString(ui_rover_name)
+                                                    + " ("
+                                                    + updated_rover_status
+                                                    + ")";
+
+            // Update the UI
+            item->setText(updated_rover_name_and_status);
+        }
+
         return;
     }
 
@@ -644,24 +710,44 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     ui.all_autonomous_button->setEnabled(true);
     ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
 
+    // This code is from above. Consider moving into a function or restructuring
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
     {
-        QListWidgetItem* new_item = new QListWidgetItem(QString::fromStdString(*i));
-        new_item->setForeground(Qt::red);
-        ui.rover_list->addItem(new_item);
-        
         //Set up publishers
         control_mode_publishers[*i]=nh.advertise<std_msgs::UInt8>("/"+*i+"/mode", 10, true); // last argument sets latch to true
         targetPickUpPublisher[*i] = nh.advertise<std_msgs::Int16>("/"+*i+"/targetPickUpValue", 10, this);
         targetDropOffPublisher[*i] = nh.advertise<std_msgs::Int16>("/"+*i+"/targetDropOffValue", 10, this);
-        
+
         //Set up subscribers
+        status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
         obstacle_subscribers[*i] = nh.subscribe("/"+*i+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
         encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
         targetPickUpSubscribers[*i] = nh.subscribe("/"+*i+"/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
         targetDropOffSubscribers[*i] = nh.subscribe("/"+*i+"/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
+
+        QString rover_status = "";
+        // Build new ui rover list string
+        try
+        {
+            rover_status = QString::fromStdString(rover_statuses.at(*i));
+        }
+        catch (std::out_of_range& e)
+        {
+            displayLogMessage("No status entry for rover " + QString::fromStdString(*i));
+        }
+
+        QString rover_name_and_status = QString::fromStdString(*i) // Add the rover name
+                                                + " (" // Delimiters needed for parsing the rover name and status when read
+                                                +  rover_status // Add the rover status
+                                                + ")";
+
+        QListWidgetItem* new_item = new QListWidgetItem(rover_name_and_status);
+        new_item->setForeground(Qt::red);
+        ui.rover_list->addItem(new_item);
+        
+
     }
 }
 
@@ -1125,11 +1211,18 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     us_left_subscriber.shutdown();
     us_right_subscriber.shutdown();
     imu_subscriber.shutdown();
-    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
 
+    // Possible error - the following seems to shutdown all subscribers not just those from simulation
+
+    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) it->second.shutdown();
+    status_subscribers.clear();
+
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
     obstacle_subscribers.clear();
+
     for (map<string,ros::Subscriber>::iterator it=targetPickUpSubscribers.begin(); it!=targetPickUpSubscribers.end(); ++it) it->second.shutdown();
     targetPickUpSubscribers.clear();
+
     for (map<string,ros::Subscriber>::iterator it=targetDropOffSubscribers.begin(); it!=targetDropOffSubscribers.end(); ++it) it->second.shutdown();
     targetDropOffSubscribers.clear();
     camera_subscriber.shutdown();
