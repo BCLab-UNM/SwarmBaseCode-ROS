@@ -456,13 +456,13 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
 // Receives and stores the status update messages from rovers
 void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String const> &event)
 {
-    const std::string& publisher_name = event.getPublisherName();
     const ros::M_string& header = event.getConnectionHeader();
     ros::Time receipt_time = event.getReceiptTime();
 
-    // Extract rover name from the message source. Publisher is in the format /*rover_name*_MOBILITY
-    size_t found = publisher_name.find("_MOBILITY");
-    string rover_name = publisher_name.substr(1,found-1);
+    // Extract rover name from the message source
+    string topic = header.at("topic");
+    size_t found = topic.find("/status");
+    string rover_name = topic.substr(1,found-1);
 
     const std_msgs::StringConstPtr& msg = event.getMessage();
 
