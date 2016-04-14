@@ -30,7 +30,7 @@ namespace gazebo
       physicsMsg.set_type(msgs::Physics::ODE);
 
       // Set the step time
-      physicsMsg.set_max_step_size(0.01);
+      physicsMsg.set_max_step_size(0.001);
 
       // Change gravity
       //msgs::Set(physicsMsg.mutable_gravity(), math::Vector3(0.01, 0, 0.1));

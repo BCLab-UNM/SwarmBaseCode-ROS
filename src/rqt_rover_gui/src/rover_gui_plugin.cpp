@@ -23,6 +23,7 @@
 #include <QProgressDialog>
 #include <QStringList>
 #include <QLCDNumber>
+#include <QFileDialog>
 #include <QComboBox>
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
@@ -123,6 +124,8 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(joystickRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
     connect(this, SIGNAL(updateLog(QString)), this, SLOT(displayLogMessage(QString)));
+    connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
+    connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -140,6 +143,9 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
     ui.joystick_frame->setHidden(false);
+
+    ui.custom_world_path_button->setDisabled(true);
+    ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     ui.tab_widget->setCurrentIndex(0);
 
@@ -971,6 +977,45 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
 }
 
+// Get the path to the world file containing the custom distribution from the user
+void RoverGUIPlugin::customWorldButtonEventHandler()
+{
+    const char *name = "SWARMATHON_APP_ROOT";
+    char *app_root_cstr;
+    app_root_cstr = getenv(name);
+    QString app_root = QString(app_root_cstr) + "/simulation/worlds/";
+
+    QString path = QFileDialog::getOpenFileName(widget, tr("Open File"),
+                                                    app_root,
+                                                    tr("Gazebo World File (*.world)"));
+
+    sim_mgr.setCustomWorldPath(path);
+    emit displayLogMessage("User selected custom world path: " + path);
+
+    // Extract the base filename for short display
+    QFileInfo fi=path;
+    ui.custom_world_path->setText(fi.baseName());
+}
+
+// Enable or disable custom distributions
+void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
+{
+    ui.custom_world_path_button->setEnabled(toggled);
+
+    // Set the button color to reflect whether or not it is disabled
+    // Clear the sim path if custom distribution it deselected
+    if( toggled )
+    {
+        ui.custom_world_path_button->setStyleSheet("color: white; border:2px solid white;");
+    }
+    else
+    {
+        sim_mgr.setCustomWorldPath("");
+        ui.custom_world_path->setText("");
+        ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+    }
+}
+
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
 {
     displayLogMessage("Building simulation...");
@@ -1349,7 +1394,7 @@ QString RoverGUIPlugin::addUniformTargets()
     // (before checking for collisions including the collection disk at the center)
     float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_1_clearance);
 
-    for (int i = 0; i < 256; i++)
+    for (int i = 0; i < 192; i++)
     {
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
@@ -1367,6 +1412,28 @@ QString RoverGUIPlugin::addUniformTargets()
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     }
     displayLogMessage("Placed 256 single targets");
+
+    // Four piles of 64
+    for (int i = 3; i < 4; i++)
+    {
+        // Keep GUI responsive
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        do
+        {
+            displayLogMessage("Tried to place cluster "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
+        }
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
+        displayLogMessage("<font color=green>Succeeded.</font>");
+
+        progress_dialog.setValue(i*100.0f/4);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        output = sim_mgr.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_64_clearance);
+        displayLogMessage(output);
+    }
 
     return output;
 }
