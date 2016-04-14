@@ -466,10 +466,8 @@ void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String
     ros::Time receipt_time = event.getReceiptTime();
 
     // Extract rover name from the message source
-<<<<<<< HEAD
+
     // This method is used rather than reading the publisher name to accomodate teams that changed the node name.
-=======
->>>>>>> 91498af2d2c4b9a021eba4817664ac1777b8d1c0
     string topic = header.at("topic");
     size_t found = topic.find("/status");
     string rover_name = topic.substr(1,found-1);
