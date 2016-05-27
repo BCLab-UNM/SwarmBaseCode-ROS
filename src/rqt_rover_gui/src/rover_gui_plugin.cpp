@@ -210,24 +210,7 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
             emit joystickRightUpdate(0);
         }
 
-        // Magic axis values in the code below were taken the rover_driver_rqt_motor code /joystick output for default linear and angular velocities.
-        // Magic indicies are taken from rover_motor.cpp.
-        // This way the code is consistent with the existing GUI joystick.
-        // A better way would be to standardize a manual movement control interface and requre all input mechanisms to take input from the user
-        // and repackage te information according to the interface spec.
-        geometry_msgs::Twist standardized_joy_msg;
-
-        if (abs(joy_msg->axes[4]) >= 0.1)
-        {
-          standardized_joy_msg.linear.x = joy_msg->axes[4];
-        }
-
-        if (abs(joy_msg->axes[3]) >= 0.1)
-        {
-          standardized_joy_msg.angular.z = joy_msg->axes[3];
-        }
-
-        joystick_publisher.publish(standardized_joy_msg);
+        joystick_publisher.publish(joy_msg);
     }
 }
 
@@ -872,7 +855,7 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     rover_control_state[selected_rover_name] = 1;
     displayLogMessage("Setting up joystick publisher " + QString::fromStdString("/"+selected_rover_name+"/joystick"));
-    joystick_publisher = nh.advertise<geometry_msgs::Twist>("/"+selected_rover_name+"/joystick", 10, this);
+    joystick_publisher = nh.advertise<sensor_msgs::Joy>("/"+selected_rover_name+"/joystick", 10, this);
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control
@@ -1868,7 +1851,9 @@ void RoverGUIPlugin::gazeboServerFinishedEventHandler()
 
 bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 {
-    geometry_msgs::Twist standardized_joy_msg;
+    sensor_msgs::Joy joy_msg;
+    joy_msg.axes = {0.0,0.0,0.0,0.0,0.0,0.0};
+    
     if (joystick_publisher)
     {
 
@@ -1885,19 +1870,19 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             switch( keyEvent->key() )
             {
             case Qt::Key_I:
-                standardized_joy_msg.linear.x = speed;
+                joy_msg.axes[4] = speed;
                 ui.joy_lcd_forward->display(speed);
                 break;
             case Qt::Key_K:
-                standardized_joy_msg.linear.x = -speed;
+                joy_msg.axes[4] = -speed;
                 ui.joy_lcd_back->display(speed);
                 break;
             case Qt::Key_J:
-                standardized_joy_msg.angular.z = speed;
+                joy_msg.axes[3] = speed;
                 ui.joy_lcd_left->display(speed);
                 break;
             case Qt::Key_L:
-                standardized_joy_msg.angular.z = -speed;
+                joy_msg.axes[3] = -speed;
                 ui.joy_lcd_right->display(speed);
                 break;
             default:
@@ -1907,7 +1892,7 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 
             if (direction_key )
             {
-                joystick_publisher.publish(standardized_joy_msg);
+                joystick_publisher.publish(joy_msg);
                 return true;
             }
         }
@@ -1928,14 +1913,14 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 
             if (keyEvent->key() == Qt::Key_I || keyEvent->key() == Qt::Key_J || keyEvent->key() == Qt::Key_K || keyEvent->key() == Qt::Key_L )
             {
-                standardized_joy_msg.linear.x = 0;
-                standardized_joy_msg.angular.z = 0;
+                joy_msg.axes[4] = 0;
+                joy_msg.axes[3] = 0;
                 ui.joy_lcd_forward->display(0);
                 ui.joy_lcd_back->display(0);
                 ui.joy_lcd_left->display(0);
                 ui.joy_lcd_right->display(0);
 
-                joystick_publisher.publish(standardized_joy_msg);
+                joystick_publisher.publish(joy_msg);
                 return true;
 
             }
