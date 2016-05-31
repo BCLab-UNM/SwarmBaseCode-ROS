@@ -58,6 +58,8 @@ ros::Publisher status_publisher;
 ros::Publisher targetCollectedPublish;
 ros::Publisher targetPickUpPublish;
 ros::Publisher targetDropOffPublish;
+ros::Publisher fingerAnglePublish;
+ros::Publisher wristAnglePublish;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -76,7 +78,7 @@ ros::Timer killSwitchTimer;
 void sigintEventHandler(int signal);
 
 //Callback handlers
-void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message);
+void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const shared_messages::TagsImage::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
@@ -127,6 +129,8 @@ int main(int argc, char **argv) {
     targetCollectedPublish = mNH.advertise<std_msgs::Int16>(("targetsCollected"), 1, true);
     targetPickUpPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetPickUpImage"), 1, true);
     targetDropOffPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetDropOffImage"), 1, true);
+    fingerAnglePublish = mNH.advertise<std_msgs::Int16>((publishedName + "/fingerAngle"), 1, true);
+    wristAnglePublish = mNH.advertise<std_msgs::Int16>((publishedName + "/wristAngle"), 1, true);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     //killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
@@ -335,11 +339,29 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 	currentLocation.theta = yaw;
 }
 
-void joyCmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
-    if (currentMode == 0 || currentMode == 1) 
-      {
-	setVelocity(message->linear.x, message->angular.z);
-      } 
+void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
+	if (currentMode == 0 || currentMode == 1) {
+		setVelocity(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
+		
+		std_msgs::Int16 angle;
+		if (message->axes[6] < 0.) {
+			angle.data = -1;
+			fingerAnglePublish.publish(angle);
+		}
+		else if (message->axes[6] > 0.) {
+			angle.data = -2;
+			fingerAnglePublish.publish(angle);
+		}
+		
+		if (message->axes[7] > 0.) {
+			angle.data = -1;
+			wristAnglePublish.publish(angle);
+		}
+		else if (message->axes[7] < 0.) {
+			angle.data = -2;
+			wristAnglePublish.publish(angle);
+		}
+	} 
 }
 
 

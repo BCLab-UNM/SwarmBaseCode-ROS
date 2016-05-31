@@ -4,6 +4,7 @@
 #include <tf/transform_datatypes.h>
 
 //ROS messages
+#include <std_msgs/Int16.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Twist.h>
@@ -18,6 +19,8 @@ using namespace std;
 
 //aBridge functions
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
+void fingerAngleHandler(const std_msgs::Int16::ConstPtr& angle);
+void wristAngleHandler(const std_msgs::Int16::ConstPtr& angle);
 void serialActivityTimer(const ros::TimerEvent& e);
 void publishRosTopics();
 void parseData(string data);
@@ -48,6 +51,8 @@ ros::Publisher sonarRightPublish;
 
 //Subscribers
 ros::Subscriber velocitySubscriber;
+ros::Subscriber fingerAngleSubscriber;
+ros::Subscriber wristAngleSubscriber;
 
 //Timers
 ros::Timer publishTimer;
@@ -83,6 +88,8 @@ int main(int argc, char **argv) {
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     
     velocitySubscriber = aNH.subscribe((publishedName + "/velocity"), 10, cmdHandler);
+    fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle"), 1, fingerAngleHandler);
+    wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle"), 1, wristAngleHandler);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
@@ -113,6 +120,18 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     }
     
     memset(&moveCmd, '\0', sizeof (moveCmd));
+}
+
+void fingerAngleHandler(const std_msgs::Int16::ConstPtr& angle) {
+	sprintf(moveCmd, "f,%d\n", angle->data);
+	usb.sendData(moveCmd);
+	memset(&moveCmd, '\0', sizeof (moveCmd));
+}
+
+void wristAngleHandler(const std_msgs::Int16::ConstPtr& angle) {
+	sprintf(moveCmd, "w,%d\n", angle->data);
+	usb.sendData(moveCmd);
+	memset(&moveCmd, '\0', sizeof (moveCmd));
 }
 
 void serialActivityTimer(const ros::TimerEvent& e) {
