@@ -60,6 +60,7 @@ ros::Publisher targetPickUpPublish;
 ros::Publisher targetDropOffPublish;
 ros::Publisher fingerAnglePublish;
 ros::Publisher wristAnglePublish;
+ros::Publisher infoLogPublisher;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -131,11 +132,15 @@ int main(int argc, char **argv) {
     targetDropOffPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetDropOffImage"), 1, true);
     fingerAnglePublish = mNH.advertise<std_msgs::Int16>((publishedName + "/fingerAngle"), 1, true);
     wristAnglePublish = mNH.advertise<std_msgs::Int16>((publishedName + "/wristAngle"), 1, true);
+    infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     //killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
     stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
-    
+
+    std_msgs::String msg;
+    msg.data = "Log Started";
+    infoLogPublisher.publish(msg);
     ros::spin();
     
     return EXIT_SUCCESS;

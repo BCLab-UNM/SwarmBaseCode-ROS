@@ -157,6 +157,8 @@ namespace rqt_rover_gui
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
+
+    info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -1938,6 +1940,24 @@ void RoverGUIPlugin::receiveLogMessage(QString msg)
 {
     displayLogMessage(msg);
 }
+
+void RoverGUIPlugin::infoLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const boost::shared_ptr<const std_msgs::String> msg = event.getMessage();
+
+    string log_msg = msg->data;
+
+    emit sendLogMessage(QString::fromStdString(publisher_name)
+                           + " <font color=Lime size=1>"
+                           + QString::fromStdString(log_msg)
+                           + "</font>");
+}
+
+
 // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
 void RoverGUIPlugin::refocusKeyboardEventHandler()
 {
