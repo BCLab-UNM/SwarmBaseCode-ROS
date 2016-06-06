@@ -102,6 +102,8 @@ namespace rqt_rover_gui {
     void rightUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
+    void infoLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
+
     void addModelToGazebo();
     QString addPowerLawTargets();
     QString addUniformTargets();
@@ -175,6 +177,7 @@ namespace rqt_rover_gui {
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
+    ros::Subscriber info_log_subscriber;
 
     map<string,ros::Subscriber> status_subscribers;
     map<string,ros::Subscriber> obstacle_subscribers;
