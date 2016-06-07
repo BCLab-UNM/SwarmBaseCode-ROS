@@ -103,6 +103,8 @@ namespace rqt_rover_gui {
     void IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg);
 
     void infoLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
+    void diagLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
+
 
     void addModelToGazebo();
     QString addPowerLawTargets();
@@ -128,7 +130,8 @@ namespace rqt_rover_gui {
 
   signals:
 
-    void sendLogMessage(QString); // log message updates need to be implemented as signals so they can be used in ROS event handlers.
+    void sendInfoLogMessage(QString); // log message updates need to be implemented as signals so they can be used in ROS event handlers.
+    void sendDiagLogMessage(QString);
     void joystickForwardUpdate(double);
     void joystickBackUpdate(double);
     void joystickLeftUpdate(double);
@@ -137,7 +140,8 @@ namespace rqt_rover_gui {
 
   private slots:
 
-    void receiveLogMessage(QString);
+    void receiveInfoLogMessage(QString);
+    void receiveDiagLogMessage(QString);
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
     void pollRoversTimerEventHandler();
     void GPSCheckboxToggledEventHandler(bool checked);
@@ -153,7 +157,8 @@ namespace rqt_rover_gui {
     void clearSimulationButtonEventHandler();
     void visualizeSimulationButtonEventHandler();
     void gazeboServerFinishedEventHandler();  
-    void displayLogMessage(QString msg);
+    void displayInfoLogMessage(QString msg);
+    void displayDiagLogMessage(QString msg);
 
     // Needed to refocus the keyboard events when the user clicks on the widget list
     // to the main widget so keyboard manual control is handled properly
@@ -178,6 +183,7 @@ namespace rqt_rover_gui {
     ros::Subscriber us_right_subscriber;
     ros::Subscriber imu_subscriber;
     ros::Subscriber info_log_subscriber;
+    ros::Subscriber diag_log_subscriber;
 
     map<string,ros::Subscriber> status_subscribers;
     map<string,ros::Subscriber> obstacle_subscribers;
@@ -194,7 +200,9 @@ namespace rqt_rover_gui {
     QProcess* joy_process;
     QTimer* rover_poll_timer; // for rover polling
 
-    QString log_messages;
+    QString info_log_messages;
+    QString diag_log_messages;
+
     GazeboSimManager sim_mgr;
 
     map<string,int> rover_control_state;

@@ -1,4 +1,5 @@
 <launch>
+  <node name="aeneas_DIAGNOSTICS" pkg="diagnostics" type="diagnostics" args="$(arg name)" />	
   <node name="aeneas_MOBILITY" pkg="mobility" type="mobility" args="$(arg name)" />
   <node name="aeneas_TARGET" pkg="target_detection" type="target" args="$(arg name)" />
   <node name="aeneas_OBSTACLE" pkg="obstacle_detection" type="obstacle" args="$(arg name)" />
