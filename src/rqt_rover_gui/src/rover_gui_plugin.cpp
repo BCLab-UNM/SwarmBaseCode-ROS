@@ -46,7 +46,9 @@ namespace rqt_rover_gui
   RoverGUIPlugin::RoverGUIPlugin() : rqt_gui_cpp::Plugin(), widget(0)
   {
     setObjectName("RoverGUI");
-    log_messages = "";
+    info_log_messages = "";
+    diag_log_messages = "";
+
     joy_process = NULL;
 
     obstacle_call_count = 0;
@@ -122,12 +124,13 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(joystickLeftUpdate(double)), ui.joy_lcd_left, SLOT(display(double)));
     connect(this, SIGNAL(joystickRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
-    connect(this, SIGNAL(sendLogMessage(QString)), this, SLOT(receiveLogMessage(QString)));
+    connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
+    connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
 
-    displayLogMessage("Searching for rovers...");
+    emit sendInfoLogMessage("Searching for rovers...");
 
     // Add discovered rovers to the GUI list
     rover_poll_timer = new QTimer(this);
@@ -159,6 +162,8 @@ namespace rqt_rover_gui
     //displayLogMessage(return_msg);
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
+    diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -384,7 +389,7 @@ void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sens
     else {
 		//Record target ID according to the rover that reported it
         targetsPickedUp[rover_name] = targetID;
-        emit sendLogMessage("Resource " + QString::number(targetID) + " picked up by " + QString::fromStdString(rover_name));
+        emit sendInfoLogMessage("Resource " + QString::number(targetID) + " picked up by " + QString::fromStdString(rover_name));
         ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
         
         //Publish target ID
@@ -417,7 +422,7 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
         try {
 			//Add target ID to list of dropped off targets
             targetsDroppedOff[targetsPickedUp.at(rover_name)] = true;
-            emit sendLogMessage("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
+            emit sendInfoLogMessage("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
             ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
             targetsPickedUp.erase(rover_name);
             ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
@@ -428,7 +433,7 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
 			targetDropOffPublisher[rover_name].publish(targetIDMsg);
         }
         catch(const std::out_of_range& oor) {
-            emit sendLogMessage(QString::fromStdString(rover_name) + " attempted a drop off but was not carrying a target");
+            emit sendInfoLogMessage(QString::fromStdString(rover_name) + " attempted a drop off but was not carrying a target");
             
             //Publish -1 to alert robot of failed drop off event
             std_msgs::Int16 targetIDMsg;
@@ -478,7 +483,7 @@ void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    emit sendLogMessage("Selcted Rover Changed");
+    emit sendInfoLogMessage("Selcted Rover Changed");
 
     if (!current) return; // Check to make sure the current selection isn't null
 
@@ -495,7 +500,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
     ui.rover_name->setText(rover_name_msg_qstr);
 
-    emit sendLogMessage(QString("Selected rover: ") + QString::fromStdString(selected_rover_name));
+    emit sendInfoLogMessage(QString("Selected rover: ") + QString::fromStdString(selected_rover_name));
 
     // Attempt to read the simulation model xml file if it exists. If it does not exist assume this is a physical rover.
     const char *name = "GAZEBO_MODEL_PATH";
@@ -515,7 +520,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
-    emit sendLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
+    emit sendInfoLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
     ui.map_frame->setRoverMapToDisplay(selected_rover_name);
 
     // No entry for this rover name
@@ -526,7 +531,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         ui.autonomous_control_radio_button->setChecked(false);
         joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
         rover_control_state[selected_rover_name]=1;
-        emit sendLogMessage("New rover selected");
+        emit sendInfoLogMessage("New rover selected");
     }
     else
     {
@@ -547,10 +552,10 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
             autonomousRadioButtonEventHandler(true); // Manually trigger the autonomous selected event
             break;
         default:
-            emit sendLogMessage("Unknown control state: "+QString::number(control_state));
+            emit sendInfoLogMessage("Unknown control state: "+QString::number(control_state));
         }
 
-        emit sendLogMessage("Existing rover selected");
+        emit sendInfoLogMessage("Existing rover selected");
     }
 
     // Clear map
@@ -574,7 +579,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
     for (set<string>::iterator it = orphaned_rover_names.begin(); it != orphaned_rover_names.end(); ++it)
     {
-        emit sendLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
+        emit sendInfoLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
         ui.map_frame->clearMap(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
         rover_statuses.erase(*it);
@@ -667,7 +672,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
             }
             catch (std::out_of_range& e)
             {
-                emit sendLogMessage("Error: No status entry for rover " + QString::fromStdString(ui_rover_name));
+                emit sendInfoLogMessage("Error: No status entry for rover " + QString::fromStdString(ui_rover_name));
             }
 
 
@@ -686,7 +691,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
     rover_names = new_rover_names;
     
-    emit sendLogMessage("List of connected rovers has changed");
+    emit sendInfoLogMessage("List of connected rovers has changed");
     selected_rover_name = "";
     ui.rover_list->clearSelection();
     ui.rover_list->clear();
@@ -720,7 +725,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         }
         catch (std::out_of_range& e)
         {
-            emit sendLogMessage("No status entry for rover " + QString::fromStdString(*i));
+            emit sendInfoLogMessage("No status entry for rover " + QString::fromStdString(*i));
         }
 
         QString rover_name_and_status = QString::fromStdString(*i) // Add the rover name
@@ -811,7 +816,8 @@ void RoverGUIPlugin::encoderCheckboxToggledEventHandler(bool checked)
 
 //}
 
-void RoverGUIPlugin::displayLogMessage(QString msg)
+
+void RoverGUIPlugin::displayDiagLogMessage(QString msg)
 {
     if (msg.isEmpty()) msg = "Message is empty";
     if (msg == NULL) msg = "Message was a NULL pointer";
@@ -821,10 +827,27 @@ void RoverGUIPlugin::displayLogMessage(QString msg)
     msg.replace("\n","<br>");
 
     QString new_message = msg+"<br>";
-    log_messages = log_messages+new_message;
-    ui.log->setText("<font color='white'>"+log_messages+"</font>");
+    diag_log_messages = diag_log_messages+new_message;
+    ui.diag_log->setText("<font color='white'>"+diag_log_messages+"</font>");
 
-    QScrollBar *sb = ui.log->verticalScrollBar();
+    QScrollBar *sb = ui.diag_log->verticalScrollBar();
+    sb->setValue(sb->maximum());
+}
+
+void RoverGUIPlugin::displayInfoLogMessage(QString msg)
+{
+    if (msg.isEmpty()) msg = "Message is empty";
+    if (msg == NULL) msg = "Message was a NULL pointer";
+
+
+    // replace new lines with <br> in the message
+    msg.replace("\n","<br>");
+
+    QString new_message = msg+"<br>";
+    info_log_messages = info_log_messages+new_message;
+    ui.info_log->setText("<font color='white'>"+info_log_messages+"</font>");
+
+    QScrollBar *sb = ui.info_log->verticalScrollBar();
     sb->setValue(sb->maximum());
 }
 
@@ -838,10 +861,10 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
     control_mode_msg.data = 2; // 2 indicates autonomous control
 
     control_mode_publishers[selected_rover_name].publish(control_mode_msg);
-    emit sendLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
+    emit sendInfoLogMessage(QString::fromStdString(selected_rover_name)+" changed to autonomous control");
 
     QString return_msg = stopROSJoyNode();
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
     
     //Enable all stop button
     ui.all_stop_button->setEnabled(true);
@@ -856,17 +879,17 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
     if (!marked) return;
 
     rover_control_state[selected_rover_name] = 1;
-    emit sendLogMessage("Setting up joystick publisher " + QString::fromStdString("/"+selected_rover_name+"/joystick"));
+    emit sendInfoLogMessage("Setting up joystick publisher " + QString::fromStdString("/"+selected_rover_name+"/joystick"));
     joystick_publisher = nh.advertise<sensor_msgs::Joy>("/"+selected_rover_name+"/joystick", 10, this);
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control
 
     control_mode_publishers[selected_rover_name].publish(control_mode_msg);
-    emit sendLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");\
+    emit sendInfoLogMessage(QString::fromStdString(selected_rover_name)+" changed to joystick control");\
 
     QString return_msg = startROSJoyNode();
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
     
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
@@ -878,7 +901,7 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
 void RoverGUIPlugin::allAutonomousButtonEventHandler()
 {
-    emit sendLogMessage("changing all rovers to autonomous control...");
+    emit sendInfoLogMessage("changing all rovers to autonomous control...");
 
     std::string remember_selected_rover_name = selected_rover_name;
     int remember_selected_index = ui.rover_list->currentRow();
@@ -918,7 +941,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
 
 void RoverGUIPlugin::allStopButtonEventHandler()
 {
-    emit sendLogMessage("changing all rovers to manual control...");
+    emit sendInfoLogMessage("changing all rovers to manual control...");
 
     std::string remember_selected_rover_name = selected_rover_name;
     int remember_selected_index = ui.rover_list->currentRow();
@@ -958,7 +981,7 @@ void RoverGUIPlugin::allStopButtonEventHandler()
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
 {
-    emit sendLogMessage("Building simulation...");
+    emit sendInfoLogMessage("Building simulation...");
 
     ui.build_simulation_button->setEnabled(false);
 
@@ -968,7 +991,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
     if (sim_mgr.isGazeboServerRunning())
     {
-        emit sendLogMessage("A gazebo server simulation process is already running. Restart the Swarmathon GUI to clear.");
+        emit sendInfoLogMessage("A gazebo server simulation process is already running. Restart the Swarmathon GUI to clear.");
         return;
     }
 
@@ -993,33 +1016,33 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         addPrelimsWalls();
     }
 
-    emit sendLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
+    emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
 
     if (ui.texture_combobox->currentText() == "Gravel")
     {
-    emit sendLogMessage("Adding gravel ground plane...");
+    emit sendInfoLogMessage("Adding gravel ground plane...");
     return_msg = sim_mgr.addGroundPlane("mars_ground_plane");
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
     }
     else if (ui.texture_combobox->currentText() == "KSC Concrete")
     {
-    emit sendLogMessage("Adding concrete ground plane...");
+    emit sendInfoLogMessage("Adding concrete ground plane...");
     return_msg = sim_mgr.addGroundPlane("concrete_ground_plane");
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
     }
     else if (ui.texture_combobox->currentText() == "Car park")
     {
-    emit sendLogMessage("Adding carpark ground plane...");
+    emit sendInfoLogMessage("Adding carpark ground plane...");
     return_msg = sim_mgr.addGroundPlane("carpark_ground_plane");
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
     }
     else
     {
-        emit sendLogMessage("Unknown ground plane...");
+        emit sendInfoLogMessage("Unknown ground plane...");
     }
 
 
-    emit sendLogMessage("Adding collection disk...");
+    emit sendInfoLogMessage("Adding collection disk...");
     float collection_disk_radius = 0.5; // meters
     sim_mgr.addModel("collection_disk", "collection_disk", 0, 0, 0, collection_disk_radius);
 
@@ -1035,35 +1058,35 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
-    emit sendLogMessage("Adding rover achilles...");
+    emit sendInfoLogMessage("Adding rover achilles...");
     return_msg = sim_mgr.addRover("achilles", 0, 1, 0);
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
 
-    emit sendLogMessage("Starting rover node for achilles...");
+    emit sendInfoLogMessage("Starting rover node for achilles...");
     return_msg = sim_mgr.startRoverNode("achilles");
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
 
     progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-    emit sendLogMessage("Adding rover aeneas...");
+    emit sendInfoLogMessage("Adding rover aeneas...");
     return_msg = sim_mgr.addRover("aeneas", -1, 0, 0);
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
 
-    emit sendLogMessage("Starting rover node for aeneas...");
+    emit sendInfoLogMessage("Starting rover node for aeneas...");
     return_msg = sim_mgr.startRoverNode("aeneas");
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
 
     progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-    emit sendLogMessage("Adding rover ajax...");
+    emit sendInfoLogMessage("Adding rover ajax...");
     return_msg = sim_mgr.addRover("ajax", 1, 0, 0);
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
 
-   emit sendLogMessage("Starting rover node for ajax...");
+   emit sendInfoLogMessage("Starting rover node for ajax...");
    return_msg = sim_mgr.startRoverNode("ajax");
-   emit sendLogMessage(return_msg);
+   emit sendInfoLogMessage(return_msg);
 
    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1071,35 +1094,35 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    if (ui.final_radio_button->isChecked())
    {
 
-       emit sendLogMessage("Adding rover diomedes...");
+       emit sendInfoLogMessage("Adding rover diomedes...");
        return_msg = sim_mgr.addRover("diomedes", 1, 1, 0);
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
 
-       emit sendLogMessage("Starting rover node for diomedes...");
+       emit sendInfoLogMessage("Starting rover node for diomedes...");
        return_msg = sim_mgr.startRoverNode("diomedes");
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
 
        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-       emit sendLogMessage("Adding rover hector...");
+       emit sendInfoLogMessage("Adding rover hector...");
        return_msg = sim_mgr.addRover("hector", -1, -1, 0);
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
 
-       emit sendLogMessage("Starting rover node for hector...");
+       emit sendInfoLogMessage("Starting rover node for hector...");
        return_msg = sim_mgr.startRoverNode("hector");
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-       emit sendLogMessage("Adding rover paris...");
+       emit sendInfoLogMessage("Adding rover paris...");
        return_msg = sim_mgr.addRover("paris", 1, -1, 0);
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
 
-       emit sendLogMessage("Starting rover node for paris...");
+       emit sendInfoLogMessage("Starting rover node for paris...");
        return_msg = sim_mgr.startRoverNode("paris");
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1107,21 +1130,21 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 }
    if (ui.powerlaw_distribution_radio_button->isChecked())
    {
-       emit sendLogMessage("Adding powerlaw distribution of targets...");
+       emit sendInfoLogMessage("Adding powerlaw distribution of targets...");
        return_msg = addPowerLawTargets();
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
    }
    else if (ui.uniform_distribution_radio_button->isChecked())
    {
-       emit sendLogMessage("Adding uniform distribution of targets...");
+       emit sendInfoLogMessage("Adding uniform distribution of targets...");
        return_msg = addUniformTargets();
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
    }
    else if (ui.clustered_distribution_radio_button->isChecked())
    {
-       emit sendLogMessage("Adding clustered distribution of targets...");
+       emit sendInfoLogMessage("Adding clustered distribution of targets...");
        return_msg = addClusteredTargets();
-       emit sendLogMessage(return_msg);
+       emit sendInfoLogMessage(return_msg);
    }
 
    // add walls given nw corner (x,y) and height and width (in meters)
@@ -1142,7 +1165,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white;");
    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
 
-   emit sendLogMessage("Finished building simulation.");
+   emit sendInfoLogMessage("Finished building simulation.");
 
   // Visualize the simulation by default call button event handler
    visualizeSimulationButtonEventHandler();
@@ -1153,12 +1176,12 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 {
     if (!sim_mgr.isGazeboServerRunning())
     {
-        emit sendLogMessage("Simulation is not running.");
+        emit sendInfoLogMessage("Simulation is not running.");
 
         return;
     }
 
-    emit sendLogMessage("Ending simulation...");
+    emit sendInfoLogMessage("Ending simulation...");
 
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Shutting Down Rovers");
@@ -1184,7 +1207,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     // Unsubscribe from topics
 
-    emit sendLogMessage("Shutting down subscribers...");
+    emit sendInfoLogMessage("Shutting down subscribers...");
 
     for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) it->second.shutdown();
     encoder_subscribers.clear();
@@ -1212,7 +1235,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     targetDropOffSubscribers.clear();
     camera_subscriber.shutdown();
 
-    emit sendLogMessage("Shutting down publishers...");
+    emit sendInfoLogMessage("Shutting down publishers...");
 
     for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it) it->second.shutdown();
     control_mode_publishers.clear();
@@ -1220,7 +1243,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     return_msg += sim_mgr.stopGazeboClient();
     return_msg += "<br>";
     return_msg += sim_mgr.stopGazeboServer();
-    emit sendLogMessage(return_msg);
+    emit sendInfoLogMessage(return_msg);
 
     ui.visualize_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
@@ -1245,7 +1268,7 @@ void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
 {
     if (!sim_mgr.isGazeboServerRunning())
     {
-        emit sendLogMessage("Simulation is not running.");
+        emit sendInfoLogMessage("Simulation is not running.");
 
         return;
     }
@@ -1256,16 +1279,16 @@ void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
 
     if (display_sim_visualization)
     {
-        emit sendLogMessage("Visualizing simulation...");
+        emit sendInfoLogMessage("Visualizing simulation...");
 
         QProcess* sim_client_process = sim_mgr.startGazeboClient();
     }
     else
     {
-        emit sendLogMessage("Ending visualization...");
+        emit sendInfoLogMessage("Ending visualization...");
 
         return_msg = sim_mgr.stopGazeboClient();
-        emit sendLogMessage(return_msg);
+        emit sendInfoLogMessage(return_msg);
     }
 
 }
@@ -1339,19 +1362,19 @@ QString RoverGUIPlugin::addUniformTargets()
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
         {
-            emit sendLogMessage("Tried to place target "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y) + "...");
+            emit sendInfoLogMessage("Tried to place target "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y) + "...");
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
        }
        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
-       emit sendLogMessage("<font color=green>Succeeded.</font>");
+       emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
         output = sim_mgr.addModel(QString("at")+QString::number(i),  QString("at")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_1_clearance);
 
        progress_dialog.setValue(i*100.0f/256);
        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     }
-    emit sendLogMessage("Placed 256 single targets");
+    emit sendInfoLogMessage("Placed 256 single targets");
 
     return output;
 }
@@ -1381,21 +1404,21 @@ QString RoverGUIPlugin::addClusteredTargets()
 
         do
         {
-            emit sendLogMessage("Tried to place cluster "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            emit sendInfoLogMessage("Tried to place cluster "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
         while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
-        emit sendLogMessage("<font color=green>Succeeded.</font>");
+        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
         progress_dialog.setValue(i*100.0f/4);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
         output = sim_mgr.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_64_clearance);
-        emit sendLogMessage(output);
+        emit sendInfoLogMessage(output);
     }
 
-    emit sendLogMessage("Placed four clusters of 64 targets");
+    emit sendInfoLogMessage("Placed four clusters of 64 targets");
 
     return output;
 }
@@ -1424,12 +1447,12 @@ QString RoverGUIPlugin::addPowerLawTargets()
 
     do
     {
-        emit sendLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+        emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
         proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
         proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
     }
     while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
-    emit sendLogMessage("<font color=green>Succeeded.</font>");
+    emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
     progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
     output+= sim_mgr.addModel("atags64_0", "atags64_0", proposed_x, proposed_y, 0, target_cluster_size_64_clearance);
@@ -1444,10 +1467,10 @@ QString RoverGUIPlugin::addPowerLawTargets()
         {
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
-            emit sendLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
         }
         while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_16_clearance));
-        emit sendLogMessage("<font color=green>Succeeded.</font>");
+        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
@@ -1463,12 +1486,12 @@ QString RoverGUIPlugin::addPowerLawTargets()
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
         {
-            emit sendLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
         while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_4_clearance));
-        emit sendLogMessage("<font color=green>Succeeded.</font>");
+        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1483,12 +1506,12 @@ QString RoverGUIPlugin::addPowerLawTargets()
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         do
         {
-            emit sendLogMessage("Tried to place target "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+            emit sendInfoLogMessage("Tried to place target "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
         while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
-        emit sendLogMessage("<font color=green>Succeeded.</font>");
+        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
         progress_dialog.setValue(clusters_placed++*100.0f/total_number_of_clusters);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1635,9 +1658,9 @@ void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float 
         x_comp =
         z_comp = 0;
         y_comp = 0;
-        emit sendLogMessage("Moving rover back into the arena");
+        emit sendInfoLogMessage("Moving rover back into the arena");
         QString return_msg = sim_mgr.moveRover(rover_name, x_comp, y, 0);
-        emit sendLogMessage(return_msg);
+        emit sendInfoLogMessage(return_msg);
     }
 }
 
@@ -1646,10 +1669,10 @@ void RoverGUIPlugin::readRoverModelXML(QString path)
     ifstream model_file;
     model_file.open(path.toStdString(), ios::in);
     if (model_file.is_open())
-        emit sendLogMessage("Read model file at " + path );
+        emit sendInfoLogMessage("Read model file at " + path );
     else
     {
-        emit sendLogMessage(QString::fromStdString(selected_rover_name) + " appears to be a physical rover.");
+        emit sendInfoLogMessage(QString::fromStdString(selected_rover_name) + " appears to be a physical rover.");
         return;
     }
 
@@ -1840,7 +1863,7 @@ void RoverGUIPlugin::readRoverModelXML(QString path)
 void RoverGUIPlugin::gazeboServerFinishedEventHandler()
 {
 
-    emit sendLogMessage("Gazebo client exited");
+    emit sendInfoLogMessage("Gazebo client exited");
 
     ui.visualize_simulation_button->setEnabled(false);
     ui.clear_simulation_button->setEnabled(false);
@@ -1936,9 +1959,15 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
     return rqt_gui_cpp::Plugin::eventFilter(target, event);
 }
 
-void RoverGUIPlugin::receiveLogMessage(QString msg)
+void RoverGUIPlugin::receiveInfoLogMessage(QString msg)
 {
-    displayLogMessage(msg);
+    displayInfoLogMessage(msg);
+}
+
+
+void RoverGUIPlugin::receiveDiagLogMessage(QString msg)
+{
+    displayDiagLogMessage(msg);
 }
 
 void RoverGUIPlugin::infoLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event)
@@ -1951,12 +1980,24 @@ void RoverGUIPlugin::infoLogMessageEventHandler(const ros::MessageEvent<std_msgs
 
     string log_msg = msg->data;
 
-    emit sendLogMessage(QString::fromStdString(publisher_name)
+    emit sendInfoLogMessage(QString::fromStdString(publisher_name)
                            + " <font color=Lime size=1>"
                            + QString::fromStdString(log_msg)
                            + "</font>");
 }
 
+void RoverGUIPlugin::diagLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const boost::shared_ptr<const std_msgs::String> msg = event.getMessage();
+
+    string log_msg = msg->data;
+
+    emit sendDiagLogMessage(QString::fromStdString(log_msg));
+}
 
 // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
 void RoverGUIPlugin::refocusKeyboardEventHandler()
