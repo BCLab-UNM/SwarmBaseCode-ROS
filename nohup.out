@@ -1,0 +1,715 @@
+No Name Selected. Default is: delta
+No name selected. Default is: delta
+No Name Selected. Default is: delta
+No Name Selected. Default is: delta
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+[0m[ INFO] [1465405749.402043497]: Opened serial port /dev/ttyACM0[0m
+Set baudrate 4800
+Changing baudrate to 9600
+No Name Selected. Default is: delta
+[0m[ INFO] [1465405754.291223920]: Initial odometry pose is Origin: (-0.0016187080276509127619 -0.00011349701438484367268 0)
+Rotation (RPY): (0, -0, 0.071324481964111369203)
+[0m
+[0m[ INFO] [1465405754.391075337]: Initial odometry pose is Origin: (-0.0093566852387263494545 -0.0007501358047607593069 0)
+Rotation (RPY): (0, -0, 0.082658374794615782633)
+[0m
+[0m[ INFO] [1465405754.490981389]: Initial odometry pose is Origin: (-0.019041234050524460247 -0.0013353558361992629196 0)
+Rotation (RPY): (0, -0, 0.072655670587912182801)
+[0m
+[0m[ INFO] [1465405754.590927487]: Initial odometry pose is Origin: (-0.028331357279476641203 -0.0017030671640354301533 0)
+Rotation (RPY): (0, -0, 0.062657835430457650694)
+[0m
+[0m[ INFO] [1465405754.591078901]: Datum (latitude, longitude, altitude) is (35.082479, -106.625504, 1586.255000)[0m
+[0m[ INFO] [1465405754.591129556]: Datum UTM coordinate is (351812.233712, 3883398.158418)[0m
+[33m[ WARN] [1465405754.591335604]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405754.591384908]: Unable to obtain delta/base_link->gps transform. Will assume navsat device is mounted at vehicle's origin[0m
+[0m[ INFO] [1465405754.591440817]: Corrected for magnetic declination of 0.153065 and user-specified offset of 1.570796. Transform heading factor is now 1.783862[0m
+[0m[ INFO] [1465405754.591505719]: Transform world frame pose is: Origin: (-0.028331357279476641203 -0.0017030671640354301533 0)
+Rotation (RPY): (0, -0, 0.062657835430457650694)
+[0m
+[0m[ INFO] [1465405754.591565269]: World frame->utm transform is Origin: (-3786839.0366008928977 929732.98686874425039 -1586.2550000000001091)
+Rotation (RPY): (0, 0, -1.7212038913595424372)
+[0m
+[33m[ WARN] [1465405754.691038277]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405756.891069189]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405759.091027949]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405759.891016990]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405761.091029839]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405763.091063550]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405764.891055759]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405765.391043045]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405767.591050129]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405769.591064091]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405770.091068632]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405771.891072504]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405774.091041431]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405775.391022659]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405776.091080611]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405778.091139667]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405780.391044309]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405780.391113959]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405782.591031460]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405784.591062718]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405785.591070273]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405786.891012071]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405788.891047022]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405790.891019103]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405791.091061786]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405793.091077899]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405795.391037896]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405796.090997055]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405797.591065958]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405799.891014066]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405801.091018227]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405801.891015699]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405803.891054954]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405806.091046455]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405806.091122149]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405808.391053162]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405810.591033144]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405811.391020460]: Could not obtain delta/base_link->gpsterminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465405846.790928446]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.791119149]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465405749.909944482]: ublox_version < 7, ignoring GNSS settings[0m
+[0m[ INFO] [1465405749.910007152]: U-Blox configured successfully.[0m
+[33m[ WARN] [1465405846.782680776]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.782818287]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465405846.824986702]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.825094303]: Reason given for shutdown: [user request][0m
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465405846.813286207]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.813386621]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465405846.830682783]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.830813188]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465405846.803667817]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.803776696]: Reason given for shutdown: [user request][0m
+ transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405812.591050631]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405814.891058270]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405816.391042171]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405816.891059128]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405819.091013857]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405821.390995803]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405821.391058924]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405823.391021464]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405825.391036926]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405826.591020728]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405827.590971096]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405829.591025385]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405831.891009317]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405831.891071965]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405834.090989899]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405836.091034553]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405837.090977636]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405838.391009768]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405845.591010715]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465405845.591073891]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465405846.818668982]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.818722815]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465405846.796597773]: Shutdown request received.[0m
+[33m[ WARN] [1465405846.796740186]: Reason given for shutdown: [user request][0m
+No name selected. Default is: delta
+No Name Selected. Default is: delta
+No Name Selected. Default is: delta
+No Name Selected. Default is: delta
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+[0m[ INFO] [1465409274.232446414]: Opened serial port /dev/ttyACM0[0m
+Set baudrate 4800
+Changing baudrate to 9600
+No Name Selected. Default is: delta
+[0m[ INFO] [1465409275.607969373]: Datum (latitude, longitude, altitude) is (35.082381, -106.625304, 1546.080000)[0m
+[0m[ INFO] [1465409275.608097255]: Datum UTM coordinate is (351830.316863, 3883386.902375)[0m
+[0m[ INFO] [1465409275.907860380]: Datum (latitude, longitude, altitude) is (35.082383, -106.625306, 1545.939000)[0m
+[0m[ INFO] [1465409275.907958627]: Datum UTM coordinate is (351830.147614, 3883387.149208)[0m
+[0m[ INFO] [1465409276.107855683]: Datum (latitude, longitude, altitude) is (35.082385, -106.625307, 1546.027000)[0m
+[0m[ INFO] [1465409276.107956053]: Datum UTM coordinate is (351830.078655, 3883387.394406)[0m
+[0m[ INFO] [1465409276.307885955]: Datum (latitude, longitude, altitude) is (35.082385, -106.625307, 1546.010000)[0m
+[0m[ INFO] [1465409276.307979574]: Datum UTM coordinate is (351830.032526, 3883387.361876)[0m
+[0m[ INFO] [1465409276.607840057]: Datum (latitude, longitude, altitude) is (35.082380, -106.625311, 1545.758000)[0m
+[0m[ INFO] [1465409276.607913177]: Datum UTM coordinate is (351829.677931, 3883386.868418)[0m
+[0m[ INFO] [1465409276.907965074]: Datum (latitude, longitude, altitude) is (35.082379, -106.625315, 1545.783000)[0m
+[0m[ INFO] [1465409276.908039141]: Datum UTM coordinate is (351829.311070, 3883386.741270)[0m
+[0m[ INFO] [1465409277.107874805]: Datum (latitude, longitude, altitude) is (35.082382, -106.625316, 1545.659000)[0m
+[0m[ INFO] [1465409277.107946755]: Datum UTM coordinate is (351829.252132, 3883387.041775)[0m
+[0m[ INFO] [1465409277.307860846]: Datum (latitude, longitude, altitude) is (35.082382, -106.625319, 1545.408000)[0m
+[0m[ INFO] [1465409277.307940058]: Datum UTM coordinate is (351828.914432, 3883387.025094)[0m
+[0m[ INFO] [1465409277.607945987]: Datum (latitude, longitude, altitude) is (35.082384, -106.625321, 1545.344000)[0m
+[0m[ INFO] [1465409277.608032358]: Datum UTM coordinate is (351828.727491, 3883387.305499)[0m
+[0m[ INFO] [1465409277.807953788]: Datum (latitude, longitude, altitude) is (35.082384, -106.625324, 1545.146000)[0m
+[0m[ INFO] [1465409277.808056518]: Datum UTM coordinate is (351828.463633, 3883387.343085)[0m
+[0m[ INFO] [1465409278.107968672]: Datum (latitude, longitude, altitude) is (35.082382, -106.625327, 1544.907000)[0m
+[0m[ INFO] [1465409278.108064414]: Datum UTM coordinate is (351828.231180, 3883387.069520)[0m
+[0m[ INFO] [1465409278.307871030]: Datum (latitude, longitude, altitude) is (35.082383, -106.625331, 1544.874000)[0m
+[0m[ INFO] [1465409278.307976494]: Datum UTM coordinate is (351827.849521, 3883387.153404)[0m
+[0m[ INFO] [1465409278.607938102]: Datum (latitude, longitude, altitude) is (35.082381, -106.625335, 1544.739000)[0m
+[0m[ INFO] [1465409278.608025988]: Datum UTM coordinate is (351827.446009, 3883387.015760)[0m
+[0m[ INFO] [1465409278.807857914]: Datum (latitude, longitude, altitude) is (35.082377, -106.625339, 1544.554000)[0m
+[0m[ INFO] [1465409278.807961677]: Datum UTM coordinate is (351827.127702, 3883386.510615)[0m
+[0m[ INFO] [1465409279.107837281]: Datum (latitude, longitude, altitude) is (35.082373, -106.625342, 1544.416000)[0m
+[0m[ INFO] [1465409279.107905984]: Datum UTM coordinate is (351826.819416, 3883386.060779)[0m
+[0m[ INFO] [1465409279.307854220]: Datum (latitude, longitude, altitude) is (35.082371, -106.625343, 1544.614000)[0m
+[0m[ INFO] [1465409279.307954764]: Datum UTM coordinate is (351826.716774, 3883385.918228)[0m
+[0m[ INFO] [1465409279.607853145]: Datum (latitude, longitude, altitude) is (35.082372, -106.625344, 1544.565000)[0m
+[0m[ INFO] [1465409279.607933372]: Datum UTM coordinate is (351826.689965, 3883385.951948)[0m
+[0m[ INFO] [1465409279.608081823]: Initial odometry pose is Origin: (-4.6987153870249440338e-13 -4.2402988423250298884e-14 0)
+Rotation (RPY): (0, -0, 0.090001311302184999752)
+[0m
+[0m[ INFO] [1465409279.708090887]: Initial odometry pose is Origin: (-7.6898594306498702089e-10 -6.9345795978333762966e-11 0)
+Rotation (RPY): (0, -0, 0.090000763347136511494)
+[0m
+[33m[ WARN] [1465409279.708393920]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409279.708535262]: Unable to obtain delta/base_link->gps transform. Will assume navsat device is mounted at vehicle's origin[0m
+[0m[ INFO] [1465409279.708613103]: Corrected for magnetic declination of 0.153065 and user-specified offset of 1.570796. Transform heading factor is now 1.813862[0m
+[0m[ INFO] [1465409279.708683714]: Transform world frame pose is: Origin: (-7.6898594306498702089e-10 -6.9345795978333762966e-11 0)
+Rotation (RPY): (0, -0, 0.090000763347136511494)
+[0m
+[0m[ INFO] [1465409279.708749088]: World frame->utm transform is Origin: (-3784341.0081446045078 939804.02511971502099 -1544.5650000000000546)
+Rotation (RPY): (0, 0, -1.7238609634428634365)
+[0m
+[33m[ WARN] [1465409279.808162401]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409281.807909192]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409283.908020329]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409284.907910208]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409286.107900619]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409288.407875694]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409290.107884905]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409290.407903269]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409292.407913205]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409294.607923034]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409295.107902757]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409296.907950168]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409299.107877580]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409300.107910327]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409301.107906040]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409303.107908409]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409305.107940804]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409305.108003617]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409307.307884999]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409309.407891807]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409310.307874812]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409311.407891050]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409313.607912370]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409315.407891625]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409315.607964761]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409317.907915796]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409319.907924123]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409320.607972317]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409321.907930296]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409324.107915420]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409325.807942552]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409326.307915738]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409328.407909481]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409330.607907363]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409330.907913822]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409332.807876987]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409334.907904163]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409336.107918102]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409336.907930667]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409338.907926367]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409341.107924763]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409341.107986930]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409343.307975904]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409345.407951189]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409346.407927410]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409347.407991477]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409349.607929936]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409351.408015153]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409351.607930164]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409353.907942557]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409356.107928174]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409356.607922377]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409358.107932525]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409360.307940794]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409361.807878174]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409362.607991985]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409364.807930770]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409366.907905807]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409366.907968375]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409369.107961400]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409371.407935563]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409372.107891769]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409373.607917435]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409375.607964395]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409377.107909605]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409377.807944465]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409379.907917189]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409382.107990769]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409382.108138901]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409384.307925682]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409386.307949189]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409387.307883798]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409388.407946086]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409390.607914381]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409392.308002409]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409392.607937753]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409394.607941368]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409396.607946077]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409397.407887194]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409398.907925323]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409401.107905836]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409402.407887179]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409403.107930225]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409405.407939627]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409407.607901078]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409407.607964771]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409409.607930191]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409411.808166828]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409412.907905009]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409413.907921160]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409415.907924602]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409417.907918726]: Could not obtain [33m[ WARN] [1465409274.807756190]: ublox_version < 7, ignoring GNSS settings[0m
+[0m[ INFO] [1465409274.807816319]: U-Blox configured successfully.[0m
+[33m[ WARN] [1465409442.811739072]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.811808818]: Reason given for shutdown: [user request][0m
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465409442.819307001]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.819405707]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465409442.825575826]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.825718498]: Reason given for shutdown: [user request][0m
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465409442.842229305]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.842320095]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465409442.853941824]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.854222423]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465409442.861616396]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.861738874]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465409442.834944502]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.835059473]: Reason given for shutdown: [user request][0m
+delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409418.107986591]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409420.307889899]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409422.307904020]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409423.107905161]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409424.607946606]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409426.807917702]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409428.107970731]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409428.807925402]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409431.107920386]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409433.307940566]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409433.308001168]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409435.607942743]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409437.807908325]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409438.407968167]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465409440.107932188]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409442.107976040]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465409442.847993562]: Shutdown request received.[0m
+[33m[ WARN] [1465409442.848045352]: Reason given for shutdown: [user request][0m
+No name selected. Default is: delta
+No Name Selected. Default is: delta
+No Name Selected. Default is: delta
+No Name Selected. Default is: delta
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+[0m[ INFO] [1465426635.146397540]: Opened serial port /dev/ttyACM0[0m
+Set baudrate 4800
+Changing baudrate to 9600
+No Name Selected. Default is: delta
+[0m[ INFO] [1465426636.366038095]: Datum (latitude, longitude, altitude) is (35.082465, -106.625514, 1626.830000)[0m
+[0m[ INFO] [1465426636.366230114]: Datum UTM coordinate is (351811.296479, 3883396.609415)[0m
+[0m[ INFO] [1465426637.565531378]: Datum (latitude, longitude, altitude) is (35.082466, -106.625515, 1627.087000)[0m
+[0m[ INFO] [1465426637.565618098]: Datum UTM coordinate is (351811.207297, 3883396.732907)[0m
+[0m[ INFO] [1465426637.865567990]: Datum (latitude, longitude, altitude) is (35.082465, -106.625512, 1627.159000)[0m
+[0m[ INFO] [1465426637.865662617]: Datum UTM coordinate is (351811.486314, 3883396.506471)[0m
+[0m[ INFO] [1465426638.065554684]: Datum (latitude, longitude, altitude) is (35.082467, -106.625515, 1627.190000)[0m
+[0m[ INFO] [1465426638.065654660]: Datum UTM coordinate is (351811.244308, 3883396.765586)[0m
+[0m[ INFO] [1465426638.365536369]: Datum (latitude, longitude, altitude) is (35.082466, -106.625509, 1627.198000)[0m
+[0m[ INFO] [1465426638.365627577]: Datum UTM coordinate is (351811.771300, 3883396.646048)[0m
+[0m[ INFO] [1465426638.565838021]: Datum (latitude, longitude, altitude) is (35.082465, -106.625498, 1627.197000)[0m
+[0m[ INFO] [1465426638.565927546]: Datum UTM coordinate is (351812.745761, 3883396.563588)[0m
+[0m[ INFO] [1465426638.865564899]: Datum (latitude, longitude, altitude) is (35.082465, -106.625492, 1627.183000)[0m
+[0m[ INFO] [1465426638.865664554]: Datum UTM coordinate is (351813.328904, 3883396.531888)[0m
+[0m[ INFO] [1465426639.065525048]: Datum (latitude, longitude, altitude) is (35.082470, -106.625494, 1627.207000)[0m
+[0m[ INFO] [1465426639.065610821]: Datum UTM coordinate is (351813.145944, 3883397.056302)[0m
+[0m[ INFO] [1465426639.365517640]: Datum (latitude, longitude, altitude) is (35.082470, -106.625492, 1627.189000)[0m
+[0m[ INFO] [1465426639.365600624]: Datum UTM coordinate is (351813.347247, 3883397.097396)[0m
+[0m[ INFO] [1465426639.565472555]: Datum (latitude, longitude, altitude) is (35.082466, -106.625485, 1627.188000)[0m
+[0m[ INFO] [1465426639.565537672]: Datum UTM coordinate is (351813.969645, 3883396.676757)[0m
+[0m[ INFO] [1465426639.865479544]: Datum (latitude, longitude, altitude) is (35.082468, -106.625481, 1627.225000)[0m
+[0m[ INFO] [1465426639.865551954]: Datum UTM coordinate is (351814.345804, 3883396.814847)[0m
+[0m[ INFO] [1465426639.865682259]: Initial odometry pose is Origin: (-4.3218571114648851175e-13 -3.4648805901656367903e-14 0)
+Rotation (RPY): (0, -0, 0.080001196861267109828)
+[0m
+[0m[ INFO] [1465426639.965486782]: Initial odometry pose is Origin: (-7.733171668126981313e-10 -5.926069926659796594e-11 0)
+Rotation (RPY): (0, -0, 0.070000822240716950584)
+[0m
+[33m[ WARN] [1465426639.965771807]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426639.965825646]: Unable to obtain delta/base_link->gps transform. Will assume navsat device is mounted at vehicle's origin[0m
+[0m[ INFO] [1465426639.965889636]: Corrected for magnetic declination of 0.153065 and user-specified offset of 1.570796. Transform heading factor is now 1.793862[0m
+[0m[ INFO] [1465426639.965949871]: Transform world frame pose is: Origin: (-7.733171668126981313e-10 -5.926069926659796594e-11 0)
+Rotation (RPY): (0, -0, 0.070000822240716950584)
+[0m
+[0m[ INFO] [1465426639.966015536]: World frame->utm transform is Origin: (-3784353.6814732900821 939793.25864728854503 -1627.2250000000001364)
+Rotation (RPY): (0, 0, -1.7238609045492829797)
+[0m
+[33m[ WARN] [1465426640.065603419]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426642.065577419]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426644.065610480]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426645.365609176]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426646.365613338]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426648.565592811]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426650.565589500]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426650.865581558]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426653.065572090]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426655.065597618]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426655.865574686]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426657.365565646]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426659.365611513]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426660.865589789]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426661.565589716]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426663.865590581]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426665.865601933]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426665.865676499]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426668.065566872]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426670.065588917]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426671.065559840]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426672.365558066]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426674.365570550]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426676.065563313]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426676.365599733]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426678.565565982]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426680.865587260]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426681.065628205]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426683.065586424]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426685.065610845]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426686.365565451]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426687.365566944]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426689.365580173]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426691.565570514]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426691.565633388]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426693.865582393]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426695.865606749]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426696.865587347]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426698.065587414]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426700.365560182]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426701.865604774]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426702.365566660]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426704.565599622]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426706.865566238]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426706.865628162]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426708.865566756]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426710.865566831]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426712.065604373]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426713.065570598]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426715.365572182]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426717.365557926]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ Wterminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465426734.207708667]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.207808058]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465426635.652070712]: ublox_version < 7, ignoring GNSS settings[0m
+[0m[ INFO] [1465426635.652130899]: U-Blox configured successfully.[0m
+[33m[ WARN] [1465426734.200880239]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.200972699]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465426734.247318192]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.247438118]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465426734.256748282]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.256874671]: Reason given for shutdown: [user request][0m
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465426734.231096454]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.231184768]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465426734.224160791]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.224317000]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465426734.213035839]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.213222924]: Reason given for shutdown: [user request][0m
+ARN] [1465426717.565567914]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426719.565588377]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426721.565625835]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426722.365605954]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426723.865582705]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426725.865620539]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426727.365652021]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426728.065601607]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426730.065609292]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426732.065656078]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465426732.565625783]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465426734.237870974]: Shutdown request received.[0m
+[33m[ WARN] [1465426734.237922062]: Reason given for shutdown: [user request][0m
+No Name Selected. Default is: delta
+No name selected. Default is: delta
+No Name Selected. Default is: delta
+No Name Selected. Default is: delta
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+VIDIOC_QUERYMENU: Invalid argument
+[0m[ INFO] [1465429816.065944465]: Opened serial port /dev/ttyACM0[0m
+Set baudrate 4800
+Changing baudrate to 9600
+No Name Selected. Default is: delta
+[0m[ INFO] [1465429817.363956557]: Datum (latitude, longitude, altitude) is (35.082528, -106.625874, 1615.958000)[0m
+[0m[ INFO] [1465429817.364089485]: Datum UTM coordinate is (351778.578148, 3883404.065940)[0m
+[0m[ INFO] [1465429817.563757304]: Datum (latitude, longitude, altitude) is (35.082533, -106.625869, 1616.038000)[0m
+[0m[ INFO] [1465429817.563825593]: Datum UTM coordinate is (351779.080431, 3883404.667930)[0m
+[0m[ INFO] [1465429817.863796956]: Datum (latitude, longitude, altitude) is (35.082537, -106.625865, 1616.102000)[0m
+[0m[ INFO] [1465429817.863870473]: Datum UTM coordinate is (351779.487561, 3883405.027398)[0m
+[0m[ INFO] [1465429818.063756270]: Datum (latitude, longitude, altitude) is (35.082539, -106.625861, 1616.154000)[0m
+[0m[ INFO] [1465429818.063842264]: Datum UTM coordinate is (351779.857318, 3883405.332005)[0m
+[0m[ INFO] [1465429818.363776259]: Datum (latitude, longitude, altitude) is (35.082543, -106.625857, 1616.196000)[0m
+[0m[ INFO] [1465429818.363846812]: Datum UTM coordinate is (351780.182392, 3883405.692812)[0m
+[0m[ INFO] [1465429818.563797115]: Datum (latitude, longitude, altitude) is (35.082547, -106.625854, 1616.233000)[0m
+[0m[ INFO] [1465429818.563872480]: Datum UTM coordinate is (351780.500883, 3883406.209046)[0m
+[0m[ INFO] [1465429818.863815199]: Datum (latitude, longitude, altitude) is (35.082551, -106.625849, 1616.265000)[0m
+[0m[ INFO] [1465429818.863895860]: Datum UTM coordinate is (351780.953780, 3883406.578862)[0m
+[0m[ INFO] [1465429819.063813689]: Datum (latitude, longitude, altitude) is (35.082553, -106.625844, 1616.292000)[0m
+[0m[ INFO] [1465429819.063896152]: Datum UTM coordinate is (351781.431134, 3883406.770771)[0m
+[0m[ INFO] [1465429819.363794901]: Datum (latitude, longitude, altitude) is (35.082555, -106.625841, 1616.316000)[0m
+[0m[ INFO] [1465429819.363866240]: Datum UTM coordinate is (351781.708090, 3883406.977043)[0m
+[0m[ INFO] [1465429819.563794146]: Datum (latitude, longitude, altitude) is (35.082556, -106.625837, 1616.336000)[0m
+[0m[ INFO] [1465429819.563866389]: Datum UTM coordinate is (351782.020971, 3883407.149447)[0m
+[0m[ INFO] [1465429819.863835380]: Datum (latitude, longitude, altitude) is (35.082557, -106.625836, 1616.354000)[0m
+[0m[ INFO] [1465429819.863917453]: Datum UTM coordinate is (351782.123432, 3883407.280907)[0m
+[0m[ INFO] [1465429820.063816565]: Datum (latitude, longitude, altitude) is (35.082558, -106.625835, 1616.369000)[0m
+[0m[ INFO] [1465429820.063900252]: Datum UTM coordinate is (351782.224084, 3883407.301453)[0m
+[0m[ INFO] [1465429820.363826658]: Datum (latitude, longitude, altitude) is (35.082556, -106.625833, 1616.382000)[0m
+[0m[ INFO] [1465429820.363905601]: Datum UTM coordinate is (351782.358852, 3883407.177218)[0m
+[0m[ INFO] [1465429820.563791135]: Datum (latitude, longitude, altitude) is (35.082557, -106.625829, 1616.372000)[0m
+[0m[ INFO] [1465429820.563862493]: Datum UTM coordinate is (351782.798289, 3883407.280991)[0m
+[0m[ INFO] [1465429820.863802941]: Datum (latitude, longitude, altitude) is (35.082558, -106.625823, 1616.362000)[0m
+[0m[ INFO] [1465429820.863882988]: Datum UTM coordinate is (351783.356070, 3883407.371740)[0m
+[0m[ INFO] [1465429821.063829008]: Datum (latitude, longitude, altitude) is (35.082560, -106.625816, 1616.354000)[0m
+[0m[ INFO] [1465429821.063914158]: Datum UTM coordinate is (351783.942649, 3883407.550773)[0m
+[0m[ INFO] [1465429821.163873413]: Initial odometry pose is Origin: (-4.3870377216077958757e-13 -3.9590291047495323687e-14 0)
+Rotation (RPY): (0, -0, 0.090001215934753395209)
+[0m
+[0m[ INFO] [1465429821.263830889]: Initial odometry pose is Origin: (-7.2165679855518138908e-10 -6.5139390029948091021e-11 0)
+Rotation (RPY): (0, -0, 0.11000075039622210504)
+[0m
+[33m[ WARN] [1465429821.264178776]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429821.264248222]: Unable to obtain delta/base_link->gps transform. Will assume navsat device is mterminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465429839.954437102]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.954534410]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465429816.799557004]: ublox_version < 7, ignoring GNSS settings[0m
+[0m[ INFO] [1465429816.799633510]: U-Blox configured successfully.[0m
+[33m[ WARN] [1465429839.949633893]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.949711461]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465429839.959716073]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.959828928]: Reason given for shutdown: [user request][0m
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::lock_error> >'
+  what():  boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[33m[ WARN] [1465429839.975155974]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.975247016]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465429839.990623160]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.990720694]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465429839.965086528]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.965234367]: Reason given for shutdown: [user request][0m
+[33m[ WARN] [1465429840.011606280]: Shutdown request received.[0m
+[33m[ WARN] [1465429840.011721447]: Reason given for shutdown: [user request][0m
+ounted at vehicle's origin[0m
+[0m[ INFO] [1465429821.264414142]: Corrected for magnetic declination of 0.153065 and user-specified offset of 1.570796. Transform heading factor is now 1.833862[0m
+[0m[ INFO] [1465429821.264491861]: Transform world frame pose is: Origin: (-7.2165679855518138908e-10 -6.5139390029948091021e-11 0)
+Rotation (RPY): (0, -0, 0.11000075039622210504)
+[0m
+[0m[ INFO] [1465429821.264569583]: World frame->utm transform is Origin: (-3784368.8598586544394 939765.11971922649536 -1616.3540000000000418)
+Rotation (RPY): (0, 0, -1.7238609763937779995)
+[0m
+[33m[ WARN] [1465429821.384221397]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465429823.363928926]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429825.563932002]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429826.563877879]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465429827.863878847]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429830.063818636]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429831.863871768]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465429832.063867110]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429834.363870371]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429836.563857612]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429837.063853647]: Could not obtain delta/base_link->gps transform. Will not remove offset of navsat device from robot's origin.[0m
+[33m[ WARN] [1465429838.563862080]: Could not obtain transform from gps to delta/base_link. Error was "gps" passed to lookupTransform argument source_frame does not exist. 
+[0m
+[33m[ WARN] [1465429839.984952808]: Shutdown request received.[0m
+[33m[ WARN] [1465429839.985006882]: Reason given for shutdown: [user request][0m

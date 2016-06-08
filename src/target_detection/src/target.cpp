@@ -5,10 +5,12 @@
 
 //ROS messages
 #include <std_msgs/Int16.h>
+#include <std_msgs/String.h>
 #include <sensor_msgs/image_encodings.h>
 
 //Custom messages
 #include <shared_messages/TagsImage.h>
+#include <shared_messages/Float64Array.h>
 
 //OpenCV headers
 #include <opencv2/opencv.hpp>
@@ -43,6 +45,7 @@ image_u8_t *copy_image_data_into_u8_container(int width, int height, uint8_t *rg
 
 //Publishers
 ros::Publisher tagPublish;
+ros::Publisher infoLogPublisher;
 
 //Callback handlers
 void targetDetect(const sensor_msgs::ImageConstPtr& rawImage);
@@ -75,6 +78,7 @@ int main(int argc, char* argv[]) {
     image_transport::Subscriber imgSubscribe = it.subscribe((publishedName + "/camera/image"), 2, targetDetect);
 
     tagPublish = tNH.advertise<shared_messages::TagsImage>((publishedName + "/targets"), 2, true);
+    infoLogPublisher = tNH.advertise<std_msgs::String>("/infoLog", 1, true);
 
     ros::spin();
 
@@ -124,6 +128,13 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 	    zarray_get(detections, 0, &det); //use the first tag detected in the image
 	    tagDetected.tags.data.push_back(det->id);
 	    tagDetected.image = *rawImage;
+        std_msgs::String msg;
+        shared_messages::Float64Array coordinate;
+        coordinate.y.push_back(1.0);
+        tagDetected.x.push_back(coordinate);
+        msg.data = "<font Color=Red> The size of the array is " + boost::lexical_cast<std::string>(tagDetected.x.size()) + "</font>";
+        infoLogPublisher.publish(msg);
+
 
 	    //Publish detected tag
 	    tagPublish.publish(tagDetected);
