@@ -55,6 +55,7 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event)
   checkIMU();
   checkGPS();
   checkSonar();
+  checkCamera();
 }
 
 void Diagnostics::checkIMU() {
@@ -67,7 +68,29 @@ void Diagnostics::checkGPS() {
   //publishWarningLogMessage("GPS Warning");
 
   // Check that a U-Blox device exists in the connected USB devices list
-  if ( !checkGPSExists() ) publishErrorLogMessage("GPS Missing");
+  if ( checkGPSExists() ) {
+    // Notify the GUI only if reconnected after being previously disconnected
+    if (!GPSConnected) publishInfoLogMessage("GPS reconnected");
+    GPSConnected = true;
+  } else {
+    publishErrorLogMessage("GPS not connected");
+    GPSConnected = false;
+  }
+}
+
+void Diagnostics::checkCamera() {
+    // Example
+  //publishWarningLogMessage("Camera Warning");
+
+  // Check that a Logitec c170 device exists in the connected USB devices list
+  if ( checkCameraExists() ) {
+    // Notify the GUI only if reconnected after being previously disconnected
+    if (!cameraConnected) publishInfoLogMessage("Camera reconnected");
+    cameraConnected = true;
+  } else {
+    publishErrorLogMessage("Camera not connected");
+    cameraConnected = false;
+  }
 }
 
 void Diagnostics::checkSonar() {
@@ -75,13 +98,28 @@ void Diagnostics::checkSonar() {
   //publishErrorLogMessage("Sonar Error");
 }
 
-// Search through the connected USB devices to see if the U-Blox GPS is connected
+// Check if the U-Blox GPS is connected
 // ID_VENDOR = 0x1546
 // ID_PRODUCT = 0x01a6
 bool Diagnostics::checkGPSExists(){
-
   uint16_t GPSVendorID = 0x1546;
   uint16_t GPSProductID = 0x01a6;
+  return checkUSBDeviceExists( GPSVendorID, GPSProductID );
+}
+
+// Check if the Logitech c170 camera is connected
+// ID_VENDOR = 0x046d
+// ID_PRODUCT = 0x082b
+bool Diagnostics::checkCameraExists(){
+  uint16_t cameraVendorID = 0x046d;
+  uint16_t cameraProductID = 0x082b;
+  return checkUSBDeviceExists( cameraVendorID, cameraProductID );
+}
+
+
+// Search through the connected USB devices for one that matches the
+// specified vendorID and productID
+bool Diagnostics::checkUSBDeviceExists(uint16_t vendorID, uint16_t productID){
   
   struct usb_bus *bus;
   struct usb_device *dev;
@@ -92,7 +130,7 @@ bool Diagnostics::checkGPSExists(){
   // Iterate through busses and devices
   for (bus = usb_busses; bus; bus = bus->next)
     for (dev = bus->devices; dev; dev = dev->next)
-      if ( dev->descriptor.idVendor == GPSVendorID && dev->descriptor.idProduct == GPSProductID )
+      if ( dev->descriptor.idVendor == vendorID && dev->descriptor.idProduct == productID )
         return true; 
 
   // GPS not found
