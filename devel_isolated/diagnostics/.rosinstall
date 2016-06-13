@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/swarmie/rover_workspace/devel_isolated/diagnostics/setup.sh

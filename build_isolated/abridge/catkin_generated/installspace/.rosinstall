@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/swarmie/rover_workspace/install_isolated/setup.sh

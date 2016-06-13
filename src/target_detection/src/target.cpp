@@ -128,11 +128,30 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 	    zarray_get(detections, 0, &det); //use the first tag detected in the image
 	    tagDetected.tags.data.push_back(det->id);
 	    tagDetected.image = *rawImage;
+
+        // String containing coordinates to be sent to output
         std_msgs::String msg;
-        shared_messages::Float64Array coordinate;
-        coordinate.y.push_back(1.0);
-        tagDetected.x.push_back(coordinate);
-        msg.data = "<font Color=Red> The size of the array is " + boost::lexical_cast<std::string>(tagDetected.x.size()) + "</font>";
+
+        for(int i = 0; i < 4; i++) {
+            shared_messages::Float64Array corner;
+            for(int j = 0; j < 2; j++) {
+                corner.coord.push_back(det->p[i][j]);
+            }
+            tagDetected.corners.push_back(corner);
+        }
+
+        msg.data = "<font color=Red> {{ " + boost::lexical_cast<std::string>(tagDetected.corners[0].coord[0]) + ", ";
+        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[0].coord[1]) + " }, ";
+
+        msg.data += "{ " + boost::lexical_cast<std::string>(tagDetected.corners[1].coord[0]) + ", ";
+        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[1].coord[1]) + " }, ";
+
+        msg.data += "{ " + boost::lexical_cast<std::string>(tagDetected.corners[2].coord[0]) + ", ";
+        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[2].coord[1]) + " }, ";
+
+        msg.data += "{ " + boost::lexical_cast<std::string>(tagDetected.corners[3].coord[0]) + ", ";
+        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[3].coord[1]) + " }} ";
+
         infoLogPublisher.publish(msg);
 
 

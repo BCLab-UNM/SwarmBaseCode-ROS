@@ -1,0 +1,8 @@
+prefix=/home/swarmie/rover_workspace/devel_isolated/abridge
+
+Name: abridge
+Description: Description of abridge
+Version: 0.2.0
+Cflags: 
+Libs: -L/home/swarmie/rover_workspace/devel_isolated/abridge/lib 
+Requires: geometry_msgs roscpp sensor_msgs std_msgs tf nav_msgs

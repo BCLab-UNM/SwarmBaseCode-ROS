@@ -1,0 +1,53 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1414464663/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1414464663.dir/build.make CMakeFiles/cmTryCompileExec1414464663.dir/build
+make[1]: Entering directory `/home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1414464663.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec1414464663.dir/CheckSymbolExists.c.o   -c /home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTryCompileExec1414464663
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1414464663.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec1414464663.dir/CheckSymbolExists.c.o  -o cmTryCompileExec1414464663 -rdynamic 
+CMakeFiles/cmTryCompileExec1414464663.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: Leaving directory `/home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec1414464663] Error 1
+make: *** [cmTryCompileExec1414464663/fast] Error 2
+
+File /home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec875043632/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec875043632.dir/build.make CMakeFiles/cmTryCompileExec875043632.dir/build
+make[1]: Entering directory `/home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec875043632.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec875043632.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec875043632
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec875043632.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec875043632.dir/CheckFunctionExists.c.o  -o cmTryCompileExec875043632 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec875043632] Error 1
+make[1]: Leaving directory `/home/swarmie/rover_workspace/build_isolated/diagnostics/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec875043632/fast] Error 2
+
+
