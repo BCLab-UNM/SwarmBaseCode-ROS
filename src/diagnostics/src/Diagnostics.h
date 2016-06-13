@@ -22,10 +22,16 @@ private:
   void checkGPS();
   void checkSonar();
   void checkCamera();
-
+  
   bool checkGPSExists();
   bool checkCameraExists();
 
+  // This function checks the rover published name against the simulated rover model files.
+  // If the name of this rover does not appear in the models then assume we are a
+  // simulated rover. Being a simulated rover means that certain diagnostic checks will
+  // be bypassed.
+  bool checkIfSimulatedRover();
+  
   // Takes the vendor and device IDs and searches the USB busses for a match
   bool checkUSBDeviceExists(uint16_t, uint16_t);
   
@@ -40,7 +46,7 @@ private:
   // Store some state about the current health of the rover
   bool cameraConnected = true;
   bool GPSConnected = true;
-  
+  bool simulated = false;
 };
 
 #endif // End Diagnostics_h
