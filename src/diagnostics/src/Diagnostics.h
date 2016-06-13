@@ -21,15 +21,25 @@ private:
   void checkIMU();
   void checkGPS();
   void checkSonar();
+  void checkCamera();
 
   bool checkGPSExists();
+  bool checkCameraExists();
+
+  // Takes the vendor and device IDs and searches the USB busses for a match
+  bool checkUSBDeviceExists(uint16_t, uint16_t);
   
   ros::NodeHandle nodeHandle;
   ros::Publisher diagLogPublisher;
   std::string publishedName;
 
+  
   float sensorCheckInterval = 100; // Check sensors every 10 seconds
   ros::Timer sensorCheckTimer;
+
+  // Store some state about the current health of the rover
+  bool cameraConnected = true;
+  bool GPSConnected = true;
   
 };
 
