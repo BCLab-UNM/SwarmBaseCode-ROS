@@ -1,6 +1,6 @@
 #include "Diagnostics.h"
 #include <usb.h>
-
+#include <sys/stat.h>
 #include <std_msgs/String.h> // For creating ROS string messages
 #include <ctime> // For time()
 
@@ -12,7 +12,14 @@ Diagnostics::Diagnostics(std::string name) {
 
   // Setup sensor check timers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
-  publishInfoLogMessage("Diagnostics Package Started");
+  if ( checkIfSimulatedRover() ) {
+    simulated = true;
+    publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
+  } else {
+    simulated = false;
+    publishInfoLogMessage("Diagnostic Package Started. Physical Rover.");
+  }
+  
 }
 
 void Diagnostics::publishErrorLogMessage(std::string msg) {
@@ -50,12 +57,13 @@ string Diagnostics::getHumanFriendlyTime() {
 
 // sensor check timeout handler. This function is triggered periodically and calls the
 // sensor check functions.
-void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event)
-{
+void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
+  if (!simulated) {
   checkIMU();
   checkGPS();
   checkSonar();
   checkCamera();
+  }
 }
 
 void Diagnostics::checkIMU() {
@@ -137,5 +145,15 @@ bool Diagnostics::checkUSBDeviceExists(uint16_t vendorID, uint16_t productID){
   return false;
 }
 
+// Check whether a rover model file exists with the same name as this rover name
+// if not then we should be a physcial rover. Need a better method.
+bool Diagnostics::checkIfSimulatedRover() {
+  struct stat buffer;
+  const char *model_path_env = "GAZEBO_MODEL_PATH";
+  char *model_root = getenv(model_path_env);
+  string model_path = string(model_root)+"/"+publishedName+"/model.sdf";
+  return (stat(model_path.c_str(), &buffer) == 0); 
+}
+     
 Diagnostics::~Diagnostics() {
 }
