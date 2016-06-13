@@ -47,6 +47,7 @@ nohup rosrun target_detection camera &
 nohup rosrun mobility mobility &
 nohup rosrun obstacle_detection obstacle &
 nohup rosrun target_detection target &
+nohup rosrun diagnostics diagnostics &
 
 microcontrollerDevicePath=$(findDevicePath Arduino)
 if [ -z "$microcontrollerDevicePath" ]
