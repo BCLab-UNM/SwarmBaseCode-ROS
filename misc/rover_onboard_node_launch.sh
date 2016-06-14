@@ -7,6 +7,7 @@ pkill abridge
 pkill ublox_gps
 pkill navsat_transform
 pkill ekf_localization
+pkill diagnostics
 
 
 #Point to ROS master on the network
@@ -47,6 +48,7 @@ nohup rosrun target_detection camera &
 nohup rosrun mobility mobility &
 nohup rosrun obstacle_detection obstacle &
 nohup rosrun target_detection target &
+nohup rosrun diagnostics diagnostics &
 
 microcontrollerDevicePath=$(findDevicePath Arduino)
 if [ -z "$microcontrollerDevicePath" ]
@@ -89,7 +91,7 @@ while true; do
 	rosnode kill $HOSTNAME\_CAMERA
 	rosnode kill $HOSTNAME\_OBSTACLE
 	rosnode kill $HOSTNAME\_TARGET
-	rosnode kill $HOSTNAME
+	rosnode kill $HOSTNAME\_DIAGNOSTICS
 
 	exit 1
     fi
