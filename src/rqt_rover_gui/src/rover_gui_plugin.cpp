@@ -24,6 +24,7 @@
 #include <QStringList>
 #include <QLCDNumber>
 #include <QComboBox>
+#include <QPainter>
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
 #include <algorithm>
@@ -319,6 +320,12 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
      // Create QImage to hold the image
      //const uchar* image_buffer = (const uchar*)cv_image_ptr->image.data; // extract the raw data
      QImage qimg(&(image->data[0]), image_cols, image_rows, image_step, QImage::Format_RGB888);
+     QPainter qPainter(&qimg);
+     qPainter.setBrush(Qt::NoBrush);
+     qPainter.setPen(Qt::red);
+     qPainter.drawRect(50, 50, 50, 50);
+     bool end = QPainter.end();
+     
      qimg = qimg.rgbSwapped(); // Convert from RGB to BGR which is the output format for the rovers.
      ui.camera_frame->setImage(qimg);
  }

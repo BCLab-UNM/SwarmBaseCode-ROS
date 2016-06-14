@@ -7,6 +7,7 @@ pkill abridge
 pkill ublox_gps
 pkill navsat_transform
 pkill ekf_localization
+pkill diagnostics
 
 
 #Point to ROS master on the network
@@ -91,6 +92,7 @@ while true; do
 	rosnode kill $HOSTNAME\_OBSTACLE
 	rosnode kill $HOSTNAME\_TARGET
 	rosnode kill $HOSTNAME
+	rosnode kill $HOSTNAME\_DIAGNOSTICS
 
 	exit 1
     fi
