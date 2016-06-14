@@ -40,7 +40,7 @@ private:
   std::string publishedName;
 
   
-  float sensorCheckInterval = 100; // Check sensors every 10 seconds
+  float sensorCheckInterval = 10; // Check sensors every 10 seconds
   ros::Timer sensorCheckTimer;
 
   // Store some state about the current health of the rover
