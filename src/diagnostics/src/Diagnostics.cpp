@@ -76,12 +76,14 @@ void Diagnostics::checkGPS() {
   //publishWarningLogMessage("GPS Warning");
 
   // Check that a U-Blox device exists in the connected USB devices list
+
   if ( checkGPSExists() ) {
     // Notify the GUI only if reconnected after being previously disconnected
     if (!GPSConnected) publishInfoLogMessage("GPS reconnected");
     GPSConnected = true;
-  } else {
-    publishErrorLogMessage("GPS not connected");
+  } else { 
+    if (GPSConnected) // Guard against repeating the error.
+      publishErrorLogMessage("GPS is not connected");
     GPSConnected = false;
   }
 }
