@@ -398,6 +398,16 @@ void MapFrame::paintEvent(QPaintEvent* event)
     point_array = &scaled_target_locations[0];
     painter.drawPoints(point_array, scaled_target_locations.size());
 
+    // Draw a yellow circle at the current EKF estimated rover location
+    painter.setPen(Qt::yellow);
+    pair<float,float> current_coordinate = ekf_rover_path[rover_to_display].back();
+    QPoint point;
+    float x = map_origin_x+((current_coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+    float y = map_origin_y+((current_coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+    float radius = 2.5;
+    //painter.drawArc(x-radius,y-radius,2*radius,2*radius,0,16*360);
+    painter.drawEllipse(QPointF(x,y), radius, radius);
+    
     update_mutex.unlock();
 
     painter.setPen(Qt::white);
