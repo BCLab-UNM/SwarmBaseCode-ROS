@@ -66,6 +66,9 @@
 #include "common/zarray.h"
 #include "common/getopt.h"
 
+#include "shared_messages/TagsImage.h"
+#include "shared_messages/Float64Array.h"
+
 using namespace std;
 
 namespace rqt_rover_gui {
@@ -95,6 +98,7 @@ namespace rqt_rover_gui {
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void targetPickUpEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
     void targetDropOffEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
+    void targetCoordinateEventHandler(const ros::MessageEvent<const shared_messages::TagsImage> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -189,6 +193,7 @@ namespace rqt_rover_gui {
     map<string,ros::Subscriber> obstacle_subscribers;
     map<string,ros::Subscriber> targetDropOffSubscribers;
     map<string,ros::Subscriber> targetPickUpSubscribers;
+    map<string,ros::Subscriber> targetCoordinateSubscribers;
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;

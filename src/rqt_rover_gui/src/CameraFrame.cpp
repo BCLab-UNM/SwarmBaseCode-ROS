@@ -22,6 +22,8 @@ void CameraFrame::paintEvent(QPaintEvent* event)
         //painter.drawText(QPoint(50,50), "Image Received From Camera");
 
         painter.drawImage(contentsRect(), image);
+        painter.drawRect(target_c1[0], target_c1[1], 50, 50);
+
     }
     else
     {

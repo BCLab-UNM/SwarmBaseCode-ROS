@@ -270,15 +270,6 @@ void setVelocity(double linearVel, double angularVel)
 
 void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
 
-    //std_msgs::String msg;
-    //msg.data = "<font Color=Red> H = " + boost::lexical_cast<std::string>(message->image.height) + 
-        //"</font>";
-    //infoLogPublisher.publish(msg);
-    
-    //msg.data = "<font Color=Red> W = " + boost::lexical_cast<std::string>(message->image.width) + 
-        //"</font>";
-    //infoLogPublisher.publish(msg);
-    
 	//if this is the goal target
 	if (message->tags.data[0] == 256) {
 		//if we were returning with a target

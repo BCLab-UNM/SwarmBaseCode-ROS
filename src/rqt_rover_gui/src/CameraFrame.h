@@ -15,6 +15,7 @@
 #include <QImage>
 #include <QMutex>
 #include <QPainter>
+#include <QRect>
 
 namespace rqt_rover_gui
 {
@@ -26,6 +27,8 @@ public:
     CameraFrame(QWidget *parent, Qt::WFlags = 0);
 
     void setImage(const QImage& image);
+    // four corners of tag
+    void addTarget(double c1[2], double c2[2], double c3[2], double c4[2]);
 
 signals:
 
@@ -45,6 +48,11 @@ private:
 
     QTime frame_rate_timer;
     int frames;
+
+    double target_c1[2];
+    double target_c2[2];
+    double target_c3[2];
+    double target_c4[2];
 };
 
 }
