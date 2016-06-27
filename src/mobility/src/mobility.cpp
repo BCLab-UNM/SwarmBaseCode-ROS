@@ -29,6 +29,10 @@ random_numbers::RandomNumberGenerator* rng;
 
 //Mobility Logic Functions
 void setVelocity(double linearVel, double angularVel);
+void openFingers(); // Open fingers to 90 degrees
+void closeFingers();// Close fingers to 0 degrees
+void raiseWrist();  // Return wrist back to 0 degrees
+void lowerWrist();  // Lower wrist to 50 degrees
 
 //Numeric Variables
 geometry_msgs::Pose2D currentLocation;
@@ -266,6 +270,15 @@ void setVelocity(double linearVel, double angularVel)
 
 void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
 
+    //std_msgs::String msg;
+    //msg.data = "<font Color=Red> H = " + boost::lexical_cast<std::string>(message->image.height) + 
+        //"</font>";
+    //infoLogPublisher.publish(msg);
+    
+    //msg.data = "<font Color=Red> W = " + boost::lexical_cast<std::string>(message->image.width) + 
+        //"</font>";
+    //infoLogPublisher.publish(msg);
+    
 	//if this is the goal target
 	if (message->tags.data[0] == 256) {
 		//if we were returning with a target
@@ -396,3 +409,37 @@ void sigintEventHandler(int sig)
      // All the default sigint handler does is call shutdown()
      ros::shutdown();
 }
+
+void openFingers()
+{
+    // Opens fingers/claw to 50 degrees
+    std_msgs::Int16 msg;
+    msg.data = 90;
+    fingerAnglePublish.publish(msg);
+}
+
+void closeFingers()
+{
+    // Close fingers to 0 degrees
+    std_msgs::Int16 msg;
+    msg.data = 0;
+    fingerAnglePublish.publish(msg);
+}
+
+void raiseWrist()
+{
+    // Return wrist back to neutral position at 0 degrees
+    std_msgs::Int16 msg;
+    msg.data = 0;
+    wristAnglePublish.publish(msg);
+}
+
+void lowerWrist()
+{
+    // Lowers wrist to just above the ground at 50 degrees
+    std_msgs::Int16 msg;
+    msg.data = 50;
+    wristAnglePublish.publish(msg);
+}
+
+
