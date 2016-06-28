@@ -22,7 +22,9 @@ void CameraFrame::paintEvent(QPaintEvent* event)
         //painter.drawText(QPoint(50,50), "Image Received From Camera");
 
         painter.drawImage(contentsRect(), image);
-        painter.drawRect(target_c1[0], target_c1[1], 50, 50);
+
+        QRect rect(target_c1[0], target_c1[1], target_c4[0] - target_c1[0], target_c4[1] - target_c1[1]);
+        painter.drawRect(rect);
 
     }
     else
@@ -59,4 +61,42 @@ void CameraFrame::setImage(const QImage& img)
     emit delayedUpdate();
 }
 
+void CameraFrame::addTarget(double c1[2], double c2[2], double c3[2], double c4[2])
+{
+    double *TL;
+    double *BR;
+
+    TL = BR = c1;
+
+    (greaterThan(c2, c1)) ? BR = c2 : BR;
+    (greaterThan(c3, BR)) ? BR = c3 : BR;
+    (greaterThan(c4, BR)) ? BR = c4 : BR;
+
+    (!greaterThan(c2, c1)) ? TL = c2 : TL;
+    (!greaterThan(c3, TL)) ? TL = c3 : TL;
+    (!greaterThan(c4, TL)) ? TL = c4 : TL;
+
+    target_c1[0] = TL[0];
+    target_c1[1] = TL[1];
+
+    target_c4[0] = BR[0];
+    target_c4[1] = BR[1];
+
+
 }
+
+bool greaterThan(double c1[2], double c2[2])
+{
+    double sum1 = c1[0] + c1[1];
+    double sum2 = c2[0] + c2[1];
+
+    return sum1 > sum1;
+}
+
+//bool greaterThan(double c1, double c2)
+//{
+    //return c1 > c2;
+//}
+
+}
+

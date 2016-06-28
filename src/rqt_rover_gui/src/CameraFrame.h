@@ -29,6 +29,8 @@ public:
     void setImage(const QImage& image);
     // four corners of tag
     void addTarget(double c1[2], double c2[2], double c3[2], double c4[2]);
+    bool greaterThan(double c1[2], double c2[2]);
+    bool greaterThan(double c1, double c2);
 
 signals:
 
