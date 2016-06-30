@@ -31,6 +31,22 @@ void CameraFrame::paintEvent(QPaintEvent* event)
             QPointF(target_c4[0], target_c4[1])
         };
 
+        std::stringstream ss;
+
+        ss << " \n {{ " << target_c1[0] <<  ", ";
+        ss << target_c1[1] <<  " }, ";
+
+        ss << "\n{ " << target_c2[0] <<  ", ";
+        ss << target_c2[1] <<  " }, ";
+
+        ss << "\n{ " << target_c3[0] <<  ", ";
+        ss << target_c3[1] <<  " }, ";
+
+        ss << "\n{ " << target_c4[0] << ", ";
+        ss << target_c4[1] <<  " }} ";
+
+        ROS_ERROR_STREAM(ss.str());
+
         //static const QPointF points[4] = {
             //QPointF(10.0, 80.5),
             //QPointF(20.0, 72.0),

@@ -17,6 +17,8 @@
 #include <QMutex>
 #include <QPainter>
 #include <QPointF>
+#include <sstream>
+#include <ros/ros.h>
 
 namespace rqt_rover_gui
 {

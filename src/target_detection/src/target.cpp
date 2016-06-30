@@ -130,7 +130,7 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 	    tagDetected.image = *rawImage;
 
         // String containing coordinates to be sent to output
-        std_msgs::String msg;
+        //std_msgs::String msg;
 
         for(int i = 0; i < 4; i++) {
             shared_messages::Float64Array corner;
@@ -140,19 +140,19 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
             tagDetected.corners.push_back(corner);
         }
 
-        msg.data = "<font color=Red> \n {{ " + boost::lexical_cast<std::string>(tagDetected.corners[0].coord[0]) + ", ";
-        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[0].coord[1]) + " }, ";
+        //msg.data = "<font color=Red> \n {{ " + boost::lexical_cast<std::string>(tagDetected.corners[0].coord[0]) + ", ";
+        //msg.data += boost::lexical_cast<std::string>(tagDetected.corners[0].coord[1]) + " }, ";
 
-        msg.data += "\n{ " + boost::lexical_cast<std::string>(tagDetected.corners[1].coord[0]) + ", ";
-        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[1].coord[1]) + " }, ";
+        //msg.data += "\n{ " + boost::lexical_cast<std::string>(tagDetected.corners[1].coord[0]) + ", ";
+        //msg.data += boost::lexical_cast<std::string>(tagDetected.corners[1].coord[1]) + " }, ";
 
-        msg.data += "\n{ " + boost::lexical_cast<std::string>(tagDetected.corners[2].coord[0]) + ", ";
-        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[2].coord[1]) + " }, ";
+        //msg.data += "\n{ " + boost::lexical_cast<std::string>(tagDetected.corners[2].coord[0]) + ", ";
+        //msg.data += boost::lexical_cast<std::string>(tagDetected.corners[2].coord[1]) + " }, ";
 
-        msg.data += "\n{ " + boost::lexical_cast<std::string>(tagDetected.corners[3].coord[0]) + ", ";
-        msg.data += boost::lexical_cast<std::string>(tagDetected.corners[3].coord[1]) + " }} ";
+        //msg.data += "\n{ " + boost::lexical_cast<std::string>(tagDetected.corners[3].coord[0]) + ", ";
+        //msg.data += boost::lexical_cast<std::string>(tagDetected.corners[3].coord[1]) + " }} ";
 
-        infoLogPublisher.publish(msg);
+        //infoLogPublisher.publish(msg);
 
 
 	    //Publish detected tag
