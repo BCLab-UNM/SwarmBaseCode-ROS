@@ -15,7 +15,7 @@
 #include <QImage>
 #include <QMutex>
 #include <QPainter>
-#include <QRect>
+#include <QPointF>
 
 namespace rqt_rover_gui
 {

@@ -23,8 +23,14 @@ void CameraFrame::paintEvent(QPaintEvent* event)
 
         painter.drawImage(contentsRect(), image);
 
-        QRect rect(target_c1[0], target_c1[1], target_c4[0] - target_c1[0], target_c4[1] - target_c1[1]);
-        painter.drawRect(rect);
+        static const QPointF points[4] = {
+            QPointF(target_c1[0], target_c1[1]),
+            QPointF(target_c2[0], target_c2[1]),
+            QPointF(target_c3[0], target_c3[1]),
+            QPointF(target_c4[0], target_c4[1])
+        };
+
+        painter.drawConvexPolygon(points, 4);
 
     }
     else
