@@ -10,6 +10,7 @@
 #ifndef CAMERAFRAME_H
 #define CAMERAFRAME_H
 
+#include <cmath>
 #include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
