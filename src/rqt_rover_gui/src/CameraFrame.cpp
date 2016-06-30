@@ -23,37 +23,25 @@ void CameraFrame::paintEvent(QPaintEvent* event)
 
         painter.drawImage(contentsRect(), image);
 
+        if(target_c1[0] != -1) 
+        {
+            QPointF points[4] = {
+                QPointF(target_c1[0], target_c1[1]),
+                QPointF(target_c2[0], target_c2[1]),
+                QPointF(target_c3[0], target_c3[1]),
+                QPointF(target_c4[0], target_c4[1])
+            };
 
-        static const QPointF points[4] = {
-            QPointF(target_c1[0], target_c1[1]),
-            QPointF(target_c2[0], target_c2[1]),
-            QPointF(target_c3[0], target_c3[1]),
-            QPointF(target_c4[0], target_c4[1])
-        };
+            painter.drawPolygon(points, 4);
 
-        std::stringstream ss;
-
-        ss << " \n {{ " << target_c1[0] + 0.001 <<  ", ";
-        ss << target_c1[1] + 0.001 <<  " }, ";
-
-        ss << "\n{ " << target_c2[0] + 0.001 <<  ", ";
-        ss << target_c2[1] + 0.001 <<  " }, ";
-
-        ss << "\n{ " << target_c3[0] + 0.001 <<  ", ";
-        ss << target_c3[1] + 0.001 <<  " }, ";
-
-        ss << "\n{ " << target_c4[0] + 0.001 << ", ";
-        ss << target_c4[1] + 0.011 <<  " }} ";
-
-        ROS_ERROR_STREAM(ss.str());
-
-        //static const QPointF points[4] = {
-            //QPointF(10.0, 80.5),
-            //QPointF(20.0, 72.0),
-            //QPointF(28.6, 42.5),
-            //QPointF(92.1, 85.1)
-        //};
-        painter.drawConvexPolygon(points, 4);
+            for(int i = 0; i < 2; i++)
+            {
+                target_c1[i] = -1;
+                target_c2[i] = -1;
+                target_c3[i] = -1;
+                target_c4[i] = -1;
+            }
+        }
 
     }
     else
@@ -92,48 +80,16 @@ void CameraFrame::setImage(const QImage& img)
 
 void CameraFrame::addTarget(double c1[2], double c2[2], double c3[2], double c4[2])
 {
-    //double *TL;
-    //double *BR;
-
-    //TL = BR = c1;
-
-    //(greaterThan(c2, c1)) ? BR = c2 : BR;
-    //(greaterThan(c3, BR)) ? BR = c3 : BR;
-    //(greaterThan(c4, BR)) ? BR = c4 : BR;
-
-    //(!greaterThan(c2, c1)) ? TL = c2 : TL;
-    //(!greaterThan(c3, TL)) ? TL = c3 : TL;
-    //(!greaterThan(c4, TL)) ? TL = c4 : TL;
-
-    //target_c1[0] = TL[0];
-    //target_c1[1] = TL[1];
-
-    //target_c4[0] = BR[0];
-    //target_c4[1] = BR[1];
 
     for(int i = 0; i < 2; i++)
     {
-        target_c1[i] = (float)std::round(c1[i]);
-        target_c2[i] = (float)std::round(c2[i]);
-        target_c3[i] = (float)std::round(c3[i]);
-        target_c4[i] = (float)std::round(c4[i]);
+        target_c1[i] = c1[i];
+        target_c2[i] = c2[i];
+        target_c3[i] = c3[i];
+        target_c4[i] = c4[i];
     }
 
-
 }
-
-bool greaterThan(double c1[2], double c2[2])
-{
-    double sum1 = c1[0] + c1[1];
-    double sum2 = c2[0] + c2[1];
-
-    return sum1 > sum1;
-}
-
-//bool greaterThan(double c1, double c2)
-//{
-    //return c1 > c2;
-//}
 
 }
 
