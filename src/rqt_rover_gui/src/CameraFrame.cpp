@@ -113,10 +113,10 @@ void CameraFrame::addTarget(double c1[2], double c2[2], double c3[2], double c4[
 
     for(int i = 0; i < 2; i++)
     {
-        target_c1[i] = (double)std::round(c1[i]);
-        target_c2[i] = (double)std::round(c2[i]);
-        target_c3[i] = (double)std::round(c3[i]);
-        target_c4[i] = (double)std::round(c4[i]);
+        target_c1[i] = (float)std::round(c1[i]);
+        target_c2[i] = (float)std::round(c2[i]);
+        target_c3[i] = (float)std::round(c3[i]);
+        target_c4[i] = (float)std::round(c4[i]);
     }
 
 
