@@ -33,17 +33,17 @@ void CameraFrame::paintEvent(QPaintEvent* event)
 
         std::stringstream ss;
 
-        ss << " \n {{ " << target_c1[0] <<  ", ";
-        ss << target_c1[1] <<  " }, ";
+        ss << " \n {{ " << target_c1[0] + 0.001 <<  ", ";
+        ss << target_c1[1] + 0.001 <<  " }, ";
 
-        ss << "\n{ " << target_c2[0] <<  ", ";
-        ss << target_c2[1] <<  " }, ";
+        ss << "\n{ " << target_c2[0] + 0.001 <<  ", ";
+        ss << target_c2[1] + 0.001 <<  " }, ";
 
-        ss << "\n{ " << target_c3[0] <<  ", ";
-        ss << target_c3[1] <<  " }, ";
+        ss << "\n{ " << target_c3[0] + 0.001 <<  ", ";
+        ss << target_c3[1] + 0.001 <<  " }, ";
 
-        ss << "\n{ " << target_c4[0] << ", ";
-        ss << target_c4[1] <<  " }} ";
+        ss << "\n{ " << target_c4[0] + 0.001 << ", ";
+        ss << target_c4[1] + 0.011 <<  " }} ";
 
         ROS_ERROR_STREAM(ss.str());
 
