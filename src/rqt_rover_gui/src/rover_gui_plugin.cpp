@@ -462,13 +462,17 @@ void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const 
     double c3[2];
     double c4[2];
 
-    for(int i = 0; i < 2; i++)
-    {
-        c1[i] = image->corners[0].coord[i];
-        c2[i] = image->corners[1].coord[i];
-        c3[i] = image->corners[2].coord[i];
-        c4[i] = image->corners[3].coord[i];
-    }
+    c1[0] = image->corners.points[0].x;
+    c1[1] = image->corners.points[0].y;
+
+    c2[0] = image->corners.points[1].x;
+    c2[1] = image->corners.points[1].y;
+
+    c3[0] = image->corners.points[2].x;
+    c3[1] = image->corners.points[2].y;
+
+    c4[0] = image->corners.points[3].x;
+    c4[1] = image->corners.points[3].y;
 
     ui.camera_frame->addTarget(c1, c2, c3, c4);
 }

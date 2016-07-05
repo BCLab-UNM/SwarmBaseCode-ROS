@@ -35,6 +35,8 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/UInt8.h>
+#include <geometry_msgs/Polygon.h>
+#include <geometry_msgs/Point32.h>
 #include <pluginlib/class_list_macros.h>
 #include <QGraphicsView>
 #include <QEvent>

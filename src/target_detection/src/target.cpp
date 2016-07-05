@@ -7,10 +7,11 @@
 #include <std_msgs/Int16.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/image_encodings.h>
+#include <geometry_msgs/Polygon.h>
+#include <geometry_msgs/Point32.h>
 
 //Custom messages
 #include <shared_messages/TagsImage.h>
-#include <shared_messages/Float64Array.h>
 
 //OpenCV headers
 #include <opencv2/opencv.hpp>
@@ -124,17 +125,19 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
     
     //Check result for valid tag
     if (zarray_size(detections) > 0) {
+        ROS_ERROR_STREAM("Imin");
 	    apriltag_detection_t *det;
 	    zarray_get(detections, 0, &det); //use the first tag detected in the image
 	    tagDetected.tags.data.push_back(det->id);
 	    tagDetected.image = *rawImage;
 
         for(int i = 0; i < 4; i++) {
-            shared_messages::Float64Array corner;
-            for(int j = 0; j < 2; j++) {
-                corner.coord.push_back(det->p[i][j]);
-            }
-            tagDetected.corners.push_back(corner);
+            geometry_msgs::Point32 corner;
+
+            corner.x = det->p[i][0];
+            corner.y = det->p[i][1];
+
+            tagDetected.corners.points.push_back(corner);
         }
         
 	    //Publish detected tag

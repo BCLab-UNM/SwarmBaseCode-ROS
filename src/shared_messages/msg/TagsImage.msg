@@ -6,7 +6,7 @@ sensor_msgs/Image image
 # detected starting from the top left (TL)
 # going counter clockwise
 # {TL, TR, BR, BL}
-Float64Array[] corners
+geometry_msgs/Polygon corners
 
 # Contains the center coordinates for detected
 # april tag {x,y} 

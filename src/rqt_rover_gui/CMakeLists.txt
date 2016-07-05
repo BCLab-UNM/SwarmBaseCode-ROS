@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   shared_messages
+  geometry_msgs
 )
 
 find_package(Qt4 REQUIRED COMPONENTS
@@ -38,7 +39,7 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 #list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 catkin_package(
-  CATKIN_DEPENDS rqt_gui rqt_gui_cpp cv_bridge image_transport shared_messages
+  CATKIN_DEPENDS rqt_gui rqt_gui_cpp cv_bridge image_transport shared_messages geometry_msgs
 )
 
 SET(rover_gui_plugin_RESOURCES resources/resources.qrc)
