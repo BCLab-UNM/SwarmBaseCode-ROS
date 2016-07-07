@@ -125,19 +125,27 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
     
     //Check result for valid tag
     if (zarray_size(detections) > 0) {
-        ROS_ERROR_STREAM("Imin");
-	    apriltag_detection_t *det;
-	    zarray_get(detections, 0, &det); //use the first tag detected in the image
-	    tagDetected.tags.data.push_back(det->id);
-	    tagDetected.image = *rawImage;
+        for(int i = 0; i < zarray_size(detections); i++) {
+            apriltag_detection_t *det;
+            zarray_get(detections, i, &det); //use the first tag detected in the image
+            tagDetected.tags.data.push_back(det->id);
 
-        for(int i = 0; i < 4; i++) {
-            geometry_msgs::Point32 corner;
+            if(i == 0) {
+                tagDetected.image = *rawImage;
+            }
 
-            corner.x = det->p[i][0];
-            corner.y = det->p[i][1];
+            geometry_msgs::Polygon poly;
 
-            tagDetected.corners.points.push_back(corner);
+            for(int j = 0; j < 4; j++) {
+                geometry_msgs::Point32 corner;
+
+                corner.x = det->p[j][0];
+                corner.y = det->p[j][1];
+
+                poly.points.push_back(corner);
+            }
+
+            tagDetected.corners.push_back(poly);
         }
         
 	    //Publish detected tag
