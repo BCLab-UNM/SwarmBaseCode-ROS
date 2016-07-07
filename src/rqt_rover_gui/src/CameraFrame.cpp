@@ -23,25 +23,26 @@ void CameraFrame::paintEvent(QPaintEvent* event)
 
         painter.drawImage(contentsRect(), image);
 
-        if(target_c1[0] != -1) 
+        if(target_corners_1.size() > 0) 
         {
-            QPointF points[4] = {
-                QPointF(target_c1[0], target_c1[1]),
-                QPointF(target_c2[0], target_c2[1]),
-                QPointF(target_c3[0], target_c3[1]),
-                QPointF(target_c4[0], target_c4[1])
-            };
-
-            painter.drawPolygon(points, 4);
-
-            for(int i = 0; i < 2; i++)
+            for(int i = 0; i < target_corners_1.size(); i++) 
             {
-                target_c1[i] = -1;
-                target_c2[i] = -1;
-                target_c3[i] = -1;
-                target_c4[i] = -1;
+                QPointF points[4] = {
+                    QPointF(target_corners_1[i].first, target_corners_1[i].second),
+                    QPointF(target_corners_2[i].first, target_corners_2[i].second),
+                    QPointF(target_corners_3[i].first, target_corners_3[i].second),
+                    QPointF(target_corners_4[i].first, target_corners_4[i].second),
+                };
+
+                painter.drawPolygon(points, 4);
             }
+
         }
+
+        target_corners_1.clear();
+        target_corners_2.clear();
+        target_corners_3.clear();
+        target_corners_4.clear();
 
     }
     else
@@ -78,17 +79,12 @@ void CameraFrame::setImage(const QImage& img)
     emit delayedUpdate();
 }
 
-void CameraFrame::addTarget(double c1[2], double c2[2], double c3[2], double c4[2])
+void CameraFrame::addTarget(std::pair<double,double> c1, std::pair<double,double> c2, std::pair<double,double> c3, std::pair<double,double> c4)
 {
-
-    for(int i = 0; i < 2; i++)
-    {
-        target_c1[i] = c1[i];
-        target_c2[i] = c2[i];
-        target_c3[i] = c3[i];
-        target_c4[i] = c4[i];
-    }
-
+    target_corners_1.push_back(c1);
+    target_corners_2.push_back(c2);
+    target_corners_3.push_back(c3);
+    target_corners_4.push_back(c4);
 }
 
 }
