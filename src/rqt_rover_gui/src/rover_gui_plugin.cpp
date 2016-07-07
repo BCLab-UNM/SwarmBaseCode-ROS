@@ -457,22 +457,22 @@ void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const 
     size_t found = topic.find("/targets");
     string rover_name = topic.substr(1,found-1);
 
-    double c1[2];
-    double c2[2];
-    double c3[2];
-    double c4[2];
+    std::pair<double, double> c1;
+    std::pair<double, double> c2;
+    std::pair<double, double> c3;
+    std::pair<double, double> c4;
 
-    c1[0] = image->corners[0].points[0].x;
-    c1[1] = image->corners[0].points[0].y;
+    c1.first = image->corners[0].points[0].x;
+    c1.second = image->corners[0].points[0].y;
 
-    c2[0] = image->corners[0].points[1].x;
-    c2[1] = image->corners[0].points[1].y;
+    c2.first = image->corners[0].points[1].x;
+    c2.second = image->corners[0].points[1].y;
 
-    c3[0] = image->corners[0].points[2].x;
-    c3[1] = image->corners[0].points[2].y;
+    c3.first = image->corners[0].points[2].x;
+    c3.second = image->corners[0].points[2].y;
 
-    c4[0] = image->corners[0].points[3].x;
-    c4[1] = image->corners[0].points[3].y;
+    c4.first = image->corners[0].points[3].x;
+    c4.second = image->corners[0].points[3].y;
 
     ui.camera_frame->addTarget(c1, c2, c3, c4);
 }

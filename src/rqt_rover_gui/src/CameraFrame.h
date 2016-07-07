@@ -11,6 +11,8 @@
 #define CAMERAFRAME_H
 
 #include <cmath>
+#include <utility>
+#include <vector>
 #include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
@@ -29,7 +31,7 @@ public:
 
     void setImage(const QImage& image);
     // four corners of tag
-    void addTarget(double c1[2], double c2[2], double c3[2], double c4[2]);
+    void addTarget(std::pair<double,double> c1, std::pair<double,double> c2, std::pair<double,double> c3, std::pair<double,double> c4);
 
 signals:
 
@@ -50,10 +52,10 @@ private:
     QTime frame_rate_timer;
     int frames;
 
-    double target_c1[2];
-    double target_c2[2];
-    double target_c3[2];
-    double target_c4[2];
+    std::vector<std::pair<double, double>> target_corners_1;
+    std::vector<std::pair<double, double>> target_corners_2;
+    std::vector<std::pair<double, double>> target_corners_3;
+    std::vector<std::pair<double, double>> target_corners_4;
 };
 
 }
