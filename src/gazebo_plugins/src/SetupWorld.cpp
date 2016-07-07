@@ -30,12 +30,9 @@ namespace gazebo
       physicsMsg.set_type(msgs::Physics::ODE);
 
       // Set the step time
-      // original value 0.01; changed to 0.001 with the update to robot weights in .sdf files
       physicsMsg.set_max_step_size(0.001);
 
       // Set the real time update rate
-      // 0.0 makes Gazebo go as fast as it reasonably can
-      // the default is 1000.0; if gazebo is running too fast, you should change this value
       physicsMsg.set_real_time_update_rate(0.0);
 
       // Change gravity
