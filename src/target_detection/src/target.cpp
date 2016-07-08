@@ -134,7 +134,7 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
                 tagDetected.image = *rawImage;
             }
 
-            geometry_msgs::Polygon poly;
+            geometry_msgs::Polygon target_corners;
 
             for(int j = 0; j < 4; j++) {
                 geometry_msgs::Point32 corner;
@@ -142,10 +142,18 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
                 corner.x = det->p[j][0];
                 corner.y = det->p[j][1];
 
-                poly.points.push_back(corner);
+                target_corners.points.push_back(corner);
             }
 
-            tagDetected.corners.push_back(poly);
+            tagDetected.corners.push_back(target_corners);
+
+            geometry_msgs::Point32 center_coordinates;
+
+            center_coordinates.x = det->c[0];
+            center_coordinates.y = det->c[1];
+
+            tagDetected.center.points.push_back(center_coordinates);
+
         }
         
 	    //Publish detected tag

@@ -69,7 +69,6 @@
 #include "common/getopt.h"
 
 #include "shared_messages/TagsImage.h"
-#include "shared_messages/Float64Array.h"
 
 using namespace std;
 

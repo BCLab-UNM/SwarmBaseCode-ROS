@@ -10,5 +10,5 @@ geometry_msgs/Polygon[] corners
 
 # Contains the center coordinates for detected
 # april tag {x,y} 
-float64[]   center
+geometry_msgs/Polygon   center
 

@@ -1,8 +1,0 @@
-prefix=/home/swarmie/rover_workspace/install_isolated
-
-Name: diagnostics
-Description: Description of diagnostics
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/swarmie/rover_workspace/install_isolated/lib 
-Requires: std_msgs

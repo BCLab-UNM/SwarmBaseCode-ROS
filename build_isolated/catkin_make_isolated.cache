@@ -1,2 +1,0 @@
-abridge:diagnostics:gazebo_plugins:mobility:obstacle_detection:rqt_rover_gui:shared_messages:target_detection:ublox/ublox:ublox/ublox_gps:ublox/ublox_msgs:ublox/ublox_serialization
--G Unix Makefiles -DCATKIN_DEVEL_PREFIX=/home/swarmie/rover_workspace/devel_isolated -DCMAKE_INSTALL_PREFIX=/home/swarmie/rover_workspace/install_isolated
