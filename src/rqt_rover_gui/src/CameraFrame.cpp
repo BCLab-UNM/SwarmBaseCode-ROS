@@ -25,6 +25,10 @@ void CameraFrame::paintEvent(QPaintEvent* event)
 
         if(target_corners_1.size() > 0) 
         {
+            QPen pen(Qt::red);
+            pen.setWidth(2);
+            painter.setPen(pen);
+
             for(int i = 0; i < target_corners_1.size(); i++) 
             {
                 QPointF points[4] = {
@@ -36,6 +40,8 @@ void CameraFrame::paintEvent(QPaintEvent* event)
 
                 painter.drawPolygon(points, 4);
             }
+
+            painter.setPen(Qt::white);
 
         }
 

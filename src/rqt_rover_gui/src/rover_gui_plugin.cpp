@@ -479,7 +479,6 @@ void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const 
         ui.camera_frame->addTarget(c1, c2, c3, c4);
     }
 
-    ROS_ERROR_STREAM("The first center coordinate is (" << image->center.points[0].x << ", " << image->center.points[0].y << ")");
 }
 
 
