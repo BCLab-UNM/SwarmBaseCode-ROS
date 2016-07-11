@@ -152,6 +152,8 @@ namespace rqt_rover_gui {
     void autonomousRadioButtonEventHandler(bool marked);
     void allAutonomousButtonEventHandler();
     void allStopButtonEventHandler();
+    void customWorldButtonEventHandler();
+    void customWorldRadioButtonEventHandler(bool marked);
 
     void buildSimulationButtonEventHandler();
     void clearSimulationButtonEventHandler();
@@ -235,6 +237,7 @@ namespace rqt_rover_gui {
 	
 	//AprilTag assigned to collection zone
 	int collectionZoneID = 256;
+
   };
 } // end namespace
 

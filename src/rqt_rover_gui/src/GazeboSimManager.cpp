@@ -18,15 +18,29 @@ GazeboSimManager::GazeboSimManager()
     char *app_root_cstr;
     app_root_cstr = getenv(name);
     app_root = QString(app_root_cstr);
+    custom_world_path = "";
 }
 
+// Load a default world path unless a custom path has been specified
 QProcess* GazeboSimManager::startGazeboServer()
+{
+    QString path;
+    if (custom_world_path == "")
+        path = app_root + "/simulation/worlds/swarmathon.world";
+    else
+        path = custom_world_path;
+
+    return startGazeboServer( path );
+}
+
+// Start the gazebo server with a custom world path
+QProcess* GazeboSimManager::startGazeboServer( QString path )
 {
     if (gazebo_server_process != NULL) return gazebo_server_process;
 
     gazebo_server_process = new QProcess();
 
-    QString command = QString("rosrun gazebo_ros gzserver ") + app_root + "/simulation/worlds/swarmathon.world";
+    QString command = QString("rosrun gazebo_ros gzserver ") + path;
 
     gazebo_server_process->startDetached(command);
 
@@ -356,6 +370,11 @@ bool GazeboSimManager::isGazeboClientRunning()
     return gazebo_server_process != NULL;
 }
 
+void GazeboSimManager::setCustomWorldPath(QString path)
+{
+    custom_world_path = path;
+}
+
 GazeboSimManager::~GazeboSimManager()
 {
     stopGazeboServer();
@@ -367,4 +386,6 @@ GazeboSimManager::~GazeboSimManager()
     delete gazebo_server_process;
     delete command_process;
 }
+
+
 

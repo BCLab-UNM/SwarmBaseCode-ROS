@@ -253,13 +253,13 @@ QTabBar::tab:only-one {
     <attribute name="title">
      <string>Simulation Control</string>
     </attribute>
-    <widget class="QFrame" name="simulation_setup_frame">
+    <widget class="QFrame" name="setup_group">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>60</y>
        <width>301</width>
-       <height>231</height>
+       <height>271</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -268,11 +268,132 @@ QTabBar::tab:only-one {
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
+     <widget class="QGroupBox" name="target_distribution_group_box">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>141</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="title">
+       <string>Target Distribution</string>
+      </property>
+      <widget class="QRadioButton" name="uniform_distribution_radio_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>30</y>
+         <width>91</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Uniform</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="powerlaw_distribution_radio_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>90</y>
+         <width>101</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Power Law</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="clustered_distribution_radio_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>60</y>
+         <width>91</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Clustered</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="custom_distribution_radio_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>130</y>
+         <width>117</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Custom</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="custom_world_path_button">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>150</y>
+        <width>71</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+      </property>
+      <property name="text">
+       <string>Select</string>
+      </property>
+     </widget>
      <widget class="QGroupBox" name="round_type_button_group">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>10</y>
+        <x>160</x>
+        <y>50</y>
         <width>121</width>
         <height>91</height>
        </rect>
@@ -326,91 +447,27 @@ border-color: rgb(255, 255, 255);</string>
        </property>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="target_distribution_group_box">
+     <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>10</y>
-        <width>141</width>
-        <height>111</height>
+        <x>20</x>
+        <y>220</y>
+        <width>111</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
-      <property name="title">
-       <string>Target Distribution</string>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ground Texture&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
-      <widget class="QRadioButton" name="uniform_distribution_radio_button">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>91</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string>Uniform</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="powerlaw_distribution_radio_button">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>101</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string>Power Law</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="clustered_distribution_radio_button">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>91</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string>Clustered</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
      </widget>
      <widget class="QComboBox" name="texture_combobox">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>170</y>
+        <x>150</x>
+        <y>220</y>
         <width>131</width>
         <height>27</height>
        </rect>
@@ -438,12 +495,12 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        </property>
       </item>
      </widget>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="custom_world_path">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>150</y>
-        <width>111</width>
+        <x>40</x>
+        <y>180</y>
+        <width>241</width>
         <height>20</height>
        </rect>
       </property>
@@ -451,7 +508,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ground Texture&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string/>
       </property>
      </widget>
     </widget>
@@ -488,7 +545,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>320</y>
+       <y>350</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -750,7 +807,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>370</y>
+       <y>400</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -1468,6 +1525,30 @@ border: 1px solid white;
        <string>val</string>
       </property>
      </widget>
+     <zorder>label_27</zorder>
+     <zorder>label_28</zorder>
+     <zorder>label_29</zorder>
+     <zorder>label_30</zorder>
+     <zorder>label_31</zorder>
+     <zorder>label_32</zorder>
+     <zorder>label_33</zorder>
+     <zorder>label_34</zorder>
+     <zorder>label_35</zorder>
+     <zorder>label_36</zorder>
+     <zorder>label_37</zorder>
+     <zorder>label_38</zorder>
+     <zorder>imu_update_rate</zorder>
+     <zorder>imu_rate_drift</zorder>
+     <zorder>imu_rate_noise</zorder>
+     <zorder>imu_heading_drift</zorder>
+     <zorder>imu_heading_noise</zorder>
+     <zorder>imu_accel_drift</zorder>
+     <zorder>imu_accel_noise</zorder>
+     <zorder>imu_rpy_offsets</zorder>
+     <zorder>imu_noise</zorder>
+     <zorder>label_63</zorder>
+     <zorder>label_64</zorder>
+     <zorder>setup_group</zorder>
     </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">
@@ -1712,7 +1793,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>420</y>
+       <y>450</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -1727,7 +1808,7 @@ border: 1px solid white;
       <string>Toggle Visualization</string>
      </property>
     </widget>
-    <zorder>simulation_setup_frame</zorder>
+    <zorder>setup_group</zorder>
     <zorder>label_7</zorder>
     <zorder>rover_image_label</zorder>
     <zorder>build_simulation_button</zorder>

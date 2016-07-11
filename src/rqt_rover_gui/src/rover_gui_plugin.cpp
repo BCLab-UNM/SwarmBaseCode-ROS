@@ -23,6 +23,7 @@
 #include <QProgressDialog>
 #include <QStringList>
 #include <QLCDNumber>
+#include <QFileDialog>
 #include <QComboBox>
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
@@ -126,6 +127,8 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
     connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
+    connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
+    connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
 
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
@@ -143,6 +146,9 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
     ui.joystick_frame->setHidden(false);
+
+    ui.custom_world_path_button->setDisabled(true);
+    ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     ui.tab_widget->setCurrentIndex(0);
 
@@ -450,6 +456,8 @@ void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String
     ros::Time receipt_time = event.getReceiptTime();
 
     // Extract rover name from the message source
+
+    // This method is used rather than reading the publisher name to accomodate teams that changed the node name.
     string topic = header.at("topic");
     size_t found = topic.find("/status");
     string rover_name = topic.substr(1,found-1);
@@ -977,6 +985,45 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     //Disable all stop button
     ui.all_stop_button->setEnabled(false);
     ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+}
+
+// Get the path to the world file containing the custom distribution from the user
+void RoverGUIPlugin::customWorldButtonEventHandler()
+{
+    const char *name = "SWARMATHON_APP_ROOT";
+    char *app_root_cstr;
+    app_root_cstr = getenv(name);
+    QString app_root = QString(app_root_cstr) + "/simulation/worlds/";
+
+    QString path = QFileDialog::getOpenFileName(widget, tr("Open File"),
+                                                    app_root,
+                                                    tr("Gazebo World File (*.world)"));
+
+    sim_mgr.setCustomWorldPath(path);
+    emit sendInfoLogMessage("User selected custom world path: " + path);
+
+    // Extract the base filename for short display
+    QFileInfo fi=path;
+    ui.custom_world_path->setText(fi.baseName());
+}
+
+// Enable or disable custom distributions
+void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
+{
+    ui.custom_world_path_button->setEnabled(toggled);
+
+    // Set the button color to reflect whether or not it is disabled
+    // Clear the sim path if custom distribution it deselected
+    if( toggled )
+    {
+        ui.custom_world_path_button->setStyleSheet("color: white; border:2px solid white;");
+    }
+    else
+    {
+        sim_mgr.setCustomWorldPath("");
+        ui.custom_world_path->setText("");
+        ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+    }
 }
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
