@@ -457,10 +457,13 @@ void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const 
     size_t found = topic.find("/targets");
     string rover_name = topic.substr(1,found-1);
 
+    // Each pair will store an individual corner coordinate and the center coordinate
+    // for each april tag 
     std::pair<double, double> c1;
     std::pair<double, double> c2;
     std::pair<double, double> c3;
     std::pair<double, double> c4;
+    std::pair<double, double> center;
 
     for(int i = 0; i < image->corners.size(); i++)
     {
@@ -476,7 +479,10 @@ void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const 
         c4.first = image->corners[i].points[3].x;
         c4.second = image->corners[i].points[3].y;
 
-        ui.camera_frame->addTarget(c1, c2, c3, c4);
+        center.first = image->centers.points[i].x;
+        center.second = image->centers.points[i].y;
+
+        ui.camera_frame->addTarget(c1, c2, c3, c4, center);
     }
 
 }

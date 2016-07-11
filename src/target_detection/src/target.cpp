@@ -123,15 +123,19 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
     
     //Check result for valid tag
     if (zarray_size(detections) > 0) {
+
+        // Grab information for all april tags detected
         for(int i = 0; i < zarray_size(detections); i++) {
             apriltag_detection_t *det;
-            zarray_get(detections, i, &det); //use the first tag detected in the image
+            zarray_get(detections, i, &det); 
             tagDetected.tags.data.push_back(det->id);
 
-            //if(i == 0) {
-                //tagDetected.image = *rawImage;
-            //}
+            // Use only the first raw image 
+            if(i == 0) {
+                tagDetected.image = *rawImage;
+            }
 
+            // Stores corners for all targets detected
             geometry_msgs::Polygon target_corners;
 
             for(int j = 0; j < 4; j++) {
@@ -145,17 +149,18 @@ void targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
 
             tagDetected.corners.push_back(target_corners);
 
+            // Stores center coordinates
             geometry_msgs::Point32 center_coordinates;
 
             center_coordinates.x = det->c[0];
             center_coordinates.y = det->c[1];
 
-            tagDetected.center.points.push_back(center_coordinates);
+            tagDetected.centers.points.push_back(center_coordinates);
 
         }
         
 	    //Publish detected tag
-		//tagPublish.publish(tagDetected);
+        tagPublish.publish(tagDetected);
 	}
 }
 

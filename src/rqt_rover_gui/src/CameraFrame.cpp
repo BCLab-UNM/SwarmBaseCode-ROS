@@ -85,12 +85,14 @@ void CameraFrame::setImage(const QImage& img)
     emit delayedUpdate();
 }
 
-void CameraFrame::addTarget(std::pair<double,double> c1, std::pair<double,double> c2, std::pair<double,double> c3, std::pair<double,double> c4)
+void CameraFrame::addTarget(std::pair<double,double> c1, std::pair<double,double> c2, std::pair<double,double> c3,
+        std::pair<double,double> c4, std::pair<double,double> center)
 {
     target_corners_1.push_back(c1);
     target_corners_2.push_back(c2);
     target_corners_3.push_back(c3);
     target_corners_4.push_back(c4);
+    target_centers.push_back(center);
 }
 
 }
