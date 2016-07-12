@@ -61,7 +61,7 @@ if [ -z "$gpsDevicePath" ]
 then
     echo "Error: u-blox GPS device not found"
 else
-    nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath &
+    nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath _frame_id:=$HOSTNAME/base_link &
 fi
 
 nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
