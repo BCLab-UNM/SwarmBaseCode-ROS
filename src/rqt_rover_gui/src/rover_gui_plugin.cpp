@@ -449,6 +449,51 @@ void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sen
     }
 }
 
+// Receives coordinates for all detected targets from camera
+void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const shared_messages::TagsImage> &event)
+{
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const shared_messages::TagsImageConstPtr& image = event.getMessage();
+
+    // Extract rover name from the message source
+    string topic = header.at("topic");
+    size_t found = topic.find("/targets");
+    string rover_name = topic.substr(1,found-1);
+
+    // Each pair will store an individual corner coordinate and the center coordinate
+    // for each april tag 
+    std::pair<double, double> c1;
+    std::pair<double, double> c2;
+    std::pair<double, double> c3;
+    std::pair<double, double> c4;
+    std::pair<double, double> center;
+
+    for(int i = 0; i < image->corners.size(); i++)
+    {
+        c1.first = image->corners[i].points[0].x;
+        c1.second = image->corners[i].points[0].y;
+
+        c2.first = image->corners[i].points[1].x;
+        c2.second = image->corners[i].points[1].y;
+
+        c3.first = image->corners[i].points[2].x;
+        c3.second = image->corners[i].points[2].y;
+
+        c4.first = image->corners[i].points[3].x;
+        c4.second = image->corners[i].points[3].y;
+
+        center.first = image->centers.points[i].x;
+        center.second = image->centers.points[i].y;
+
+        ui.camera_frame->addTarget(c1, c2, c3, c4, center);
+    }
+
+}
+
+
 // Receives and stores the status update messages from rovers
 void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String const> &event)
 {
@@ -615,6 +660,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ekf_subscribers[*it].shutdown();
         targetPickUpSubscribers[*it].shutdown();
         targetDropOffSubscribers[*it].shutdown();
+        targetCoordinateSubscribers[*it].shutdown();
 
         // Delete the subscribers
         status_subscribers.erase(*it);
@@ -623,6 +669,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ekf_subscribers.erase(*it);
         targetPickUpSubscribers.erase(*it);
         targetDropOffSubscribers.erase(*it);
+        targetCoordinateSubscribers.erase(*it);
         
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
@@ -724,6 +771,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
         targetPickUpSubscribers[*i] = nh.subscribe("/"+*i+"/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
         targetDropOffSubscribers[*i] = nh.subscribe("/"+*i+"/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
+        targetCoordinateSubscribers[*i] = nh.subscribe("/"+*i+"/targets", 10, &RoverGUIPlugin::targetCoordinateEventHandler, this);
 
         QString rover_status = "";
         // Build new ui rover list string
@@ -1280,6 +1328,10 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     for (map<string,ros::Subscriber>::iterator it=targetDropOffSubscribers.begin(); it!=targetDropOffSubscribers.end(); ++it) it->second.shutdown();
     targetDropOffSubscribers.clear();
+
+    for (map<string,ros::Subscriber>::iterator it=targetCoordinateSubscribers.begin(); it!=targetCoordinateSubscribers.end(); ++it) it->second.shutdown();
+    targetCoordinateSubscribers.clear();
+
     camera_subscriber.shutdown();
 
     emit sendInfoLogMessage("Shutting down publishers...");
