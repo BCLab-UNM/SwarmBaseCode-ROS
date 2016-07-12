@@ -1,7 +1,0 @@
-Location for header file containing apriltag_detection struct
-~/rover_workerspace/src/target_detection/include/apriltag.h
-Line 203-244
-
-double c[2]
-
-double p[4][2]
