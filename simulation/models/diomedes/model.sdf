@@ -644,11 +644,11 @@
 			<rightRearJoint>right_rear</rightRearJoint>
 			<wheelSeparation>0.27</wheelSeparation>
 			<wheelDiameter>0.12</wheelDiameter>
-			<robotBaseFrame>base_link</robotBaseFrame>
+			<robotBaseFrame>diomedes/base_link</robotBaseFrame>
 			<torque>2.8</torque>
 			<commandTopic>/diomedes/velocity</commandTopic>
 			<odometryTopic>/diomedes/odom</odometryTopic>
-			<odometryFrame>odom</odometryFrame>
+			<odometryFrame>diomedes/odom</odometryFrame>
 		</plugin>
 
 		<!-- GPS plugin -->
@@ -656,6 +656,7 @@
 			<alwaysOn>1</alwaysOn>
 			<updateRate>5</updateRate>
 			<bodyName>base_link</bodyName>
+			<frameId>diomedes/base_link</frameId>
 			<topicName>/diomedes/fix</topicName>
 			<referenceLatitude>28.584810</referenceLatitude>
 			<referenceLongitude>-80.649650</referenceLongitude>
@@ -671,6 +672,7 @@
 		<plugin name="imu_sim" filename="libhector_gazebo_ros_imu.so">
 			<updateRate>10</updateRate>
 			<bodyName>base_link</bodyName>
+			<frameId>diomedes/base_link</frameId>
 			<topicName>/diomedes/imu</topicName>
 			<rpyOffsets>0 0 0</rpyOffsets> 
 			<gaussianNoise>0</gaussianNoise>  

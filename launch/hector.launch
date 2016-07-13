@@ -1,4 +1,7 @@
 <launch>
+
+  <param name="tf_prefix" value="$(arg name)" />
+
   <node name="hector_DIAGNOSTICS" pkg="diagnostics" type="diagnostics" args="$(arg name)" />
   <node name="hector_MOBILITY" pkg="mobility" type="mobility" args="$(arg name)" />
   <node name="hector_TARGET" pkg="target_detection" type="target" args="$(arg name)" />
