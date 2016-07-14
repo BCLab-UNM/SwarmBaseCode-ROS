@@ -40,7 +40,7 @@
 		</link>
 
 		<link name='top'>
-			<pose>0.0006 0 0.1245 0 0 0</pose>
+			<pose>0.0006 0 0.12 0 0 0</pose>
 			<inertial>
 				<mass>0.2</mass>
 				<inertia>
@@ -649,6 +649,7 @@
 			<commandTopic>/hector/velocity</commandTopic>
 			<odometryTopic>/hector/odom</odometryTopic>
 			<odometryFrame>odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->
@@ -672,7 +673,8 @@
 			<updateRate>10</updateRate>
 			<bodyName>base_link</bodyName>
 			<topicName>/hector/imu</topicName>
-			<rpyOffsets>0 0 0</rpyOffsets>
+			<xyzOffset>0 0 0</xyzOffset>
+			<rpyOffset>0 0 0</rpyOffset>
 			<gaussianNoise>0</gaussianNoise>  
 			<accelDrift>0.5 0.5 0.5</accelDrift>
 			<accelGaussianNoise>0.35 0.35 0.3</accelGaussianNoise>
