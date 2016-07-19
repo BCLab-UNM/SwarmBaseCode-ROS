@@ -82,7 +82,7 @@
 		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_wrist">
 			<inertial>
-				<mass>0.1</mass>
+				<mass>0.001</mass>
 				<inertia>
 					<ixx>0.00635</ixx>
 					<ixy>0.0</ixy>
@@ -114,20 +114,21 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<limit>
-					<upper>0.8290</upper>
-					<lower>0.0</lower>
+					<upper>0</upper>
+					<lower>0.87</lower>
 				</limit>
 				<dynamics>
-					<damping>1</damping>
+				  <damping>0.3</damping>
 				</dynamics>
 			</axis>
+			
 		</joint>
 
 		<!-- TODO: Temporarily giving ALL gripper components the same physics
 		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_left_finger">
 			<inertial>
-				<mass>0.1</mass>
+				<mass>0.001</mass>
 				<inertia>
 					<ixx>0.00635</ixx>
 					<ixy>0.0</ixy>
@@ -179,7 +180,7 @@
 					<lower>0.0</lower>
 				</limit>
 				<dynamics>
-					<damping>1</damping>
+				  <damping>0.3</damping>
 				</dynamics>
 			</axis>
 		</joint>
@@ -188,7 +189,7 @@
 		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_right_finger">
 			<inertial>
-				<mass>0.1</mass>
+				<mass>0.001</mass>
 				<inertia>
 					<ixx>0.00635</ixx>
 					<ixy>0.0</ixy>
@@ -240,7 +241,7 @@
 					<lower>-0.7854</lower>
 				</limit>
 				<dynamics>
-					<damping>1</damping>
+				  <damping>0.3</damping>
 				</dynamics>
 			</axis>
 		</joint>
@@ -636,13 +637,12 @@
 		</link>
 
 		<!-- Gripper plugin-->
-		<plugin name="gripper_sim" filename="/home/antonio/Documents/GripperPlugin/build/libGripperPlugin.so">
+		<plugin name="gripper_sim" filename="libgazebo_plugins_gripper.so">
 			<wristJoint>gripper_wrist_joint</wristJoint>
 			<leftFingerJoint>gripper_left_finger_joint</leftFingerJoint>
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 			<wristTopic>/achilles/wristAngle</wristTopic>
 			<fingerTopic>/achilles/fingerAngle</fingerTopic>
-			<K_P>2.5</K_P>
 		</plugin>
 
 		<!-- Skid Steer Drive plugin -->
