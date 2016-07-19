@@ -117,6 +117,9 @@
 					<upper>0.8290</upper>
 					<lower>0.0</lower>
 				</limit>
+				<dynamics>
+					<damping>1</damping>
+				</dynamics>
 			</axis>
 		</joint>
 
@@ -175,6 +178,9 @@
 					<upper>0.7854</upper>
 					<lower>0.0</lower>
 				</limit>
+				<dynamics>
+					<damping>1</damping>
+				</dynamics>
 			</axis>
 		</joint>
 
@@ -233,6 +239,9 @@
 					<upper>0.0</upper>
 					<lower>-0.7854</lower>
 				</limit>
+				<dynamics>
+					<damping>1</damping>
+				</dynamics>
 			</axis>
 		</joint>
 
@@ -631,6 +640,9 @@
 			<wristJoint>gripper_wrist_joint</wristJoint>
 			<leftFingerJoint>gripper_left_finger_joint</leftFingerJoint>
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
+			<wristTopic>/achilles/wristAngle</wristTopic>
+			<fingerTopic>/achilles/fingerAngle</fingerTopic>
+			<K_P>2.5</K_P>
 		</plugin>
 
 		<!-- Skid Steer Drive plugin -->
