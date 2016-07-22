@@ -632,17 +632,30 @@
 					<distortionK3>0.0</distortionK3>
 					<distortionT1>0.0</distortionT1>
 					<distortionT2>0.0</distortionT2>
+					<CxPrime>0</CxPrime>
+					<Cx>0</Cx>
+					<Cy>0</Cy>
+					<focalLength>0</focalLength>
 				</plugin>
 			</sensor>
 		</link>
 
 		<!-- Gripper plugin-->
 		<plugin name="gripper_sim" filename="libgazebo_plugins_gripper.so">
+			<!-- required: joint definitions -->
 			<wristJoint>gripper_wrist_joint</wristJoint>
 			<leftFingerJoint>gripper_left_finger_joint</leftFingerJoint>
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
+
+			<!-- required: data input topics for this plugin -->
 			<wristTopic>/achilles/wristAngle</wristTopic>
 			<fingerTopic>/achilles/fingerAngle</fingerTopic>
+
+			<!-- optional: print debug info to the console: true or false -->
+      <debug>true</debug>
+
+			<!-- optional: the refresh rate of the gripper and all debugging output -->
+			<updateRateInSeconds>10.0</updateRateInSeconds>
 		</plugin>
 
 		<!-- Skid Steer Drive plugin -->
