@@ -120,11 +120,21 @@ namespace rqt_rover_gui
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
     connect(ui.visualize_simulation_button, SIGNAL(pressed()), this, SLOT(visualizeSimulationButtonEventHandler()));
-    connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_forward, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_back, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_left, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
+
+    // Joystick output display - Drive
+    connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(display(double)));
+
+    // Joystick output display - Gripper
+    connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(display(double)));
+    connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(display(double)));
+    connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(display(double)));
+    connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
+
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
+
     connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
@@ -190,38 +200,82 @@ void RoverGUIPlugin::restoreSettings(const qt_gui_cpp::Settings& plugin_settings
 
 void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 {
+     // Give the array values some helpful names:
+    int left_stick_y_axis = 1; // Gripper wrist up and down
+    int left_stick_x_axis = 0; // Gripper fingers close and open
+    int right_stick_x_axis = 3; // Turn left and right
+    int right_stick_y_axis = 4; // Drive forward and backward
+
+
      if (joystick_publisher)
         {
+         // Handle drive commands - BEGIN
+
         //Set the gui values. Filter values to be large enough to move the physical rover.
-        if (joy_msg->axes[4] >= 0.1)
+        if (joy_msg->axes[right_stick_y_axis] >= 0.1)
         {
-            emit joystickDriveForwardUpdate(joy_msg->axes[4]);
+            emit joystickDriveForwardUpdate(joy_msg->axes[right_stick_y_axis]);
         }
-        if (joy_msg->axes[4] <= -0.1)
+        if (joy_msg->axes[right_stick_y_axis] <= -0.1)
         {
-            emit joystickDriveBackwardUpdate(-joy_msg->axes[4]);
+            emit joystickDriveBackwardUpdate(-joy_msg->axes[right_stick_y_axis]);
         }
         //If value is too small, display 0.
-        if (abs(joy_msg->axes[4]) < 0.1)
+        if (abs(joy_msg->axes[right_stick_y_axis]) < 0.1)
         {
             emit joystickDriveForwardUpdate(0);
             emit joystickDriveBackwardUpdate(0);
         }
 
-        if (joy_msg->axes[3] >= 0.1)
+        if (joy_msg->axes[right_stick_x_axis] >= 0.1)
         {
-            emit joystickDriveLeftUpdate(joy_msg->axes[3]);
+            emit joystickDriveLeftUpdate(joy_msg->axes[right_stick_x_axis]);
         }
-        if (joy_msg->axes[3] <= -0.1)
+        if (joy_msg->axes[right_stick_x_axis] <= -0.1)
         {
-            emit joystickDriveRightUpdate(-joy_msg->axes[3]);
+            emit joystickDriveRightUpdate(-joy_msg->axes[right_stick_x_axis]);
         }
         //If value is too small, display 0.
-        if (abs(joy_msg->axes[3]) < 0.1)
+        if (abs(joy_msg->axes[right_stick_x_axis]) < 0.1)
         {
             emit joystickDriveLeftUpdate(0);
             emit joystickDriveRightUpdate(0);
         }
+
+        // Handle drive commands - END
+
+        // Handle gripper commands - BEGIN
+        if (joy_msg->axes[left_stick_y_axis] >= 0.1)
+        {
+            emit joystickGripperWristUpUpdate(joy_msg->axes[left_stick_y_axis]);
+        }
+        if (joy_msg->axes[left_stick_y_axis] <= -0.1)
+        {
+            emit joystickGripperWristDownUpdate(-joy_msg->axes[left_stick_y_axis]);
+        }
+        //If value is too small, display 0.
+        if (abs(joy_msg->axes[left_stick_y_axis]) < 0.1)
+        {
+            emit joystickGripperWristUpUpdate(0);
+            emit joystickGripperWristDownUpdate(0);
+        }
+
+        if (joy_msg->axes[left_stick_x_axis] >= 0.1)
+        {
+            emit joystickGripperFingersCloseUpdate(joy_msg->axes[left_stick_x_axis]);
+        }
+        if (joy_msg->axes[left_stick_x_axis] <= -0.1)
+        {
+            emit joystickGripperFingersOpenUpdate(-joy_msg->axes[left_stick_x_axis]);
+        }
+        //If value is too small, display 0.
+        if (abs(joy_msg->axes[left_stick_x_axis]) < 0.1)
+        {
+            emit joystickGripperFingersCloseUpdate(0);
+            emit joystickGripperFingersOpenUpdate(0);
+        }
+        // Handle gripper commands - END
+
 
         joystick_publisher.publish(joy_msg);
     }
@@ -1995,19 +2049,19 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
             case Qt::Key_I:
                 joy_msg.axes[4] = speed;
-                ui.joy_lcd_forward->display(speed);
+                ui.joy_lcd_drive_forward->display(speed);
                 break;
             case Qt::Key_K:
                 joy_msg.axes[4] = -speed;
-                ui.joy_lcd_back->display(speed);
+                ui.joy_lcd_drive_back->display(speed);
                 break;
             case Qt::Key_J:
                 joy_msg.axes[3] = speed;
-                ui.joy_lcd_left->display(speed);
+                ui.joy_lcd_drive_left->display(speed);
                 break;
             case Qt::Key_L:
                 joy_msg.axes[3] = -speed;
-                ui.joy_lcd_right->display(speed);
+                ui.joy_lcd_drive_right->display(speed);
                 break;
             default:
                 // Not a direction key so ignore
@@ -2039,10 +2093,10 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
                 joy_msg.axes[4] = 0;
                 joy_msg.axes[3] = 0;
-                ui.joy_lcd_forward->display(0);
-                ui.joy_lcd_back->display(0);
-                ui.joy_lcd_left->display(0);
-                ui.joy_lcd_right->display(0);
+                ui.joy_lcd_drive_forward->display(0);
+                ui.joy_lcd_drive_back->display(0);
+                ui.joy_lcd_drive_left->display(0);
+                ui.joy_lcd_drive_right->display(0);
 
                 joystick_publisher.publish(joy_msg);
                 return true;

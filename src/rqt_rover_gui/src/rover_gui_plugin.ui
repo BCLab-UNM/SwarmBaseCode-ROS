@@ -1525,30 +1525,6 @@ border: 1px solid white;
        <string>val</string>
       </property>
      </widget>
-     <zorder>label_27</zorder>
-     <zorder>label_28</zorder>
-     <zorder>label_29</zorder>
-     <zorder>label_30</zorder>
-     <zorder>label_31</zorder>
-     <zorder>label_32</zorder>
-     <zorder>label_33</zorder>
-     <zorder>label_34</zorder>
-     <zorder>label_35</zorder>
-     <zorder>label_36</zorder>
-     <zorder>label_37</zorder>
-     <zorder>label_38</zorder>
-     <zorder>imu_update_rate</zorder>
-     <zorder>imu_rate_drift</zorder>
-     <zorder>imu_rate_noise</zorder>
-     <zorder>imu_heading_drift</zorder>
-     <zorder>imu_heading_noise</zorder>
-     <zorder>imu_accel_drift</zorder>
-     <zorder>imu_accel_noise</zorder>
-     <zorder>imu_rpy_offsets</zorder>
-     <zorder>imu_noise</zorder>
-     <zorder>label_63</zorder>
-     <zorder>label_64</zorder>
-     <zorder>setup_group</zorder>
     </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">
@@ -2037,8 +2013,8 @@ border: 1px solid white;
    <property name="geometry">
     <rect>
      <x>810</x>
-     <y>570</y>
-     <width>201</width>
+     <y>590</y>
+     <width>191</width>
      <height>111</height>
     </rect>
    </property>
@@ -2048,43 +2024,13 @@ border: 1px solid white;
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QLCDNumber" name="joy_lcd_forward">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>10</y>
-      <width>64</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-     </font>
-    </property>
-   </widget>
-   <widget class="QLCDNumber" name="joy_lcd_left">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-     </font>
-    </property>
-   </widget>
-   <widget class="QLCDNumber" name="joy_lcd_right">
+   <widget class="QLCDNumber" name="joy_lcd_drive_forward">
     <property name="geometry">
      <rect>
       <x>110</x>
       <y>40</y>
-      <width>71</width>
-      <height>31</height>
+      <width>41</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -2093,19 +2039,141 @@ border: 1px solid white;
      </font>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="joy_lcd_back">
+   <widget class="QLCDNumber" name="joy_lcd_drive_left">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>70</y>
-      <width>64</width>
-      <height>31</height>
+      <x>90</x>
+      <y>60</y>
+      <width>41</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <pointsize>18</pointsize>
      </font>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="joy_lcd_drive_right">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>60</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="joy_lcd_drive_back">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>80</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="joy_lcd_gripper_up">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>40</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="joy_lcd_gripper_open">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>60</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="joy_lcd_gripper_close">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="joy_lcd_gripper_down">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>80</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="drive_label">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Drive</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gripper_label">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Gripper</string>
     </property>
    </widget>
   </widget>
