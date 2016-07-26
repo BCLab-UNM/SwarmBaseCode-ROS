@@ -115,13 +115,12 @@
 				<xyz>0 1 0</xyz>
 				<limit>
 					<upper>0.7854</upper>
-					<lower>0</lower>
+					<lower>0.0</lower>
 				</limit>
 				<dynamics>
 				  <damping>0.3</damping>
 				</dynamics>
 			</axis>
-			
 		</joint>
 
 		<!-- TODO: Temporarily giving ALL gripper components the same physics
@@ -651,13 +650,18 @@
 			<wristTopic>/achilles/wristAngle</wristTopic>
 			<fingerTopic>/achilles/fingerAngle</fingerTopic>
 
-			<!-- optional: print debug info to the console: true or false -->
-			<debug>true</debug>
+			<!-- optional: print debug info to the console -->
+			<debug>
+				<!-- true (debug mode is on) or false (debug mode is off) -->
+				<printToConsole>false</printToConsole>
+				<!-- time (in simulated seconds) between debug print statements -->
+				<printDelayInSeconds>5.0</printDelayInSeconds>
+			</debug>
 
 			<!-- optional: the refresh rate of the gripper and all debugging output -->
 			<!-- this value is the number of updates performed per second -->
 			<!-- warning: low values (i.e. < 100) can cause the gripper to have poor performance -->
-			<updateRate>100.0</updateRate>
+			<updateRate>1000.0</updateRate>
 
 			<!-- optional: set the default PID values for the wrist joint -->
 			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->

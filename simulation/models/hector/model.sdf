@@ -52,14 +52,6 @@
 					<izz>0.0002</izz>
 				</inertia>
 			</inertial>
-			<collision name='collision'>
-				<pose>0 0 -0.0015 0 0 0</pose>
-				<geometry>
-					<box>
-						<size>0.25 0.30 0.008</size>
-					</box>
-				</geometry>
-			</collision>
 			<visual name='visual'>
 				<geometry>
 					<mesh>
@@ -122,9 +114,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<limit>
-					<upper>0.8290</upper>
+					<upper>0.7854</upper>
 					<lower>0.0</lower>
 				</limit>
+				<dynamics>
+				  <damping>0.3</damping>
+				</dynamics>
 			</axis>
 		</joint>
 
@@ -183,6 +178,9 @@
 					<upper>0.7854</upper>
 					<lower>0.0</lower>
 				</limit>
+				<dynamics>
+				  <damping>0.3</damping>
+				</dynamics>
 			</axis>
 		</joint>
 
@@ -241,6 +239,9 @@
 					<upper>0.0</upper>
 					<lower>-0.7854</lower>
 				</limit>
+				<dynamics>
+				  <damping>0.3</damping>
+				</dynamics>
 			</axis>
 		</joint>
 
@@ -630,9 +631,56 @@
 					<distortionK3>0.0</distortionK3>
 					<distortionT1>0.0</distortionT1>
 					<distortionT2>0.0</distortionT2>
+					<CxPrime>0.0</CxPrime>
+					<Cx>0.0</Cx>
+					<Cy>0.0</Cy>
+					<focalLength>0.0</focalLength>
 				</plugin>
 			</sensor>
 		</link>
+
+		<!-- Gripper plugin-->
+		<plugin name="gripper_sim" filename="libgazebo_plugins_gripper.so">
+			<!-- required: joint definitions -->
+			<wristJoint>gripper_wrist_joint</wristJoint>
+			<leftFingerJoint>gripper_left_finger_joint</leftFingerJoint>
+			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
+
+			<!-- required: data input topics for this plugin -->
+			<wristTopic>/hector/wristAngle</wristTopic>
+			<fingerTopic>/hector/fingerAngle</fingerTopic>
+
+			<!-- optional: print debug info to the console -->
+			<debug>
+				<!-- true (debug mode is on) or false (debug mode is off) -->
+				<printToConsole>false</printToConsole>
+				<!-- time (in simulated seconds) between debug print statements -->
+				<printDelayInSeconds>5.0</printDelayInSeconds>
+			</debug>
+
+			<!-- optional: the refresh rate of the gripper and all debugging output -->
+			<!-- this value is the number of updates performed per second -->
+			<!-- warning: low values (i.e. < 100) can cause the gripper to have poor performance -->
+			<updateRate>1000.0</updateRate>
+
+			<!-- optional: set the default PID values for the wrist joint -->
+			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
+			<wristPID>2.5 0.0 0.0</wristPID>
+
+			<!-- optional: set the default PID values for the finger joints -->
+			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
+			<!-- it is always assumed that both fingers use the same PID values -->
+			<fingerPID>2.5 0.0 0.0</fingerPID>
+
+			<!-- optional: set the min/max force applicable to the wrist joint in Newtons -->
+			<!-- values in order: minimum force, maximum force -->
+			<wristForceLimits>-10 10</wristForceLimits>
+
+			<!-- optional: set the min/max force applicable to the finger joints in Newtons -->
+			<!-- values in order: minimum force, maximum force -->
+			<!-- it is always assumed that both fingers use the same min/max force values -->
+			<fingerForceLimits>-10 10</fingerForceLimits>
+		</plugin>
 
 		<!-- Skin Steer Drive plugin -->
 		<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
