@@ -78,7 +78,7 @@ float PIDController::update(float setPoint, float currentValue) {
   // Calculate the integral term: the amount to adjust based on the total error
   // seen so far.
   integral += (error*dt);
-  float integralTerm = Ki*integral);
+  float integralTerm = Ki*integral;
 
   // Sum all of the terms.
   float output = proportionalTerm + derivativeTerm + integralTerm;
