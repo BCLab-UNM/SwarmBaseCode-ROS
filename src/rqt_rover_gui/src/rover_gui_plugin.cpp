@@ -120,10 +120,10 @@ namespace rqt_rover_gui
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
     connect(ui.visualize_simulation_button, SIGNAL(pressed()), this, SLOT(visualizeSimulationButtonEventHandler()));
-    connect(this, SIGNAL(joystickForwardUpdate(double)), ui.joy_lcd_forward, SLOT(display(double)));
-    connect(this, SIGNAL(joystickBackUpdate(double)), ui.joy_lcd_back, SLOT(display(double)));
-    connect(this, SIGNAL(joystickLeftUpdate(double)), ui.joy_lcd_left, SLOT(display(double)));
-    connect(this, SIGNAL(joystickRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_forward, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_back, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_left, SLOT(display(double)));
+    connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_right, SLOT(display(double)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
     connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
@@ -195,32 +195,32 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
         //Set the gui values. Filter values to be large enough to move the physical rover.
         if (joy_msg->axes[4] >= 0.1)
         {
-            emit joystickForwardUpdate(joy_msg->axes[4]);
+            emit joystickDriveForwardUpdate(joy_msg->axes[4]);
         }
         if (joy_msg->axes[4] <= -0.1)
         {
-            emit joystickBackUpdate(-joy_msg->axes[4]);
+            emit joystickDriveBackwardUpdate(-joy_msg->axes[4]);
         }
         //If value is too small, display 0.
         if (abs(joy_msg->axes[4]) < 0.1)
         {
-            emit joystickForwardUpdate(0);
-            emit joystickBackUpdate(0);
+            emit joystickDriveForwardUpdate(0);
+            emit joystickDriveBackwardUpdate(0);
         }
 
         if (joy_msg->axes[3] >= 0.1)
         {
-            emit joystickLeftUpdate(joy_msg->axes[3]);
+            emit joystickDriveLeftUpdate(joy_msg->axes[3]);
         }
         if (joy_msg->axes[3] <= -0.1)
         {
-            emit joystickRightUpdate(-joy_msg->axes[3]);
+            emit joystickDriveRightUpdate(-joy_msg->axes[3]);
         }
         //If value is too small, display 0.
         if (abs(joy_msg->axes[3]) < 0.1)
         {
-            emit joystickLeftUpdate(0);
-            emit joystickRightUpdate(0);
+            emit joystickDriveLeftUpdate(0);
+            emit joystickDriveRightUpdate(0);
         }
 
         joystick_publisher.publish(joy_msg);

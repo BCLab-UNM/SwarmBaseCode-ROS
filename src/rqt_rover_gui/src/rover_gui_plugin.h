@@ -137,10 +137,10 @@ namespace rqt_rover_gui {
 
     void sendInfoLogMessage(QString); // log message updates need to be implemented as signals so they can be used in ROS event handlers.
     void sendDiagLogMessage(QString);
-    void joystickForwardUpdate(double);
-    void joystickBackUpdate(double);
-    void joystickLeftUpdate(double);
-    void joystickRightUpdate(double);
+    void joystickDriveForwardUpdate(double);
+    void joystickDriveBackwardUpdate(double);
+    void joystickDriveLeftUpdate(double);
+    void joystickDriveRightUpdate(double);
     void updateObstacleCallCount(QString text);
 
   private slots:
