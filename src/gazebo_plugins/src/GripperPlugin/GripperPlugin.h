@@ -27,55 +27,67 @@
  * @see    PIDController
  */
 namespace gazebo {
-    class GripperPlugin : public ModelPlugin {
+
+  class GripperPlugin : public ModelPlugin {
 
     public:
 
-        // required overloaded function from ModelPlugin class
-        void Load(gazebo::physics::ModelPtr parent, sdf::ElementPtr sdf);
+      // required overloaded function from ModelPlugin class
+      void Load(gazebo::physics::ModelPtr parent, sdf::ElementPtr sdf);
 
-        // Gazebo actuation function
-        void updateWorldEventHandler();
+      // Gazebo actuation function
+      void updateWorldEventHandler();
 
-        // ROS topic handlers
-        void setWristAngleHandler(const std_msgs::Float32ConstPtr &msg);
-        void setFingerAngleHandler(const std_msgs::Float32ConstPtr &msg);
+      // ROS topic handlers
+      void setWristAngleHandler(const std_msgs::Float32ConstPtr &msg);
+      void setFingerAngleHandler(const std_msgs::Float32ConstPtr &msg);
 
     private:
 
-        // private helper functions
-        void processRosQueue();
-        physics::JointPtr loadJoint(std::string jointTag);
+      // private helper functions
+      void processRosQueue();
+      void loadDebugMode();
+      void loadUpdatePeriod();
+      std::string loadSubscriptionTopic(std::string topicTag);
+      physics::JointPtr loadJoint(std::string jointTag);
+      PIDController::PIDSettings loadPIDSettings(std::string PIDTag);
 
-        // pointers to gazebo model and xml configuration file
-        physics::ModelPtr model;
-        sdf::ElementPtr sdf;
+      // pointers to gazebo model and xml configuration file
+      physics::ModelPtr model;
+      sdf::ElementPtr sdf;
 
-        // interface for processing ROS message queue
-        event::ConnectionPtr updateConnection;
-        std::unique_ptr<ros::NodeHandle> rosNode;
-        std::thread rosQueueThread;
-        ros::CallbackQueue rosQueue;
+      // interface for processing ROS message queue
+      event::ConnectionPtr updateConnection;
+      std::unique_ptr<ros::NodeHandle> rosNode;
+      std::thread rosQueueThread;
+      ros::CallbackQueue rosQueue;
 
-        // ROS subscribers
-        ros::Subscriber wristAngleSubscriber;
-        ros::Subscriber fingerAngleSubscriber;
+      // ROS subscribers
+      ros::Subscriber wristAngleSubscriber;
+      ros::Subscriber fingerAngleSubscriber;
 
-        // gripper component objects
-        GripperManager gripperManager;
-        physics::JointPtr wristJoint;
-        physics::JointPtr leftFingerJoint;
-        physics::JointPtr rightFingerJoint;
-        math::Angle desiredWristAngle;
-        math::Angle desiredFingerAngle;
+      // gripper component objects
+      GripperManager gripperManager;
+      physics::JointPtr wristJoint;
+      physics::JointPtr leftFingerJoint;
+      physics::JointPtr rightFingerJoint;
+      math::Angle desiredWristAngle;
+      math::Angle desiredFingerAngle;
 
-        common::Time previousUpdateTime;
-        float updateRateInSeconds;
-        bool isDebuggingModeActive;
-    };
+      // time management variables
+      common::Time previousUpdateTime;
+      float updatePeriod;
 
-    // Register this plugin with the simulator
-    GZ_REGISTER_MODEL_PLUGIN(GripperPlugin)
+      // debugging variables
+      common::Time previousDebugUpdateTime;
+      float debugUpdatePeriod;
+      bool isDebuggingModeActive;
+
+  };
+
+  // Register this plugin with the simulator
+  GZ_REGISTER_MODEL_PLUGIN(GripperPlugin)
+
 }
 
 #endif /* GRIPPER_PLUGIN_H */
