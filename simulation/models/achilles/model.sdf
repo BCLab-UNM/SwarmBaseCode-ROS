@@ -632,10 +632,10 @@
 					<distortionK3>0.0</distortionK3>
 					<distortionT1>0.0</distortionT1>
 					<distortionT2>0.0</distortionT2>
-					<CxPrime>0</CxPrime>
-					<Cx>0</Cx>
-					<Cy>0</Cy>
-					<focalLength>0</focalLength>
+					<CxPrime>0.0</CxPrime>
+					<Cx>0.0</Cx>
+					<Cy>0.0</Cy>
+					<focalLength>0.0</focalLength>
 				</plugin>
 			</sensor>
 		</link>
@@ -652,10 +652,30 @@
 			<fingerTopic>/achilles/fingerAngle</fingerTopic>
 
 			<!-- optional: print debug info to the console: true or false -->
-      <debug>true</debug>
+			<debug>true</debug>
 
 			<!-- optional: the refresh rate of the gripper and all debugging output -->
-			<updateRateInSeconds>10.0</updateRateInSeconds>
+			<!-- this value is the number of updates performed per second -->
+			<!-- warning: low values (i.e. < 100) can cause the gripper to have poor performance -->
+			<updateRate>100.0</updateRate>
+
+			<!-- optional: set the default PID values for the wrist joint -->
+			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
+			<wristPID>2.5 0.0 0.0</wristPID>
+
+			<!-- optional: set the default PID values for the finger joints -->
+			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
+			<!-- it is always assumed that both fingers use the same PID values -->
+			<fingerPID>2.5 0.0 0.0</fingerPID>
+
+			<!-- optional: set the min/max force applicable to the wrist joint in Newtons -->
+			<!-- values in order: minimum force, maximum force -->
+			<wristForceLimits>-10 10</wristForceLimits>
+
+			<!-- optional: set the min/max force applicable to the finger joints in Newtons -->
+			<!-- values in order: minimum force, maximum force -->
+			<!-- it is always assumed that both fingers use the same min/max force values -->
+			<fingerForceLimits>-10 10</fingerForceLimits>
 		</plugin>
 
 		<!-- Skid Steer Drive plugin -->
