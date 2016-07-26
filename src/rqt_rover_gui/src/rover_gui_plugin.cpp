@@ -71,13 +71,29 @@ namespace rqt_rover_gui
 
     barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
 
-	//Initialize AprilTag detection apparatus
+    // Initialize AprilTag detection apparatus
 	tf = tag36h11_create();
     td = apriltag_detector_create();
     apriltag_detector_add_family(td, tf);
 
-    //Allocate image memory up front so it doesn't need to be done for every image frame
+    // Allocate image memory up front so it doesn't need to be done for every image frame
     u8_image = image_u8_create(320, 240);
+
+    // Initialize gripper angles in radians
+    wrist_angle = 0;
+    finger_angle = 0;
+
+    // Setup angle change parameters
+    wrist_angle_min = 0.0;
+    wrist_angle_max = 1.0;
+
+    finger_angle_min = 0.0;
+    finger_angle_max = 1.0;
+
+    // The fraction of the joystick output value by which to change the gripper angles
+    // The values will be too high for fine control otherwise
+    finger_angle_change_rate = 0.1;
+    wrist_angle_change_rate = 0.1;
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -198,14 +214,18 @@ void RoverGUIPlugin::restoreSettings(const qt_gui_cpp::Settings& plugin_settings
 {
 }
 
+
+// Recieves messages from the ROS joystick driver and used them to articulate the gripper and drive the rover.
 void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 {
      // Give the array values some helpful names:
-    int left_stick_y_axis = 1; // Gripper wrist up and down
     int left_stick_x_axis = 0; // Gripper fingers close and open
+    int left_stick_y_axis = 1; // Gripper wrist up and down
+
     int right_stick_x_axis = 3; // Turn left and right
     int right_stick_y_axis = 4; // Drive forward and backward
 
+    // Note: joystick stick axis output value are between -1 and 1
 
      if (joystick_publisher)
         {
@@ -245,21 +265,42 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
         // Handle drive commands - END
 
         // Handle gripper commands - BEGIN
+
+        // These first two if statements just determine which GUI element to update.
         if (joy_msg->axes[left_stick_y_axis] >= 0.1)
         {
             emit joystickGripperWristUpUpdate(joy_msg->axes[left_stick_y_axis]);
+
         }
         if (joy_msg->axes[left_stick_y_axis] <= -0.1)
         {
             emit joystickGripperWristDownUpdate(-joy_msg->axes[left_stick_y_axis]);
         }
-        //If value is too small, display 0.
+        //If value is too small, display 0 and dont change the gripper wrist angle
         if (abs(joy_msg->axes[left_stick_y_axis]) < 0.1)
         {
             emit joystickGripperWristUpUpdate(0);
             emit joystickGripperWristDownUpdate(0);
         }
+        else // Change the angle and publish
+        {
+            // Calculate the new finger wrist angle to request
+            wrist_angle += joy_msg->axes[left_stick_x_axis]*wrist_angle_change_rate;
 
+            // Don't exceed the min and max angles
+            if (wrist_angle > wrist_angle_max) wrist_angle = wrist_angle_max;
+            else if (wrist_angle < wrist_angle_min) wrist_angle = wrist_angle_min;
+
+            // Publish the angle commands
+            // Publish the angle commands
+            std_msgs::Float32 angle_msg;
+            angle_msg.data = wrist_angle;
+            gripper_wrist_angle_publisher.publish(angle_msg);
+
+            emit sendInfoLogMessage("New Wrist Angle: " + QString::number(wrist_angle));
+        }
+
+        // These first two if statements just determine which GUI element to update.
         if (joy_msg->axes[left_stick_x_axis] >= 0.1)
         {
             emit joystickGripperFingersCloseUpdate(joy_msg->axes[left_stick_x_axis]);
@@ -268,11 +309,27 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
         {
             emit joystickGripperFingersOpenUpdate(-joy_msg->axes[left_stick_x_axis]);
         }
-        //If value is too small, display 0.
+        //If value is too small, display 0 and dont change the gripper finger angles
         if (abs(joy_msg->axes[left_stick_x_axis]) < 0.1)
         {
             emit joystickGripperFingersCloseUpdate(0);
             emit joystickGripperFingersOpenUpdate(0);
+        }
+        else // Change the angle and publish
+        {
+            // Calculate the new finger wrist angle to request
+            finger_angle += joy_msg->axes[left_stick_x_axis]*finger_angle_change_rate;
+
+            // Don't exceed the min and max angles
+            if (finger_angle > finger_angle_max) finger_angle = finger_angle_max;
+            else if (finger_angle < finger_angle_min) finger_angle = finger_angle_min;
+
+            // Publish the angle commands
+            std_msgs::Float32 angle_msg;
+            angle_msg.data = finger_angle;
+            gripper_finger_angle_publisher.publish(angle_msg);
+
+            emit sendInfoLogMessage("New Finger Angle: " + QString::number(finger_angle));
         }
         // Handle gripper commands - END
 
@@ -700,7 +757,9 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
             us_left_subscriber.shutdown();
             us_right_subscriber.shutdown();
             joystick_publisher.shutdown();
-            
+            gripper_wrist_angle_publisher.shutdown();
+            gripper_finger_angle_publisher.shutdown();
+
             //Reset selected rover name to empty string
             selected_rover_name = "";
         }
@@ -990,7 +1049,22 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     rover_control_state[selected_rover_name] = 1;
     emit sendInfoLogMessage("Setting up joystick publisher " + QString::fromStdString("/"+selected_rover_name+"/joystick"));
+
+    // Setup joystick publisher
     joystick_publisher = nh.advertise<sensor_msgs::Joy>("/"+selected_rover_name+"/joystick", 10, this);
+
+    // Setup Gripper publishers
+    emit sendInfoLogMessage("Setting up Gripper control publishers: ");
+    emit sendInfoLogMessage(QString::fromStdString("/"+selected_rover_name+"/wristAngle"));
+    emit sendInfoLogMessage(QString::fromStdString("/"+selected_rover_name+"/fingerAngle"));
+
+    // Reset the desired gripper angles
+    wrist_angle = 0;
+    finger_angle = 0;
+
+    gripper_wrist_angle_publisher = nh.advertise<std_msgs::Float32>("/"+selected_rover_name+"/wristAngle", 10, this);
+    gripper_finger_angle_publisher = nh.advertise<std_msgs::Float32>("/"+selected_rover_name+"/fingerAngle", 10, this);
+
 
     std_msgs::UInt8 control_mode_msg;
     control_mode_msg.data = 1; // 1 indicates manual control

@@ -185,11 +185,15 @@ namespace rqt_rover_gui {
     void checkAndRepositionRover(QString rover_name, float x, float y);
     void readRoverModelXML(QString path);
 
+    // ROS Publishers
     map<string,ros::Publisher> control_mode_publishers;
     ros::Publisher joystick_publisher;
+    ros::Publisher gripper_wrist_angle_publisher;
+    ros::Publisher gripper_finger_angle_publisher;
     map<string,ros::Publisher> targetPickUpPublisher;
     map<string,ros::Publisher> targetDropOffPublisher;
 
+    // ROS Subscribers
     ros::Subscriber joystick_subscriber;
     map<string,ros::Subscriber> encoder_subscribers;
     map<string,ros::Subscriber> gps_subscribers;
@@ -252,6 +256,10 @@ namespace rqt_rover_gui {
 	
 	//AprilTag assigned to collection zone
 	int collectionZoneID = 256;
+
+    // Joystick gripper controller state
+    float wrist_angle, wrist_angle_change_rate, wrist_angle_max, wrist_angle_min;
+    float finger_angle, finger_angle_change_rate, finger_angle_max, finger_angle_min;
 
   };
 } // end namespace
