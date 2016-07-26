@@ -2,24 +2,24 @@
 
 This plugin implements a gripper controller for the NASA Swarmathon Rovers. There are several required XML tags and numberous optional XML tags that can be used to customize the behavior of the gripper and to debug the plugin.
 
-| Required XML Tag   | Value  | Definition                                                          |
-|-------------------:|:------:|:--------------------------------------------------------------------|
-|       <wristJoint> | string | name of the gripper's wrist joint defined in the SDF file           |
-|  <leftFingerJoint> | string | name of the gripper's left finger joint defined in the SDF file     |
-| <rightFingerJoint> | string | name of the gripper's right finger joint defined in the SDF file    |
-|       <wristTopic> | string | name of the subscription topic for a specific rover's wrist joint   |
-|      <fingerTopic> | string | name of the subscription topic for a specific rover's finger joints |
+| Required XML Tag | Value  | Definition                                                          |
+|-----------------:|:------:|:--------------------------------------------------------------------|
+|       wristJoint | string | name of the gripper's wrist joint defined in the SDF file           |
+|  leftFingerJoint | string | name of the gripper's left finger joint defined in the SDF file     |
+| rightFingerJoint | string | name of the gripper's right finger joint defined in the SDF file    |
+|       wristTopic | string | name of the subscription topic for a specific rover's wrist joint   |
+|      fingerTopic | string | name of the subscription topic for a specific rover's finger joints |
 
-| Optional XML Tags     | Value               | Definition                                                                         |
-|----------------------:|:-------------------:|:-----------------------------------------------------------------------------------|
-|               <debug> |                     | container tag for the <printToConsole> and <printDelayInSeconds> tags              |
-|      <printToConsole> | bool                | <debug> sub-tag; true = debugging is on; false = debugging is off                  |
-| <printDelayInSeconds> | float               | <debug> sub-tag; the number of seconds to delay between debug print statements     |
-|          <updateRate> | float               | the subscriber refresh rate for the gripper; the number of updates per second      |
-|            <wristPID> | float, float, float | PID values for the wrist joint: Kp, Ki, Kd                                         |
-|           <fingerPID> | float, float, float | PID values for both of the finger joints: Kp, Ki, Kd                               |
-|    <wristForceLimits> | float, float        | min and max amounts of force (in Newtons) that can be applied to the wrist joint   |
-|   <fingerForceLimits> | float, float        | min and max amounts of force (in Newtons) that can be applied to the finger joints |
+| Optional XML Tags   | Value               | Definition                                                                         |
+|--------------------:|:-------------------:|:-----------------------------------------------------------------------------------|
+|               debug |                     | container tag for the "printToConsole" and "printDelayInSeconds" tags              |
+|      printToConsole | bool                | "debug" sub-tag; true = debugging is on; false = debugging is off                  |
+| printDelayInSeconds | float               | "debug" sub-tag; the number of seconds to delay between debug print statements     |
+|          updateRate | float               | the subscriber refresh rate for the gripper; the number of updates per second      |
+|            wristPID | float, float, float | PID values for the wrist joint: Kp, Ki, Kd                                         |
+|           fingerPID | float, float, float | PID values for both of the finger joints: Kp, Ki, Kd                               |
+|    wristForceLimits | float, float        | min and max amounts of force (in Newtons) that can be applied to the wrist joint   |
+|   fingerForceLimits | float, float        | min and max amounts of force (in Newtons) that can be applied to the finger joints |
 
 The following code example demonstrates how to use the plugin in a Rover's SDF configuration file:
 
