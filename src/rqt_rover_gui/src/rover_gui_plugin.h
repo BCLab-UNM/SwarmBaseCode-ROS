@@ -158,6 +158,8 @@ namespace rqt_rover_gui {
     void receiveDiagLogMessage(QString);
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
     void pollRoversTimerEventHandler();
+    void joystickGripperWristControlTimerEventHandler();
+    void joystickGripperFingerControlTimerEventHandler();
     void GPSCheckboxToggledEventHandler(bool checked);
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
@@ -219,6 +221,8 @@ namespace rqt_rover_gui {
     Ui::RoverGUI ui;
 
     QProcess* joy_process;
+    QTimer* joystick_gripper_wrist_control_timer; // for rover polling
+    QTimer* joystick_gripper_finger_control_timer; // for rover polling
     QTimer* rover_poll_timer; // for rover polling
 
     QString info_log_messages;
@@ -260,6 +264,11 @@ namespace rqt_rover_gui {
     // Joystick gripper controller state
     float wrist_angle, wrist_angle_change_rate, wrist_angle_max, wrist_angle_min;
     float finger_angle, finger_angle_change_rate, finger_angle_max, finger_angle_min;
+
+    float wrist_direction;
+    float finger_direction;
+
+    float joystick_gripper_control_timeout;
 
   };
 } // end namespace
