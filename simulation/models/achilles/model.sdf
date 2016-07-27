@@ -82,7 +82,7 @@
 		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_wrist">
 			<inertial>
-				<mass>0.001</mass>
+				<mass>0.1</mass>
 				<inertia>
 					<ixx>0.00635</ixx>
 					<ixy>0.0</ixy>
@@ -127,7 +127,7 @@
 		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_left_finger">
 			<inertial>
-				<mass>0.001</mass>
+				<mass>0.1</mass>
 				<inertia>
 					<ixx>0.00635</ixx>
 					<ixy>0.0</ixy>
@@ -188,7 +188,7 @@
 		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_right_finger">
 			<inertial>
-				<mass>0.001</mass>
+				<mass>0.1</mass>
 				<inertia>
 					<ixx>0.00635</ixx>
 					<ixy>0.0</ixy>
@@ -491,7 +491,7 @@
 					<frameId>us_center_link</frameId>
 				</plugin>
 			</sensor>
-		</link> 
+		</link>
 
 		<joint name="us_right_joint" type="revolute">
 			<parent>base_link</parent>

@@ -491,7 +491,7 @@
 					<frameId>us_center_link</frameId>
 				</plugin>
 			</sensor>
-		</link> 
+		</link>
 
 		<joint name="us_right_joint" type="revolute">
 			<parent>base_link</parent>
@@ -531,7 +531,7 @@
 					<frameId>us_center_link</frameId>
 				</plugin>
 			</sensor>
-		</link> 
+		</link>
 
 		<joint name="us_left_joint" type="revolute">
 			<parent>base_link</parent>
@@ -682,7 +682,7 @@
 			<fingerForceLimits>-10 10</fingerForceLimits>
 		</plugin>
 
-		<!-- Skin Steer Drive plugin -->
+		<!-- Skid Steer Drive plugin -->
 		<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
 			<updateRate>10</updateRate>
 			<robotNamespace>/</robotNamespace>
