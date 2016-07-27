@@ -15,25 +15,18 @@ GripperManager::GripperManager() {
  * GripperManager. The PIDSettings objects are set in the GripperPlugin and
  * then passed along here when the GripperManager is initialized.
  *
- * @param jointNames Struct with joint names for the wrist, left finger, and
- *                   right finger joints.
  * @param wristPID   Struct with the six PID controller parameters for the
  *                   wrist joint.
  * @param fingerPID  Struct with the six PID controller parameters for both of
  *                   the finger joints.
  */
-GripperManager::GripperManager(GripperManager::GripperJointNames jointNames,
-  PIDController::PIDSettings wristPID, PIDController::PIDSettings fingerPID) {
+GripperManager::GripperManager(PIDController::PIDSettings wristPIDSettings,
+    PIDController::PIDSettings fingerPIDSettings) {
 
   isInitialized = true;
-
-  leftFingerController =
-    FingerController(jointNames.leftFingerJointName, fingerPID);
-
-  rightFingerController =
-    FingerController(jointNames.rightFingerJointName, fingerPID);
-
-  wristController = WristController(jointNames.wristJointName, wristPID);
+  leftFingerController = PIDController(fingerPIDSettings);
+  rightFingerController = PIDController(fingerPIDSettings);
+  wristController = PIDController(wristPIDSettings);
 }
 
 /**

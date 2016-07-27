@@ -2,8 +2,7 @@
 #define GRIPPER_MANAGER_H
 
 #include <ros/console.h>
-#include "FingerController.h"
-#include "WristController.h"
+#include "PIDController.h"
 
 /**
  * This class defines the interface between the GripperPlugin class and the PID
@@ -46,16 +45,10 @@ class GripperManager {
     float rightFingerForce;
   };
 
-  struct GripperJointNames {
-    std::string wristJointName;
-    std::string leftFingerJointName;
-    std::string rightFingerJointName;
-  };
-
-  // constructors and destructors
+  // constructors
   GripperManager();
-  GripperManager(GripperManager::GripperJointNames jointNames,
-    PIDController::PIDSettings wristPID, PIDController::PIDSettings fingerPID);
+  GripperManager(PIDController::PIDSettings wristPIDSettings,
+    PIDController::PIDSettings fingerPIDSettings);
 
   // PID controller interface function
   GripperForces getForces(GripperState desiredState, GripperState currentState);
@@ -63,9 +56,9 @@ class GripperManager {
  private:
 
   // PID controllers for each joint of the gripper
-  WristController  wristController;
-  FingerController leftFingerController;
-  FingerController rightFingerController;
+  PIDController wristController;
+  PIDController leftFingerController;
+  PIDController rightFingerController;
 
   // gripper manager status flags
   bool isInitialized;

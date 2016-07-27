@@ -32,7 +32,7 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   loadUpdatePeriod();
   ROS_DEBUG_STREAM_COND(isDebuggingModeActive, "[Gripper Plugin : "
     << model->GetName() << "]\n    set the plugin update period:\n"
-    << "        " << updatePeriod << " Hz or " << (1.0/updatePeriod)
+    << "        " << updatePeriodInSeconds << " Hz or " << (1.0/updatePeriodInSeconds)
     << " updates per second");
 
   // LOAD GRIPPER JOINTS - begin
@@ -47,15 +47,9 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // LOAD GRIPPER JOINTS - end
 
   // INITIALIZE GRIPPER MANAGER - begin
-  GripperManager::GripperJointNames jointNames;
-  jointNames.wristJointName = model->GetName() + "_" + wristJoint->GetName();
-  jointNames.leftFingerJointName =
-    model->GetName() + "_" + leftFingerJoint->GetName();
-  jointNames.rightFingerJointName =
-    model->GetName() + "_" + rightFingerJoint->GetName();
   PIDController::PIDSettings wristPID = loadPIDSettings("wrist");
   PIDController::PIDSettings fingerPID = loadPIDSettings("finger");
-  gripperManager = GripperManager(jointNames, wristPID, fingerPID);
+  gripperManager = GripperManager(wristPID, fingerPID);
   ROS_DEBUG_STREAM_COND(isDebuggingModeActive, "[Gripper Plugin : "
     << model->GetName() << "]\n    initialized the GripperManager:\n"
     << "        wristPID:  Kp=" << wristPID.Kp << ", Ki=" << wristPID.Ki
@@ -136,8 +130,8 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 void GripperPlugin::updateWorldEventHandler() {
   common::Time currentTime = model->GetWorld()->GetSimTime();
 
-  // only update the gripper plugin once every updatePeriod
-  if((currentTime - previousUpdateTime).Float() < updatePeriod) {
+  // only update the gripper plugin once every updatePeriodInSeconds
+  if((currentTime - previousUpdateTime).Float() < updatePeriodInSeconds) {
     return;
   }
 
@@ -174,7 +168,7 @@ void GripperPlugin::updateWorldEventHandler() {
   rightFingerJoint->SetForce(0, commandForces.rightFingerForce);
 
   // If debugging mode is active, print debugging statements
-  if((currentTime - previousDebugUpdateTime).Float() >= debugUpdatePeriod) {
+  if((currentTime - previousDebugUpdateTime).Float() >= debugUpdatePeriodInSeconds) {
     previousDebugUpdateTime = currentTime;
 
     ROS_DEBUG_STREAM_COND(
@@ -270,14 +264,14 @@ void GripperPlugin::loadDebugMode() {
         isDebuggingModeActive = true;
 
         if(debug->HasElement("printDelayInSeconds")) {
-          debugUpdatePeriod =
+          debugUpdatePeriodInSeconds =
             debug->GetElement("printDelayInSeconds")->Get<float>();
 
-          // fatal error: the debugUpdatePeriod cannot be <= 0
-          if(debugUpdatePeriod <= 0.0) {
+          // fatal error: the debugUpdatePeriodInSeconds cannot be <= 0
+          if(debugUpdatePeriodInSeconds <= 0.0) {
             ROS_ERROR_STREAM("[Gripper Plugin : " << model->GetName()
               << "]: In GripperPlugin.cpp: loadDebugMode(): "
-              << "printDelayInSeconds = " << debugUpdatePeriod
+              << "printDelayInSeconds = " << debugUpdatePeriodInSeconds
               << ", printDelayInSeconds cannot be <= 0.0");
             exit(1);
           }
@@ -286,7 +280,7 @@ void GripperPlugin::loadDebugMode() {
             << "]: In GripperPlugin.cpp: loadDebugMode(): "
             << "missing nested <printDelayInSeconds> tag in <debug> tag, "
             << "defaulting to 3.0 seconds");
-          debugUpdatePeriod = 3.0;
+          debugUpdatePeriodInSeconds = 3.0;
         }
 
         ros::console::levels::Level dLevel = ros::console::levels::Debug;
@@ -341,8 +335,8 @@ void GripperPlugin::loadUpdatePeriod() {
   }
 
   // set the update period for this plugin: the plugin will refresh at a rate
-  // of "updateRate" times per second, i.e., at "updatePeriod" hertz
-  updatePeriod = 1.0 / updateRate;
+  // of "updateRate" times per second, i.e., at "updatePeriodInSeconds" hertz
+  updatePeriodInSeconds = 1.0 / updateRate;
 }
 
 /**
@@ -448,7 +442,7 @@ PIDController::PIDSettings GripperPlugin::loadPIDSettings(string PIDTag) {
   settings.Kp  = (float)pid.x;
   settings.Ki  = (float)pid.y;
   settings.Kd  = (float)pid.z;
-  settings.dt  = updatePeriod;
+  settings.dt  = updatePeriodInSeconds;
   settings.min = (float)forceLimits.x;
   settings.max = (float)forceLimits.y;
 

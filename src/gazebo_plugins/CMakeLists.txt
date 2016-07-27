@@ -26,9 +26,7 @@ add_library(${PROJECT_NAME} src/SetupWorld.cpp)
 add_library(${PROJECT_NAME}_gripper 
   src/GripperPlugin/GripperPlugin.cpp
   src/GripperPlugin/PIDController.cpp 
-  src/GripperPlugin/GripperManager.cpp 
-  src/GripperPlugin/FingerController.cpp 
-  src/GripperPlugin/WristController.cpp)
+  src/GripperPlugin/GripperManager.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 

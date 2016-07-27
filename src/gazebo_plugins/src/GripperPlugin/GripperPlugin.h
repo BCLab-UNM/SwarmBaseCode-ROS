@@ -76,11 +76,11 @@ namespace gazebo {
 
       // time management variables
       common::Time previousUpdateTime;
-      float updatePeriod;
+      float updatePeriodInSeconds;
 
       // debugging variables
       common::Time previousDebugUpdateTime;
-      float debugUpdatePeriod;
+      float debugUpdatePeriodInSeconds;
       bool isDebuggingModeActive;
 
   };
