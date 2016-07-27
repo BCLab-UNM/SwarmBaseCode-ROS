@@ -292,7 +292,6 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
             else if (wrist_angle < wrist_angle_min) wrist_angle = wrist_angle_min;
 
             // Publish the angle commands
-            // Publish the angle commands
             std_msgs::Float32 angle_msg;
             angle_msg.data = wrist_angle;
             gripper_wrist_angle_publisher.publish(angle_msg);
