@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gazebo_plugins)
 
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS 
   roscpp 
@@ -17,8 +19,14 @@ catkin_package(
 find_package(gazebo REQUIRED)
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} src src/GripperPlugin ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${PROJECT_NAME} src/SetupWorld.cpp)
+
+add_library(${PROJECT_NAME}_gripper 
+  src/GripperPlugin/GripperPlugin.cpp
+  src/GripperPlugin/PIDController.cpp 
+  src/GripperPlugin/GripperManager.cpp)
+
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
