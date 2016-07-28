@@ -697,6 +697,7 @@
 			<commandTopic>/aeneas/velocity</commandTopic>
 			<odometryTopic>/aeneas/odom</odometryTopic>
 			<odometryFrame>aeneas/odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->

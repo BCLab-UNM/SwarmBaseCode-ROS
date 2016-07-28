@@ -697,6 +697,7 @@
 			<commandTopic>/hector/velocity</commandTopic>
 			<odometryTopic>/hector/odom</odometryTopic>
 			<odometryFrame>hector/odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->

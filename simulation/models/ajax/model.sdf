@@ -697,6 +697,7 @@
 			<commandTopic>/ajax/velocity</commandTopic>
 			<odometryTopic>/ajax/odom</odometryTopic>
 			<odometryFrame>ajax/odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->

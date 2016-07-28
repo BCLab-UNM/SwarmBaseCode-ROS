@@ -697,6 +697,7 @@
 			<commandTopic>/achilles/velocity</commandTopic>
 			<odometryTopic>/achilles/odom</odometryTopic>
 			<odometryFrame>achilles/odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->

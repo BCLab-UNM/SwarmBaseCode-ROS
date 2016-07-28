@@ -697,6 +697,7 @@
 			<commandTopic>/paris/velocity</commandTopic>
 			<odometryTopic>/paris/odom</odometryTopic>
 			<odometryFrame>paris/odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->

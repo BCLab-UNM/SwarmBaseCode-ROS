@@ -697,6 +697,7 @@
 			<commandTopic>/diomedes/velocity</commandTopic>
 			<odometryTopic>/diomedes/odom</odometryTopic>
 			<odometryFrame>diomedes/odom</odometryFrame>
+			<broadcastTF>0</broadcastTF>
 		</plugin>
 
 		<!-- GPS plugin -->
