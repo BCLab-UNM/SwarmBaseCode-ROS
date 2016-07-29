@@ -55,6 +55,7 @@
 #include <QLabel>
 
 #include "GazeboSimManager.h"
+#include "JoystickGripperInterface.h"
 
 //AprilTag headers
 #include "apriltag.h"
@@ -80,6 +81,7 @@ namespace rqt_rover_gui {
       
   public:
     RoverGUIPlugin();
+    ~RoverGUIPlugin();
     virtual void initPlugin(qt_gui_cpp::PluginContext& context);
     virtual void shutdownPlugin();
     virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const;
@@ -137,10 +139,19 @@ namespace rqt_rover_gui {
 
     void sendInfoLogMessage(QString); // log message updates need to be implemented as signals so they can be used in ROS event handlers.
     void sendDiagLogMessage(QString);
-    void joystickForwardUpdate(double);
-    void joystickBackUpdate(double);
-    void joystickLeftUpdate(double);
-    void joystickRightUpdate(double);
+
+    // Joystick output - Drive
+    void joystickDriveForwardUpdate(double);
+    void joystickDriveBackwardUpdate(double);
+    void joystickDriveLeftUpdate(double);
+    void joystickDriveRightUpdate(double);
+
+    // Joystick GUI output - Gripper
+    void joystickGripperWristUpUpdate(double);
+    void joystickGripperWristDownUpdate(double);
+    void joystickGripperFingersCloseUpdate(double);
+    void joystickGripperFingersOpenUpdate(double);
+
     void updateObstacleCallCount(QString text);
 
   private slots:
@@ -176,11 +187,13 @@ namespace rqt_rover_gui {
     void checkAndRepositionRover(QString rover_name, float x, float y);
     void readRoverModelXML(QString path);
 
+    // ROS Publishers
     map<string,ros::Publisher> control_mode_publishers;
     ros::Publisher joystick_publisher;
     map<string,ros::Publisher> targetPickUpPublisher;
     map<string,ros::Publisher> targetDropOffPublisher;
 
+    // ROS Subscribers
     ros::Subscriber joystick_subscriber;
     map<string,ros::Subscriber> encoder_subscribers;
     map<string,ros::Subscriber> gps_subscribers;
@@ -243,6 +256,11 @@ namespace rqt_rover_gui {
 	
 	//AprilTag assigned to collection zone
 	int collectionZoneID = 256;
+
+    // Joystick commands to ROS gripper command interface
+    // This is a singleton class. Deleting it while it is still receiving movement commands will cause a segfault.
+    // Use changeRovers instead of recreating with a new rover name
+    JoystickGripperInterface* joystickGripperInterface;
 
   };
 } // end namespace
