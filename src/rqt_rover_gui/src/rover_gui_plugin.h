@@ -146,7 +146,7 @@ namespace rqt_rover_gui {
     void joystickDriveLeftUpdate(double);
     void joystickDriveRightUpdate(double);
 
-    // Josystick GUI output - Gripper
+    // Joystick GUI output - Gripper
     void joystickGripperWristUpUpdate(double);
     void joystickGripperWristDownUpdate(double);
     void joystickGripperFingersCloseUpdate(double);
