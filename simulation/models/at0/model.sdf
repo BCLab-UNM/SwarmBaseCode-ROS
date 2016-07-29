@@ -1,32 +1,52 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
-    <model name="at0">
-        <static>true</static>
-        <link name='link'>
-
-
-            <collision name ='collision'>
-                <geometry>
-                    <box>
-                        <size>0.0763 0.05912 .001</size>
-                    </box>
-                </geometry>
-            </collision>
-            <visual name='visual'>
-                <geometry>
-                    <box>
-                        <size>0.0763 0.05912 .001</size>
-                    </box>
-                </geometry>
-
-                <material>
-                    <script>
-                        <uri>model://at0/materials/scripts</uri>
-                        <uri>model://at0/materials/textures</uri>
-                        <name>at0/Diffuse</name>
-                    </script>
-                </material>
-            </visual>
-        </link>     
-    </model>
+	<model name="at0">
+		<static>false</static>
+		<link name='link'>
+			<inertial>
+				<!-- to calculate the inertia matrix of a cube: where M = 0.1, and s = 0.05 -->
+				<!--                           | 1 0 0 |   | 0.00004 0       0       |      -->
+				<!-- I = M * ((s^2) / (6.0)) * | 0 1 0 | = | 0       0.00004 0       |      -->
+				<!--                           | 0 0 1 |   | 0       0       0.00004 |      -->
+				<mass>0.1</mass>
+				<inertia>
+					<ixx>0.00004</ixx>
+					<ixy>0.0</ixy>
+					<ixz>0.0</ixz>
+					<iyy>0.00004</iyy>
+					<iyz>0.0</iyz>
+					<izz>0.00004</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<geometry>
+					<box>
+						<size>0.05 0.05 0.05</size>
+					</box>
+				</geometry>
+				<material>
+					<script>
+						<uri>model://at0/materials/scripts</uri>
+						<uri>model://at0/materials/textures</uri>
+						<name>at0/Diffuse</name>
+					</script>
+				</material>
+			</visual>
+			<collision name ='collision'>
+				<geometry>
+					<box>
+						<size>0.05 0.05 0.05</size>
+					</box>
+				</geometry>
+				<surface>
+					<friction>
+						<ode>
+							<mu>0.8</mu>
+							<mu2>0.7</mu2>
+						</ode>
+					</friction>
+				</surface>
+			</collision>
+		</link>     
+	</model>
 </sdf>
