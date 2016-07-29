@@ -54,6 +54,7 @@ qt4_wrap_cpp(
   src/USFrame.h
   src/GPSFrame.h
   src/IMUFrame.h
+  src/JoystickGripperInterface.h
   #src/IMUWidget.h
 )
 
@@ -80,6 +81,7 @@ add_library(
   rqt_rover_gui
   ${version_file}
   src/GazeboSimManager.cpp
+  src/JoystickGripperInterface.cpp
   src/rover_gui_plugin.cpp
   src/CameraFrame.cpp
   src/MapFrame.cpp
