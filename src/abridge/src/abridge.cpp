@@ -4,7 +4,7 @@
 #include <tf/transform_datatypes.h>
 
 //ROS messages
-#include <std_msgs/Int16.h>
+#include <std_msgs/Float32.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Twist.h>
@@ -19,8 +19,8 @@ using namespace std;
 
 //aBridge functions
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
-void fingerAngleHandler(const std_msgs::Int16::ConstPtr& angle);
-void wristAngleHandler(const std_msgs::Int16::ConstPtr& angle);
+void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle);
+void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void serialActivityTimer(const ros::TimerEvent& e);
 void publishRosTopics();
 void parseData(string data);
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     
     odom.header.frame_id = publishedName+"/odom";
     odom.child_frame_id = publishedName+"/base_link";
-    
+
     ros::spin();
     
     return EXIT_SUCCESS;
@@ -122,16 +122,35 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     memset(&moveCmd, '\0', sizeof (moveCmd));
 }
 
-void fingerAngleHandler(const std_msgs::Int16::ConstPtr& angle) {
-	sprintf(moveCmd, "f,%d\n", angle->data);
-	usb.sendData(moveCmd);
-	memset(&moveCmd, '\0', sizeof (moveCmd));
+// The finger and wrist handlers receive gripper angle commands in floating point
+// radians, write them to a string and send that to the arduino
+// for processing.
+void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle) {
+  char cmd[16]={'\0'};
+
+  // Avoid dealing with negative exponents which confuse the conversion to string by checking if the angle is small
+  if (angle->data < 0.01) {
+    // 'f' indicates this is a finger command to the arduino
+    sprintf(cmd, "f,0\n");
+  } else {
+    sprintf(cmd, "f,%.4g\n", angle->data);
+  }
+  usb.sendData(cmd);
+  memset(&cmd, '\0', sizeof (cmd));
 }
 
-void wristAngleHandler(const std_msgs::Int16::ConstPtr& angle) {
-	sprintf(moveCmd, "w,%d\n", angle->data);
-	usb.sendData(moveCmd);
-	memset(&moveCmd, '\0', sizeof (moveCmd));
+void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle) {
+    char cmd[16]={'\0'};
+
+    // Avoid dealing with negative exponents which confuse the conversion to string by checking if the angle is small
+  if (angle->data < 0.01) {
+    // 'w' indicates this is a wrist command to the arduino
+    sprintf(cmd, "w,0\n");
+  } else {
+    sprintf(cmd, "w,%.4g\n", angle->data);
+  }
+  usb.sendData(cmd);
+  memset(&cmd, '\0', sizeof (cmd));
 }
 
 void serialActivityTimer(const ros::TimerEvent& e) {
