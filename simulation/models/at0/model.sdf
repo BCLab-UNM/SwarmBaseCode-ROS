@@ -4,10 +4,6 @@
 		<static>false</static>
 		<link name='link'>
 			<inertial>
-				<!-- to calculate the inertia matrix of a cube: where M = 0.1, and s = 0.05 -->
-				<!--                           | 1 0 0 |   | 0.00004 0       0       |      -->
-				<!-- I = M * ((s^2) / (6.0)) * | 0 1 0 | = | 0       0.00004 0       |      -->
-				<!--                           | 0 0 1 |   | 0       0       0.00004 |      -->
 				<mass>0.1</mass>
 				<inertia>
 					<ixx>0.00004</ixx>
