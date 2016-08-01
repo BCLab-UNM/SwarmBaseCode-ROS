@@ -65,10 +65,10 @@ JoystickGripperInterface::JoystickGripperInterface(ros::NodeHandle nh, string ro
     // Should this be limited here or rely on the ROS command receivers to sensibly
     // handle commands that are out of bounds?
     wristAngleMin = 0.0;
-    wristAngleMax = 0.78; // Rad
+    wristAngleMax = 1.0; // Rad
 
     fingerAngleMin = 0.0;
-    fingerAngleMax = 1.57; // Rad (90 degrees)
+    fingerAngleMax = 2.0;
 
     // The fraction of the joystick output value by which to change the gripper angles
     // This should be tuned in accordance with user feedback.
@@ -146,6 +146,10 @@ void JoystickGripperInterface::joystickGripperWristControlTimerEventHandler(){
     if (wristAngle > wristAngleMax) wristAngle = wristAngleMax;
     else if (wristAngle < wristAngleMin) wristAngle = wristAngleMin;
 
+    // If the wrist angle is small enough to use negative exponents set to zero
+    // negative exponents confuse the downstream conversion to string
+    if (fabs(wristAngle) < 0.001) wristAngle = 0.0f;
+
     std_msgs::Float32 angleMsg;
     angleMsg.data = wristAngle;
     gripperWristAnglePublisher.publish(angleMsg);
@@ -188,6 +192,11 @@ void JoystickGripperInterface::joystickGripperFingerControlTimerEventHandler(){
     // Don't exceed the min and max angles
     if (fingerAngle > fingerAngleMax) fingerAngle = fingerAngleMax;
     else if (fingerAngle < fingerAngleMin) fingerAngle = fingerAngleMin;
+
+
+    // If the finger angle is small enough to use negative exponents set to zero
+    // negative exponents confuse the downstream conversion to string
+    if (fabs(fingerAngle) < 0.001) fingerAngle = 0.0f;
 
     // Publish the finger angle commands
     std_msgs::Float32 angleMsg;
