@@ -11,6 +11,8 @@ struct signalInfo {
   char ssid[33];
   int bitrate;
   int level;
+  int quality;
+  int noise;
 };
 
 class Diagnostics {

@@ -72,6 +72,8 @@ return(-1);
 //signal is measured in dBm and is valid for us to use
 
 sigInfo->level=((iw_statistics *)req.u.data.pointer)->qual.level - 256;
+sigInfo->quality=((iw_statistics *)req.u.data.pointer)->qual.qual;
+sigInfo->noise=((iw_statistics *)req.u.data.pointer)->qual.noise;
 
 }
 
@@ -212,7 +214,12 @@ void Diagnostics::checkWireless() {
 signalInfo*  info; 
 string interfaceName = "wlan1";
 getSignalInfo(info, interfaceName.c_str());
-publishInfoLogMessage("Wireless signal strength is: " + to_string(info->level));
+publishInfoLogMessage("Wireless " + interfaceName + ":\n"
+		       + "Connected to: " + string(info->ssid) + "\n"
+		       + "Quality: " + to_string(info->quality) + "\n"
+		       + "Level: " + to_string(info->level) + "\n"
+		       + "Bitrate: " + to_string(info->bitrate) + "\n");
+
 }
 
 void Diagnostics::checkIMU() {
