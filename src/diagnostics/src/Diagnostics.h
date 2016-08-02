@@ -3,6 +3,15 @@
 
 #include <ros/ros.h>
 #include <string>
+#include <exception>
+
+//struct to hold collected information
+struct signalInfo {
+  char mac[18];
+  char ssid[33];
+  int bitrate;
+  int level;
+};
 
 class Diagnostics {
   
@@ -22,6 +31,7 @@ private:
   void checkGPS();
   void checkSonar();
   void checkCamera();
+  void checkWireless();
   
   bool checkGPSExists();
   bool checkCameraExists();
@@ -32,6 +42,9 @@ private:
   // be bypassed.
   bool checkIfSimulatedRover();
   
+  // Get wireless info
+  int getSignalInfo(signalInfo *sigInfo, const char *iwname);
+
   // Takes the vendor and device IDs and searches the USB busses for a match
   bool checkUSBDeviceExists(uint16_t, uint16_t);
   
