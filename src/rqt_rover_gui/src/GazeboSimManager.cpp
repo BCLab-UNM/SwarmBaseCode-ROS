@@ -162,6 +162,12 @@ QString GazeboSimManager::stopRoverNode( QString rover_name )
     output += "<br>" + sh.readAll();
     sh.close();
 
+    argument = "rosnode kill "+rover_name+"_DIAGNOSTICS";
+    sh.start("sh", QStringList() << "-c" << argument);
+    sh.waitForFinished();
+    output += "<br>" + sh.readAll();
+    sh.close();
+
     return output+"<br>rover process " + rover_name + " terminated along with <font color='green'>navsat, target, obstacle, and mobility</font> nodes";
 }
 
