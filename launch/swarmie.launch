@@ -21,23 +21,18 @@
 
   </node>
 
-  <node pkg="robot_localization" type="ekf_localization_node" name="$(arg name)_EKF" respawn="false">
+  <node pkg="robot_localization" type="ekf_localization_node" name="$(arg name)_ODOM">
 
-      <param name="odom0" value="/$(arg name)/odom/navsat" />
-      <param name="odom1" value="/$(arg name)/odom" />
+      <param name="odom0" value="/$(arg name)/odom" />
       <param name="imu0" value="/$(arg name)/imu" />
       <param name="two_d_mode" value="true" />
+      <param name="world_frame" value="odom" />
+      <param name="frequency" value="10" />
 
-      <rosparam param="odom0_config">[true, true, false, 
+      <rosparam param="odom0_config">[false, false, false,
                                 false, false, false, 
-                                false, false, false, 
-                                false, false, false, 
-                                false, false, false]</rosparam>
-
-      <rosparam param="odom1_config">[true, true, false, 
-                                false, false, false, 
-                                false, false, false, 
-                                false, false, false, 
+                                true, false, false,
+                                false, false, true,
                                 false, false, false]</rosparam>
 
       <rosparam param="imu0_config">[false, false, false, 
@@ -46,8 +41,33 @@
                                false, false, true, 
                                true, false, false]</rosparam>
 
-      <remap from="/odometry/filtered" to="/$(arg name)/odom/ekf" />
+      <remap from="/odometry/filtered" to="/$(arg name)/odom/filtered" />
     
   </node>
+
+  <node pkg="robot_localization" type="ekf_localization_node" name="$(arg name)_MAP">
+
+      <param name="odom0" value="/$(arg name)/odom/navsat" />
+      <param name="odom1" value="/$(arg name)/odom/filtered" />
+      <param name="two_d_mode" value="true" />
+      <param name="world_frame" value="map" />
+      <param name="frequency" value="10" />
+
+      <rosparam param="odom0_config">[true, true, false,
+                                false, false, false,
+                                false, false, false,
+                                false, false, false,
+                                false, false, false]</rosparam>
+
+      <rosparam param="odom1_config">[false, false, false,
+                                false, false, true,
+                                true, false, false,
+                                false, false, true,
+                                true, false, false]</rosparam>
+
+      <remap from="/odometry/filtered" to="/$(arg name)/odom/ekf" />
+
+  </node>
+
 
 </launch>
