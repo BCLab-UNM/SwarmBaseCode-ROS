@@ -779,6 +779,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         rover_names.clear();        
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
+        ui.rover_diags_list->clear();
 
         // Disable control mode group since no rovers are connected
         ui.autonomous_control_radio_button->setEnabled(false);
@@ -838,6 +839,9 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     selected_rover_name = "";
     ui.rover_list->clearSelection();
     ui.rover_list->clear();
+
+    // Also clear the rover diagnostics list
+    ui.rover_list->clear();
     
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
@@ -860,6 +864,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         targetPickUpSubscribers[*i] = nh.subscribe("/"+*i+"/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
         targetDropOffSubscribers[*i] = nh.subscribe("/"+*i+"/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
         targetCoordinateSubscribers[*i] = nh.subscribe("/"+*i+"/targets", 10, &RoverGUIPlugin::targetCoordinateEventHandler, this);
+        rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 10, &RoverGUIPlugin::diagnosticEventHandler, this);
 
         QString rover_status = "";
         // Build new ui rover list string
@@ -880,7 +885,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         QListWidgetItem* new_item = new QListWidgetItem(rover_name_and_status);
         new_item->setForeground(Qt::red);
         ui.rover_list->addItem(new_item);
-        
+
+        // Create the corresponding diagnostic data listwidgetitem
+        QListWidgetItem* new_diags_item = new QListWidgetItem("");
+        new_diags_item->setForeground(Qt::red);
+        ui.rover_diags_list->addItem(new_diags_item);
 
     }
 }
@@ -935,6 +944,64 @@ void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
                                          msg->orientation.y,
                                          msg->orientation.z        );
 
+}
+
+// This handler receives messages from the diagnostics package. It uses a float array to package the
+// data for flexibility. This means callers have to know what data is stored at each poistion.
+// When the data we cant to display stabalizes we should consider changing this to a custom
+// ROS message type that names the data being stored.
+// We extract the sender name from the ROS topic name rather than the publisher node name because that
+// tends to be more stable. Sometimes teams rename the nodes but renaming the topics would cause
+// other problems for them.
+void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_msgs::Float32MultiArray> &event) {
+
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    // Extract rover name from the message source
+    string topic = header.at("topic");
+    size_t found = topic.find("/diagnostics");
+    string rover_name = topic.substr(1,found-1);
+
+    const boost::shared_ptr<const std_msgs::Float32MultiArray> msg = event.getMessage();
+
+    string diagnostic_display = "";
+ // Iterate over the array and cocatinate into a space delimited string
+       for(std::vector<float>::const_iterator it = msg->data.begin(); it != msg->data.end(); ++it)
+        {
+            diagnostic_display += " " + to_string(*it);
+        }
+
+    // Find the row in the rover list that corresponds to the rover that sent us the diagnostics message
+    // this is just to make sure the diagnostic data is displayed in the row that matches the rover
+    // it came from
+    int row = 0; // declare here so we can use it to index into the rover_diags_list
+    for(; row < ui.rover_list->count(); row++)
+    {
+        QListWidgetItem *item = ui.rover_list->item(row);
+
+        // Extract rover name
+        string rover_name_and_status = item->text().toStdString();
+
+        // Rover names start at the begining of the rover name and status string and end at the first space
+        size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+        string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+        if (ui_rover_name.compare(rover_name)==0) break; // We found a rover with the right name
+    }
+
+    // Check the the rover was found in the rover list
+    if (row >= ui.rover_list->count())
+    {
+        emit sendInfoLogMessage(QString::fromStdString("Received diagnostic data from an unknown rover: " + rover_name));
+        return;
+    }
+
+    emit sendInfoLogMessage(QString::fromStdString("Received diagnostic data from " + rover_name));
+
+    // Update the UI
+    QListWidgetItem *item = ui.rover_diags_list->item(row);
+    item->setText(QString::fromStdString(diagnostic_display));
 }
 
 void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)
