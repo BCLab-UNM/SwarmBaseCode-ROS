@@ -2,6 +2,12 @@
 #define Diagnostics_h
 
 #include <ros/ros.h>
+
+// The following multiarray headers are for the diagnostics data publisher
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+#include "std_msgs/Float32MultiArray.h"
+
 #include <string>
 #include <exception>
 
@@ -23,6 +29,13 @@ public:
   void publishWarningLogMessage(std::string);
   void publishErrorLogMessage(std::string);
   void publishInfoLogMessage(std::string);
+  
+  // This function sends an array of floats
+  // corresponding to predefined diagnostic values 
+  // to be displayed in the GUI
+  // For example, the wireless signal quality.
+  void publishDiagnosticData();
+
   std::string getHumanFriendlyTime();
   
 private:
@@ -38,6 +51,7 @@ private:
   bool checkGPSExists();
   bool checkCameraExists();
 
+
   // This function checks the rover published name against the simulated rover model files.
   // If the name of this rover does not appear in the models then assume we are a
   // simulated rover. Being a simulated rover means that certain diagnostic checks will
@@ -52,6 +66,7 @@ private:
   
   ros::NodeHandle nodeHandle;
   ros::Publisher diagLogPublisher;
+  ros::Publisher diagnosticDataPublisher;
   std::string publishedName;
 
   

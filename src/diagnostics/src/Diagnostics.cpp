@@ -18,6 +18,7 @@ using namespace std;
 Diagnostics::Diagnostics(std::string name) {
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
+  diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
 
   // Setup sensor check timers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
@@ -60,7 +61,7 @@ req.u.data.length = sizeof(iw_statistics);
 
 if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
 
-//die with error, invalid interface
+
 publishErrorLogMessage("Diagnostics.getSignalInfo(): Invalid interface.");
 
 return(-1);
@@ -165,6 +166,19 @@ close(sockfd);
 
 }
 
+void Diagnostics::publishDiagnosticData() {
+
+signalInfo*  info; 
+string interfaceName = "wlan1";
+getSignalInfo(info, interfaceName.c_str());
+
+ std_msgs::Float32MultiArray rosMsg;
+ rosMsg.data.clear();
+ rosMsg.data.push_back(info->quality);
+ diagnosticDataPublisher.publish(rosMsg);
+ delete info;
+}
+
 void Diagnostics::publishErrorLogMessage(std::string msg) {
 
   std_msgs::String ros_msg;
@@ -201,13 +215,17 @@ string Diagnostics::getHumanFriendlyTime() {
 // sensor check timeout handler. This function is triggered periodically and calls the
 // sensor check functions.
 void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
+  
   if (!simulated) {
   checkIMU();
   checkGPS();
   checkSonar();
   checkCamera();
   checkWireless();
+
+  publishDiagnosticData();
   }
+
 }
 
 void Diagnostics::checkWireless() {
