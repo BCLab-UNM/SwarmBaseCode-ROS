@@ -1038,8 +1038,8 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     // Change the color of the text based on the link quality. These numbers are from
     // experience but need tuning.
 
-    int red = (255 * wireless_quality) / 70;
-    int green = (255 * (100 - wireless_quality)) / 70;
+    int green = (255 * wireless_quality) / 70;
+    int red = (255 * (70 - wireless_quality)) / 70;
     int blue = 0;
 
     item->setTextColor(QColor(red, green, blue));
