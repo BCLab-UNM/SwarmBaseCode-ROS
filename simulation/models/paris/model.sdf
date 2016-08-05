@@ -78,18 +78,16 @@
 			</axis>
 		</joint>
 
-		<!-- TODO: Temporarily giving ALL gripper components the same physics
-		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_wrist">
 			<inertial>
-				<mass>0.1</mass>
+				<mass>0.085</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.00005</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.00006</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.00005</izz>
 				</inertia>
 			</inertial>
 			<visual name="visual">
@@ -123,18 +121,16 @@
 			</axis>
 		</joint>
 
-		<!-- TODO: Temporarily giving ALL gripper components the same physics
-		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_left_finger">
 			<inertial>
-				<mass>0.1</mass>
+				<mass>0.005</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.000002</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.000002</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.000004</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -184,18 +180,16 @@
 			</axis>
 		</joint>
 
-		<!-- TODO: Temporarily giving ALL gripper components the same physics
-		properties as a wheel, these values need to be updated. -->
 		<link name="gripper_right_finger">
 			<inertial>
-				<mass>0.1</mass>
+				<mass>0.005</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.000002</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.000002</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.000004</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
