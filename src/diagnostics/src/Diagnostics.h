@@ -79,6 +79,9 @@ private:
   bool cameraConnected = true;
   bool GPSConnected = true;
   bool simulated = false;
+
+  // State for the bandwith calculation
+  long int prev_total_bytes = 0;
 };
 
 #endif // End Diagnostics_h

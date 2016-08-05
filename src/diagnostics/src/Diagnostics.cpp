@@ -36,7 +36,6 @@ Diagnostics::Diagnostics(std::string name) {
 float Diagnostics::calcBandwidthUsed() {
 
     long int total_bytes = 0;
-    long int prev_total_bytes = 0;
 
     // Path to the linux provided stats. These files are pointers to memory locations
     // and are not on disk.
