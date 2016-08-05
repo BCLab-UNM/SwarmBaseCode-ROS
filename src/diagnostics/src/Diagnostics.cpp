@@ -25,60 +25,58 @@ Diagnostics::Diagnostics(std::string name) {
   if ( checkIfSimulatedRover() ) {
     simulated = true;
     publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
-  } else {
+  } else { 
     simulated = false;
     publishInfoLogMessage("Diagnostic Package Started. Physical Rover.");
   }
-  
 }
 
-int Diagnostics::getSignalInfo(signalInfo *sigInfo, const char *iwname){
+SignalInfo Diagnostics::getSignalInfo(const char *iwname){
+
+  SignalInfo sigInfo;
+
+  // Declare an iwreq (wireless interface request object) for use in IOCTL communication
 
 iwreq req;
 
+// Allocate space for the request object
+memset(&req, 0, sizeof(struct iwreq));
+
+// Populate the interface name in the request object
 strcpy(req.ifr_name, iwname);
 
-
-
+// Declare an iw_statistics object to store the IOCTL results in
 iw_statistics *stats;
 
-
-
-//have to use a socket for ioctl
-
+// Create socket through which to talk to the kernel 
 int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 
-
-//make room for the iw_statistics object
-
+// Allocate space for the iw_statistics object, point to it from the request,
+// and store the length of the object in the request.
 req.u.data.pointer = (iw_statistics *)malloc(sizeof(iw_statistics));
-
 req.u.data.length = sizeof(iw_statistics);
 
 
-//this will gather the signal strength
-
+// Use IOCTL to request the wireless stats. If -1 there was an error.
 if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
 
+  string errorMsg = "Unable to open ioctl socket for " + string(iwname) + ": "+ string(strerror(errno));
 
-publishErrorLogMessage("Diagnostics.getSignalInfo(): Invalid interface.");
-
-return(-1);
-
+  // Publish the error to the diagnostics log
+  publishErrorLogMessage(errorMsg);
+  return sigInfo;
 }
-
- else if(((iw_statistics *)req.u.data.pointer)->qual.updated & IW_QUAL_DBM){
+else if(((iw_statistics *)req.u.data.pointer)->qual.updated & IW_QUAL_DBM){
 
 //signal is measured in dBm and is valid for us to use
 
-sigInfo->level=((iw_statistics *)req.u.data.pointer)->qual.level - 256;
-sigInfo->quality=((iw_statistics *)req.u.data.pointer)->qual.qual;
-sigInfo->noise=((iw_statistics *)req.u.data.pointer)->qual.noise;
+//sigInfo->level=((iw_statistics *)req.u.data.pointer)->qual.level - 256;
+sigInfo.level = ((iw_statistics *)req.u.data.pointer)->qual.level - 256;
+sigInfo.quality=((iw_statistics *)req.u.data.pointer)->qual.qual;
+sigInfo.noise=((iw_statistics *)req.u.data.pointer)->qual.noise;
 
 }
-
-
 
 //SIOCGIWESSID for ssid
 
@@ -96,18 +94,17 @@ if(ioctl(sockfd, SIOCGIWESSID, &req) == -1){
 
 //die with error, invalid interface
 
-return(-1);
+return sigInfo;
 
 }
 
  else{
 
-memcpy(&sigInfo->ssid, req.u.essid.pointer, req.u.essid.length);
+memcpy(&sigInfo.ssid, req.u.essid.pointer, req.u.essid.length);
 
-memset(&sigInfo->ssid[req.u.essid.length],0,1);
+memset(&sigInfo.ssid[req.u.essid.length],0,1);
 
 }
-
 
 
 //SIOCGIWRATE for bits/sec (convert to mbit)
@@ -120,17 +117,15 @@ if(ioctl(sockfd, SIOCGIWRATE, &req) == -1){
 
 fprintf(stderr, "bitratefail");
 
-return(-1);
+return sigInfo;
 
 }else{
 
 memcpy(&bitrate, &req.u.bitrate, sizeof(int));
 
-sigInfo->bitrate=bitrate/1000000;
+sigInfo.bitrate=bitrate/1000000;
 
 }
-
-
 
 
 
@@ -146,37 +141,37 @@ if(ioctl(sockfd, SIOCGIFHWADDR, &req2) == -1){
 
 fprintf(stderr, "mac error");
 
-return(-1);
+return sigInfo;
 
 }
 
  else{
 
-sprintf(sigInfo->mac, "%.2X", (unsigned char)req2.ifr_hwaddr.sa_data[0]);
+sprintf(sigInfo.mac, "%.2X", (unsigned char)req2.ifr_hwaddr.sa_data[0]);
 
 for(int s=1; s<6; s++){
 
-sprintf(sigInfo->mac+strlen(sigInfo->mac), ":%.2X", (unsigned char)req2.ifr_hwaddr.sa_data[s]);
+sprintf(sigInfo.mac+strlen(sigInfo.mac), ":%.2X", (unsigned char)req2.ifr_hwaddr.sa_data[s]);
 
 }
 
 }
 
 close(sockfd);
+  
 
+ return sigInfo;
 }
 
 void Diagnostics::publishDiagnosticData() {
+  string interfaceName = "wlan1";
 
-signalInfo*  info; 
-string interfaceName = "wlan1";
-getSignalInfo(info, interfaceName.c_str());
+  SignalInfo info = getSignalInfo(interfaceName.c_str());
 
- std_msgs::Float32MultiArray rosMsg;
- rosMsg.data.clear();
- rosMsg.data.push_back(info->quality);
- diagnosticDataPublisher.publish(rosMsg);
- delete info;
+  std_msgs::Float32MultiArray rosMsg;
+  rosMsg.data.clear();
+  rosMsg.data.push_back(info.quality);
+  diagnosticDataPublisher.publish(rosMsg);
 }
 
 void Diagnostics::publishErrorLogMessage(std::string msg) {
@@ -215,7 +210,9 @@ string Diagnostics::getHumanFriendlyTime() {
 // sensor check timeout handler. This function is triggered periodically and calls the
 // sensor check functions.
 void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
-  
+
+  publishInfoLogMessage("Scheduled diagnostic update occured.");
+
   if (!simulated) {
   checkIMU();
   checkGPS();
@@ -229,14 +226,16 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
 }
 
 void Diagnostics::checkWireless() {
-signalInfo*  info; 
-string interfaceName = "wlan1";
-getSignalInfo(info, interfaceName.c_str());
-publishInfoLogMessage("Wireless " + interfaceName + ":\n"
-		       + "Connected to: " + string(info->ssid) + "\n"
-		       + "Quality: " + to_string(info->quality) + "\n"
-		       + "Level: " + to_string(info->level) + "\n"
-		       + "Bitrate: " + to_string(info->bitrate) + "\n");
+
+  //  string interfaceName = "wlan1";
+  //SignalInfo info = getSignalInfo(interfaceName.c_str());
+
+
+  //publishInfoLogMessage("Wireless " + interfaceName + ":\n"
+  //		       + "Connected to: " + string(info.ssid) + "\n"
+  //		       + "Quality: " + to_string(info.quality) + "\n"
+  //		       + "Level: " + to_string(info.level) + "\n"
+  //		       + "Bitrate: " + to_string(info.bitrate) + "\n");
 
 }
 
@@ -333,3 +332,4 @@ bool Diagnostics::checkIfSimulatedRover() {
      
 Diagnostics::~Diagnostics() {
 }
+

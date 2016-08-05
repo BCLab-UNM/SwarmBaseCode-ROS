@@ -12,7 +12,7 @@
 #include <exception>
 
 //struct to hold collected information
-struct signalInfo {
+struct SignalInfo {
   char mac[18];
   char ssid[33];
   int bitrate;
@@ -59,7 +59,7 @@ private:
   bool checkIfSimulatedRover();
   
   // Get wireless info
-  int getSignalInfo(signalInfo *sigInfo, const char *iwname);
+  SignalInfo getSignalInfo(const char *iwname);
 
   // Takes the vendor and device IDs and searches the USB busses for a match
   bool checkUSBDeviceExists(uint16_t, uint16_t);
@@ -70,7 +70,7 @@ private:
   std::string publishedName;
 
   
-  float sensorCheckInterval = 10; // Check sensors every 10 seconds
+  float sensorCheckInterval = 1; // Check sensors every 10 seconds
   ros::Timer sensorCheckTimer;
 
   // Store some state about the current health of the rover
