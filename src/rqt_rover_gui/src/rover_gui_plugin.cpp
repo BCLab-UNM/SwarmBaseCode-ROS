@@ -946,13 +946,14 @@ void RoverGUIPlugin::IMUEventHandler(const sensor_msgs::Imu::ConstPtr& msg)
 
 }
 
-// This handler receives messages from the diagnostics package. It uses a float array to package the
+// This handler receives data messages from the diagnostics package. It uses a float array to package the
 // data for flexibility. This means callers have to know what data is stored at each poistion.
 // When the data we cant to display stabalizes we should consider changing this to a custom
 // ROS message type that names the data being stored.
 // We extract the sender name from the ROS topic name rather than the publisher node name because that
 // tends to be more stable. Sometimes teams rename the nodes but renaming the topics would cause
-// other problems for them.
+// other problems for them. This is distinct from the diagnostics log handler which received messages rather
+// than continual data readings.
 void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_msgs::Float32MultiArray> &event) {
 
     const std::string& publisher_name = event.getPublisherName();
@@ -967,11 +968,43 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     const boost::shared_ptr<const std_msgs::Float32MultiArray> msg = event.getMessage();
 
     string diagnostic_display = "";
- // Iterate over the array and cocatinate into a space delimited string
-       for(std::vector<float>::const_iterator it = msg->data.begin(); it != msg->data.end(); ++it)
-        {
-            diagnostic_display += " " + to_string(*it);
-        }
+
+    // Read data from the message array
+    float wireless_strength = msg->data[0];
+    float byte_rate = msg->data[1]; // Bandwidth used by the wireless interface
+
+    // Convert to strings
+
+    diagnostic_display = to_string(wireless_strength);
+
+    // Convert the byte rate into a string with units
+    // Rate in B/s
+       float rate = byte_rate;
+
+       // Conversion factors to make the rate human friendly
+       int KB = 1024;
+       int MB = 1024*1024;
+
+       string rate_str;
+       string units;
+       if (rate < KB) {
+         rate_str = to_string(rate);
+         units = "B/s";
+       } else if (rate < MB) {
+         rate = rate/KB;
+         units = "KB/s";
+       } else {
+         rate = rate/MB;
+         units = "MB/s";
+       }
+
+       rate_str = to_string(rate);
+       if (rate_str[rate_str.find(".")+1] != '0')
+         rate_str = rate_str.erase(rate_str.find(".")+2,string::npos);
+       else
+         rate_str = rate_str.erase(rate_str.find("."),string::npos);
+
+       diagnostic_display += " " + rate_str;
 
     // Find the row in the rover list that corresponds to the rover that sent us the diagnostics message
     // this is just to make sure the diagnostic data is displayed in the row that matches the rover
