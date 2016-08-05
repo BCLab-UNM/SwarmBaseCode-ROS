@@ -975,7 +975,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
 
     // Convert to strings
 
-    diagnostic_display = "<font color='blue'>" + to_string(wireless_quality) + "</font>";
+    diagnostic_display = to_string(wireless_quality);
 
     // Convert the byte rate into a string with units
     // Rate in B/s
@@ -1004,7 +1004,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
        else
          rate_str = rate_str.erase(rate_str.find("."),string::npos);
 
-       diagnostic_display += " <font color='yellow'>" + rate_str + " " + units + "</font>";
+       diagnostic_display += rate_str + " - " + units;
 
     // Find the row in the rover list that corresponds to the rover that sent us the diagnostics message
     // this is just to make sure the diagnostic data is displayed in the row that matches the rover
@@ -1034,6 +1034,15 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
 
     // Update the UI
     QListWidgetItem *item = ui.rover_diags_list->item(row);
+
+    // Change the color of the text based on the link quality. These numbers are from
+    // experience but need tuning.
+
+    int red = (255 * wireless_quality) / 70;
+    int green = (255 * (100 - wireless_quality)) / 70;
+    int blue = 0;
+
+    item->setTextColor(QColor(red, green, blue));
     item->setText(QString::fromStdString(diagnostic_display));
 }
 
