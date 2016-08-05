@@ -1005,7 +1005,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
        else
          rate_str = rate_str.erase(rate_str.find("."),string::npos);
 
-       diagnostic_display += " : " + rate_str + " " + units;
+       diagnostic_display += " | " + rate_str + " " + units;
 
     // Find the row in the rover list that corresponds to the rover that sent us the diagnostics message
     // this is just to make sure the diagnostic data is displayed in the row that matches the rover
