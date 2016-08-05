@@ -15,10 +15,11 @@
 struct SignalInfo {
   char mac[18];
   char ssid[33];
-  int bitrate;
+  int bandwidthAvailable;
   int level;
   int quality;
   int noise;
+  float bandwidthUsed;
 };
 
 class Diagnostics {
@@ -60,6 +61,7 @@ private:
   
   // Get wireless info
   SignalInfo getSignalInfo(const char *iwname);
+  float calcBandwidthUsed();
 
   // Takes the vendor and device IDs and searches the USB busses for a match
   bool checkUSBDeviceExists(uint16_t, uint16_t);
@@ -70,7 +72,7 @@ private:
   std::string publishedName;
 
   
-  float sensorCheckInterval = 1; // Check sensors every 10 seconds
+  float sensorCheckInterval = 2; // Check sensors every 2 seconds
   ros::Timer sensorCheckTimer;
 
   // Store some state about the current health of the rover

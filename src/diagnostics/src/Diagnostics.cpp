@@ -3,8 +3,10 @@
 #include <linux/types.h>
 #include <sys/socket.h>
 
-#include <linux/wireless.h>
-#include <sys/ioctl.h>
+#include <linux/wireless.h> // For wifi stats 
+#include <sys/ioctl.h> // For comminication with the kernel
+#include <iostream> // For reading system info
+#include <fstream> // "
 
 #include <string>
 
@@ -29,6 +31,52 @@ Diagnostics::Diagnostics(std::string name) {
     simulated = false;
     publishInfoLogMessage("Diagnostic Package Started. Physical Rover.");
   }
+}
+
+float Diagnostics::calcBandwidthUsed() {
+
+    long int total_bytes = 0;
+    long int prev_total_bytes = 0;
+
+    // Path to the linux provided stats. These files are pointers to memory locations
+    // and are not on disk.
+    string receive_bytes_stat_path = "/sys/class/net/wlan1/statistics/rx_bytes";
+    string transmit_bytes_stat_path = "/sys/class/net/wlan1/statistics/tx_bytes";
+
+    // Open, read and close the bytes received and bytes sent file pointers. 
+    ifstream receive_bytes_stat(receive_bytes_stat_path.c_str());
+    string receive_stat;
+    getline(receive_bytes_stat,receive_stat);
+    receive_bytes_stat.close();
+   
+    ifstream transmit_bytes_stat(transmit_bytes_stat_path.c_str());
+    string transmit_stat;
+    getline(transmit_bytes_stat,transmit_stat);
+    transmit_bytes_stat.close();
+
+    // Remember the total bytes transmitted so we can take the difference 
+    // between recordings at each time interval.
+    prev_total_bytes = total_bytes;
+   
+    // Convert string to int
+    string::size_type sz;   // alias of size_t
+    long int rx_bytes = stoi(receive_stat,&sz);
+    long int tx_bytes = stoi(transmit_stat,&sz);
+
+    // Get the total bytes transmitted and recevied. This is the total bandwidth used.
+    total_bytes = rx_bytes + tx_bytes;
+
+    // If we haven't set the value of the previous reading skip. This will never be zero since it is the number of
+    // bytes sent and received since boot. 
+    if (prev_total_bytes == 0) return 0;
+   
+    // Get the bytes transmitted and received as a function of time.
+    // This assumes the function is called using the sensor check function.
+    // Perhaps this function should keep track of the time elapsed itself? 
+    float byte_rate = byte_rate = (total_bytes - prev_total_bytes)*1.0f/sensorCheckInterval;
+   
+    // Rate in B/s
+    return byte_rate;
 }
 
 SignalInfo Diagnostics::getSignalInfo(const char *iwname){
@@ -123,7 +171,7 @@ return sigInfo;
 
 memcpy(&bitrate, &req.u.bitrate, sizeof(int));
 
-sigInfo.bitrate=bitrate/1000000;
+sigInfo.bandwidthAvailable=bitrate/1000000;
 
 }
 
@@ -158,7 +206,8 @@ sprintf(sigInfo.mac+strlen(sigInfo.mac), ":%.2X", (unsigned char)req2.ifr_hwaddr
 }
 
 close(sockfd);
-  
+
+ sigInfo.bandwidthUsed = calcBandwidthUsed();  
 
  return sigInfo;
 }
@@ -171,6 +220,7 @@ void Diagnostics::publishDiagnosticData() {
   std_msgs::Float32MultiArray rosMsg;
   rosMsg.data.clear();
   rosMsg.data.push_back(info.quality);
+  rosMsg.data.push_back(info.bandwidthUsed);
   diagnosticDataPublisher.publish(rosMsg);
 }
 
@@ -210,8 +260,6 @@ string Diagnostics::getHumanFriendlyTime() {
 // sensor check timeout handler. This function is triggered periodically and calls the
 // sensor check functions.
 void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
-
-  publishInfoLogMessage("Scheduled diagnostic update occured.");
 
   if (!simulated) {
   checkIMU();
