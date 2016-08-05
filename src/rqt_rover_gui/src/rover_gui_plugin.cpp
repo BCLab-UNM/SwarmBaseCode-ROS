@@ -970,12 +970,12 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     string diagnostic_display = "";
 
     // Read data from the message array
-    float wireless_strength = msg->data[0];
+    int wireless_quality = static_cast<int>(msg->data[0]); // Wireless quality is an integer value
     float byte_rate = msg->data[1]; // Bandwidth used by the wireless interface
 
     // Convert to strings
 
-    diagnostic_display = to_string(wireless_strength);
+    diagnostic_display = to_string(wireless_quality);
 
     // Convert the byte rate into a string with units
     // Rate in B/s
