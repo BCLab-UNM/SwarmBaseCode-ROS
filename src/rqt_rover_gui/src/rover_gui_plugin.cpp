@@ -841,7 +841,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     ui.rover_list->clear();
 
     // Also clear the rover diagnostics list
-    ui.rover_list->clear();
+    ui.rover_diags_list->clearSelection();
+    ui.rover_diags_list->clear();
     
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
@@ -1038,8 +1039,8 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     // Change the color of the text based on the link quality. These numbers are from
     // experience but need tuning.
 
-    int green = (255 * wireless_quality) / 70;
-    int red = (255 * (70 - wireless_quality)) / 70;
+    int green = 255 * wireless_quality / 70.0f;
+    int red = 255 * (70 - wireless_quality) / 70.0f ;
     int blue = 0;
 
     item->setTextColor(QColor(red, green, blue));
