@@ -328,8 +328,8 @@ void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odo
 
     QString x_str; x_str.setNum(x);
     QString y_str; y_str.setNum(y);
-    // Extract rover name from the message source. Publisher is in the format /*rover_name*_GPS
-    size_t found = publisher_name.find("_EKF");
+    // Extract rover name from the message source. Publisher is in the format /*rover_name*_MAP
+    size_t found = publisher_name.find("_MAP");
     string rover_name = publisher_name.substr(1,found-1);
 
     // Store map info for the appropriate rover name
