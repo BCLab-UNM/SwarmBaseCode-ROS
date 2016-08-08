@@ -3,6 +3,8 @@
 
 #include <ros/ros.h>
 
+#include "WirelessDiags.h"
+
 // The following multiarray headers are for the diagnostics data publisher
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
@@ -10,17 +12,6 @@
 
 #include <string>
 #include <exception>
-
-//struct to hold collected information
-struct SignalInfo {
-  char mac[18];
-  char ssid[33];
-  int bandwidthAvailable;
-  int level;
-  int quality;
-  int noise;
-  float bandwidthUsed;
-};
 
 class Diagnostics {
   
@@ -59,10 +50,6 @@ private:
   // be bypassed.
   bool checkIfSimulatedRover();
   
-  // Get wireless info
-  SignalInfo getSignalInfo(const char *iwname);
-  float calcBandwidthUsed();
-
   // Takes the vendor and device IDs and searches the USB busses for a match
   bool checkUSBDeviceExists(uint16_t, uint16_t);
   
@@ -80,9 +67,7 @@ private:
   bool GPSConnected = true;
   bool simulated = false;
 
-  // State for the bandwith calculation
-  long int prev_total_bytes = 0;
-  long int total_bytes = 0;
+  WirelessDiags wirelessDiags;
 };
 
 #endif // End Diagnostics_h
