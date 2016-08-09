@@ -71,14 +71,6 @@ namespace rqt_rover_gui
     collection_disk_clearance = 0.5;
 
     barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
-
-    // Initialize AprilTag detection apparatus
-	tf = tag36h11_create();
-    td = apriltag_detector_create();
-    apriltag_detector_add_family(td, tf);
-
-    // Allocate image memory up front so it doesn't need to be done for every image frame
-    u8_image = image_u8_create(320, 240);
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -803,15 +795,6 @@ void RoverGUIPlugin::encoderCheckboxToggledEventHandler(bool checked)
     ui.map_frame->setDisplayEncoderData(checked);
 }
 
-// Currently broken. Calling displayLogMessage from the ROS event thread causes a crash or hang
-//void RoverGUIPlugin::targetDetectedEventHandler(rover_onboard_target_detection::ATag tagInfo) //rover_onboard_target_detection::ATag msg )
-//{
-//    // Just let the user know the event happened
-//   // displayLogMessage("Tag detected");
-
-//}
-
-
 void RoverGUIPlugin::displayDiagLogMessage(QString msg)
 {
     if (msg.isEmpty()) msg = "Message is empty";
@@ -1046,12 +1029,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         emit sendInfoLogMessage("A gazebo server simulation process is already running. Restart the Swarmathon GUI to clear.");
         return;
     }
-
-    // Initialize the target counts
-    ui.num_targets_collected_label->setText(QString("<font color='white'>0</font>"));
-    ui.num_targets_detected_label->setText(QString("<font color='white'>0</font>"));
-    targetsPickedUp.clear();
-    targetsDroppedOff.clear();
 
     QProcess* sim_server_process = sim_mgr.startGazeboServer();
     connect(sim_server_process, SIGNAL(finished(int)), this, SLOT(gazeboServerFinishedEventHandler()));
@@ -1303,10 +1280,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     // Clear the task status values
-    ui.num_targets_collected_label->setText("<font color='white'>0</font>");
-    ui.num_targets_detected_label->setText("<font color='white'>0</font>");
-    targetsPickedUp.clear();
-    targetsDroppedOff.clear();
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
  }
@@ -1631,64 +1604,6 @@ QString RoverGUIPlugin::addPrelimsWalls()
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
    return output;
-}
-
-int RoverGUIPlugin::targetDetect(const sensor_msgs::ImageConstPtr& rawImage) {
-
-    cv_bridge::CvImagePtr cvImage;
-
-	//Convert from MONO8 to BGR8
-	//TODO: consider whether we should let the camera publish as BGR8 and skip this conversion
-    try {
-        cvImage = cv_bridge::toCvCopy(rawImage); //, sensor_msgs::image_encodings::MONO8);
-    } catch (cv_bridge::Exception& e) {
-        ROS_ERROR("Could not convert from '%s' to 'bgr8'.", rawImage->encoding.c_str());
-        return -1;
-    }
-
-    //Create Mat image for processing
-    cv::Mat matImage = cvImage->image;
-    cv::cvtColor(matImage, matImage, cv::COLOR_BGR2GRAY);
-
-    //Force greyscale and force image size.  This is only for Gazebo.
-    //TODO: fix model so Gazebo publishes the correct format
-    //TODO: if Mat is only used here, why not use the cvImage format here and skip the Mat image completely?
-    if (matImage.cols != 320 && matImage.rows != 240) {
-        cv::resize(matImage, matImage, cv::Size(320, 240), cv::INTER_LINEAR);
-    }
-
-    //Copy all image data into an array that AprilTag library expects
-    image_u8_t *im = copy_image_data_into_u8_container(	matImage.cols, 
-							matImage.rows, 
-							(uint8_t *) matImage.data, 
-							matImage.step);
-
-    //Detect AprilTags
-    zarray_t *detections = apriltag_detector_detect(td, im);
-    
-    //Check result for valid tag
-    for (int i = 0; i < zarray_size(detections); i++) {
-	    apriltag_detection_t *det;
-	    zarray_get(detections, i, &det);
-	
-	    int tag = det->id;
-	    
-	    //Return first tag that has not been collected
-	    if (targetsDroppedOff.count(tag) == 0){
-			return tag;
-		}
-	}
-	
-	return -1;
-}
-
-image_u8_t* RoverGUIPlugin::copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride) {
-    for (int y = 0; y < u8_image->height; y++) {
-        for (int x = 0; x < u8_image->width; x++) {
-            u8_image->buf[y * u8_image->stride + x] = rgb[y * stride + x + 0];
-        }
-    }
-    return u8_image;
 }
 
 void RoverGUIPlugin::checkAndRepositionRover(QString rover_name, float x, float y)

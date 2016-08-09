@@ -57,20 +57,6 @@
 #include "GazeboSimManager.h"
 #include "JoystickGripperInterface.h"
 
-//AprilTag headers
-#include "apriltag.h"
-#include "tag36h11.h"
-#include "tag36h10.h"
-#include "tag36artoolkit.h"
-#include "tag25h9.h"
-#include "tag25h7.h"
-#include "common/pnm.h"
-#include "common/image_u8.h"
-#include "common/zarray.h"
-#include "common/getopt.h"
-
-#include "shared_messages/TagsImage.h"
-
 using namespace std;
 
 namespace rqt_rover_gui {
@@ -99,7 +85,6 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
-    void targetCoordinateEventHandler(const ros::MessageEvent<const shared_messages::TagsImage> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -126,12 +111,6 @@ namespace rqt_rover_gui {
 
     // Detect rovers that are broadcasting information
     set<string> findConnectedRovers();
-    
-    //Image converter
-	image_u8_t *copy_image_data_into_u8_container(int width, int height, uint8_t *rgb, int stride);
-
-	//AprilTag detector
-	int targetDetect(const sensor_msgs::ImageConstPtr& rawImage);
 
   signals:
 
@@ -224,9 +203,6 @@ namespace rqt_rover_gui {
 
     float arena_dim; // in meters
 
-    map<string,int> targetsPickedUp;
-    map<int,bool> targetsDroppedOff;
-
     bool display_sim_visualization;
 
     // Object clearance. These values are used to quickly determine where objects can be placed int time simulation
@@ -239,16 +215,6 @@ namespace rqt_rover_gui {
     float barrier_clearance;
 
     unsigned long obstacle_call_count;
-    
-    //AprilTag objects
-	apriltag_family_t *tf = NULL; //tag family
-	apriltag_detector_t *td = NULL; //tag detector
-
-	//Image container
-	image_u8_t *u8_image = NULL;
-	
-	//AprilTag assigned to collection zone
-	int collectionZoneID = 256;
 
     // Joystick commands to ROS gripper command interface
     // This is a singleton class. Deleting it while it is still receiving movement commands will cause a segfault.
