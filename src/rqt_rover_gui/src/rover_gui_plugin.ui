@@ -2387,17 +2387,17 @@ QTabBar::tab:only-one {
    <widget class="QListWidget" name="rover_list">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>141</width>
-      <height>181</height>
+      <x>0</x>
+      <y>0</y>
+      <width>151</width>
+      <height>201</height>
      </rect>
     </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <property name="lineWidth">
-     <number>0</number>
+     <number>1</number>
     </property>
    </widget>
   </widget>
