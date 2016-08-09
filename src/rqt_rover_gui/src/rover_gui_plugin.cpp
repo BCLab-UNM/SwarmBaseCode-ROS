@@ -1042,18 +1042,20 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     // experience but need tuning. The raw quality value is scaled into a new range to make the colors more meaningful
     int quality_max = 70;
     int quality_min = 0;
-    int scaled_max = 70;
-    int scaled_min = 35;
+    int scaled_max = 10;
+    int scaled_min = 0;
     int quality_range = quality_max - quality_min; // Max minus min
     int scaled_range = scaled_max - scaled_min; // Scaled to match the experimental quality of the connection. Below 30 should be red = bad
-    int scaled_wireless_quality = (((wireless_quality - quality_min)*scaled_range)/quality_range) + scaled_min; // scale the quality to the new range
+    int scaled_wireless_quality = (((wireless_quality - quality_min)*static_cast<float>(scaled_range))/quality_range) + scaled_min; // scale the quality to the new range
     
-    int green = 255 * scaled_wireless_quality * 1.0f / scaled_range;
-    int red = 255 * (scaled_range - scaled_wireless_quality) * 1.0f / scaled_range;
+    int green = 255 * scaled_wireless_quality/static_cast<float>(scaled_range);
+    int red = 255 * (2*scaled_range - (scaled_wireless_quality))/static_cast<float>(2*scaled_range);
     int blue = 0;
 
     item->setTextColor(QColor(red, green, blue));
     item->setText(QString::fromStdString(diagnostic_display));
+
+    emit sendInfoLogMessage("quality: " + QString::number(wireless_quality) + " scaled: " + QString::number(scaled_wireless_quality) + QString::number(red) + " " + QString::number(green) + " " + QString::number(blue));
 }
 
 void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)
