@@ -1035,10 +1035,11 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
 
     // Update the UI
     QListWidgetItem *item = ui.rover_diags_list->item(row);
-
+    // We don't want the user to interact with this display item so make non-selectable
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    
     // Change the color of the text based on the link quality. These numbers are from
     // experience but need tuning.
-
     int green = 255 * wireless_quality / 70.0f;
     int red = 255 * (70 - wireless_quality) / 70.0f ;
     int blue = 0;
