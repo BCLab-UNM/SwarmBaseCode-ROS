@@ -448,140 +448,6 @@ set<string> RoverGUIPlugin::findConnectedRovers()
     return rovers;
 }
 
-void RoverGUIPlugin::targetPickUpEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event)
-{
-    const std::string& publisher_name = event.getPublisherName();
-    const ros::M_string& header = event.getConnectionHeader();
-    ros::Time receipt_time = event.getReceiptTime();
-    
-    const sensor_msgs::ImageConstPtr& image = event.getMessage();
-
-    // Extract rover name from the message source
-    string topic = header.at("topic");
-    size_t found = topic.find("/targetPickUpImage");
-    string rover_name = topic.substr(1,found-1);
-
-    int targetID = targetDetect(image);
-    
-    //Check all robots to ensure that no one is already holding the target
-    bool targetPreviouslyCollected = false;
-	for (map<string,int>::iterator it=targetsPickedUp.begin(); it!=targetsPickedUp.end(); ++it) {
-		if (it->second == targetID) {
-			targetPreviouslyCollected = true;
-			break;
-		}
-	}
-	
-    if((targetID < 0) || (targetID == collectionZoneID) || targetPreviouslyCollected) {
-        // No valid target was found in the image, or the target was the collection zone ID, or the target was already picked up by another robot
-        
-        //Publish -1 to alert robot of failed drop off event
-        std_msgs::Int16 targetIDMsg;
-        targetIDMsg.data = -1;
-        targetPickUpPublisher[rover_name].publish(targetIDMsg);
-    }
-    else {
-		//Record target ID according to the rover that reported it
-        targetsPickedUp[rover_name] = targetID;
-        emit sendInfoLogMessage("Resource " + QString::number(targetID) + " picked up by " + QString::fromStdString(rover_name));
-        ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
-        
-        //Publish target ID
-        std_msgs::Int16 targetIDMsg;
-        targetIDMsg.data = targetID;
-        targetPickUpPublisher[rover_name].publish(targetIDMsg);
-    }
-}
-
-void RoverGUIPlugin::targetDropOffEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event)
-{
-    const std::string& publisher_name = event.getPublisherName();
-    const ros::M_string& header = event.getConnectionHeader();
-    ros::Time receipt_time = event.getReceiptTime();
-
-    const sensor_msgs::ImageConstPtr& image = event.getMessage();
-
-    // Extract rover name from the message source
-    string topic = header.at("topic");
-    size_t found = topic.find("/targetDropOffImage");
-    string rover_name = topic.substr(1,found-1);
-
-    int targetID = targetDetect(image);
-
-    if(targetID != collectionZoneID) {
-        // This target does not match the official collection zone ID
-    }
-    else {
-		//Use try-catch here in case a rover reports the collection zone ID without ever having picked up a target
-        try {
-			//Add target ID to list of dropped off targets
-            targetsDroppedOff[targetsPickedUp.at(rover_name)] = true;
-            emit sendInfoLogMessage("Resource " + QString::number(targetsPickedUp.at(rover_name)) + " dropped off by " + QString::fromStdString(rover_name));
-            ui.num_targets_collected_label->setText(QString("<font color='white'>")+QString::number(targetsDroppedOff.size())+QString("</font>"));
-            targetsPickedUp.erase(rover_name);
-            ui.num_targets_detected_label->setText(QString("<font color='white'>")+QString::number(targetsPickedUp.size())+QString("</font>"));
-            
-            //Publish target ID (should always be equal to 256)
-			std_msgs::Int16 targetIDMsg;
-			targetIDMsg.data = targetID;
-			targetDropOffPublisher[rover_name].publish(targetIDMsg);
-        }
-        catch(const std::out_of_range& oor) {
-            emit sendInfoLogMessage(QString::fromStdString(rover_name) + " attempted a drop off but was not carrying a target");
-            
-            //Publish -1 to alert robot of failed drop off event
-            std_msgs::Int16 targetIDMsg;
-			targetIDMsg.data = -1;
-			targetDropOffPublisher[rover_name].publish(targetIDMsg);
-        }
-    }
-}
-
-// Receives coordinates for all detected targets from camera
-void RoverGUIPlugin::targetCoordinateEventHandler(const ros::MessageEvent<const shared_messages::TagsImage> &event)
-{
-    const std::string& publisher_name = event.getPublisherName();
-    const ros::M_string& header = event.getConnectionHeader();
-    ros::Time receipt_time = event.getReceiptTime();
-
-    const shared_messages::TagsImageConstPtr& image = event.getMessage();
-
-    // Extract rover name from the message source
-    string topic = header.at("topic");
-    size_t found = topic.find("/targets");
-    string rover_name = topic.substr(1,found-1);
-
-    // Each pair will store an individual corner coordinate and the center coordinate
-    // for each april tag 
-    std::pair<double, double> c1;
-    std::pair<double, double> c2;
-    std::pair<double, double> c3;
-    std::pair<double, double> c4;
-    std::pair<double, double> center;
-
-    for(int i = 0; i < image->corners.size(); i++)
-    {
-        c1.first = image->corners[i].points[0].x;
-        c1.second = image->corners[i].points[0].y;
-
-        c2.first = image->corners[i].points[1].x;
-        c2.second = image->corners[i].points[1].y;
-
-        c3.first = image->corners[i].points[2].x;
-        c3.second = image->corners[i].points[2].y;
-
-        c4.first = image->corners[i].points[3].x;
-        c4.second = image->corners[i].points[3].y;
-
-        center.first = image->centers.points[i].x;
-        center.second = image->centers.points[i].y;
-
-        ui.camera_frame->addTarget(c1, c2, c3, c4, center);
-    }
-
-}
-
-
 // Receives and stores the status update messages from rovers
 void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String const> &event)
 {
@@ -746,28 +612,18 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         encoder_subscribers[*it].shutdown();
         gps_subscribers[*it].shutdown();
         ekf_subscribers[*it].shutdown();
-        targetPickUpSubscribers[*it].shutdown();
-        targetDropOffSubscribers[*it].shutdown();
-        targetCoordinateSubscribers[*it].shutdown();
 
         // Delete the subscribers
         status_subscribers.erase(*it);
         encoder_subscribers.erase(*it);
         gps_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
-        targetPickUpSubscribers.erase(*it);
-        targetDropOffSubscribers.erase(*it);
-        targetCoordinateSubscribers.erase(*it);
         
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
-        targetPickUpPublisher[*it].shutdown();
-        targetDropOffPublisher[*it].shutdown();
 
         // Delete Publishers
         control_mode_publishers.erase(*it);
-        targetPickUpPublisher.erase(*it);
-        targetDropOffPublisher.erase(*it);
     }
 
     // Wait for a rover to connect
@@ -848,8 +704,6 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     {
         //Set up publishers
         control_mode_publishers[*i]=nh.advertise<std_msgs::UInt8>("/"+*i+"/mode", 10, true); // last argument sets latch to true
-        targetPickUpPublisher[*i] = nh.advertise<std_msgs::Int16>("/"+*i+"/targetPickUpValue", 10, this);
-        targetDropOffPublisher[*i] = nh.advertise<std_msgs::Int16>("/"+*i+"/targetDropOffValue", 10, this);
 
         //Set up subscribers
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
@@ -857,9 +711,6 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-        targetPickUpSubscribers[*i] = nh.subscribe("/"+*i+"/targetPickUpImage", 10, &RoverGUIPlugin::targetPickUpEventHandler, this);
-        targetDropOffSubscribers[*i] = nh.subscribe("/"+*i+"/targetDropOffImage", 10, &RoverGUIPlugin::targetDropOffEventHandler, this);
-        targetCoordinateSubscribers[*i] = nh.subscribe("/"+*i+"/targets", 10, &RoverGUIPlugin::targetCoordinateEventHandler, this);
 
         QString rover_status = "";
         // Build new ui rover list string
@@ -1428,15 +1279,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
     obstacle_subscribers.clear();
-
-    for (map<string,ros::Subscriber>::iterator it=targetPickUpSubscribers.begin(); it!=targetPickUpSubscribers.end(); ++it) it->second.shutdown();
-    targetPickUpSubscribers.clear();
-
-    for (map<string,ros::Subscriber>::iterator it=targetDropOffSubscribers.begin(); it!=targetDropOffSubscribers.end(); ++it) it->second.shutdown();
-    targetDropOffSubscribers.clear();
-
-    for (map<string,ros::Subscriber>::iterator it=targetCoordinateSubscribers.begin(); it!=targetCoordinateSubscribers.end(); ++it) it->second.shutdown();
-    targetCoordinateSubscribers.clear();
 
     camera_subscriber.shutdown();
 

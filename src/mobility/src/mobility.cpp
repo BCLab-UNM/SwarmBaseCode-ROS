@@ -61,8 +61,6 @@ ros::Publisher velocityPublish;
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
 ros::Publisher targetCollectedPublish;
-ros::Publisher targetPickUpPublish;
-ros::Publisher targetDropOffPublish;
 ros::Publisher fingerAnglePublish;
 ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
@@ -133,8 +131,6 @@ int main(int argc, char **argv) {
     velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
     targetCollectedPublish = mNH.advertise<std_msgs::Int16>(("targetsCollected"), 1, true);
-    targetPickUpPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetPickUpImage"), 1, true);
-    targetDropOffPublish = mNH.advertise<sensor_msgs::Image>((publishedName + "/targetDropOffImage"), 1, true);
     fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle"), 1, true);
     wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
@@ -275,8 +271,6 @@ void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
 	if (message->tags.data[0] == 256) {
 		//if we were returning with a target
 	    if (targetDetected.data != -1) {
-			//publish to scoring code
-			targetDropOffPublish.publish(message->image);
 			targetDetected.data = -1;
 	    }
 	}
@@ -298,9 +292,6 @@ void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
 			
 			//publish detected target
 			targetCollectedPublish.publish(targetDetected);
-
-			//publish to scoring code
-			targetPickUpPublish.publish(message->image);
 
 			//switch to transform state to trigger return to center
 			stateMachineState = STATE_MACHINE_TRANSFORM;

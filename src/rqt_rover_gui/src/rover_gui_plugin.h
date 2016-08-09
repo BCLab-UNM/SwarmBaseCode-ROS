@@ -99,8 +99,6 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
-    void targetPickUpEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
-    void targetDropOffEventHandler(const ros::MessageEvent<const sensor_msgs::Image> &event);
     void targetCoordinateEventHandler(const ros::MessageEvent<const shared_messages::TagsImage> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
 
@@ -190,8 +188,6 @@ namespace rqt_rover_gui {
     // ROS Publishers
     map<string,ros::Publisher> control_mode_publishers;
     ros::Publisher joystick_publisher;
-    map<string,ros::Publisher> targetPickUpPublisher;
-    map<string,ros::Publisher> targetDropOffPublisher;
 
     // ROS Subscribers
     ros::Subscriber joystick_subscriber;
@@ -207,9 +203,6 @@ namespace rqt_rover_gui {
 
     map<string,ros::Subscriber> status_subscribers;
     map<string,ros::Subscriber> obstacle_subscribers;
-    map<string,ros::Subscriber> targetDropOffSubscribers;
-    map<string,ros::Subscriber> targetPickUpSubscribers;
-    map<string,ros::Subscriber> targetCoordinateSubscribers;
     image_transport::Subscriber camera_subscriber;
 
     string selected_rover_name;
