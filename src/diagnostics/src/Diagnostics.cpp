@@ -95,17 +95,6 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
 }
 
 void Diagnostics::checkWireless() {
-
-  //  string interfaceName = "wlan1";
-  //SignalInfo info = getSignalInfo(interfaceName.c_str());
-
-
-  //publishInfoLogMessage("Wireless " + interfaceName + ":\n"
-  //		       + "Connected to: " + string(info.ssid) + "\n"
-  //		       + "Quality: " + to_string(info.quality) + "\n"
-  //		       + "Level: " + to_string(info.level) + "\n"
-  //		       + "Bitrate: " + to_string(info.bitrate) + "\n");
-
 }
 
 void Diagnostics::checkIMU() {
