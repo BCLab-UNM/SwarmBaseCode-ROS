@@ -33,7 +33,7 @@ float WirelessDiags::calcBitRate() {
   ifstream receive_bytes_stat, transmit_bytes_stat;
 
   // Throw an exception if there was a problem
-  recieve_bytes_stat.exceptions( std::ifstream::failbit | std::ifstream::badbit );
+  receive_bytes_stat.exceptions( std::ifstream::failbit | std::ifstream::badbit );
   transmit_bytes_stat.exceptions( std::ifstream::failbit | std::ifstream::badbit );
   
   // Open the files
