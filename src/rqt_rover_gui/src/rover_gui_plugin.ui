@@ -2372,13 +2372,13 @@ QTabBar::tab:only-one {
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>10</y>
-      <width>101</width>
-      <height>181</height>
+      <y>0</y>
+      <width>111</width>
+      <height>201</height>
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+     <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="lineWidth">
      <number>0</number>
@@ -2395,6 +2395,9 @@ QTabBar::tab:only-one {
     </property>
     <property name="styleSheet">
      <string notr="true"/>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
     </property>
     <property name="lineWidth">
      <number>1</number>
