@@ -1039,9 +1039,17 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     
     // Change the color of the text based on the link quality. These numbers are from
-    // experience but need tuning.
-    int green = 255 * wireless_quality / 70.0f;
-    int red = 255 * (70 - wireless_quality) / 70.0f ;
+    // experience but need tuning. The raw quality value is scaled into a new range to make the colors more meaningful
+    int quality_max = 70;
+    int quality_min = 0;
+    int scaled_max = 70;
+    int scaled_min = 35;
+    int quality_range = quality_max - quality_min; // Max minus min
+    int scaled_range = scaled_max - scaled_min; // Scaled to match the experimental quality of the connection. Below 30 should be red = bad
+    int scaled_wireless_quality = (((wireless_quality - quality_min)*scaled_range)/quality_range) + scaled_min; // scale the quality to the new range
+    
+    int green = 255 * scaled_wireless_quality * 1.0f / scaled_range;
+    int red = 255 * (scaled_range - scaled_wireless_quality) * 1.0f / scaled_range;
     int blue = 0;
 
     item->setTextColor(QColor(red, green, blue));
