@@ -735,7 +735,6 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         // Create the corresponding diagnostic data listwidgetitem
         QListWidgetItem* new_diags_item = new QListWidgetItem("");
-        new_diags_item->setForeground(Qt::green);
         ui.rover_diags_list->addItem(new_diags_item);
     }
     }
@@ -758,12 +757,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         if (ros::Time::now() - rover_status.timestamp < disconnect_threshold)
         {
             rover_item->setForeground(Qt::green);
-            diags_item->setForeground(Qt::green);
         }
         else
         {
             rover_item->setForeground(Qt::red);
-            diags_item->setForeground(Qt::red);
+	    diags_item->setForeground(Qt::red);
         }
     }
 }
