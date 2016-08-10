@@ -15,9 +15,7 @@
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
-
-//Custom messages
-#include <shared_messages/TagsImage.h>
+#include <apriltags_ros/AprilTagDetectionArray.h>
 
 // To handle shutdown signals so the node quits properly in response to "rosnode kill"
 #include <ros/ros.h>
@@ -84,7 +82,7 @@ void sigintEventHandler(int signal);
 //Callback handlers
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
-void targetHandler(const shared_messages::TagsImage::ConstPtr& tagInfo);
+void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
@@ -265,38 +263,40 @@ void setVelocity(double linearVel, double angularVel)
  * ROS CALLBACK HANDLERS
  ************************/
 
-void targetHandler(const shared_messages::TagsImage::ConstPtr& message) {
+void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
 
-	//if this is the goal target
-	if (message->tags.data[0] == 256) {
-		//if we were returning with a target
-	    if (targetDetected.data != -1) {
-			targetDetected.data = -1;
+	if (message->detections.size() > 0) {
+		//if this is the goal target
+		if (message->detections[0].id == 256) {
+			//if we were returning with a target
+		    if (targetDetected.data != -1) {
+				targetDetected.data = -1;
+		    }
+		}
+	
+		//if target has not previously been detected 
+		else if (targetDetected.data == -1) {
+	        
+	        //check if target has not yet been collected
+	        if (!targetsCollected[message->detections[0].id]) {
+				//copy target ID to class variable
+				targetDetected.data = message->detections[0].id;
+				
+		        //set angle to center as goal heading
+				goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+				
+				//set center as goal position
+				goalLocation.x = 0.0;
+				goalLocation.y = 0.0;
+				
+				//publish detected target
+				targetCollectedPublish.publish(targetDetected);
+	
+				//switch to transform state to trigger return to center
+				stateMachineState = STATE_MACHINE_TRANSFORM;
+			}
 	    }
 	}
-
-	//if target has not previously been detected 
-	else if (targetDetected.data == -1) {
-        
-        //check if target has not yet been collected
-        if (!targetsCollected[message->tags.data[0]]) {
-			//copy target ID to class variable
-			targetDetected.data = message->tags.data[0];
-			
-	        //set angle to center as goal heading
-			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
-			
-			//set center as goal position
-			goalLocation.x = 0.0;
-			goalLocation.y = 0.0;
-			
-			//publish detected target
-			targetCollectedPublish.publish(targetDetected);
-
-			//switch to transform state to trigger return to center
-			stateMachineState = STATE_MACHINE_TRANSFORM;
-		}
-    }
 }
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
