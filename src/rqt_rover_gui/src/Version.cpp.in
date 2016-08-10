@@ -4,5 +4,6 @@
 
 #include "Version.h"
 
+const QString GIT_BRANCH = "@GIT_BRANCH@";
 const QString GIT_VERSION = "@GIT_VERSION@";
 const QString BUILD_TIME = "@BUILD_TIME@";

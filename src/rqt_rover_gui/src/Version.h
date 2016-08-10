@@ -5,6 +5,7 @@
 
 #include <QString>
 
+extern const QString GIT_BRANCH;
 extern const QString GIT_VERSION;
 extern const QString BUILD_TIME;
 

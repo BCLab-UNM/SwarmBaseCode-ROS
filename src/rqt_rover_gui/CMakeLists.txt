@@ -4,6 +4,11 @@ project(rqt_rover_gui)
 set(CMAKE_BUILD_TYPE Debug)
 
 #Get version info from git and pass it into compiled code
+execute_process(COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH)
+string(STRIP "${GIT_BRANCH}" GIT_BRANCH)
+
 execute_process(COMMAND git describe --tags --abbrev=0
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_VERSION)
