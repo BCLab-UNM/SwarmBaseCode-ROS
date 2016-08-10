@@ -71,13 +71,17 @@ float WirelessDiags::calcBitRate() {
   struct timeval now;
   gettimeofday(&now, NULL);
         
-  // compute the elapsed time in millisec
+  // compute the elapsed time in seconds with millisecond resolution
   double elapsedTime = (now.tv_sec - prev_time.tv_sec) * 1000.0;      // sec to ms
   elapsedTime += (now.tv_usec - prev_time.tv_usec) / 1000.0;   // us to ms
 
-  prev_time = now; // Remember when this was called so we can calculate the delay next
+  // Now convert milliseconds to seconds
+  elapsedTime *= 1000;
+
+  // Remember when this was called so we can calculate the delay next
   // time it is called
-    
+  prev_time = now; 
+  
   float byte_rate = byte_rate = (total_bytes - prev_total_bytes)*1.0f/elapsedTime;
    
   // Rate in B/s
