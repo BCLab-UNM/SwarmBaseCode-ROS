@@ -236,6 +236,9 @@ namespace rqt_rover_gui {
     // Use changeRovers instead of recreating with a new rover name
     JoystickGripperInterface* joystickGripperInterface;
 
+    // Amount of time between status messages that results in a rover disconnect
+    ros::Duration disconnect_threshold;
+
   };
 } // end namespace
 
