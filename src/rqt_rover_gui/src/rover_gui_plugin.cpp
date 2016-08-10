@@ -457,7 +457,11 @@ void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String
 
     string status = msg->data;
 
-    rover_statuses[rover_name] = status;
+    RoverStatus rover_status;
+    rover_status.status_msg = status;
+    rover_status.timestamp = receipt_time;
+
+    rover_statuses[rover_name] = rover_status;
 }
 
 // Counts the number of obstacle avoidance calls
@@ -656,11 +660,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
             // Get current status
 
-            QString updated_rover_status = "";
+            RoverStatus updated_rover_status;
             // Build new ui rover list string
             try
             {
-                updated_rover_status = QString::fromStdString(rover_statuses.at(ui_rover_name));
+                updated_rover_status = rover_statuses.at(ui_rover_name);
             }
             catch (std::out_of_range& e)
             {
@@ -671,7 +675,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
             // Build new ui rover list string
             QString updated_rover_name_and_status = QString::fromStdString(ui_rover_name)
                                                     + " ("
-                                                    + updated_rover_status
+                                                    + QString::fromStdString(updated_rover_status.status_msg)
                                                     + ")";
 
             // Update the UI
@@ -710,11 +714,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 10, &RoverGUIPlugin::diagnosticEventHandler, this);
 
-        QString rover_status = "";
+        RoverStatus rover_status;
         // Build new ui rover list string
         try
         {
-            rover_status = QString::fromStdString(rover_statuses.at(*i));
+            rover_status = rover_statuses.at(*i);
         }
         catch (std::out_of_range& e)
         {
@@ -723,7 +727,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         QString rover_name_and_status = QString::fromStdString(*i) // Add the rover name
                                                 + " (" // Delimiters needed for parsing the rover name and status when read
-                                                +  rover_status // Add the rover status
+                                                +  QString::fromStdString(rover_status.status_msg) // Add the rover status
                                                 + ")";
 
         QListWidgetItem* new_item = new QListWidgetItem(rover_name_and_status);
