@@ -45,7 +45,6 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QProcess>
-
 #include <map>
 #include <set>
 
@@ -61,6 +60,17 @@
 #include "JoystickGripperInterface.h"
 
 using namespace std;
+
+// RoverStaus holds status messages from rovers and time
+// time they were received. The time is used to detect
+// disconnected rovers. The status message can be any string
+// in the past it has been used to display the team name
+// in the GUI
+struct RoverStatus {
+    string status_msg;
+    ros::Time timestamp;
+};
+
 
 namespace rqt_rover_gui {
 
@@ -204,7 +214,7 @@ namespace rqt_rover_gui {
     GazeboSimManager sim_mgr;
 
     map<string,int> rover_control_state;
-    map<string,string> rover_statuses;
+    map<string, RoverStatus> rover_statuses;
 
     float arena_dim; // in meters
 
@@ -225,6 +235,9 @@ namespace rqt_rover_gui {
     // This is a singleton class. Deleting it while it is still receiving movement commands will cause a segfault.
     // Use changeRovers instead of recreating with a new rover name
     JoystickGripperInterface* joystickGripperInterface;
+
+    // Amount of time between status messages that results in a rover disconnect
+    ros::Duration disconnect_threshold;
 
   };
 } // end namespace

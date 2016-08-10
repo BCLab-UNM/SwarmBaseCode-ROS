@@ -44,7 +44,8 @@ using boost::property_tree::ptree;
 
 namespace rqt_rover_gui 
 {
-  RoverGUIPlugin::RoverGUIPlugin() : rqt_gui_cpp::Plugin(), widget(0)
+  RoverGUIPlugin::RoverGUIPlugin() : rqt_gui_cpp::Plugin(), widget(0),
+      disconnect_threshold(5.0) // Rovers are marked as diconnected if they haven't sent a status message for 5 seconds
   {
     setObjectName("RoverGUI");
     info_log_messages = "";
@@ -457,7 +458,11 @@ void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String
 
     string status = msg->data;
 
-    rover_statuses[rover_name] = status;
+    RoverStatus rover_status;
+    rover_status.status_msg = status;
+    rover_status.timestamp = receipt_time;
+
+    rover_statuses[rover_name] = rover_status;
 }
 
 // Counts the number of obstacle avoidance calls
@@ -567,8 +572,8 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
 {
+    // Returns rovers that have created a status topic
     set<string>new_rover_names = findConnectedRovers();
-
 
     std::set<string> orphaned_rover_names;
 
@@ -636,10 +641,9 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.all_stop_button->setEnabled(false);
         ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
         ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
-        return;
-    }
 
-    if (new_rover_names == rover_names)
+    }
+    else if (new_rover_names == rover_names)
     {
 
         // Just update the statuses in ui rover list
@@ -656,11 +660,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
             // Get current status
 
-            QString updated_rover_status = "";
+            RoverStatus updated_rover_status;
             // Build new ui rover list string
             try
             {
-                updated_rover_status = QString::fromStdString(rover_statuses.at(ui_rover_name));
+                updated_rover_status = rover_statuses.at(ui_rover_name);
             }
             catch (std::out_of_range& e)
             {
@@ -671,16 +675,15 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
             // Build new ui rover list string
             QString updated_rover_name_and_status = QString::fromStdString(ui_rover_name)
                                                     + " ("
-                                                    + updated_rover_status
+                                                    + QString::fromStdString(updated_rover_status.status_msg)
                                                     + ")";
 
             // Update the UI
             item->setText(updated_rover_name_and_status);
         }
-
-        return;
     }
-
+    else
+    {
     rover_names = new_rover_names;
     
     emit sendInfoLogMessage("List of connected rovers has changed");
@@ -710,11 +713,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 10, &RoverGUIPlugin::diagnosticEventHandler, this);
 
-        QString rover_status = "";
+        RoverStatus rover_status;
         // Build new ui rover list string
         try
         {
-            rover_status = QString::fromStdString(rover_statuses.at(*i));
+            rover_status = rover_statuses.at(*i);
         }
         catch (std::out_of_range& e)
         {
@@ -723,18 +726,43 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         QString rover_name_and_status = QString::fromStdString(*i) // Add the rover name
                                                 + " (" // Delimiters needed for parsing the rover name and status when read
-                                                +  rover_status // Add the rover status
+                                                +  QString::fromStdString(rover_status.status_msg) // Add the rover status
                                                 + ")";
 
         QListWidgetItem* new_item = new QListWidgetItem(rover_name_and_status);
-        new_item->setForeground(Qt::red);
+        new_item->setForeground(Qt::green);
         ui.rover_list->addItem(new_item);
 
         // Create the corresponding diagnostic data listwidgetitem
         QListWidgetItem* new_diags_item = new QListWidgetItem("");
-        new_diags_item->setForeground(Qt::red);
         ui.rover_diags_list->addItem(new_diags_item);
+    }
+    }
 
+    // If rovers have not sent a status message recently mark them as disconnected
+    for(int row = 0; row < ui.rover_list->count(); row++)
+    {
+        QListWidgetItem *rover_item = ui.rover_list->item(row);
+        QListWidgetItem *diags_item = ui.rover_diags_list->item(row);
+
+        // Extract rover name
+        string rover_name_and_status = rover_item->text().toStdString();
+
+        // Rover names start at the begining of the rover name and status string and end at the first space
+        size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+        string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+
+        // Check the time of last contact with this rover
+        RoverStatus rover_status = rover_statuses[ui_rover_name];
+        if (ros::Time::now() - rover_status.timestamp < disconnect_threshold)
+        {
+            rover_item->setForeground(Qt::green);
+        }
+        else
+        {
+            rover_item->setForeground(Qt::red);
+	    diags_item->setForeground(Qt::red);
+        }
     }
 }
 
