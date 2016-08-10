@@ -902,8 +902,6 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
         return;
     }
 
-    emit sendInfoLogMessage(QString::fromStdString("Received diagnostic data from " + rover_name));
-
     // Update the UI
     QListWidgetItem *item = ui.rover_diags_list->item(row);
     // We don't want the user to interact with this display item so make non-selectable
@@ -925,8 +923,6 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
 
     item->setTextColor(QColor(red, green, blue));
     item->setText(QString::fromStdString(diagnostic_display));
-
-    emit sendInfoLogMessage("quality: " + QString::number(wireless_quality) + " scaled: " + QString::number(scaled_wireless_quality) + QString::number(red) + " " + QString::number(green) + " " + QString::number(blue));
 }
 
 void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)
