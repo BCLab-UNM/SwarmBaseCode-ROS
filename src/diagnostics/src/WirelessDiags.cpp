@@ -76,7 +76,7 @@ float WirelessDiags::calcBitRate() {
   elapsedTime += (now.tv_usec - prev_time.tv_usec) / 1000.0;   // us to ms
 
   // Now convert milliseconds to seconds
-  elapsedTime *= 1000;
+  elapsedTime /= 1000;
 
   // Remember when this was called so we can calculate the delay next
   // time it is called
