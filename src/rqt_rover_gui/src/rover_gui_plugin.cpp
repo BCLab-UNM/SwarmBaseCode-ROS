@@ -94,7 +94,7 @@ namespace rqt_rover_gui
     QString version_qstr("<font color='white'>"+GIT_VERSION+"</font>");
     ui.version_number_label->setText(version_qstr);
 
-    widget->setWindowTitle("Rover Interface: Built on " + BUILD_TIME );
+    widget->setWindowTitle("Rover Interface: Built on " + BUILD_TIME + " Branch: " + GIT_BRANCH);
 
     string rover_name_msg = "<font color='white'>Rover: " + selected_rover_name + "</font>";
     QString rover_name_msg_qstr = QString::fromStdString(rover_name_msg);
