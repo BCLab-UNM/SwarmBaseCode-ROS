@@ -1,25 +1,48 @@
 #include "Diagnostics.h"
+
+#include <string>
 #include <usb.h>
-#include <sys/stat.h>
+#include <sys/stat.h> // To check if a file exists
 #include <std_msgs/String.h> // For creating ROS string messages
 #include <ctime> // For time()
 
 using namespace std;
 
-Diagnostics::Diagnostics(std::string name) {
+Diagnostics::Diagnostics(std::string name) : wirelessDiags("wlan1") {
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
+  diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
 
   // Setup sensor check timers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
   if ( checkIfSimulatedRover() ) {
     simulated = true;
     publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
-  } else {
+  } else { 
     simulated = false;
     publishInfoLogMessage("Diagnostic Package Started. Physical Rover.");
   }
+}
+
+void Diagnostics::publishDiagnosticData() {
+
   
+  WirelessInfo info;
+
+  // Get info about the wireless interface
+  // Catch and display an error if there was an exception
+  try {
+  info = wirelessDiags.getInfo();
+  } catch( exception &e ){
+    publishErrorLogMessage(e.what());
+    return;
+  }
+  
+  std_msgs::Float32MultiArray rosMsg;
+  rosMsg.data.clear();
+  rosMsg.data.push_back(info.quality);
+  rosMsg.data.push_back(info.bandwidthUsed);
+  diagnosticDataPublisher.publish(rosMsg);
 }
 
 void Diagnostics::publishErrorLogMessage(std::string msg) {
@@ -58,12 +81,20 @@ string Diagnostics::getHumanFriendlyTime() {
 // sensor check timeout handler. This function is triggered periodically and calls the
 // sensor check functions.
 void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
+
   if (!simulated) {
   checkIMU();
   checkGPS();
   checkSonar();
   checkCamera();
+  checkWireless();
+
+  publishDiagnosticData();
   }
+
+}
+
+void Diagnostics::checkWireless() {
 }
 
 void Diagnostics::checkIMU() {
@@ -159,3 +190,4 @@ bool Diagnostics::checkIfSimulatedRover() {
      
 Diagnostics::~Diagnostics() {
 }
+

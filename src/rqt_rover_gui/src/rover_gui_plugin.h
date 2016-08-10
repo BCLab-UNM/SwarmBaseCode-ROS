@@ -35,6 +35,9 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/UInt8.h>
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+#include "std_msgs/Float32MultiArray.h"
 #include <geometry_msgs/Polygon.h>
 #include <geometry_msgs/Point32.h>
 #include <pluginlib/class_list_macros.h>
@@ -86,6 +89,7 @@ namespace rqt_rover_gui {
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
+    void diagnosticEventHandler(const ros::MessageEvent<std_msgs::Float32MultiArray const> &event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
     void leftUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -173,6 +177,7 @@ namespace rqt_rover_gui {
     map<string,ros::Subscriber> encoder_subscribers;
     map<string,ros::Subscriber> gps_subscribers;
     map<string,ros::Subscriber> ekf_subscribers;
+    map<string,ros::Subscriber> rover_diagnostic_subscribers;
     ros::Subscriber us_center_subscriber;
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;
