@@ -727,12 +727,12 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
                                                 + ")";
 
         QListWidgetItem* new_item = new QListWidgetItem(rover_name_and_status);
-        new_item->setForeground(Qt::red);
+        new_item->setForeground(Qt::green);
         ui.rover_list->addItem(new_item);
 
         // Create the corresponding diagnostic data listwidgetitem
         QListWidgetItem* new_diags_item = new QListWidgetItem("");
-        new_diags_item->setForeground(Qt::red);
+        new_diags_item->setForeground(Qt::green);
         ui.rover_diags_list->addItem(new_diags_item);
 
     }
