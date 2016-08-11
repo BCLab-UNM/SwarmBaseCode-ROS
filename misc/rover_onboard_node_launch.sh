@@ -70,15 +70,19 @@ else
     nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath _frame_id:=$HOSTNAME/base_link &
 fi
 
-nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
+nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _frequency:=10 _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
 
-rosparam set /$HOSTNAME\_EKF/odom0 /$HOSTNAME/odom/navsat
-rosparam set /$HOSTNAME\_EKF/odom1 /$HOSTNAME/odom
-rosparam set /$HOSTNAME\_EKF/imu0 /$HOSTNAME/imu
-rosparam set /$HOSTNAME\_EKF/odom0_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
-rosparam set /$HOSTNAME\_EKF/odom1_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
-rosparam set /$HOSTNAME\_EKF/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
-nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true __name:=$HOSTNAME\_EKF /odometry/filtered:=/$HOSTNAME/odom/ekf &
+rosparam set /$HOSTNAME\_ODOM/odom0 /$HOSTNAME/odom
+rosparam set /$HOSTNAME\_ODOM/imu0 /$HOSTNAME/imu
+rosparam set /$HOSTNAME\_ODOM/odom0_config [false,false,false,false,false,false,true,false,false,false,false,true,false,false,false]
+rosparam set /$HOSTNAME\_ODOM/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
+nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=odom _frequency:=10 __name:=$HOSTNAME\_ODOM /odometry/filtered:=/$HOSTNAME/odom/filtered &
+
+rosparam set /$HOSTNAME\_MAP/odom0 /$HOSTNAME/odom/navsat
+rosparam set /$HOSTNAME\_MAP/odom1 /$HOSTNAME/odom/filtered
+rosparam set /$HOSTNAME\_MAP/odom0_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
+rosparam set /$HOSTNAME\_MAP/odom1_config [false,false,false,false,false,true,true,false,false,false,false,true,true,false,false]
+nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=map _frequency:=10 __name:=$HOSTNAME\_MAP /odometry/filtered:=/$HOSTNAME/odom/ekf &
 
 
 #Wait for user input to terminate processes
@@ -91,7 +95,8 @@ while true; do
 	rostopic pub -1 /$HOSTNAME\/mobility geometry_msgs/Twist '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
 	rosnode kill $HOSTNAME\_ABRIDGE
 	rosnode kill $HOSTNAME\_NAVSAT
-	rosnode kill $HOSTNAME\_EKF
+	rosnode kill $HOSTNAME\_ODOM
+	rosnode kill $HOSTNAME\_MAP
 	rosnode kill $HOSTNAME\_CAMERA
 	rosnode kill $HOSTNAME\_OBSTACLE
 	rosnode kill $HOSTNAME\_TARGET
