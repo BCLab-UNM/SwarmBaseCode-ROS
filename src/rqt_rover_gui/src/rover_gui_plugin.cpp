@@ -762,6 +762,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         {
             rover_item->setForeground(Qt::red);
 	    diags_item->setForeground(Qt::red);
+
+	    diags_item->setText("disconnected");
         }
     }
 }
