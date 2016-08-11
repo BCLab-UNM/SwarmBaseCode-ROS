@@ -344,7 +344,7 @@ void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
 	if (currentMode == 0 || currentMode == 1) {
 		setVelocity(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
 		
-		std_msgs::Int16 angle;
+		std_msgs::Float32 angle;
 		if (message->axes[6] < 0.) {
 			angle.data = -1;
 			fingerAnglePublish.publish(angle);
@@ -396,7 +396,7 @@ void sigintEventHandler(int sig)
 void openFingers()
 {
     // Opens fingers/claw to 50 degrees
-    std_msgs::Int16 msg;
+    std_msgs::Float32 msg;
     msg.data = 90;
     fingerAnglePublish.publish(msg);
 }
@@ -404,7 +404,7 @@ void openFingers()
 void closeFingers()
 {
     // Close fingers to 0 degrees
-    std_msgs::Int16 msg;
+    std_msgs::Float32 msg;
     msg.data = 0;
     fingerAnglePublish.publish(msg);
 }
@@ -412,7 +412,7 @@ void closeFingers()
 void raiseWrist()
 {
     // Return wrist back to neutral position at 0 degrees
-    std_msgs::Int16 msg;
+    std_msgs::Float32 msg;
     msg.data = 0;
     wristAnglePublish.publish(msg);
 }
@@ -420,7 +420,7 @@ void raiseWrist()
 void lowerWrist()
 {
     // Lowers wrist to just above the ground at 50 degrees
-    std_msgs::Int16 msg;
+    std_msgs::Float32 msg;
     msg.data = 50;
     wristAnglePublish.publish(msg);
 }
