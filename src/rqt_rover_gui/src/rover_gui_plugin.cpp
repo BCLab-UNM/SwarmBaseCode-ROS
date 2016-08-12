@@ -633,6 +633,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
         ui.rover_diags_list->clear();
+        ui.map_selection_list->clear();
 
         // Disable control mode group since no rovers are connected
         ui.autonomous_control_radio_button->setEnabled(false);
@@ -692,8 +693,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     ui.rover_list->clear();
 
     // Also clear the rover diagnostics list
-    ui.rover_diags_list->clearSelection();
     ui.rover_diags_list->clear();
+    ui.map_selection_list->clear();
     
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
@@ -736,6 +737,19 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         // Create the corresponding diagnostic data listwidgetitem
         QListWidgetItem* new_diags_item = new QListWidgetItem("");
         ui.rover_diags_list->addItem(new_diags_item);
+
+        // Add the map selection checkbox for this rover
+        QListWidgetItem* new_map_selection_item = new QListWidgetItem("");
+
+        // set checkable but not selectable flags
+        new_map_selection_item->setFlags(new_map_selection_item->flags() | Qt::ItemIsUserCheckable);
+        new_map_selection_item->setFlags(new_map_selection_item->flags() & ~Qt::ItemIsSelectable);
+        new_map_selection_item->setCheckState(Qt::Unchecked);
+        new_map_selection_item->setForeground(Qt::white);
+        new_map_selection_item->setBackground(Qt::black);
+        // Add to the widget list
+        ui.map_selection_list->addItem(new_map_selection_item);
+
     }
     }
 

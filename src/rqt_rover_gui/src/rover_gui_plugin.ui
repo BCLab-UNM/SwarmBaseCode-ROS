@@ -2459,7 +2459,7 @@ QTabBar::tab:only-one {
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; color:#ffffff;&quot;&gt;Link Quality | Bitrate&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_14">
+  <widget class="QLabel" name="map_list_label">
    <property name="geometry">
     <rect>
      <x>290</x>
