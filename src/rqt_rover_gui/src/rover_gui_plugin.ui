@@ -38,9 +38,9 @@ border-color: rgb(255, 255, 255);</string>
   <widget class="BWTabWidget" name="tab_widget">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>360</x>
      <y>10</y>
-     <width>801</width>
+     <width>721</width>
      <height>551</height>
     </rect>
    </property>
@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -563,8 +563,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_2">
      <property name="geometry">
       <rect>
-       <x>600</x>
-       <y>260</y>
+       <x>510</x>
+       <y>330</y>
        <width>191</width>
        <height>161</height>
       </rect>
@@ -799,6 +799,22 @@ border: 1px solid white;
        <string>val</string>
       </property>
      </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>-10</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Ultrasound</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QPushButton" name="clear_simulation_button">
      <property name="enabled">
@@ -822,27 +838,11 @@ border: 1px solid white;
       <string>End Simulation</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>620</x>
-       <y>250</y>
-       <width>81</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Ultrasound</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_11">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>320</y>
+       <x>360</x>
+       <y>310</y>
        <width>31</width>
        <height>17</height>
       </rect>
@@ -857,8 +857,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_4">
      <property name="geometry">
       <rect>
-       <x>440</x>
-       <y>330</y>
+       <x>350</x>
+       <y>320</y>
        <width>151</width>
        <height>181</height>
       </rect>
@@ -1145,8 +1145,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_5">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>150</y>
+       <x>350</x>
+       <y>140</y>
        <width>271</width>
        <height>171</height>
       </rect>
@@ -1525,6 +1525,30 @@ border: 1px solid white;
        <string>val</string>
       </property>
      </widget>
+     <zorder>label_27</zorder>
+     <zorder>label_28</zorder>
+     <zorder>label_29</zorder>
+     <zorder>label_30</zorder>
+     <zorder>label_31</zorder>
+     <zorder>label_32</zorder>
+     <zorder>label_33</zorder>
+     <zorder>label_34</zorder>
+     <zorder>label_35</zorder>
+     <zorder>label_36</zorder>
+     <zorder>label_37</zorder>
+     <zorder>label_38</zorder>
+     <zorder>imu_update_rate</zorder>
+     <zorder>imu_rate_drift</zorder>
+     <zorder>imu_rate_noise</zorder>
+     <zorder>imu_heading_drift</zorder>
+     <zorder>imu_heading_noise</zorder>
+     <zorder>imu_accel_drift</zorder>
+     <zorder>imu_accel_noise</zorder>
+     <zorder>imu_rpy_offsets</zorder>
+     <zorder>imu_noise</zorder>
+     <zorder>label_63</zorder>
+     <zorder>label_64</zorder>
+     <zorder>label_12</zorder>
     </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">
@@ -1790,7 +1814,6 @@ border: 1px solid white;
     <zorder>build_simulation_button</zorder>
     <zorder>frame_2</zorder>
     <zorder>clear_simulation_button</zorder>
-    <zorder>label_10</zorder>
     <zorder>frame_4</zorder>
     <zorder>label_11</zorder>
     <zorder>frame_5</zorder>
@@ -2353,12 +2376,12 @@ QTabBar::tab:only-one {
     </widget>
    </widget>
   </widget>
-  <widget class="QFrame" name="frame">
+  <widget class="QFrame" name="Rover_frame">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>90</y>
-     <width>261</width>
+     <width>311</width>
      <height>201</height>
     </rect>
    </property>
@@ -2373,7 +2396,7 @@ QTabBar::tab:only-one {
      <rect>
       <x>150</x>
       <y>0</y>
-      <width>111</width>
+      <width>121</width>
       <height>201</height>
      </rect>
     </property>
@@ -2403,6 +2426,22 @@ QTabBar::tab:only-one {
      <number>1</number>
     </property>
    </widget>
+   <widget class="QListWidget" name="map_selection_list">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>0</y>
+      <width>41</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="lineWidth">
+     <number>0</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label_13">
    <property name="geometry">
@@ -2418,6 +2457,22 @@ QTabBar::tab:only-one {
    </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; color:#ffffff;&quot;&gt;Link Quality | Bitrate&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_14">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>70</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 63 8pt &quot;Ubuntu&quot;;</string>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; color:#ffffff;&quot;&gt;Map&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
  </widget>
