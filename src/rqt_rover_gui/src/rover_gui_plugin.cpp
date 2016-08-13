@@ -346,7 +346,7 @@ void RoverGUIPlugin::encoderEventHandler(const ros::MessageEvent<const nav_msgs:
     QString y_str; y_str.setNum(y);
 
     // Extract rover name from the message source. Get the topic name from the event header. Can't use publisher_name here because it is just /gazebo.
-    size_t found = topic.find("/odom");
+    size_t found = topic.find("/odom/filtered");
     string rover_name = topic.substr(1,found-1);
 
     // Store map info for the appropriate rover name
@@ -708,7 +708,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         //Set up subscribers
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
         obstacle_subscribers[*i] = nh.subscribe("/"+*i+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
-        encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/", 10, &RoverGUIPlugin::encoderEventHandler, this);
+        encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 10, &RoverGUIPlugin::diagnosticEventHandler, this);
