@@ -69,7 +69,7 @@ if [ -z "$gpsDevicePath" ]
 then
     echo "Error: u-blox GPS device not found"
 else
-    nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME /ublox_gps/fix:=/$HOSTNAME/fix _device:=/dev/$gpsDevicePath _frame_id:=$HOSTNAME/base_link &
+    nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME\_UBLOX /$HOSTNAME\_UBLOX/fix:=/$HOSTNAME/fix /$HOSTNAME\_UBLOX/fix_velocity:=/$HOSTNAME/fix_velocity /$HOSTNAME\_UBLOX/navposllh:=/$HOSTNAME/navposllh /$HOSTNAME\_UBLOX/navsol:=/$HOSTNAME/navsol /$HOSTNAME\_UBLOX/navstatus:=/$HOSTNAME/navstatus /$HOSTNAME\_UBLOX/navvelned:=/$HOSTNAME/navvelned _device:=/dev/$gpsDevicePath _frame_id:=$HOSTNAME/base_link &
 fi
 
 nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _frequency:=10 _magnetic_declination_radians:=0.1530654 _yaw_offset:=1.57079632679 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
@@ -104,6 +104,7 @@ while true; do
 	rosnode kill $HOSTNAME\_TARGET
 	rosnode kill $HOSTNAME\_DIAGNOSTICS
 	rosnode kill $HOSTNAME\_BASE2CAM
+	rosnode kill $HOSTNAME\_UBLOX
 
 	exit 1
     fi
