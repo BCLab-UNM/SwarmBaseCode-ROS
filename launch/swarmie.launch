@@ -2,6 +2,7 @@
 
   <param name="tf_prefix" value="$(arg name)" />
 
+  <node name="$(arg name)_BASE2CAM" pkg="tf" type="static_transform_publisher" args="0.12 -0.03 0.195 -1.57 0 -2.22 $(arg name)/base_link $(arg name)/camera_link 100" />
   <node name="$(arg name)_DIAGNOSTICS" pkg="diagnostics" type="diagnostics" args="$(arg name)" />
   <node name="$(arg name)_MOBILITY" pkg="mobility" type="mobility" args="$(arg name)" />
   <node name="$(arg name)_OBSTACLE" pkg="obstacle_detection" type="obstacle" args="$(arg name)" />

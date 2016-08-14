@@ -8,6 +8,7 @@ pkill ublox_gps
 pkill navsat_transform
 pkill ekf_localization
 pkill diagnostics
+pkill static_transform_publisher
 
 
 #Point to ROS master on the network
@@ -44,6 +45,7 @@ findDevicePath() {
 
 
 #Startup ROS packages/processes
+nohup rosrun tf static_transform_publisher __name:=$HOSTNAME\_BASE2CAM 0.12 -0.03 0.195 -1.57 0 -2.22 /$HOSTNAME/base_link /$HOSTNAME/camera_link 100 &
 nohup rosrun usb_cam usb_cam_node __name:=$HOSTNAME\_CAMERA /$HOSTNAME\_CAMERA/image_raw:=/$HOSTNAME/camera/image _camera_info_url:=file://${HOME}/rover_workspace/camera_info/head_camera.yaml _image_width:=320 _image_height:=240 &
 nohup rosrun mobility mobility &
 nohup rosrun obstacle_detection obstacle &
@@ -101,6 +103,7 @@ while true; do
 	rosnode kill $HOSTNAME\_OBSTACLE
 	rosnode kill $HOSTNAME\_TARGET
 	rosnode kill $HOSTNAME\_DIAGNOSTICS
+	rosnode kill $HOSTNAME\_BASE2CAM
 
 	exit 1
     fi
