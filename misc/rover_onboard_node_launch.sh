@@ -1,8 +1,8 @@
 #!/bin/bash
-pkill camera
+pkill usb_cam_node
 pkill mobility
 pkill obstacle
-pkill target
+pkill apriltag_detector_node
 pkill abridge
 pkill ublox_gps
 pkill navsat_transform
