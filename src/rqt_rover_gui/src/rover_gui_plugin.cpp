@@ -134,6 +134,10 @@ namespace rqt_rover_gui
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
 
+    // Add the checkbox handler so we can process events. We have to listen for itemChange events since
+    // we don't have a real chackbox with toggle events
+    connect(ui.map_selection_list, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapSelectionListItemChangedHandler(QListWidgetItem*)));
+
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
 
@@ -173,7 +177,6 @@ namespace rqt_rover_gui
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
-
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -745,8 +748,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         new_map_selection_item->setFlags(new_map_selection_item->flags() | Qt::ItemIsUserCheckable);
         new_map_selection_item->setFlags(new_map_selection_item->flags() & ~Qt::ItemIsSelectable);
         new_map_selection_item->setCheckState(Qt::Unchecked);
-        new_map_selection_item->setForeground(Qt::white);
-        new_map_selection_item->setBackground(Qt::black);
+
         // Add to the widget list
         ui.map_selection_list->addItem(new_map_selection_item);
 
@@ -939,6 +941,27 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
 
     item->setTextColor(QColor(red, green, blue));
     item->setText(QString::fromStdString(diagnostic_display));
+}
+
+// We use item changed signal as a proxy for the checkbox being clicked
+void RoverGUIPlugin::mapSelectionListItemChangedHandler(QListWidgetItem* changed_item)
+{
+    // Get the rover name associated with this map selction list item
+    int row = ui.map_selection_list->row(changed_item);
+
+    // Rover names start at the begining of the rover name and status string and end at the first space
+    QListWidgetItem* rover_item = ui.rover_list->item(row);
+
+    // Extract the rover name corresponding to the changed map selection item
+    string rover_name_and_status = rover_item->text().toStdString();
+
+    // Rover names start at the begining of the rover name and status string and end at the first space
+    size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+    string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+
+    bool checked = changed_item->checkState();
+
+    emit sendInfoLogMessage("Map selection changed to " + (checked ? QString("true") : QString("false")) + " for rover " + QString::fromStdString(ui_rover_name));
 }
 
 void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)
