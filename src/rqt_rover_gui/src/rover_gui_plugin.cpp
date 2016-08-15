@@ -181,6 +181,7 @@ namespace rqt_rover_gui
 
   void RoverGUIPlugin::shutdownPlugin()
   {
+    ui.map_frame->clearMap(); // Clear the map and stop drawing before the map_frame is destroyed
     clearSimulationButtonEventHandler();
     rover_poll_timer->stop();
     stopROSJoyNode();
@@ -528,7 +529,10 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
     emit sendInfoLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
-    ui.map_frame->setRoverMapToDisplay(selected_rover_name);
+
+    // Add to the rover map.
+    QListWidgetItem* map_selection_item = ui.map_selection_list->item(ui.rover_list->row(current));
+    map_selection_item->setCheckState(Qt::Checked);
 
     // No entry for this rover name
     if ( 0 == rover_control_state.count(selected_rover_name) )

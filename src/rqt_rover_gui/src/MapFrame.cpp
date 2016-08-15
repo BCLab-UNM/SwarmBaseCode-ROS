@@ -50,11 +50,6 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 
 }
 
-void MapFrame::setRoverMapToDisplay(string rover)
-{
-    rover_to_display = rover;
-}
-
 void MapFrame::addToGPSRoverPath(string rover, float x, float y)
 { 
   // Negate the y direction to orient the map so up is north.
@@ -116,6 +111,18 @@ void MapFrame::addToEKFRoverPath(string rover, float x, float y)
     emit delayedUpdate();
 }
 
+void MapFrame::clearMap()
+{
+    update_mutex.lock();
+    for (auto rover : display_list)
+    {
+        clearMap(rover);
+    }
+
+    display_list.clear();
+    update_mutex.unlock();
+}
+
 void MapFrame::clearMap(string rover)
 {
     ekf_rover_path[rover].clear();
@@ -149,7 +156,7 @@ void MapFrame::addCollectionPoint(string rover, float x, float y)
     y = -y;
 
     update_mutex.lock();
-    collection_points[rover_to_display].push_back(pair<float,float>(x,y));
+    collection_points[rover].push_back(pair<float,float>(x,y));
     update_mutex.unlock();
     emit delayedUpdate();
 }
@@ -211,10 +218,10 @@ void MapFrame::paintEvent(QPaintEvent* event)
         // Always include the ekf data because that is what we are using to position the current position marker for the rover
     // if (display_ekf_data)
     {
-        min_seen_x = min_ekf_seen_x[rover_to_display];
-        min_seen_y = min_ekf_seen_y[rover_to_display];
-        max_seen_height = max_ekf_seen_height[rover_to_display];
-        max_seen_width = max_ekf_seen_height[rover_to_display];
+        if (min_seen_x > min_ekf_seen_x[rover_to_display]) min_seen_x = min_ekf_seen_x[rover_to_display];
+        if (min_seen_y > min_ekf_seen_y[rover_to_display]) min_seen_y = min_ekf_seen_y[rover_to_display];
+        if (max_seen_height < max_ekf_seen_height[rover_to_display]) max_seen_height = max_ekf_seen_height[rover_to_display];
+        if (max_seen_width < max_ekf_seen_width[rover_to_display]) max_seen_width = max_ekf_seen_width[rover_to_display];
     }
 
     if (display_gps_data)
@@ -236,10 +243,15 @@ void MapFrame::paintEvent(QPaintEvent* event)
     if (ekf_rover_path[rover_to_display].empty() && encoder_rover_path[rover_to_display].empty() && gps_rover_path[rover_to_display].empty() && target_locations[rover_to_display].empty() && collection_points[rover_to_display].empty())
     {
         painter.drawText(QPoint(50,50+no_data_offset), QString::fromStdString(rover_to_display) + ": No data.");
-        return;
+        no_data_offset += 10;
     }
 
-    no_data_offset += 10;
+    // Check extended kalman filter has any values in it
+    else if (ekf_rover_path[rover_to_display].empty())
+       {
+            painter.drawText(QPoint(50,50+no_data_offset), "Map Frame: No EKF data received.");
+            no_data_offset += 10;
+        }
    }
 
     int map_origin_x = fm.width(QString::number(-max_seen_height, 'f', 1)+"m");
@@ -282,12 +294,6 @@ void MapFrame::paintEvent(QPaintEvent* event)
     // Draw rover origin crosshairs
     // painter.setPen(green);
 
-    // Check encoder has any values in it
-    if (ekf_rover_path[rover_to_display].empty())
-          {
-            painter.drawText(QPoint(50,50), "Map Frame: No encoder data received.");
-           return;
-        }
 
     float initial_x = 0.0; //ekf_rover_path[rover_to_display].begin()->first;
     float initial_y = 0.001; //ekf_rover_path[rover_to_display].begin()->second;
@@ -383,6 +389,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
         float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
         float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
+        // Move to the starting point of the path without drawing a line
         if (it == ekf_rover_path[rover_to_display].begin()) scaled_ekf_rover_path.moveTo(x, y);
         scaled_ekf_rover_path.lineTo(x, y);
     }
@@ -404,6 +411,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
         float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
         float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
+        // Move to the starting point of the path without drawing a line
        if (it == encoder_rover_path[rover_to_display].begin()) scaled_encoder_rover_path.moveTo(x, y);
 
         scaled_encoder_rover_path.lineTo(x, y);
@@ -472,9 +480,19 @@ void MapFrame::setDisplayEKFData(bool display)
 void MapFrame::setWhetherToDisplay(string rover, bool yes)
 {
     if (yes)
+    {
         display_list.insert(rover);
+    }
     else
+    {
         display_list.erase(rover);
+    }
+}
+
+MapFrame::~MapFrame()
+{
+    // Safely erase map data - locks to make sure a frame isnt being drawn
+    clearMap();
 }
 
 }

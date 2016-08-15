@@ -35,7 +35,6 @@ class MapFrame : public QFrame
 public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
-    void setRoverMapToDisplay(string rover);
     void setWhetherToDisplay(string rover, bool yes);
 
     void setDisplayEncoderData(bool display);
@@ -50,6 +49,9 @@ public:
     void addTargetLocation(string rover, float x, float y);
     void addCollectionPoint(string rover, float x, float y);
     void clearMap(string rover);
+    void clearMap();
+
+    ~MapFrame();
 
 signals:
 
@@ -63,8 +65,6 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-
-    string rover_to_display;
 
     mutable QMutex update_mutex;
     int frame_width;
