@@ -20,6 +20,7 @@
 #include <QMutex>
 #include <QPainter>
 #include <vector>
+#include <set>
 #include <utility> // For STL pair
 #include <map>
 
@@ -35,6 +36,7 @@ public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
     void setRoverMapToDisplay(string rover);
+    void setWhetherToDisplay(string rover, bool yes);
 
     void setDisplayEncoderData(bool display);
     void setDisplayGPSData(bool display);
@@ -105,6 +107,8 @@ private:
 
     map<string, float> max_encoder_seen_width;
     map<string, float> max_encoder_seen_height;
+
+    set<string> display_list;
 
 };
 

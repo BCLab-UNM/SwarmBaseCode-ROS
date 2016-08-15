@@ -962,6 +962,8 @@ void RoverGUIPlugin::mapSelectionListItemChangedHandler(QListWidgetItem* changed
     bool checked = changed_item->checkState();
 
     emit sendInfoLogMessage("Map selection changed to " + (checked ? QString("true") : QString("false")) + " for rover " + QString::fromStdString(ui_rover_name));
+
+    ui.map_frame->setWhetherToDisplay(ui_rover_name, checked);
 }
 
 void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)

@@ -157,6 +157,38 @@ void MapFrame::addCollectionPoint(string rover, float x, float y)
 
 void MapFrame::paintEvent(QPaintEvent* event)
 {
+
+    // Begin drawing the map
+    QPainter painter(this);
+    painter.setPen(Qt::white);
+    QFont font = painter.font();
+    qreal font_size = font.pointSizeF();
+    QFontMetrics fm(font);
+
+    // Track the frames per second for development purposes
+    QString frames_per_second;
+    frames_per_second = QString::number(frames / (frame_rate_timer.elapsed() / 1000.0), 'f', 0) + " FPS";
+
+
+    painter.drawText(this->width()-fm.width(frames_per_second), fm.height(), frames_per_second);
+
+    frames++;
+
+    if (!(frames % 100)) // time how long it takes to dispay 100 frames
+    {
+        frame_rate_timer.start();
+        frames = 0;
+    }
+
+    // end frames per second
+
+    // Check if any rovers have been selected for display
+    if ( display_list.empty() )
+    {
+        painter.drawText(QPoint(50,50), "No rover maps selected for display");
+        return;
+    }
+
     // Colorblind friendly colors
     QColor green(17, 192, 131);
     QColor red(255, 65, 30);
@@ -167,9 +199,17 @@ void MapFrame::paintEvent(QPaintEvent* event)
     float min_seen_x = std::numeric_limits<float>::max();
     float min_seen_y = std::numeric_limits<float>::max();
 
+    int no_data_offset = 0; // So the "no data" message is not overlayed if there are multiple rovers with no data.
+
+    // Repeat the display code for each rover selected by the user - Using C++11 range syntax
+    for(auto rover_to_display : display_list)
+    {
+
     // Set the max and min seen values depending on which data the user has selected to view
     // Check each of the display data options and choose the most extreme value from those selected by the user
-    if (display_ekf_data)
+
+        // Always include the ekf data because that is what we are using to position the current position marker for the rover
+    // if (display_ekf_data)
     {
         min_seen_x = min_ekf_seen_x[rover_to_display];
         min_seen_y = min_ekf_seen_y[rover_to_display];
@@ -193,32 +233,14 @@ void MapFrame::paintEvent(QPaintEvent* event)
         if (max_seen_width < max_encoder_seen_width[rover_to_display]) max_seen_width = max_encoder_seen_width[rover_to_display];
     }
 
-    // Begin drawing the map
-    QPainter painter(this);
-    painter.setPen(Qt::white);
-
-    // Track the frames per second for development purposes
-    QString frames_per_second;
-    frames_per_second = QString::number(frames /(frame_rate_timer.elapsed() / 1000.0), 'f', 0) + " FPS";
-
-    QFontMetrics fm(painter.font());
-    painter.drawText(this->width()-fm.width(frames_per_second), fm.height(), frames_per_second);
-
-    frames++;
-
-    if (!(frames % 100)) // time how long it takes to dispay 100 frames
-    {
-        frame_rate_timer.start();
-        frames = 0;
-    }
-
-    // end frames per second
-
     if (ekf_rover_path[rover_to_display].empty() && encoder_rover_path[rover_to_display].empty() && gps_rover_path[rover_to_display].empty() && target_locations[rover_to_display].empty() && collection_points[rover_to_display].empty())
     {
-        painter.drawText(QPoint(50,50), "Map Frame: Nothing to display.");
+        painter.drawText(QPoint(50,50+no_data_offset), QString::fromStdString(rover_to_display) + ": No data.");
         return;
     }
+
+    no_data_offset += 10;
+   }
 
     int map_origin_x = fm.width(QString::number(-max_seen_height, 'f', 1)+"m");
     int map_origin_y = 2*fm.height();
@@ -228,6 +250,9 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
     int map_center_x = map_origin_x+((map_width-map_origin_x)/2);
     int map_center_y = map_origin_y+((map_height-map_origin_y)/2);
+
+    // The map axes do not need to be redrawn for each rover so this code is sandwiched between the two rover display list loops
+
 
     // Draw the scale bars
     //painter.setPen(Qt::gray);
@@ -317,6 +342,10 @@ void MapFrame::paintEvent(QPaintEvent* event)
     // End draw scale bars
 
     update_mutex.lock();
+
+    // Repeat the display code for each rover selected by the user - Using C++11 range syntax
+    for(auto rover_to_display : display_list)
+    {
     // scale coordinates
 
     std::vector<QPoint> scaled_target_locations;
@@ -407,10 +436,21 @@ void MapFrame::paintEvent(QPaintEvent* event)
     float radius = 2.5;
     //painter.drawArc(x-radius,y-radius,2*radius,2*radius,0,16*360);
     painter.drawEllipse(QPointF(x,y), radius, radius);
-    
+
+    // Display rover name in half the default font size
+    font.setPointSizeF( font_size / 2);
+
+    // set the modified font to the painter
+    painter.setFont(font);
+    painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display));
+
+    // return the painter font size to normal
+    font.setPointSizeF( font_size );
+
     update_mutex.unlock();
 
     painter.setPen(Qt::white);
+  } // End rover display list set iteration
 }
 
 
@@ -429,6 +469,13 @@ void MapFrame::setDisplayEKFData(bool display)
     display_ekf_data = display;
 }
 
+void MapFrame::setWhetherToDisplay(string rover, bool yes)
+{
+    if (yes)
+        display_list.insert(rover);
+    else
+        display_list.erase(rover);
+}
 
 }
 #endif
