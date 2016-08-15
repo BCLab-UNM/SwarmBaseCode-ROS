@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   random_numbers
-  message_generation
+  tf
 )
 
 catkin_package(
