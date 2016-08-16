@@ -11,7 +11,8 @@
 
       <param name="magnetic_declination_radians" value="0.1530654"/>
       <param name="yaw_offset" value="1.57079632679"/>
-      <param name="world_state" value="map"/>
+      <param name="world_frame" value="map"/>
+      <param name="frequency" value="10"/>
 
       <remap from="/imu/data" to="/$(arg name)/imu" />
       <remap from="/gps/fix" to="/$(arg name)/fix" />
