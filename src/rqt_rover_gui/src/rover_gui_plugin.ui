@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -174,7 +174,7 @@ QTabBar::tab:only-one {
        <string>GPS</string>
       </property>
       <property name="checked">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QCheckBox" name="ekf_checkbox">
@@ -212,7 +212,7 @@ QTabBar::tab:only-one {
        <string>Encoders</string>
       </property>
       <property name="checked">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
     </widget>
@@ -1525,30 +1525,6 @@ border: 1px solid white;
        <string>val</string>
       </property>
      </widget>
-     <zorder>label_27</zorder>
-     <zorder>label_28</zorder>
-     <zorder>label_29</zorder>
-     <zorder>label_30</zorder>
-     <zorder>label_31</zorder>
-     <zorder>label_32</zorder>
-     <zorder>label_33</zorder>
-     <zorder>label_34</zorder>
-     <zorder>label_35</zorder>
-     <zorder>label_36</zorder>
-     <zorder>label_37</zorder>
-     <zorder>label_38</zorder>
-     <zorder>imu_update_rate</zorder>
-     <zorder>imu_rate_drift</zorder>
-     <zorder>imu_rate_noise</zorder>
-     <zorder>imu_heading_drift</zorder>
-     <zorder>imu_heading_noise</zorder>
-     <zorder>imu_accel_drift</zorder>
-     <zorder>imu_accel_noise</zorder>
-     <zorder>imu_rpy_offsets</zorder>
-     <zorder>imu_noise</zorder>
-     <zorder>label_63</zorder>
-     <zorder>label_64</zorder>
-     <zorder>label_12</zorder>
     </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">

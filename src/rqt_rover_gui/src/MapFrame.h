@@ -99,15 +99,6 @@ private:
     map<string, float> min_ekf_seen_x;
     map<string, float> min_ekf_seen_y;
 
-    map<string, float> max_gps_seen_width;
-    map<string, float> max_gps_seen_height;
-
-    map<string, float> max_ekf_seen_width;
-    map<string, float> max_ekf_seen_height;
-
-    map<string, float> max_encoder_seen_width;
-    map<string, float> max_encoder_seen_height;
-
     set<string> display_list;
 
 };
