@@ -52,8 +52,6 @@ public:
     void clearMap(string rover);
     void clearMap();
 
-    void mousePressedEventHandler(QMouseEvent *me);
-
     ~MapFrame();
 
 signals:
