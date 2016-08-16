@@ -47,7 +47,6 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     display_encoder_data = false;
 
     frames = 0;
-
 }
 
 void MapFrame::addToGPSRoverPath(string rover, float x, float y)
@@ -499,6 +498,21 @@ void MapFrame::setWhetherToDisplay(string rover, bool yes)
     {
         display_list.erase(rover);
     }
+}
+
+void MapFrame::mousePressEvent(QMouseEvent *event)
+{
+    emit sendInfoLogMessage("MapFrame: mouse press.");
+}
+
+void MapFrame::mouseMoveEvent(QMouseEvent *event)
+{
+    emit sendInfoLogMessage("MapFrame: mouse move.");
+}
+
+void MapFrame::wheelEvent(QWheelEvent *e)
+{
+    emit sendInfoLogMessage("MapFrame: mouse wheel.");
 }
 
 MapFrame::~MapFrame()

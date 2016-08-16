@@ -23,6 +23,7 @@
 #include <set>
 #include <utility> // For STL pair
 #include <map>
+#include <QString>
 
 using namespace std;
 
@@ -51,10 +52,13 @@ public:
     void clearMap(string rover);
     void clearMap();
 
+    void mousePressedEventHandler(QMouseEvent *me);
+
     ~MapFrame();
 
 signals:
 
+    void sendInfoLogMessage(QString msg);
     void delayedUpdate();
 
 public slots:
@@ -63,6 +67,10 @@ public slots:
 protected:
 
     void paintEvent(QPaintEvent *event);
+
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *);
 
 private:
 
