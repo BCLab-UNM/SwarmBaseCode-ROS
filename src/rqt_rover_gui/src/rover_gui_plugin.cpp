@@ -1532,14 +1532,14 @@ QString RoverGUIPlugin::addUniformTargets()
             emit sendInfoLogMessage("Tried to place target "+QString::number(i)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y) + "...");
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
-       }
-       while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
-       emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
+        }
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
+        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
 
         output = sim_mgr.addModel(QString("at")+QString::number(i),  QString("at")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_1_clearance);
 
-       progress_dialog.setValue(i*100.0f/256);
-       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        progress_dialog.setValue(i*100.0f/256);
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     }
     emit sendInfoLogMessage("Placed 256 single targets");
 
@@ -1558,10 +1558,11 @@ QString RoverGUIPlugin::addClusteredTargets()
 
     QString output;
 
-    float proposed_x;
-    float proposed_y;
+    float proposed_x, proposed_x2;
+    float proposed_y, proposed_y2;
 
     float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_64_clearance);
+    int cube_index = 0;
 
     // Four piles of 64
     for (int i = 0; i < 4; i++)
@@ -1576,12 +1577,24 @@ QString RoverGUIPlugin::addClusteredTargets()
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
         while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
+
+        proposed_y2 = proposed_y - (target_cluster_size_1_clearance * 8);
+
+        for(int j = 0; j < 8; j++) {
+            proposed_x2 = proposed_x - (target_cluster_size_1_clearance * 8);
+
+            for(int k = 0; k < 8; k++) {
+                output = sim_mgr.addModel(QString("at")+QString::number(cube_index),  QString("at")+QString::number(cube_index), proposed_x2, proposed_y2, 0, target_cluster_size_1_clearance);
+                proposed_x2 += target_cluster_size_1_clearance;
+                progress_dialog.setValue(cube_index*100.0f/256);
+                cube_index++;
+            }
+
+            proposed_y2 += target_cluster_size_1_clearance;
+        }
+
         emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
-
-        progress_dialog.setValue(i*100.0f/4);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-        output = sim_mgr.addModel(QString("atags64_")+QString::number(i), QString("atags64_")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_64_clearance);
         emit sendInfoLogMessage(output);
     }
 
