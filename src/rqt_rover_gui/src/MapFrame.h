@@ -25,6 +25,9 @@
 #include <map>
 #include <QString>
 
+// Forward declarations
+class QMainWindow;
+
 using namespace std;
 
 namespace rqt_rover_gui
@@ -37,6 +40,7 @@ public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
     void setWhetherToDisplay(string rover, bool yes);
+    void createPopoutWindow();
 
     void setDisplayEncoderData(bool display);
     void setDisplayGPSData(bool display);
@@ -106,6 +110,10 @@ private:
     map<string, float> min_ekf_seen_y;
 
     set<string> display_list;
+
+    // For external pop out window
+    QMainWindow* popout_window;
+    MapFrame* popout_mapframe;
 
 };
 

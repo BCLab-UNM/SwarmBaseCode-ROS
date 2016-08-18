@@ -180,6 +180,8 @@ namespace rqt_rover_gui
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
+
+    ui.map_frame->createPopoutWindow();
   }
 
   void RoverGUIPlugin::shutdownPlugin()

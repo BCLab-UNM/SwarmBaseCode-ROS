@@ -4,9 +4,11 @@
 #include <iostream>
 #include <cmath>
 #include <limits>
+#include <QMainWindow>
+#include <QGridLayout>
+#include <QLabel>
 
-#include <MapFrame.h>
-
+#include "MapFrame.h"
 
 namespace rqt_rover_gui
 {
@@ -47,10 +49,34 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     display_encoder_data = false;
 
     frames = 0;
+    popout_mapframe = NULL;
+    popout_window = NULL;
+
+
+}
+
+// This can't go in the constructor or there will be an infinite regression.
+// Instead call from the main UI in it's startup routine.
+void MapFrame::createPopoutWindow()
+{
+    popout_window = new QMainWindow();
+    popout_mapframe = new MapFrame(popout_window, 0);
+
+    QGridLayout* layout = new QGridLayout();
+    layout->addWidget(popout_mapframe);
+
+    QWidget* central_widget = new QWidget();
+    central_widget->setLayout(layout);
+
+    popout_window->setGeometry(QRect(10, 10, 500, 500));
+    popout_window->setStyleSheet("background-color: rgb(0, 0, 0); border-color: rgb(255, 255, 255);");
+    popout_window->setCentralWidget(central_widget);
 }
 
 void MapFrame::addToGPSRoverPath(string rover, float x, float y)
-{ 
+{     
+  if(popout_mapframe) popout_mapframe->addToGPSRoverPath( rover, x, y );
+
   // Negate the y direction to orient the map so up is north.
   y = -y;
 
@@ -67,6 +93,8 @@ void MapFrame::addToGPSRoverPath(string rover, float x, float y)
 
 void MapFrame::addToEncoderRoverPath(string rover, float x, float y)
 {
+  if(popout_mapframe) popout_mapframe->addToEncoderRoverPath( rover, x, y );
+
   // Negate the y direction to orient the map so up is north.
   y = -y;
 
@@ -78,12 +106,14 @@ void MapFrame::addToEncoderRoverPath(string rover, float x, float y)
     update_mutex.lock();
     encoder_rover_path[rover].push_back(pair<float,float>(x,y));
     update_mutex.unlock();
-    emit delayedUpdate();
+    emit delayedUpdate();  
 }
 
 
 void MapFrame::addToEKFRoverPath(string rover, float x, float y)
 {
+  if(popout_mapframe) popout_mapframe->addToEKFRoverPath( rover, x, y );
+
   // Negate the y direction to orient the map so up is north.
   y = -y;
 
@@ -108,6 +138,8 @@ void MapFrame::clearMap()
 
     display_list.clear();
     update_mutex.unlock();
+
+    if(popout_mapframe) popout_mapframe->clearMap();
 }
 
 void MapFrame::clearMap(string rover)
@@ -257,9 +289,6 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
     int map_center_x = map_origin_x+((map_width-map_origin_x)/2);
     int map_center_y = map_origin_y+((map_height-map_origin_y)/2);
-
-
-
 
     // The map axes do not need to be redrawn for each rover so this code is sandwiched between the two rover display list loops
 
@@ -459,33 +488,39 @@ void MapFrame::paintEvent(QPaintEvent* event)
   } // End rover display list set iteration
 
 
-    //painter.setPen(Qt::blue);
-    //painter.drawText(QPoint(0,15), "min_seen_x: " + QString::number(min_seen_x));
-    //painter.drawText(QPoint(0,30), "min_seen_y: " + QString::number(min_seen_y));
-    //painter.drawText(QPoint(0,45), "max_width_seen: " + QString::number(max_seen_width));
-    //painter.drawText(QPoint(0,60), "max_height_seen: " + QString::number(max_seen_height));
+    painter.setPen(Qt::blue);
+    painter.drawText(QPoint(0,15), "min_seen_x: " + QString::number(min_seen_x));
+    painter.drawText(QPoint(0,30), "min_seen_y: " + QString::number(min_seen_y));
+    painter.drawText(QPoint(0,45), "max_width_seen: " + QString::number(max_seen_width));
+    painter.drawText(QPoint(0,60), "max_height_seen: " + QString::number(max_seen_height));
 
-    //painter.drawText(QPoint(0,75), "map_origin_x: " + QString::number(map_origin_x));
-    //painter.drawText(QPoint(0,90), "map_origin_y: " + QString::number(map_origin_y));
-    //painter.drawText(QPoint(0,105), "map_width: " + QString::number(map_width));
-    //painter.drawText(QPoint(0,120), "map_height: " + QString::number(map_height));
-    //painter.setPen(Qt::white);
+    painter.drawText(QPoint(0,75), "map_origin_x: " + QString::number(map_origin_x));
+    painter.drawText(QPoint(0,90), "map_origin_y: " + QString::number(map_origin_y));
+    painter.drawText(QPoint(0,105), "map_width: " + QString::number(map_width));
+    painter.drawText(QPoint(0,120), "map_height: " + QString::number(map_height));
+    painter.setPen(Qt::white);
 }
 
 
 void MapFrame::setDisplayEncoderData(bool display)
 {
     display_encoder_data = display;
+
+    if(popout_mapframe) popout_mapframe->setDisplayEncoderData(display);
 }
 
 void MapFrame::setDisplayGPSData(bool display)
 {
     display_gps_data = display;
+
+    if(popout_mapframe) popout_mapframe->setDisplayGPSData(display);
 }
 
 void MapFrame::setDisplayEKFData(bool display)
 {
     display_ekf_data = display;
+
+    if(popout_mapframe) popout_mapframe->setDisplayEKFData(display);
 }
 
 void MapFrame::setWhetherToDisplay(string rover, bool yes)
@@ -498,11 +533,15 @@ void MapFrame::setWhetherToDisplay(string rover, bool yes)
     {
         display_list.erase(rover);
     }
+
+    if(popout_mapframe) popout_mapframe->setWhetherToDisplay(rover, yes);
 }
 
 void MapFrame::mousePressEvent(QMouseEvent *event)
 {
     emit sendInfoLogMessage("MapFrame: mouse press.");
+
+    if (popout_window) popout_window->show();
 }
 
 void MapFrame::mouseMoveEvent(QMouseEvent *event)
@@ -519,6 +558,7 @@ MapFrame::~MapFrame()
 {
     // Safely erase map data - locks to make sure a frame isnt being drawn
     clearMap();
+    if (popout_window) delete popout_window;
 }
 
 }
