@@ -154,8 +154,11 @@ namespace rqt_rover_gui {
     void GPSCheckboxToggledEventHandler(bool checked);
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
-    void mapSelectionListItemChangedHandler(QListWidgetItem* changed_item);
 
+    void mapSelectionListItemChangedHandler(QListWidgetItem* changed_item);
+    void mapAutoRadioButtonEventHandler(bool marked);
+    void mapManualRadioButtonEventHandler(bool marked);
+    void mapPopoutButtonEventHandler();
 
     void joystickRadioButtonEventHandler(bool marked);
     void autonomousRadioButtonEventHandler(bool marked);

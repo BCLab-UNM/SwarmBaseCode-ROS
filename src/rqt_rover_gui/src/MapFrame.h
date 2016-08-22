@@ -50,6 +50,16 @@ public:
     void addToEncoderRoverPath(string rover, float x, float y);
     void addToEKFRoverPath(string rover, float x, float y);
 
+    // Set the map scale and translation using user mouse clicks
+    // wheel for zooming in and out
+    // press and move for panning
+    // Excludes auto transform
+    void setManualTransform();
+
+    // Calculate scale and transform to keep all data in the map frame
+    // Excludes manual trasform
+    void setAutoTransform();
+    void popout(); // Show a copy of the map in its own resizable window
 
     void addTargetLocation(string rover, float x, float y);
     void addCollectionPoint(string rover, float x, float y);
@@ -115,6 +125,21 @@ private:
     QMainWindow* popout_window;
     MapFrame* popout_mapframe;
 
+    // State for panning and zooming the map
+    float scale;
+    float scale_speed; // Amount to zoom as the mouse wheel angle changes
+
+    QPoint previous_mouse_position;
+    float translate_x;
+    float translate_y;
+    float translate_speed; // Amount to pan by as the mouse position changes
+
+    bool auto_transform;
+
+    float max_seen_width_when_manual_enabled;
+    float max_seen_height_when_manual_enabled;
+    float min_seen_x_when_manual_enabled;
+    float min_seen_y_when_manual_enabled;
 };
 
 }

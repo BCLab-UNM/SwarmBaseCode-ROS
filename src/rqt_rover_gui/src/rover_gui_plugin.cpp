@@ -114,6 +114,10 @@ namespace rqt_rover_gui
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
     connect(ui.visualize_simulation_button, SIGNAL(pressed()), this, SLOT(visualizeSimulationButtonEventHandler()));
+    connect(ui.map_auto_radio_button, SIGNAL(toggled(bool)), this, SLOT(mapAutoRadioButtonEventHandler(bool)));
+    connect(ui.map_manual_radio_button, SIGNAL(toggled(bool)), this, SLOT(mapManualRadioButtonEventHandler(bool)));
+    connect(ui.map_popout_button, SIGNAL(pressed()), this, SLOT(mapPopoutButtonEventHandler()));
+
 
     // Joystick output display - Drive
     connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
@@ -152,6 +156,7 @@ namespace rqt_rover_gui
     rover_poll_timer->start(5000);
 
     // Setup the initial display parameters for the map
+    ui.map_frame->createPopoutWindow(); // This has to happen before the display radio buttons are set
     ui.map_frame->setDisplayGPSData(ui.gps_checkbox->isChecked());
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
@@ -180,8 +185,6 @@ namespace rqt_rover_gui
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
-
-    ui.map_frame->createPopoutWindow();
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -748,7 +751,12 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         // Create the corresponding diagnostic data listwidgetitem
         QListWidgetItem* new_diags_item = new QListWidgetItem("");
+
+        // The user shouldn't be able to select the diagnostic output
+        new_diags_item->setFlags(new_diags_item->flags() & ~Qt::ItemIsSelectable);
+
         ui.rover_diags_list->addItem(new_diags_item);
+
 
         // Add the map selection checkbox for this rover
         QListWidgetItem* new_map_selection_item = new QListWidgetItem("");
@@ -1024,6 +1032,22 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
     sb->setValue(sb->maximum());
 }
 
+// These button handlers allow the user to select whether to manually pan and zoom the map
+// or use auto scaling.
+void RoverGUIPlugin::mapAutoRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+    ui.map_frame->setAutoTransform();
+
+}
+
+void RoverGUIPlugin::mapManualRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+    ui.map_frame->setManualTransform();
+}
+
+
 void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 {
     if (!marked) return;
@@ -1207,6 +1231,11 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
         ui.custom_world_path->setText("");
         ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
     }
+}
+
+void RoverGUIPlugin::mapPopoutButtonEventHandler()
+{
+    ui.map_frame->popout();
 }
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
