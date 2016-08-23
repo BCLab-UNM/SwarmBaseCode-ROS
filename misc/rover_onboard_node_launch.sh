@@ -94,7 +94,7 @@ while true; do
 
     if [ "$choice" == "q" ];then
 	rosnode kill $HOSTNAME\_MOBILITY
-	rostopic pub -1 /$HOSTNAME\/mobility geometry_msgs/Twist '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
+	rostopic pub -1 /$HOSTNAME\/velocity geometry_msgs/Twist '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
 	rosnode kill $HOSTNAME\_ABRIDGE
 	rosnode kill $HOSTNAME\_NAVSAT
 	rosnode kill $HOSTNAME\_ODOM
