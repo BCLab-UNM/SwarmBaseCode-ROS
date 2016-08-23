@@ -58,6 +58,7 @@
 
 #include "GazeboSimManager.h"
 #include "JoystickGripperInterface.h"
+#include "MapData.h"
 
 using namespace std;
 
@@ -243,6 +244,8 @@ namespace rqt_rover_gui {
 
     // Amount of time between status messages that results in a rover disconnect
     ros::Duration disconnect_threshold;
+
+    MapData* map_data;
 
   };
 } // end namespace

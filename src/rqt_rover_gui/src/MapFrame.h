@@ -24,6 +24,7 @@
 #include <utility> // For STL pair
 #include <map>
 #include <QString>
+#include "MapData.h"
 
 // Forward declarations
 class QMainWindow;
@@ -40,15 +41,16 @@ public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
     void setWhetherToDisplay(string rover, bool yes);
-    void createPopoutWindow();
+    void createPopoutWindow(MapData *map_data);
 
     void setDisplayEncoderData(bool display);
     void setDisplayGPSData(bool display);
     void setDisplayEKFData(bool display);
 
-    void addToGPSRoverPath(string rover, float x, float y);
-    void addToEncoderRoverPath(string rover, float x, float y);
-    void addToEKFRoverPath(string rover, float x, float y);
+    void setMapData(MapData* map_data);
+
+    void clear();
+    void clear(std::string rover);
 
     // Set the map scale and translation using user mouse clicks
     // wheel for zooming in and out
@@ -60,11 +62,6 @@ public:
     // Excludes manual trasform
     void setAutoTransform();
     void popout(); // Show a copy of the map in its own resizable window
-
-    void addTargetLocation(string rover, float x, float y);
-    void addCollectionPoint(string rover, float x, float y);
-    void clearMap(string rover);
-    void clearMap();
 
     ~MapFrame();
 
@@ -97,28 +94,6 @@ private:
     QTime frame_rate_timer;
     int frames;
 
-    map<string, vector< pair<float,float> > > gps_rover_path;
-    map<string, vector< pair<float,float> > >  ekf_rover_path;
-    map<string, vector< pair<float,float> > >  encoder_rover_path;
-
-    map<string, vector< pair<float,float> > >  collection_points;
-    map<string, vector< pair<float,float> > >  target_locations;
-
-    map<string, float> max_gps_seen_x;
-    map<string, float> max_gps_seen_y;
-    map<string, float> min_gps_seen_x;
-    map<string, float> min_gps_seen_y;
-
-    map<string, float> max_encoder_seen_x;
-    map<string, float> max_encoder_seen_y;
-    map<string, float> min_encoder_seen_x;
-    map<string, float> min_encoder_seen_y;
-
-    map<string, float> max_ekf_seen_x;
-    map<string, float> max_ekf_seen_y;
-    map<string, float> min_ekf_seen_x;
-    map<string, float> min_ekf_seen_y;
-
     set<string> display_list;
 
     // For external pop out window
@@ -140,6 +115,8 @@ private:
     float max_seen_height_when_manual_enabled;
     float min_seen_x_when_manual_enabled;
     float min_seen_y_when_manual_enabled;
+
+    MapData* map_data;
 };
 
 }

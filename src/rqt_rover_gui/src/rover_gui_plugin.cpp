@@ -156,7 +156,7 @@ namespace rqt_rover_gui
     rover_poll_timer->start(5000);
 
     // Setup the initial display parameters for the map
-    ui.map_frame->createPopoutWindow(); // This has to happen before the display radio buttons are set
+    ui.map_frame->createPopoutWindow(map_data); // This has to happen before the display radio buttons are set
     ui.map_frame->setDisplayGPSData(ui.gps_checkbox->isChecked());
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
@@ -185,11 +185,14 @@ namespace rqt_rover_gui
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
+
+    ui.map_frame->setMapData(map_data);
   }
 
   void RoverGUIPlugin::shutdownPlugin()
   {
-    ui.map_frame->clearMap(); // Clear the map and stop drawing before the map_frame is destroyed
+    map_data->clear(); // Clear the map and stop drawing before the map_frame is destroyed
+    ui.map_frame->clear();
     clearSimulationButtonEventHandler();
     rover_poll_timer->stop();
     stopROSJoyNode();
@@ -317,6 +320,8 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 
 
         joystick_publisher.publish(joy_msg);
+
+        map_data = new MapData();
     }
 }
 
@@ -338,7 +343,7 @@ void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     string rover_name = publisher_name.substr(1,found-1);
 
     // Store map info for the appropriate rover name
-    ui.map_frame->addToEKFRoverPath(rover_name, x, y);
+    map_data->addToEKFRoverPath(rover_name, x, y);
 }
 
 
@@ -362,7 +367,7 @@ void RoverGUIPlugin::encoderEventHandler(const ros::MessageEvent<const nav_msgs:
     string rover_name = topic.substr(1,found-1);
 
     // Store map info for the appropriate rover name
-   ui.map_frame->addToEncoderRoverPath(rover_name, x, y);
+   map_data->addToEncoderRoverPath(rover_name, x, y);
 }
 
 
@@ -384,7 +389,7 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     string rover_name = publisher_name.substr(1,found-1);
 
     // Store map info for the appropriate rover name
-    ui.map_frame->addToGPSRoverPath(rover_name, x, y);
+    map_data->addToGPSRoverPath(rover_name, x, y);
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)
@@ -577,9 +582,6 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         emit sendInfoLogMessage("Existing rover selected");
     }
 
-    // Clear map
-    // ui.map_frame->clearMap();
-
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setEnabled(true);
@@ -599,7 +601,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     for (set<string>::iterator it = orphaned_rover_names.begin(); it != orphaned_rover_names.end(); ++it)
     {
         emit sendInfoLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
-        ui.map_frame->clearMap(*it);
+        map_data->clear(*it);
+        ui.map_frame->clear(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
         rover_statuses.erase(*it);
 
@@ -2194,6 +2197,7 @@ void RoverGUIPlugin::refocusKeyboardEventHandler()
 // Clean up memory when this object is deleted
 RoverGUIPlugin::~RoverGUIPlugin()
 {
+    if (map_data) delete map_data;
     delete joystickGripperInterface;
 }
 
