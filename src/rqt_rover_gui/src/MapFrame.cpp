@@ -324,16 +324,6 @@ void MapFrame::paintEvent(QPaintEvent* event)
             scaled_ekf_rover_path.lineTo(x, y);
         }
 
-        QPainterPath scaled_gps_rover_path;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getGPSPath(rover_to_display).begin(); it != map_data->getGPSPath(rover_to_display).end(); ++it) {
-            pair<float,float> coordinate  = *it;
-            QPoint point;
-            float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
-            float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
-
-            scaled_gps_rover_path.lineTo(x, y);
-        }
-
         QPainterPath scaled_encoder_rover_path;
         for(std::vector< pair<float,float> >::iterator it = map_data->getEncoderPath(rover_to_display).begin(); it != map_data->getEncoderPath(rover_to_display).end(); ++it) {
             pair<float,float> coordinate  = *it;
