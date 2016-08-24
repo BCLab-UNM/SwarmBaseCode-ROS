@@ -344,25 +344,6 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
 	if (currentMode == 0 || currentMode == 1) {
 		setVelocity(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
-		
-		std_msgs::Float32 angle;
-		if (message->axes[6] < 0.) {
-			angle.data = -1;
-			fingerAnglePublish.publish(angle);
-		}
-		else if (message->axes[6] > 0.) {
-			angle.data = -2;
-			fingerAnglePublish.publish(angle);
-		}
-		
-		if (message->axes[7] > 0.) {
-			angle.data = -1;
-			wristAnglePublish.publish(angle);
-		}
-		else if (message->axes[7] < 0.) {
-			angle.data = -2;
-			wristAnglePublish.publish(angle);
-		}
 	} 
 }
 
