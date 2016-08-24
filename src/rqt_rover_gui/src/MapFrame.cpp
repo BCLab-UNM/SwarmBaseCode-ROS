@@ -8,7 +8,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QMouseEvent>
-
+#include <MapData.h>
 #include "MapFrame.h"
 
 namespace rqt_rover_gui
@@ -556,6 +556,11 @@ void MapFrame::popout()
 {
     if (popout_window) popout_window->show();
 }
+
+ void MapFrame::setMapData(MapData* data)
+ {
+     map_data = data;
+ }
 
 MapFrame::~MapFrame()
 {

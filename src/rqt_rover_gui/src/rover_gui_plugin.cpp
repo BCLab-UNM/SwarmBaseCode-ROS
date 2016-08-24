@@ -35,6 +35,8 @@
 
 //#include <regex> // For regex expressions
 
+#include "MapData.h"
+
 #include <cv_bridge/cv_bridge.h>
 #include <opencv/cv.h>
 

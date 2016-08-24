@@ -58,9 +58,13 @@
 
 #include "GazeboSimManager.h"
 #include "JoystickGripperInterface.h"
-#include "MapData.h"
+
+
+// Forward declarations
+class MapData;
 
 using namespace std;
+
 
 // RoverStaus holds status messages from rovers and time
 // time they were received. The time is used to detect

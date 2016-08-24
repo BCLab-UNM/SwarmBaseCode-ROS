@@ -24,10 +24,10 @@
 #include <utility> // For STL pair
 #include <map>
 #include <QString>
-#include "MapData.h"
 
 // Forward declarations
 class QMainWindow;
+class MapData;
 
 using namespace std;
 
