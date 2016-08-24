@@ -374,37 +374,3 @@ void sigintEventHandler(int sig)
      // All the default sigint handler does is call shutdown()
      ros::shutdown();
 }
-
-void openFingers()
-{
-    // Opens fingers/claw to 50 degrees
-    std_msgs::Float32 msg;
-    msg.data = 90;
-    fingerAnglePublish.publish(msg);
-}
-
-void closeFingers()
-{
-    // Close fingers to 0 degrees
-    std_msgs::Float32 msg;
-    msg.data = 0;
-    fingerAnglePublish.publish(msg);
-}
-
-void raiseWrist()
-{
-    // Return wrist back to neutral position at 0 degrees
-    std_msgs::Float32 msg;
-    msg.data = 0;
-    wristAnglePublish.publish(msg);
-}
-
-void lowerWrist()
-{
-    // Lowers wrist to just above the ground at 50 degrees
-    std_msgs::Float32 msg;
-    msg.data = 50;
-    wristAnglePublish.publish(msg);
-}
-
-
