@@ -41,8 +41,8 @@ int currentMode = 0;
 float mobilityLoopTimeStep = 0.1; //time between the mobility loop calls
 float status_publish_interval = 5;
 float killSwitchTimeout = 10;
-std_msgs::Int16 targetDetected; //ID of the detected target
-bool targetsCollected [256] = {0}; //array of booleans indicating whether each target ID has been found
+bool targetDetected = false;
+bool targetCollected = false;
 
 // state machine states
 #define STATE_MACHINE_TRANSFORM	0
@@ -59,7 +59,6 @@ char prev_state_machine[128];
 ros::Publisher velocityPublish;
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
-ros::Publisher targetCollectedPublish;
 ros::Publisher fingerAnglePublish;
 ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
@@ -70,12 +69,15 @@ ros::Subscriber modeSubscriber;
 ros::Subscriber targetSubscriber;
 ros::Subscriber obstacleSubscriber;
 ros::Subscriber odometrySubscriber;
-ros::Subscriber targetsCollectedSubscriber;
 
 //Timers
 ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 ros::Timer killSwitchTimer;
+ros::Timer targetDetectedTimer;
+
+//Transforms
+tf::TransformListener *tfListener;
 
 // OS Signal Handler
 void sigintEventHandler(int signal);
@@ -88,8 +90,8 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
-void targetsCollectedHandler(const std_msgs::Int16::ConstPtr& message);
 void killSwitchTimerEventHandler(const ros::TimerEvent& event);
+void targetDetectedReset(const ros::TimerEvent& event);
 
 int main(int argc, char **argv) {
 
@@ -98,9 +100,7 @@ int main(int argc, char **argv) {
 
     rng = new random_numbers::RandomNumberGenerator(); //instantiate random number generator
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
-    
-    targetDetected.data = -1; //initialize target detected
-    
+
     //select initial search position 50 cm from center (0,0)
 	goalLocation.x = 0.5 * cos(goalLocation.theta);
 	goalLocation.y = 0.5 * sin(goalLocation.theta);
@@ -123,13 +123,11 @@ int main(int argc, char **argv) {
     modeSubscriber = mNH.subscribe((publishedName + "/mode"), 1, modeHandler);
     targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
     obstacleSubscriber = mNH.subscribe((publishedName + "/obstacle"), 10, obstacleHandler);
-    odometrySubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, odometryHandler);
-    targetsCollectedSubscriber = mNH.subscribe(("targetsCollected"), 10, targetsCollectedHandler);
+    odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
 
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
-    targetCollectedPublish = mNH.advertise<std_msgs::Int16>(("targetsCollected"), 1, true);
     fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle"), 1, true);
     wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
@@ -137,6 +135,9 @@ int main(int argc, char **argv) {
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     //killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
     stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
+    targetDetectedTimer = mNH.createTimer(ros::Duration(0), targetDetectedReset, true);
+    
+    tfListener = new tf::TransformListener();
 
     std_msgs::String msg;
     msg.data = "Log Started";
@@ -166,7 +167,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
 				//If returning with a target
-				else if (targetDetected.data != -1) {
+				else if (targetCollected) {
 					//If goal has not yet been reached
 					if (hypot(0.0 - currentLocation.x, 0.0 - currentLocation.y) > 0.5) {
 				        //set angle to center as goal heading
@@ -176,15 +177,22 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 						goalLocation.x = 0.0;
 						goalLocation.y = 0.0;
 					}
-					//Otherwise, reset target and select new random uniform heading
+					//Otherwise, drop off target and select new random uniform heading
 					else {
-						targetDetected.data = -1;
+						//open fingers
+						std_msgs::Float32 angle;
+						angle.data = M_PI_2;
+						fingerAnglePublish.publish(angle);
+						
+						//reset flag
+						targetCollected = false;
+						
 						goalLocation.theta = rng->uniformReal(0, 2 * M_PI);
 					}
 				}
-				//Otherwise, assign a new goal
-				else {
-					 //select new heading from Gaussian distribution around current heading
+				//If no targets have been detected, assign a new goal
+				else if (!targetDetected) {
+					//select new heading from Gaussian distribution around current heading
 					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
 					
 					//select new position 50 cm from current location
@@ -223,6 +231,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				}
 				else {
 					setVelocity(0.0, 0.0); //stop
+					
+					//close fingers
+					std_msgs::Float32 angle;
+					angle.data = 0;
+					fingerAnglePublish.publish(angle);
+					
 					stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
 				}
 			    break;
@@ -267,36 +281,68 @@ void setVelocity(double linearVel, double angularVel)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
 
 	if (message->detections.size() > 0) {
-		//if this is the goal target
-		if (message->detections[0].id == 256) {
-			//if we were returning with a target
-		    if (targetDetected.data != -1) {
-				targetDetected.data = -1;
-		    }
+		
+		geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
+		
+		//if target is close enough
+		if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.2) {
+			//assume target has been picked up by gripper
+			targetCollected = true;
+			
+			//lower wrist to avoid ultrasound sensors
+			std_msgs::Float32 angle;
+			angle.data = M_PI_2/4;
+			wristAnglePublish.publish(angle);
 		}
-	
-		//if target has not previously been detected 
-		else if (targetDetected.data == -1) {
-	        
-	        //check if target has not yet been collected
-	        if (!targetsCollected[message->detections[0].id]) {
-				//copy target ID to class variable
-				targetDetected.data = message->detections[0].id;
+		
+		else {
+			tagPose.header.stamp = ros::Time(0);
+			geometry_msgs::PoseStamped odomPose;
+
+			try {
+				tfListener->waitForTransform(publishedName + "/odom", publishedName + "/camera_link", ros::Time(0), ros::Duration(1.0));
+				tfListener->transformPose(publishedName + "/odom", tagPose, odomPose);
+			}
+
+			catch(tf::TransformException& ex) {
+				ROS_INFO("Received an exception trying to transform a point from \"odom\" to \"camera_link\": %s", ex.what());
+			}
+
+			//if this is the goal target
+			if (message->detections[0].id == 256) {
+				//open fingers to drop off target
+				std_msgs::Float32 angle;
+				angle.data = M_PI_2;
+				fingerAnglePublish.publish(angle);
+			}
+
+			//Otherwise, if no target has been collected, set target pose as goal
+			else if (!targetCollected) {
+				//set goal heading
+				goalLocation.theta = atan2(odomPose.pose.position.y - currentLocation.y, odomPose.pose.position.x - currentLocation.x);
 				
-		        //set angle to center as goal heading
-				goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+				//set goal position
+				goalLocation.x = odomPose.pose.position.x - (0.26 * cos(goalLocation.theta));
+				goalLocation.y = odomPose.pose.position.y - (0.26 * sin(goalLocation.theta));
 				
-				//set center as goal position
-				goalLocation.x = 0.0;
-				goalLocation.y = 0.0;
+				//set gripper
+				std_msgs::Float32 angle;
+				//open fingers
+				angle.data = M_PI_2;
+				fingerAnglePublish.publish(angle);
+				//lower wrist
+				angle.data = 0.8;
+				wristAnglePublish.publish(angle);
 				
-				//publish detected target
-				targetCollectedPublish.publish(targetDetected);
-	
+				//set state and timeout
+				targetDetected = true;
+				targetDetectedTimer.setPeriod(ros::Duration(5.0));
+				targetDetectedTimer.start();
+				
 				//switch to transform state to trigger return to center
 				stateMachineState = STATE_MACHINE_TRANSFORM;
 			}
-	    }
+		}
 	}
 }
 
@@ -306,7 +352,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 }
 
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
-	if (message->data > 0) {
+	if (!targetDetected && (message->data > 0)) {
 		//obstacle on right side
 		if (message->data == 1) {
 			//select new heading 0.2 radians to the left
@@ -344,25 +390,6 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
 	if (currentMode == 0 || currentMode == 1) {
 		setVelocity(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
-		
-		std_msgs::Float32 angle;
-		if (message->axes[6] < 0.) {
-			angle.data = -1;
-			fingerAnglePublish.publish(angle);
-		}
-		else if (message->axes[6] > 0.) {
-			angle.data = -2;
-			fingerAnglePublish.publish(angle);
-		}
-		
-		if (message->axes[7] > 0.) {
-			angle.data = -1;
-			wristAnglePublish.publish(angle);
-		}
-		else if (message->axes[7] < 0.) {
-			angle.data = -2;
-			wristAnglePublish.publish(angle);
-		}
 	} 
 }
 
@@ -384,8 +411,13 @@ void killSwitchTimerEventHandler(const ros::TimerEvent& t)
   ROS_INFO("In mobility.cpp:: killSwitchTimerEventHander(): Movement input timeout. Stopping the rover at %6.4f.", current_time);
 }
 
-void targetsCollectedHandler(const std_msgs::Int16::ConstPtr& message) {
-	targetsCollected[message->data] = 1;
+void targetDetectedReset(const ros::TimerEvent& event) {
+	targetDetected = false;
+	
+	std_msgs::Float32 angle;
+	angle.data = 0;
+	fingerAnglePublish.publish(angle); //close fingers
+	wristAnglePublish.publish(angle); //raise wrist
 }
 
 void sigintEventHandler(int sig)
@@ -393,37 +425,3 @@ void sigintEventHandler(int sig)
      // All the default sigint handler does is call shutdown()
      ros::shutdown();
 }
-
-void openFingers()
-{
-    // Opens fingers/claw to 50 degrees
-    std_msgs::Float32 msg;
-    msg.data = 90;
-    fingerAnglePublish.publish(msg);
-}
-
-void closeFingers()
-{
-    // Close fingers to 0 degrees
-    std_msgs::Float32 msg;
-    msg.data = 0;
-    fingerAnglePublish.publish(msg);
-}
-
-void raiseWrist()
-{
-    // Return wrist back to neutral position at 0 degrees
-    std_msgs::Float32 msg;
-    msg.data = 0;
-    wristAnglePublish.publish(msg);
-}
-
-void lowerWrist()
-{
-    // Lowers wrist to just above the ground at 50 degrees
-    std_msgs::Float32 msg;
-    msg.data = 50;
-    wristAnglePublish.publish(msg);
-}
-
-
