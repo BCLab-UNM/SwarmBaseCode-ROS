@@ -75,6 +75,7 @@
       <remap from="/image_rect/theora" to="/$(arg name)/camera/image/theora" />
       <remap from="/camera_info" to="/$(arg name)/camera/info" />
       <remap from="/tag_detections" to="/$(arg name)/targets" />
+      <remap from="/tag_detections_image" to="/$(arg name)/targets/image" />
 
       <param name="image_transport" type="str" value="theora" />
       <param name="tag_family" type="str" value="36h11" />
