@@ -32,7 +32,7 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     translate_y = 0;
 
     scale_speed = 0.1; // The amount of zoom per mouse wheel angle change
-    translate_speed = 0.01;
+    translate_speed = 1.5;
 
     display_ekf_data = false;
     display_gps_data = false;
@@ -49,7 +49,6 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
 // Instead call from the main UI in it's startup routine.
 void MapFrame::createPopoutWindow( MapData * map_data )
 {
-    return;
     popout_window = new QMainWindow();
     popout_mapframe = new MapFrame(popout_window, 0);
     popout_mapframe->setMapData(map_data);
@@ -459,7 +458,7 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
         float x_difference = mouse_event->pos().x() - previous_mouse_position.x();
         float y_difference = mouse_event->pos().y() - previous_mouse_position.y();
 
-        if (fabs(x_difference) > mouse_tolerance)
+        if (fabs(x_difference) < mouse_tolerance)
         if (x_difference < 0)
         {
 
@@ -471,7 +470,7 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
         }
 
         //if ((mouse_event->pos().y()-height()/2) > 0)
-        if (fabs(y_difference) > mouse_tolerance)
+        if (fabs(y_difference) < mouse_tolerance)
         if (y_difference < 0)
         {
             translate_y += translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
@@ -483,7 +482,7 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
 
         previous_mouse_position = mouse_event->pos();
 
-        emit sendInfoLogMessage("MapFrame: mouse move. x difference: " + QString::number(x_difference) + " y difference: " + QString::number(y_difference) + " translate_y: " + QString::number(translate_x));
+        //emit sendInfoLogMessage("MapFrame: mouse move. x difference: " + QString::number(x_difference) + " y difference: " + QString::number(y_difference) + " translate_y: " + QString::number(translate_x));
 
     }
 
