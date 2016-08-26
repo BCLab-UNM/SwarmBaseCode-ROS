@@ -74,6 +74,8 @@ namespace rqt_rover_gui
     collection_disk_clearance = 0.5;
 
     barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
+
+    map_data = new MapData();
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -158,6 +160,7 @@ namespace rqt_rover_gui
     rover_poll_timer->start(5000);
 
     // Setup the initial display parameters for the map
+    ui.map_frame->setMapData(map_data);
     ui.map_frame->createPopoutWindow(map_data); // This has to happen before the display radio buttons are set
     ui.map_frame->setDisplayGPSData(ui.gps_checkbox->isChecked());
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
@@ -188,7 +191,7 @@ namespace rqt_rover_gui
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
-    ui.map_frame->setMapData(map_data);
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -322,8 +325,6 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 
 
         joystick_publisher.publish(joy_msg);
-
-        map_data = new MapData();
     }
 }
 
@@ -345,7 +346,7 @@ void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     string rover_name = publisher_name.substr(1,found-1);
 
     // Store map info for the appropriate rover name
-    map_data->addToEKFRoverPath(rover_name, x, y);
+    ui.map_frame->addToEKFRoverPath(rover_name, x, y);
 }
 
 
@@ -369,7 +370,7 @@ void RoverGUIPlugin::encoderEventHandler(const ros::MessageEvent<const nav_msgs:
     string rover_name = topic.substr(1,found-1);
 
     // Store map info for the appropriate rover name
-   map_data->addToEncoderRoverPath(rover_name, x, y);
+   ui.map_frame->addToEncoderRoverPath(rover_name, x, y);
 }
 
 
@@ -391,7 +392,7 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     string rover_name = publisher_name.substr(1,found-1);
 
     // Store map info for the appropriate rover name
-    map_data->addToGPSRoverPath(rover_name, x, y);
+    ui.map_frame->addToGPSRoverPath(rover_name, x, y);
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)

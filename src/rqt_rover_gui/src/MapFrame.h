@@ -47,6 +47,10 @@ public:
     void setDisplayGPSData(bool display);
     void setDisplayEKFData(bool display);
 
+    void addToGPSRoverPath(std::string rover, float x, float y);
+    void addToEncoderRoverPath(std::string rover, float x, float y);
+    void addToEKFRoverPath(std::string rover, float x, float y);
+
     void setMapData(MapData* map_data);
 
     void clear();

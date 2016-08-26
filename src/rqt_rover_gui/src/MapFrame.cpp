@@ -41,12 +41,15 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     frames = 0;
     popout_mapframe = NULL;
     popout_window = NULL;
+
+    map_data = NULL;
 }
 
 // This can't go in the constructor or there will be an infinite regression.
 // Instead call from the main UI in it's startup routine.
 void MapFrame::createPopoutWindow( MapData * map_data )
 {
+    return;
     popout_window = new QMainWindow();
     popout_mapframe = new MapFrame(popout_window, 0);
     popout_mapframe->setMapData(map_data);
@@ -61,6 +64,8 @@ void MapFrame::createPopoutWindow( MapData * map_data )
     popout_window->setGeometry(QRect(10, 10, 500, 500));
     popout_window->setStyleSheet("background-color: rgb(0, 0, 0); border-color: rgb(255, 255, 255);");
     popout_window->setCentralWidget(central_widget);
+
+    connect(this, SIGNAL(delayedUpdate()), popout_mapframe, SLOT(update()), Qt::QueuedConnection);
 }
 
 void MapFrame::paintEvent(QPaintEvent* event)
@@ -90,11 +95,21 @@ void MapFrame::paintEvent(QPaintEvent* event)
     // end frames per second
 
     // Check if any rovers have been selected for display
+    if ( !map_data )
+    {
+        painter.drawText(QPoint(50,50), "No map data provided");
+        return;
+    }
+
+
+    // Check if any rovers have been selected for display
     if ( display_list.empty() )
     {
         painter.drawText(QPoint(50,50), "No rover maps selected for display");
         return;
     }
+
+    map_data->lock();
 
     // Colorblind friendly colors
     QColor green(17, 192, 131);
@@ -114,14 +129,14 @@ void MapFrame::paintEvent(QPaintEvent* event)
     // Repeat the display code for each rover selected by the user - Using C++11 range syntax
     for(auto rover_to_display : display_list)
     {
-    if (map_data->getEKFPath(rover_to_display).empty() && map_data->getEncoderPath(rover_to_display).empty() && map_data->getGPSPath(rover_to_display).empty() && map_data->getTargetLocations(rover_to_display).empty() && map_data->getCollectionPoints(rover_to_display).empty())
+    if (map_data->getEKFPath(rover_to_display)->empty() && map_data->getEncoderPath(rover_to_display)->empty() && map_data->getGPSPath(rover_to_display)->empty() && map_data->getTargetLocations(rover_to_display)->empty() && map_data->getCollectionPoints(rover_to_display)->empty())
     {
         painter.drawText(QPoint(50,50+no_data_offset), QString::fromStdString(rover_to_display) + ": No data.");
         no_data_offset += 10;
     }
 
     // Check extended kalman filter has any values in it
-    else if (map_data->getEKFPath(rover_to_display).empty())
+    else if (map_data->getEKFPath(rover_to_display)->empty())
     {
         painter.drawText(QPoint(50,50+no_data_offset), "Map Frame: No EKF data received.");
         no_data_offset += 10;
@@ -277,7 +292,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
     // End draw scale bars
 
-    map_data->lock();
+
 
     // Repeat the display code for each rover selected by the user - Using C++11 range syntax
     for(auto rover_to_display : display_list)
@@ -285,7 +300,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
         // scale coordinates
 
         std::vector<QPoint> scaled_target_locations;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getTargetLocations(rover_to_display).begin(); it != map_data->getTargetLocations(rover_to_display).end(); ++it) {
+        for(std::vector< pair<float,float> >::iterator it = map_data->getTargetLocations(rover_to_display)->begin(); it < map_data->getTargetLocations(rover_to_display)->end(); ++it) {
             pair<float,float> coordinate  = *it;
             QPoint point;
             point.setX(map_origin_x+coordinate.first*map_width);
@@ -294,7 +309,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
         }
 
         std::vector<QPoint> scaled_collection_points;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getCollectionPoints(rover_to_display).begin(); it != map_data->getCollectionPoints(rover_to_display).end(); ++it) {
+        for(std::vector< pair<float,float> >::iterator it = map_data->getCollectionPoints(rover_to_display)->begin(); it < map_data->getCollectionPoints(rover_to_display)->end(); ++it) {
             pair<float,float> coordinate  = *it;
             QPoint point;
             point.setX(map_origin_x+coordinate.first*map_width);
@@ -303,7 +318,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
         }
 
         std::vector<QPoint> scaled_gps_rover_points;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getGPSPath(rover_to_display).begin(); it != map_data->getGPSPath(rover_to_display).end(); ++it) {
+        for(std::vector< pair<float,float> >::iterator it = map_data->getGPSPath(rover_to_display)->begin(); it < map_data->getGPSPath(rover_to_display)->end(); ++it) {
             pair<float,float> coordinate  = *it;
 
             float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
@@ -313,26 +328,26 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
 
         QPainterPath scaled_ekf_rover_path;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getEKFPath(rover_to_display).begin(); it != map_data->getEKFPath(rover_to_display).end(); ++it) {
+        for(std::vector< pair<float,float> >::iterator it = map_data->getEKFPath(rover_to_display)->begin(); it < map_data->getEKFPath(rover_to_display)->end(); ++it) {
             pair<float,float> coordinate  = *it;
             QPoint point;
             float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
             float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
             // Move to the starting point of the path without drawing a line
-            if (it == map_data->getEKFPath(rover_to_display).begin()) scaled_ekf_rover_path.moveTo(x, y);
+            if (it == map_data->getEKFPath(rover_to_display)->begin()) scaled_ekf_rover_path.moveTo(x, y);
             scaled_ekf_rover_path.lineTo(x, y);
         }
 
         QPainterPath scaled_encoder_rover_path;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getEncoderPath(rover_to_display).begin(); it != map_data->getEncoderPath(rover_to_display).end(); ++it) {
+        for(std::vector< pair<float,float> >::iterator it = map_data->getEncoderPath(rover_to_display)->begin(); it < map_data->getEncoderPath(rover_to_display)->end(); ++it) {
             pair<float,float> coordinate  = *it;
             QPoint point;
             float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
             float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
             // Move to the starting point of the path without drawing a line
-            if (it == map_data->getEncoderPath(rover_to_display).begin()) scaled_encoder_rover_path.moveTo(x, y);
+            if (it == map_data->getEncoderPath(rover_to_display)->begin()) scaled_encoder_rover_path.moveTo(x, y);
 
             scaled_encoder_rover_path.lineTo(x, y);
         }
@@ -356,7 +371,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
         // Draw a yellow circle at the current EKF estimated rover location
         painter.setPen(Qt::yellow);
-        pair<float,float> current_coordinate = map_data->getEKFPath(rover_to_display).back();
+        pair<float,float> current_coordinate = map_data->getEKFPath(rover_to_display)->back();
         QPoint point;
         float x = map_origin_x+((current_coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
         float y = map_origin_y+((current_coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
@@ -410,6 +425,8 @@ void MapFrame::setDisplayEKFData(bool display)
 
 void MapFrame::setWhetherToDisplay(string rover, bool yes)
 {
+    map_data->lock();
+
     if (yes)
     {
         display_list.insert(rover);
@@ -418,6 +435,8 @@ void MapFrame::setWhetherToDisplay(string rover, bool yes)
     {
         display_list.erase(rover);
     }
+
+    map_data->unlock();
 
     if(popout_mapframe) popout_mapframe->setWhetherToDisplay(rover, yes);
 }
@@ -544,12 +563,16 @@ void MapFrame::setAutoTransform()
 
 void MapFrame::clear()
 {
+    map_data->lock();
     display_list.clear();
+    map_data->unlock();
 }
 
 void MapFrame::clear(string rover)
 {
+    map_data->lock();
     display_list.erase(rover);
+    map_data->unlock();
 }
 
 void MapFrame::popout()
@@ -560,6 +583,33 @@ void MapFrame::popout()
  void MapFrame::setMapData(MapData* data)
  {
      map_data = data;
+ }
+
+ void MapFrame::addToGPSRoverPath(std::string rover, float x, float y)
+ {
+     if (map_data)
+     {
+        map_data->addToGPSRoverPath(rover, x, y);
+        emit delayedUpdate();
+     }
+ }
+
+ void MapFrame::addToEncoderRoverPath(std::string rover, float x, float y)
+ {
+     if (map_data)
+     {
+        map_data->addToEncoderRoverPath(rover, x, y);
+        emit delayedUpdate();
+     }
+}
+
+ void MapFrame::addToEKFRoverPath(std::string rover, float x, float y)
+ {
+     if (map_data)
+     {
+         map_data->addToEKFRoverPath(rover, x, y);
+         emit delayedUpdate();
+     }
  }
 
 MapFrame::~MapFrame()

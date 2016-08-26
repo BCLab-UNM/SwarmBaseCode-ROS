@@ -29,11 +29,11 @@ public:
     void lock();
     void unlock();
 
-    std::vector< std::pair<float,float> > getEKFPath(std::string rover_name);
-    std::vector< std::pair<float,float> > getGPSPath(std::string rover_name);
-    std::vector< std::pair<float,float> > getEncoderPath(std::string rover_name);
-    std::vector< std::pair<float,float> > getTargetLocations(std::string rover_name);
-    std::vector< std::pair<float,float> > getCollectionPoints(std::string rover_name);
+    std::vector< std::pair<float,float> >* getEKFPath(std::string rover_name);
+    std::vector< std::pair<float,float> >* getGPSPath(std::string rover_name);
+    std::vector< std::pair<float,float> >* getEncoderPath(std::string rover_name);
+    std::vector< std::pair<float,float> >* getTargetLocations(std::string rover_name);
+    std::vector< std::pair<float,float> >* getCollectionPoints(std::string rover_name);
 
     // These functions provide a fast way to get the min and max coords
     float getMaxGPSX(std::string rover_name);

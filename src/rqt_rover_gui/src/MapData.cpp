@@ -112,29 +112,29 @@ void MapData::clear(string rover)
     update_mutex.unlock();
 }
 
-std::vector< std::pair<float,float> > MapData::getEKFPath(std::string rover_name)
+std::vector< std::pair<float,float> >* MapData::getEKFPath(std::string rover_name)
 {
-    return ekf_rover_path[rover_name];
+    return &ekf_rover_path[rover_name];
 }
 
-std::vector< std::pair<float,float> > MapData::getGPSPath(std::string rover_name)
+std::vector< std::pair<float,float> >* MapData::getGPSPath(std::string rover_name)
 {
-    return gps_rover_path[rover_name];
+    return &gps_rover_path[rover_name];
 }
 
-std::vector< std::pair<float,float> > MapData::getEncoderPath(std::string rover_name)
+std::vector< std::pair<float,float> >* MapData::getEncoderPath(std::string rover_name)
 {
-    return encoder_rover_path[rover_name];
+    return &encoder_rover_path[rover_name];
 }
 
-std::vector< std::pair<float,float> > MapData::getTargetLocations(std::string rover_name)
+std::vector< std::pair<float,float> >* MapData::getTargetLocations(std::string rover_name)
 {
-    return target_locations[rover_name];
+    return &target_locations[rover_name];
 }
 
-std::vector< std::pair<float,float> > MapData::getCollectionPoints(std::string rover_name)
+std::vector< std::pair<float,float> >* MapData::getCollectionPoints(std::string rover_name)
 {
-    return collection_points[rover_name];
+    return &collection_points[rover_name];
 }
 
 // These functions report the maximum and minimum map values seen. This is useful for the GUI when it is calculating the map coordinate system.
