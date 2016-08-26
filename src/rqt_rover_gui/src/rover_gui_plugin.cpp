@@ -35,6 +35,8 @@
 
 //#include <regex> // For regex expressions
 
+#include "MapData.h"
+
 #include <cv_bridge/cv_bridge.h>
 #include <opencv/cv.h>
 
@@ -72,6 +74,8 @@ namespace rqt_rover_gui
     collection_disk_clearance = 0.5;
 
     barrier_clearance = 0.5; // Used to prevent targets being placed to close to walls
+
+    map_data = new MapData();
   }
 
   void RoverGUIPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -114,6 +118,10 @@ namespace rqt_rover_gui
     connect(ui.build_simulation_button, SIGNAL(pressed()), this, SLOT(buildSimulationButtonEventHandler()));
     connect(ui.clear_simulation_button, SIGNAL(pressed()), this, SLOT(clearSimulationButtonEventHandler()));
     connect(ui.visualize_simulation_button, SIGNAL(pressed()), this, SLOT(visualizeSimulationButtonEventHandler()));
+    connect(ui.map_auto_radio_button, SIGNAL(toggled(bool)), this, SLOT(mapAutoRadioButtonEventHandler(bool)));
+    connect(ui.map_manual_radio_button, SIGNAL(toggled(bool)), this, SLOT(mapManualRadioButtonEventHandler(bool)));
+    connect(ui.map_popout_button, SIGNAL(pressed()), this, SLOT(mapPopoutButtonEventHandler()));
+
 
     // Joystick output display - Drive
     connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
@@ -134,6 +142,13 @@ namespace rqt_rover_gui
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
 
+    // Receive log messages from contained frames
+    connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
+
+    // Add the checkbox handler so we can process events. We have to listen for itemChange events since
+    // we don't have a real chackbox with toggle events
+    connect(ui.map_selection_list, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapSelectionListItemChangedHandler(QListWidgetItem*)));
+
     // Create a subscriber to listen for joystick events
     joystick_subscriber = nh.subscribe("/joy", 1000, &RoverGUIPlugin::joyEventHandler, this);
 
@@ -145,6 +160,8 @@ namespace rqt_rover_gui
     rover_poll_timer->start(5000);
 
     // Setup the initial display parameters for the map
+    ui.map_frame->setMapData(map_data);
+    ui.map_frame->createPopoutWindow(map_data); // This has to happen before the display radio buttons are set
     ui.map_frame->setDisplayGPSData(ui.gps_checkbox->isChecked());
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
@@ -174,10 +191,13 @@ namespace rqt_rover_gui
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
   {
+    map_data->clear(); // Clear the map and stop drawing before the map_frame is destroyed
+    ui.map_frame->clear();
     clearSimulationButtonEventHandler();
     rover_poll_timer->stop();
     stopROSJoyNode();
@@ -525,7 +545,10 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
     emit sendInfoLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
-    ui.map_frame->setRoverMapToDisplay(selected_rover_name);
+
+    // Add to the rover map.
+    QListWidgetItem* map_selection_item = ui.map_selection_list->item(ui.rover_list->row(current));
+    map_selection_item->setCheckState(Qt::Checked);
 
     // No entry for this rover name
     if ( 0 == rover_control_state.count(selected_rover_name) )
@@ -562,9 +585,6 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         emit sendInfoLogMessage("Existing rover selected");
     }
 
-    // Clear map
-    // ui.map_frame->clearMap();
-
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setEnabled(true);
@@ -584,7 +604,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     for (set<string>::iterator it = orphaned_rover_names.begin(); it != orphaned_rover_names.end(); ++it)
     {
         emit sendInfoLogMessage(QString("Clearing interface data for disconnected rover ") + QString::fromStdString(*it));
-        ui.map_frame->clearMap(*it);
+        map_data->clear(*it);
+        ui.map_frame->clear(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
         rover_statuses.erase(*it);
 
@@ -633,6 +654,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
         ui.rover_diags_list->clear();
+        ui.map_selection_list->clear();
 
         // Disable control mode group since no rovers are connected
         ui.autonomous_control_radio_button->setEnabled(false);
@@ -692,8 +714,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     ui.rover_list->clear();
 
     // Also clear the rover diagnostics list
-    ui.rover_diags_list->clearSelection();
     ui.rover_diags_list->clear();
+    ui.map_selection_list->clear();
     
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
@@ -735,7 +757,24 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         // Create the corresponding diagnostic data listwidgetitem
         QListWidgetItem* new_diags_item = new QListWidgetItem("");
+
+        // The user shouldn't be able to select the diagnostic output
+        new_diags_item->setFlags(new_diags_item->flags() & ~Qt::ItemIsSelectable);
+
         ui.rover_diags_list->addItem(new_diags_item);
+
+
+        // Add the map selection checkbox for this rover
+        QListWidgetItem* new_map_selection_item = new QListWidgetItem("");
+
+        // set checkable but not selectable flags
+        new_map_selection_item->setFlags(new_map_selection_item->flags() | Qt::ItemIsUserCheckable);
+        new_map_selection_item->setFlags(new_map_selection_item->flags() & ~Qt::ItemIsSelectable);
+        new_map_selection_item->setCheckState(Qt::Unchecked);
+
+        // Add to the widget list
+        ui.map_selection_list->addItem(new_map_selection_item);
+
     }
     }
 
@@ -927,6 +966,29 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     item->setText(QString::fromStdString(diagnostic_display));
 }
 
+// We use item changed signal as a proxy for the checkbox being clicked
+void RoverGUIPlugin::mapSelectionListItemChangedHandler(QListWidgetItem* changed_item)
+{
+    // Get the rover name associated with this map selction list item
+    int row = ui.map_selection_list->row(changed_item);
+
+    // Rover names start at the begining of the rover name and status string and end at the first space
+    QListWidgetItem* rover_item = ui.rover_list->item(row);
+
+    // Extract the rover name corresponding to the changed map selection item
+    string rover_name_and_status = rover_item->text().toStdString();
+
+    // Rover names start at the begining of the rover name and status string and end at the first space
+    size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+    string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+
+    bool checked = changed_item->checkState();
+
+    emit sendInfoLogMessage("Map selection changed to " + (checked ? QString("true") : QString("false")) + " for rover " + QString::fromStdString(ui_rover_name));
+
+    ui.map_frame->setWhetherToDisplay(ui_rover_name, checked);
+}
+
 void RoverGUIPlugin::GPSCheckboxToggledEventHandler(bool checked)
 {
     ui.map_frame->setDisplayGPSData(checked);
@@ -975,6 +1037,22 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
     QScrollBar *sb = ui.info_log->verticalScrollBar();
     sb->setValue(sb->maximum());
 }
+
+// These button handlers allow the user to select whether to manually pan and zoom the map
+// or use auto scaling.
+void RoverGUIPlugin::mapAutoRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+    ui.map_frame->setAutoTransform();
+
+}
+
+void RoverGUIPlugin::mapManualRadioButtonEventHandler(bool marked)
+{
+    if (!marked) return;
+    ui.map_frame->setManualTransform();
+}
+
 
 void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 {
@@ -1159,6 +1237,11 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
         ui.custom_world_path->setText("");
         ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
     }
+}
+
+void RoverGUIPlugin::mapPopoutButtonEventHandler()
+{
+    ui.map_frame->popout();
 }
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
@@ -2170,6 +2253,7 @@ void RoverGUIPlugin::refocusKeyboardEventHandler()
 // Clean up memory when this object is deleted
 RoverGUIPlugin::~RoverGUIPlugin()
 {
+    if (map_data) delete map_data;
     delete joystickGripperInterface;
 }
 

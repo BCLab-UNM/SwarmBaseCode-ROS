@@ -91,7 +91,7 @@ add_library(
   src/MapFrame.cpp
   src/USFrame.cpp
   src/GPSFrame.cpp
-  #src/IMUWidget.cpp
+  src/MapData.cpp
   src/IMUFrame.cpp
   src/BWTabWidget.cpp
   ${rover_gui_plugin_RESOURCES}

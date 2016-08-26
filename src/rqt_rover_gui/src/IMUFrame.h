@@ -25,6 +25,7 @@
 
 using namespace std;
 
+// ROS rqt requires gui elements be in the UI plugin namespace
 namespace rqt_rover_gui
 {
 

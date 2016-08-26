@@ -59,7 +59,12 @@
 #include "GazeboSimManager.h"
 #include "JoystickGripperInterface.h"
 
+
+// Forward declarations
+class MapData;
+
 using namespace std;
+
 
 // RoverStaus holds status messages from rovers and time
 // time they were received. The time is used to detect
@@ -85,7 +90,7 @@ namespace rqt_rover_gui {
     virtual void shutdownPlugin();
     virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const;
     virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
-    
+
     bool eventFilter(QObject *target, QEvent *event);
 
     // Handles output from the joystick node
@@ -154,6 +159,11 @@ namespace rqt_rover_gui {
     void GPSCheckboxToggledEventHandler(bool checked);
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
+
+    void mapSelectionListItemChangedHandler(QListWidgetItem* changed_item);
+    void mapAutoRadioButtonEventHandler(bool marked);
+    void mapManualRadioButtonEventHandler(bool marked);
+    void mapPopoutButtonEventHandler();
 
     void joystickRadioButtonEventHandler(bool marked);
     void autonomousRadioButtonEventHandler(bool marked);
@@ -238,6 +248,8 @@ namespace rqt_rover_gui {
 
     // Amount of time between status messages that results in a rover disconnect
     ros::Duration disconnect_threshold;
+
+    MapData* map_data;
 
   };
 } // end namespace

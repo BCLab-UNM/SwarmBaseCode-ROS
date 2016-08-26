@@ -20,8 +20,14 @@
 #include <QMutex>
 #include <QPainter>
 #include <vector>
+#include <set>
 #include <utility> // For STL pair
 #include <map>
+#include <QString>
+
+// Forward declarations
+class QMainWindow;
+class MapData;
 
 using namespace std;
 
@@ -34,23 +40,38 @@ class MapFrame : public QFrame
 public:
     MapFrame(QWidget *parent, Qt::WFlags = 0);
 
-    void setRoverMapToDisplay(string rover);
+    void setWhetherToDisplay(string rover, bool yes);
+    void createPopoutWindow(MapData *map_data);
 
     void setDisplayEncoderData(bool display);
     void setDisplayGPSData(bool display);
     void setDisplayEKFData(bool display);
 
-    void addToGPSRoverPath(string rover, float x, float y);
-    void addToEncoderRoverPath(string rover, float x, float y);
-    void addToEKFRoverPath(string rover, float x, float y);
+    void addToGPSRoverPath(std::string rover, float x, float y);
+    void addToEncoderRoverPath(std::string rover, float x, float y);
+    void addToEKFRoverPath(std::string rover, float x, float y);
 
+    void setMapData(MapData* map_data);
 
-    void addTargetLocation(string rover, float x, float y);
-    void addCollectionPoint(string rover, float x, float y);
-    void clearMap(string rover);
+    void clear();
+    void clear(std::string rover);
+
+    // Set the map scale and translation using user mouse clicks
+    // wheel for zooming in and out
+    // press and move for panning
+    // Excludes auto transform
+    void setManualTransform();
+
+    // Calculate scale and transform to keep all data in the map frame
+    // Excludes manual trasform
+    void setAutoTransform();
+    void popout(); // Show a copy of the map in its own resizable window
+
+    ~MapFrame();
 
 signals:
 
+    void sendInfoLogMessage(QString msg);
     void delayedUpdate();
 
 public slots:
@@ -60,9 +81,11 @@ protected:
 
     void paintEvent(QPaintEvent *event);
 
-private:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *);
 
-    string rover_to_display;
+private:
 
     mutable QMutex update_mutex;
     int frame_width;
@@ -75,37 +98,29 @@ private:
     QTime frame_rate_timer;
     int frames;
 
-    map<string, vector< pair<float,float> > > gps_rover_path;
-    map<string, vector< pair<float,float> > >  ekf_rover_path;
-    map<string, vector< pair<float,float> > >  encoder_rover_path;
+    set<string> display_list;
 
-    map<string, vector< pair<float,float> > >  collection_points;
-    map<string, vector< pair<float,float> > >  target_locations;
+    // For external pop out window
+    QMainWindow* popout_window;
+    MapFrame* popout_mapframe;
 
-    map<string, float> max_gps_seen_x;
-    map<string, float> max_gps_seen_y;
-    map<string, float> min_gps_seen_x;
-    map<string, float> min_gps_seen_y;
+    // State for panning and zooming the map
+    float scale;
+    float scale_speed; // Amount to zoom as the mouse wheel angle changes
 
-    map<string, float> max_encoder_seen_x;
-    map<string, float> max_encoder_seen_y;
-    map<string, float> min_encoder_seen_x;
-    map<string, float> min_encoder_seen_y;
+    QPoint previous_mouse_position;
+    float translate_x;
+    float translate_y;
+    float translate_speed; // Amount to pan by as the mouse position changes
 
-    map<string, float> max_ekf_seen_x;
-    map<string, float> max_ekf_seen_y;
-    map<string, float> min_ekf_seen_x;
-    map<string, float> min_ekf_seen_y;
+    bool auto_transform;
 
-    map<string, float> max_gps_seen_width;
-    map<string, float> max_gps_seen_height;
+    float max_seen_width_when_manual_enabled;
+    float max_seen_height_when_manual_enabled;
+    float min_seen_x_when_manual_enabled;
+    float min_seen_y_when_manual_enabled;
 
-    map<string, float> max_ekf_seen_width;
-    map<string, float> max_ekf_seen_height;
-
-    map<string, float> max_encoder_seen_width;
-    map<string, float> max_encoder_seen_height;
-
+    MapData* map_data;
 };
 
 }
