@@ -39,6 +39,15 @@
 	    <size>0.05 15 0.33</size>
           </box>
         </geometry>
+	<!-->Transparency must be set for rendering in vmware<!-->
+	<transparency>0.1</transparency>
+	<!-->Set the barrier colour to bright orange<!-->
+	<material>
+	  <ambient>255 131 0 1</ambient>
+	  <diffuse>255 131 0 1</diffuse>
+	  <specular>0.1 0.1 0.1 1</specular>
+	  <emissive>0 0 0 0</emissive>
+	</material>
       </visual>
      </link>
   </model>
