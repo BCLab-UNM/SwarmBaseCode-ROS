@@ -1,10 +1,12 @@
+#include <std_msgs/String.h>
+
 #include "GripperPlugin.h"
 
 using namespace gazebo;
 using namespace std;
 
 /**
- * This function is inherited from the ModelPlugin class and implemented here.
+ * This class is inherited from the ModelPlugin class and implemented here.
  * It loads all necessary data for the plugin from the provided model and SDF
  * parameters. In addition, this function sets up the two required subscribers
  * needed for ROS to communicate with the gripper for a rover.
@@ -12,6 +14,12 @@ using namespace std;
  * <p> In the event that a required XML tag is not found in the SDF file the
  * plugin will initiate an exit(1) call with extreme prejudice resulting,
  * typically, in a segmentation fault.
+ *
+ * This class has two main jobs. It passes gripper commands from ROS to the
+ * GripperManager which returns actution commands for gazebo.
+ * And this class attached and detaches targets to the gripper as needed.
+ * This is required because older versions of Gazebo do not implement gripper
+ * physics.
  *
  * @param _model The Swarmie Rover model this gripper is attached to.
  * @param _sdf   The SDF configuration file for this plugin the model.
@@ -22,6 +30,25 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   previousUpdateTime = model->GetWorld()->GetSimTime();
   previousDebugUpdateTime = model->GetWorld()->GetSimTime();
 
+  // Set values for the gripper attachment code
+  isAttached = false;
+  noContactTime = common::Time(0.0);
+  contactTime = common::Time(0.0);
+  contactThreshold = common::Time(0.0001);
+  noContactThreshold = common::Time(0.1);
+  fingerNoContactThreshold = common::Time(0.1);
+  prevHandleGraspingTime = model->GetWorld()->GetSimTime();
+  leftFingerInContact = false;
+  rightFingerInContact = false;
+  
+  // Create a ros node
+  rosNode.reset(new ros::NodeHandle(string(model->GetName()) + "_gripper"));
+  ROS_DEBUG_STREAM_COND(isDebuggingModeActive, "[Gripper Plugin : "
+    << model->GetName() << "]\n    initialize a NodeHandle for this plugin:\n"
+    << "        " << model->GetName() + "_gripper");
+
+  // Create publisher so we can send info messages to the UI
+  infoLogPublisher = rosNode->advertise<std_msgs::String>("/infoLog", 1, true);
   // print debug statements if toggled to "true" in the model SDF file
   loadDebugMode();
 
@@ -46,6 +73,11 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     << rightFingerJoint->GetName());
   // LOAD GRIPPER JOINTS - end
 
+  // Load gripper links - begin
+  // Just need the target attachment link
+  gripperAttachLink = model->GetChildLink("gripper_wrist");
+  // Load gripper links - end
+  
   // INITIALIZE GRIPPER MANAGER - begin
   PIDController::PIDSettings wristPID = loadPIDSettings("wrist");
   PIDController::PIDSettings fingerPID = loadPIDSettings("finger");
@@ -77,11 +109,6 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
       << "this plugin can be used!");
     exit(1);
   }
-
-  rosNode.reset(new ros::NodeHandle(string(model->GetName()) + "_gripper"));
-  ROS_DEBUG_STREAM_COND(isDebuggingModeActive, "[Gripper Plugin : "
-    << model->GetName() << "]\n    initialize a NodeHandle for this plugin:\n"
-    << "        " << model->GetName() + "_gripper");
 
   // SUBSCRIBE TO ROS TOPICS - begin
   string wristTopic = loadSubscriptionTopic("wristTopic");
@@ -115,6 +142,22 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     << model->GetName() << "]\n    bind queue helper function to private "
     << "thread:\n        void GripperPlugin::processRosQueue()");
 
+  // Create Gazebo node and init
+// Create Gazebo node and init
+  gazebo::transport::NodePtr gazeboNode(new gazebo::transport::Node());
+  gazeboNode->Init();
+  
+  string leftFingerContactTopic = "/gazebo/default/"+model->GetName()+"/gripper_left_finger/contacts";
+  string rightFingerContactTopic = "/gazebo/default/"+model->GetName()+"/gripper_right_finger/contacts";
+
+  
+  // Subscribe to the gripper contact gazebo topics
+  rightFingerContactsSubscriber = gazeboNode->Subscribe(rightFingerContactTopic, &GripperPlugin::rightFingerContactEventHandler, this);
+  sendInfoLogMessage("GripperPlugin subscribed to " + rightFingerContactTopic);
+  
+  leftFingerContactsSubscriber = gazeboNode->Subscribe(leftFingerContactTopic, &GripperPlugin::leftFingerContactEventHandler, this);
+  sendInfoLogMessage("GripperPlugin subscribed to " + leftFingerContactTopic);
+  
   ROS_DEBUG_STREAM_COND(isDebuggingModeActive, "[Gripper Plugin : "
     << model->GetName() << "]\n    ===== FINISHED LOADING =====");
 }
@@ -134,6 +177,9 @@ void GripperPlugin::updateWorldEventHandler() {
   if((currentTime - previousUpdateTime).Float() < updatePeriodInSeconds) {
     return;
   }
+
+  // grasp an object if conditions are met
+  handleGrasping();
 
   previousUpdateTime = currentTime;
 
@@ -447,4 +493,210 @@ PIDController::PIDSettings GripperPlugin::loadPIDSettings(string PIDTag) {
   settings.max = (float)forceLimits.y;
 
   return settings;
+}
+
+/**
+ */
+void GripperPlugin::handleGrasping() {
+
+  bool inContact = false;
+
+  // Get the amount of time that elapsed between this call and the
+  // last time we were called. This is used for the contact and no contact
+  // time calculations
+  common::Time currentTime = model->GetWorld()->GetSimTime();
+  common::Time deltaTime = (currentTime - prevHandleGraspingTime);
+  prevHandleGraspingTime = currentTime;
+  
+  // The following conditionals check to see whether we should attach the
+  // gripper to a target
+
+  // Add to finger contact timers. These values are reset to zero by the
+  // finger contact handlers whenever a contact with a targets occurs. If these
+  // timers reach the timeout threshold the target may be dropped.
+  rightFingerNoContactTime += deltaTime;
+  leftFingerNoContactTime += deltaTime;
+
+  // Check whether both fingers are in contact with a target
+  if ( rightFingerTargetLink && leftFingerTargetLink )
+      
+    // Check whether the right and left fingers are in contact with the
+    // same object
+    if (rightFingerTargetLink == leftFingerTargetLink) {
+      
+      // Check how long the fingers have been in contact with the object
+      // if longer than contactThreshold then attach
+      noContactTime = 0;
+      contactTime += deltaTime;
+      if ( contactTime > contactThreshold ) {
+        inContact = true;
+        if (!isAttached) 
+          try {
+            attach();  
+          } catch (exception &e) {
+            sendInfoLogMessage("GripperPlugin: attach() failed with: " + string(e.what()));
+          }
+      }
+    }
+  
+
+  // Check whether we should detach an existing gripper-target joint
+  // Detach whenever the attach criteria above are not met for longer
+  // than the noContactThreshold.
+  if ( !rightFingerTargetLink && !leftFingerTargetLink )
+  if (!inContact) {
+    noContactTime += deltaTime;
+    contactTime = 0;
+    if ( noContactTime > noContactThreshold) {
+      
+      // Only detach if attached
+      if (isAttached)
+        try {
+          detach();
+        } catch (exception &e) {
+          sendInfoLogMessage("GripperPlugin: detach() failed with: " + string(e.what()));
+        }
+    }
+  }
+}
+
+/**
+ */
+void GripperPlugin::attach() {
+
+  lock_guard<std::mutex> lock(attaching_mutex);
+  
+  if (!rightFingerTargetLink || !leftFingerTargetLink) throw runtime_error("NULL target link. Aborting attach.");
+
+  if (isAttached) throw runtime_error("already attached");
+
+  sendInfoLogMessage("Gripper attached to " + rightFingerTargetLink->GetName() + " after being in contact for " + to_string(contactTime.Double()));
+
+  // Create a new joint with which to connect the target and gripper
+  targetAttachJoint = model->GetWorld()->GetPhysicsEngine()->CreateJoint("revolute");
+  targetAttachJoint->SetName(model->GetName()+"_gripper_attach_joint");
+  targetAttachJoint->Load(rightFingerTargetLink, gripperAttachLink, math::Pose(rightFingerTargetLink->GetWorldPose().pos, math::Quaternion()));
+  targetAttachJoint->Attach(gripperAttachLink, rightFingerTargetLink);
+
+  // set the axis of revolution
+  math::Vector3 axis(0,0,1);
+  targetAttachJoint->SetAxis(0, axis);
+  
+  // Initialize the joint so it doesn't move too much
+  // The dynamics of the target grip can be controlled here
+  double cfm, erp; // Constrained force mixing and Error Reduction parameter
+  double dt = model->GetWorld()->GetPhysicsEngine()->GetMaxStepSize();
+  if (dt < 1e-6) dt = 1e-6;
+  double stiffness = 20000.0f;
+  double damping = 100.0f;
+  erp = stiffness*dt / (stiffness*dt + damping);
+  cfm = 1.0 / (stiffness*dt + damping);
+  targetAttachJoint->SetAttribute("erp", 0, erp);
+  targetAttachJoint->SetAttribute("cfm", 0, cfm);
+  targetAttachJoint->SetAttribute("stop_erp", 0, erp);
+  targetAttachJoint->SetAttribute("stop_cfm", 0, cfm);
+  targetAttachJoint->SetHighStop(0, 0.0);
+  targetAttachJoint->SetLowStop(0, 0.0);
+
+  //modelList.back()->SetStatic(false);
+
+  isAttached = true;
+}
+
+/**
+ */
+void GripperPlugin::detach() {
+  lock_guard<std::mutex> lock(attaching_mutex);
+  sendInfoLogMessage("Gripper detached from target after no contact for " + to_string(noContactTime.Double()));
+
+  if (!isAttached) throw runtime_error("not attached");
+  
+  isAttached = false;
+  targetAttachJoint->Detach();
+  targetAttachJoint.reset();
+}
+
+// Contact handlers are triggered by contact with the gripper fingers.
+// Finds the link that the finger is in contact with and
+// sets the class link variable for use by the handleGrasp() function.
+// Set the link pointer to NULL if the finger is not in contact
+// with a target object.
+// Since the collision involves two objects and we don't know which might
+// be a target object we have to check collision1 and collision2.
+void GripperPlugin::rightFingerContactEventHandler(ConstContactsPtr& msg){
+  if (attaching_mutex.try_lock()){
+    lock_guard<mutex> lock(attaching_mutex, adopt_lock_t());
+    
+    for(unsigned int i=0; i < msg->contact_size(); i++){
+      string name1 = msg->contact(i).collision1();
+      string name2 = msg->contact(i).collision2();
+      
+      // Parse the collision name to find the link name (approporate GetChildLink accerros not available) This is a hacky way around that.
+      string collision1ModelName = name1.substr(0, name1.find("::"));
+      string collision2ModelName = name2.substr(0, name2.find("::"));
+      
+      physics::ModelPtr modelInCollision;
+      
+      if (collision1ModelName.substr(0,2).compare("at")==0) {
+        modelInCollision = model->GetWorld()->GetModel(collision1ModelName);
+        rightFingerTargetLink = modelInCollision->GetLink("link");
+	rightFingerNoContactTime = 0.0f;
+        return;
+      } else if (collision2ModelName.substr(0,2).compare("at")==0) {
+        modelInCollision = model->GetWorld()->GetModel(collision2ModelName);
+        rightFingerTargetLink = modelInCollision->GetLink("link");
+	rightFingerNoContactTime = 0.0f;
+        return;
+      }
+    }
+    
+    if (rightFingerNoContactTime > fingerNoContactThreshold)
+      rightFingerTargetLink = NULL;
+  }
+}
+
+void GripperPlugin::leftFingerContactEventHandler(ConstContactsPtr& msg){
+  if (attaching_mutex.try_lock()){
+    lock_guard<mutex> lock(attaching_mutex, adopt_lock_t());
+    
+    for(unsigned int i=0; i < msg->contact_size(); i++){
+      string name1 = msg->contact(i).collision1();
+      string name2 = msg->contact(i).collision2();
+      physics::ModelPtr modelInCollision;
+      
+      // Parse the collision name to find the link name (approporate GetChildLink accerros not available) This is a hacky way around that.
+      string collision1ModelName = name1.substr(0, name1.find("::"));
+      string collision2ModelName = name2.substr(0, name2.find("::"));
+      
+      if (collision1ModelName.substr(0,2).compare("at")==0) {
+        modelInCollision = model->GetWorld()->GetModel(collision1ModelName);
+        leftFingerTargetLink = modelInCollision->GetLink("link");
+	leftFingerNoContactTime = 0.0f;
+        return;
+      } else if (collision2ModelName.substr(0,2).compare("at")==0) {
+        modelInCollision = model->GetWorld()->GetModel(collision2ModelName);
+        leftFingerTargetLink = modelInCollision->GetLink("link");
+	leftFingerNoContactTime = 0.0f;
+        return;
+      }
+    }
+    
+    if (leftFingerNoContactTime > fingerNoContactThreshold)
+      leftFingerTargetLink = NULL;
+  }
+}
+
+void GripperPlugin::sendInfoLogMessage(string text) {
+ std_msgs::String msg;
+ msg.data = model->GetName() + ": " + text;
+ infoLogPublisher.publish(msg);
+}
+    
+
+GripperPlugin::~GripperPlugin() {
+  
+  rosNode->shutdown(); // Shutdown the ROS node
+
+  // Stop the multi threaded ROS spinner
+  gazebo::shutdown();
 }
