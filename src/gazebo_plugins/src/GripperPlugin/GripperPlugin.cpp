@@ -38,9 +38,7 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   noContactThreshold = common::Time(0.1);
   fingerNoContactThreshold = common::Time(0.1);
   prevHandleGraspingTime = model->GetWorld()->GetSimTime();
-  leftFingerInContact = false;
-  rightFingerInContact = false;
-  
+    
   // Create a ros node
   rosNode.reset(new ros::NodeHandle(string(model->GetName()) + "_gripper"));
   ROS_DEBUG_STREAM_COND(isDebuggingModeActive, "[Gripper Plugin : "

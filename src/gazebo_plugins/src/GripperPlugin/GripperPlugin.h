@@ -136,10 +136,6 @@ namespace gazebo {
       // the gripper and some target
       bool isAttached;
 
-      // Indicators of whether the the fingers are in contact with anything
-      bool rightFingerInContact;
-      bool leftFingerInContact;
-
       // Link pointers for gripper attachment
       // There is a left and right link for the left and right fingers
       physics::LinkPtr gripperAttachLink;
@@ -149,6 +145,8 @@ namespace gazebo {
       physics::LinkPtr rightFingerTargetLink;
       physics::LinkPtr leftFingerTargetLink;
      
+      // Timers used to decide when a finger is in contact with an object
+      // These are used to smooth out the noisiness of the gazebo engine
       common::Time fingerNoContactThreshold;
       common::Time leftFingerNoContactTime;
       common::Time rightFingerNoContactTime;
