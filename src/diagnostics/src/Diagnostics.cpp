@@ -7,42 +7,67 @@
 #include <ctime> // For time()
 
 using namespace std;
+using namespace gazebo;
 
-Diagnostics::Diagnostics(std::string name) : wirelessDiags("wlan1") {
+Diagnostics::Diagnostics(std::string name) {
+
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
   diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
 
+  // Initialize the variables we use to track the simulation update rate
+  prevRealTime = common::Time(0.0);
+  prevSimTime = common::Time(0.0);
+  simRate = 0.0f;
+
   // Setup sensor check timers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
+  
+ simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
+
+  // Create Gazebo node and init
+    gazebo::transport::NodePtr newNode(new gazebo::transport::Node());
+    gazeboNode = newNode;
+    gazeboNode->Init();
+    string worldStatsTopic = "/gazebo/default/world_stats";
+    worldStatsSubscriber = gazeboNode->Subscribe(worldStatsTopic, &Diagnostics::simWorldStatsEventHandler, this);
+ 
   if ( checkIfSimulatedRover() ) {
     simulated = true;
     publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
-  } else { 
+     
+  } else {
+    try {
+    wirelessDiags.setInterface("wlan0");
+    } catch(exception &e) {
+      publishErrorLogMessage("Error setting interface name for wireless diagnostics: " + string(e.what()));
+  }
+
+
     simulated = false;
     publishInfoLogMessage("Diagnostic Package Started. Physical Rover.");
   }
 }
 
 void Diagnostics::publishDiagnosticData() {
-
-  
+  if (!simulated) {
   WirelessInfo info;
 
   // Get info about the wireless interface
   // Catch and display an error if there was an exception
   try {
-  info = wirelessDiags.getInfo();
+    info = wirelessDiags.getInfo();
   } catch( exception &e ){
     publishErrorLogMessage(e.what());
-    return;
-  }
-  
+  return;
+}
+
   std_msgs::Float32MultiArray rosMsg;
   rosMsg.data.clear();
   rosMsg.data.push_back(info.quality);
   rosMsg.data.push_back(info.bandwidthUsed);
-  diagnosticDataPublisher.publish(rosMsg);
+  diagnosticDataPublisher.publish(rosMsg);  
+  }
 }
 
 void Diagnostics::publishErrorLogMessage(std::string msg) {
@@ -87,14 +112,26 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
   checkGPS();
   checkSonar();
   checkCamera();
-  checkWireless();
-
+  
   publishDiagnosticData();
   }
 
 }
 
-void Diagnostics::checkWireless() {
+void Diagnostics::simCheckTimerEventHandler(const ros::TimerEvent& event) {
+  
+  if (simulated) {
+    std_msgs::Float32MultiArray rosMsg;
+    rosMsg.data.clear();
+    rosMsg.data.push_back(checkSimRate());
+    rosMsg.data.push_back(checkSimRate());
+    diagnosticDataPublisher.publish(rosMsg);
+  }
+  
+}
+
+float Diagnostics::checkSimRate() {
+  return simRate;
 }
 
 void Diagnostics::checkIMU() {
@@ -178,6 +215,25 @@ bool Diagnostics::checkUSBDeviceExists(uint16_t vendorID, uint16_t productID){
   return false;
 }
 
+void Diagnostics::simWorldStatsEventHandler(ConstWorldStatisticsPtr &msg) {
+  
+  const msgs::Time simTimeMsg = msg->sim_time();
+  const msgs::Time realTimeMsg = msg->real_time();
+
+  common::Time simTime(simTimeMsg.sec(), simTimeMsg.nsec());
+  common::Time realTime(realTimeMsg.sec(), realTimeMsg.nsec());
+  
+  common::Time deltaSimTime = simTime - prevSimTime;
+  common::Time deltaRealTime = realTime - prevRealTime;
+
+  publishInfoLogMessage("simCheckTimerEventHandler fired..." + to_string(deltaSimTime.Double()) + " " + to_string(deltaRealTime.Double()));
+  
+  prevSimTime = simTime;
+  prevRealTime = realTime;
+
+  simRate = (deltaSimTime.Double())/(deltaRealTime.Double());
+}
+
 // Check whether a rover model file exists with the same name as this rover name
 // if not then we should be a physcial rover. Need a better method.
 bool Diagnostics::checkIfSimulatedRover() {
@@ -189,5 +245,6 @@ bool Diagnostics::checkIfSimulatedRover() {
 }
      
 Diagnostics::~Diagnostics() {
+  gazebo::shutdown();
 }
 
