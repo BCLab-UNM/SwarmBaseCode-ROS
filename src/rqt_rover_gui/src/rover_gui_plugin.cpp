@@ -141,6 +141,8 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
+    connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
+
 
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
@@ -170,6 +172,9 @@ namespace rqt_rover_gui
 
     ui.custom_world_path_button->setDisabled(true);
     ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+
+    // Make the custom rover number combo box look greyed out to begin with
+    ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
 
     ui.tab_widget->setCurrentIndex(0);
 
@@ -1309,6 +1314,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     int n_rovers = 3;
     if (ui.final_radio_button->isChecked()) n_rovers = 6;
 
+    // If the user chose to override the number of rovers to add to the simulation read the selected value
+    if (ui.override_num_rovers_checkbox->isChecked()) n_rovers = ui.custom_num_rovers_combobox->currentText().toInt();
+
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Creating rovers");
     progress_dialog.setCancelButton(NULL); // no cancel button
@@ -1317,76 +1325,24 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
-    emit sendInfoLogMessage("Adding rover achilles...");
-    return_msg = sim_mgr.addRover("achilles", 0, 1, 0);
-    emit sendInfoLogMessage(return_msg);
+    QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
+    QPoint rover_positions[6] = {QPoint(0,1), QPoint(1,1), QPoint(1,0), QPoint(-1,0), QPoint(0,-1), QPoint(-1,-1)};
 
-    emit sendInfoLogMessage("Starting rover node for achilles...");
-    return_msg = sim_mgr.startRoverNode("achilles");
-    emit sendInfoLogMessage(return_msg);
+    // Add rovers to the simulation and start the associated ROS nodes
+    for (int i = 0; i < n_rovers; i++)
+    {
+        emit sendInfoLogMessage("Adding rover "+rovers[i]+"...");
+        return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0);
+        emit sendInfoLogMessage(return_msg);
 
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-    emit sendInfoLogMessage("Adding rover aeneas...");
-    return_msg = sim_mgr.addRover("aeneas", -1, 0, 0);
-    emit sendInfoLogMessage(return_msg);
-
-    emit sendInfoLogMessage("Starting rover node for aeneas...");
-    return_msg = sim_mgr.startRoverNode("aeneas");
-    emit sendInfoLogMessage(return_msg);
-
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-    emit sendInfoLogMessage("Adding rover ajax...");
-    return_msg = sim_mgr.addRover("ajax", 1, 0, 0);
-    emit sendInfoLogMessage(return_msg);
-
-   emit sendInfoLogMessage("Starting rover node for ajax...");
-   return_msg = sim_mgr.startRoverNode("ajax");
-   emit sendInfoLogMessage(return_msg);
-
-   progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-   if (ui.final_radio_button->isChecked())
-   {
-
-       emit sendInfoLogMessage("Adding rover diomedes...");
-       return_msg = sim_mgr.addRover("diomedes", 1, 1, 0);
-       emit sendInfoLogMessage(return_msg);
-
-       emit sendInfoLogMessage("Starting rover node for diomedes...");
-       return_msg = sim_mgr.startRoverNode("diomedes");
-       emit sendInfoLogMessage(return_msg);
-
-       progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-       emit sendInfoLogMessage("Adding rover hector...");
-       return_msg = sim_mgr.addRover("hector", -1, -1, 0);
-       emit sendInfoLogMessage(return_msg);
-
-       emit sendInfoLogMessage("Starting rover node for hector...");
-       return_msg = sim_mgr.startRoverNode("hector");
-       emit sendInfoLogMessage(return_msg);
+        emit sendInfoLogMessage("Starting rover node for "+rovers[i]+"...");
+        return_msg = sim_mgr.startRoverNode(rovers[i]);
+        emit sendInfoLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
 
-       emit sendInfoLogMessage("Adding rover paris...");
-       return_msg = sim_mgr.addRover("paris", 1, -1, 0);
-       emit sendInfoLogMessage(return_msg);
-
-       emit sendInfoLogMessage("Starting rover node for paris...");
-       return_msg = sim_mgr.startRoverNode("paris");
-       emit sendInfoLogMessage(return_msg);
-
-        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-}
    if (ui.powerlaw_distribution_radio_button->isChecked())
    {
        emit sendInfoLogMessage("Adding powerlaw distribution of targets...");
@@ -2242,6 +2198,13 @@ void RoverGUIPlugin::diagLogMessageEventHandler(const ros::MessageEvent<std_msgs
     string log_msg = msg->data;
 
     emit sendDiagLogMessage(QString::fromStdString(log_msg));
+}
+
+void RoverGUIPlugin::overrideNumRoversCheckboxToggledEventHandler(bool checked)
+{
+    ui.custom_num_rovers_combobox->setEnabled(checked);
+    if (checked) ui.custom_num_rovers_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px"); // The padding makes the item list color change work
+    else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey;");
 }
 
 // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
