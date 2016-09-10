@@ -31,6 +31,9 @@
   <property name="windowTitle">
    <string>    Rover Interface</string>
   </property>
+  <property name="toolTip">
+   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select custom target distribution&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(0, 0, 0);
 border-color: rgb(255, 255, 255);</string>
@@ -425,7 +428,7 @@ border-color: rgb(255, 255, 255);</string>
         <string>Clustered</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QRadioButton" name="custom_distribution_radio_button">
@@ -440,11 +443,17 @@ border-color: rgb(255, 255, 255);</string>
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Select a custom target distribution</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
         <string>Custom</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
