@@ -48,7 +48,8 @@ namespace gazebo {
 
       // Gazebo actuation function
       void updateWorldEventHandler();
-
+      void updateGraspedStaticTargetPose();
+      
       // ROS topic handlers
       void setWristAngleHandler(const std_msgs::Float32ConstPtr &msg);
       void setFingerAngleHandler(const std_msgs::Float32ConstPtr &msg);
@@ -140,6 +141,12 @@ namespace gazebo {
       // There is a left and right link for the left and right fingers
       physics::LinkPtr gripperAttachLink;
 
+      // The model object for the grasped target
+      physics::ModelPtr attachedTargetModel;
+
+      // A pose offset so we can move grasped static objects around
+      math::Pose attachedTargetOffset;
+      
       // These pointers are only when a finger is in contact with a target
       // object
       physics::LinkPtr rightFingerTargetLink;
