@@ -226,8 +226,6 @@ void Diagnostics::simWorldStatsEventHandler(ConstWorldStatisticsPtr &msg) {
   common::Time deltaSimTime = simTime - prevSimTime;
   common::Time deltaRealTime = realTime - prevRealTime;
 
-  publishInfoLogMessage("simCheckTimerEventHandler fired..." + to_string(deltaSimTime.Double()) + " " + to_string(deltaRealTime.Double()));
-  
   prevSimTime = simTime;
   prevRealTime = realTime;
 
