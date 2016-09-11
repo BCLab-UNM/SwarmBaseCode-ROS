@@ -31,6 +31,8 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   previousUpdateTime = model->GetWorld()->GetSimTime();
   previousDebugUpdateTime = model->GetWorld()->GetSimTime();
 
+  attachedTargetModel = NULL;
+
   // Set values for the gripper attachment code
   isAttached = false;
   noContactTime = common::Time(0.0);
@@ -180,6 +182,7 @@ void GripperPlugin::updateWorldEventHandler() {
   // grasp an object if conditions are met
   handleGrasping();
 
+  // Moves static models when grasped. Does nothing if the model is non-static
   updateGraspedStaticTargetPose();
 
   previousUpdateTime = currentTime;
@@ -573,9 +576,10 @@ void GripperPlugin::attach() {
 
   // Get the target model
   physics::ModelPtr targetModel = rightFingerTargetLink->GetModel(); // It doesn't matter whether we use the left or right target link here.
-  
+  attachedTargetModel = targetModel;
+
    // If the model is dynamic create a joint between the gripper and the target link. If the model is not static attach the model to the gripper as a static model
-  if (!targetModel->IsStatic())
+  if (!attachedTargetModel->IsStatic())
   {
   
     // Create a new joint with which to connect the target and gripper
@@ -611,25 +615,6 @@ void GripperPlugin::attach() {
       throw runtime_error(errorMsg);
      }
 
-    // Calculate where to place the attached target in relation to the gripper
-    //attachedTargetOffset = targetModel->GetWorldPose() - gripperAttachLink->GetWorldPose();
-    
-    //= targetModel->GetWorldPose().pos.y - model->GetWorldPose().pos.y;
-    // attachedTargetOffset.pos.z = targetModel->GetWorldPose().pos.z - model->GetWorldPose().pos.z;
-    
-    //model->AttachStaticModel(targetModel, attachedTargetOffset);
-    //targetModel->SetParent(gripperAttachLink);
-    // set the axis of revolution
-
-
-    /*
-    attachedTargetOffset.pos.x = targetModel->GetWorldPose().pos.x - gripperAttachLink->GetWorldPose().pos.x;
-    attachedTargetOffset.pos.y = targetModel->GetWorldPose().pos.y - gripperAttachLink->GetWorldPose().pos.y;
-    attachedTargetOffset.pos.z = targetModel->GetWorldPose().pos.z - gripperAttachLink->GetWorldPose().pos.z;
-
-    attachedTargetOffset.rot = targetModel->GetWorldPose().rot;
-    */
-    
     attachedTargetOffset = targetModel->GetWorldPose() - gripperAttachLink->GetWorldPose();
     
     attachedTargetModel = targetModel;
@@ -638,16 +623,14 @@ void GripperPlugin::attach() {
   isAttached = true;
 
   stringstream poseDebugSStr;
-  poseDebugSStr << " Pose Offset: " << attachedTargetOffset << ", Target Pose: " << targetModel->GetWorldPose() << ", Gripper Pose: " << gripperAttachLink->GetWorldPose();
 
-  sendInfoLogMessage("Gripper attempting to attach to "
+  sendInfoLogMessage("Gripper attached to "
                      + (targetModel->IsStatic() ?
                         string(" static target ") :
                         string(" dynamic target "))
                      + targetModel->GetName()
                      + " after being in contact for "
                      + to_string(contactTime.Double())
-                     + poseDebugSStr.str()
                      );
  
  
@@ -656,11 +639,16 @@ void GripperPlugin::attach() {
 /**
  */
 void GripperPlugin::detach() {
-  return;
+ 
   lock_guard<std::mutex> lock(attaching_mutex);
 
   if (!isAttached) throw runtime_error("not attached");
   
+  if (!attachedTargetModel) {
+    string errorMsg = "Attached target model is NULL";
+    throw runtime_error(errorMsg);
+  }
+
   if (!attachedTargetModel.get()){
     string errorMsg = "Model " + attachedTargetModel->GetName()  + " could not be found";
     throw runtime_error(errorMsg);
@@ -670,11 +658,23 @@ void GripperPlugin::detach() {
     targetAttachJoint->Detach();
     targetAttachJoint.reset();
   } else {
-    model->DetachStaticModel(attachedTargetModel->GetName());
+    // Drop the target to the ground
+    math::Pose p = attachedTargetModel->GetWorldPose();
+    
+    // Modify the position of the target so that its center is half the target height
+    // above the ground. This should make the bottom flush with the ground.
+    // To do: handle collisions with objects below the target when it is released.
+    p.pos.z = attachedTargetModel->GetBoundingBox().GetZLength()/2.0f;
+    attachedTargetModel->SetWorldPose(p);
   }
 
   isAttached = false;
-  sendInfoLogMessage("Gripper detached from " + attachedTargetModel->GetName() + " after no contact for " + to_string(noContactTime.Double()));
+  sendInfoLogMessage("Gripper detached from "
+		     + attachedTargetModel->IsStatic()? string("static"): string("dynamic")
+		     + " model "
+		     + attachedTargetModel->GetName() 
+		     + " after no contact for " 
+		     + to_string(noContactTime.Double()));
   attachedTargetModel = NULL;
 }
 
@@ -759,13 +759,13 @@ void GripperPlugin::updateGraspedStaticTargetPose() {
   // Is the gripper grasping something we need to move
   if (!isAttached) return;
 
+  // Make sure the attached model pointer is non NULL
+  if (!attachedTargetModel) return;
+
   // This isn't needed for non-static grasped targets
   if (!attachedTargetModel->IsStatic()) return; 
   
-  //math::Pose p = gripperAttachLink->GetWorldPose()+attachedTargetOffset;
   attachedTargetModel->SetWorldPose(attachedTargetOffset+gripperAttachLink->GetWorldPose());
-
-  cout << " Pose Offset: " << attachedTargetOffset << ", Gripper Pose: " << gripperAttachLink->GetWorldPose() << ", Target Pose: " << attachedTargetModel->GetWorldPose() << endl;
 }
 
 
