@@ -66,6 +66,7 @@ void Diagnostics::publishDiagnosticData() {
   rosMsg.data.clear();
   rosMsg.data.push_back(info.quality);
   rosMsg.data.push_back(info.bandwidthUsed);
+  rosMsg.data.push_back(-1); // Sim update rate
   diagnosticDataPublisher.publish(rosMsg);  
   }
 }
@@ -123,7 +124,8 @@ void Diagnostics::simCheckTimerEventHandler(const ros::TimerEvent& event) {
   if (simulated) {
     std_msgs::Float32MultiArray rosMsg;
     rosMsg.data.clear();
-    rosMsg.data.push_back(checkSimRate());
+    rosMsg.data.push_back(0.0f);
+ rosMsg.data.push_back(0.0f);
     rosMsg.data.push_back(checkSimRate());
     diagnosticDataPublisher.publish(rosMsg);
   }
