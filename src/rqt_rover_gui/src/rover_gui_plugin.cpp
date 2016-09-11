@@ -170,8 +170,8 @@ namespace rqt_rover_gui
 
     ui.joystick_frame->setHidden(false);
 
-    ui.custom_world_path_button->setDisabled(true);
-    ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.custom_world_path_button->setEnabled(true);
+    ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white;");
 
     // Make the custom rover number combo box look greyed out to begin with
     ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
@@ -980,7 +980,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
 
 	// Truncate to 1 digit
 	if (sim_rate_str[sim_rate_str.find(".")+1] != '0')
-	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find(".")+2,string::npos);
+	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find(".")+3,string::npos);
 	else
 	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find("."),string::npos);
 
