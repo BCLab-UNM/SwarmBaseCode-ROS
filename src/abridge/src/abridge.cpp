@@ -105,8 +105,8 @@ int main(int argc, char **argv) {
 
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     // remove artificial factor that was multiplied for simulation. this scales it back down to -1.0 to +1.0
-    linearSpeed = (message->linear.x) / 1.5;
-    turnSpeed = (message->angular.z) / 8;
+  linearSpeed = (message->linear.x); // / 1.5;
+  turnSpeed = (message->angular.z); // / 8;
     
     if (linearSpeed != 0.) {
         sprintf(moveCmd, "m,%d\n", (int) (linearSpeed * 255));
