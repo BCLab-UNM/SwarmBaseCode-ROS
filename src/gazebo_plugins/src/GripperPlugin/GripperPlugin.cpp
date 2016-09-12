@@ -271,10 +271,15 @@ void GripperPlugin::setFingerAngleHandler(const std_msgs::Float32ConstPtr& msg) 
   float fingerAngle = msg->data;
   desiredFingerAngle = fingerAngle;
 
-  // Force drop static models
+  // Force drop static models when the gripper is open
   if (isAttached)
     if (desiredFingerAngle > M_PI/2)
-      if (attachedTargetModel->IsStatic()) detach();
+      if (attachedTargetModel->IsStatic()) 
+	try { 
+	  detach(); 
+	} catch (exception &e) {
+	  sendInfoLogMessage("GripperPlugin: detach() failed with: " + string(e.what()));
+	}
 }
 
 /**
@@ -669,12 +674,11 @@ void GripperPlugin::detach() {
     // Modify the position of the target so that its center is half the target height
     // above the ground. This should make the bottom flush with the ground.
     // To do: handle collisions with objects below the target when it is released.
-    p.pos.z = 0.0f; //attachedTargetModel->GetBoundingBox().GetZLength()/2.0f;
+    p.pos.z = 0.025; //attachedTargetModel->GetBoundingBox().GetZLength()/2.0f;
     //p.rot = math::Quaternion(1,0,0,0);
     attachedTargetModel->SetWorldPose(p);
   }
 
-  isAttached = false;
   stringstream poseStream;
   poseStream << attachedTargetModel->GetWorldPose();
   sendInfoLogMessage("Gripper detached from "
@@ -684,6 +688,10 @@ void GripperPlugin::detach() {
 		     + " after no contact for " 
 		     + to_string(noContactTime.Double())
 		     + ". Target end pose: " + poseStream.str());
+
+  cout << "**********************" << poseStream.str() << endl;
+
+  isAttached = false;
   attachedTargetModel = NULL;
 }
 
@@ -768,6 +776,7 @@ void GripperPlugin::updateGraspedStaticTargetPose() {
   
   // We don't want to update the position of the target while it is being
   // detached
+  // Try the lock and do nothing if it is locked
   if (attaching_mutex.try_lock()){
     lock_guard<mutex> lock(attaching_mutex, adopt_lock_t());
     
@@ -781,6 +790,9 @@ void GripperPlugin::updateGraspedStaticTargetPose() {
     if (!attachedTargetModel->IsStatic()) return; 
     
     attachedTargetModel->SetWorldPose(attachedTargetOffset+gripperAttachLink->GetWorldPose());
+
+    
+    cout << attachedTargetModel->GetWorldPose() << endl;
  }
 }
 

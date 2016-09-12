@@ -163,8 +163,6 @@ namespace gazebo {
 
       // Make sure the attach link doesn't change while attaching to it
       std::mutex attaching_mutex;
-      
-
   };
 
   // Register this plugin with the simulator
