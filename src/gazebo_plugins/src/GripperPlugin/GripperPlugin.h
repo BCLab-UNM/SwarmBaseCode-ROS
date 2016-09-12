@@ -69,6 +69,7 @@ namespace gazebo {
       physics::JointPtr loadJoint(std::string jointTag);
       PIDController::PIDSettings loadPIDSettings(std::string PIDTag);
       void handleGrasping();
+
       void attach();
       void detach();
 
@@ -163,6 +164,10 @@ namespace gazebo {
 
       // Make sure the attach link doesn't change while attaching to it
       std::mutex attaching_mutex;
+
+      bool dropStaticTarget;
+
+      int  dropStaticTargetCounter;
   };
 
   // Register this plugin with the simulator
