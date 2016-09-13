@@ -612,7 +612,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        <rect>
         <x>30</x>
         <y>240</y>
-        <width>171</width>
+        <width>181</width>
         <height>22</height>
        </rect>
       </property>
@@ -623,7 +623,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>Override Num Rovers</string>
+       <string>Set Number of Rovers</string>
       </property>
       <property name="checked">
        <bool>false</bool>
@@ -2656,7 +2656,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="map_display_button_group"/>
   <buttongroup name="rover_control_button_group"/>
+  <buttongroup name="map_display_button_group"/>
  </buttongroups>
 </ui>
