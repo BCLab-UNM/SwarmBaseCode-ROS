@@ -678,9 +678,6 @@ void GripperPlugin::detach() {
                        + to_string(noContactTime.Double())
                        + ". Target end pose: " + poseStream.str());
     
-    cout << "**********************" << poseStream.str() << endl;
-
-
     targetAttachJoint->Detach();
     targetAttachJoint.reset();
     isAttached = false;
@@ -801,8 +798,7 @@ void GripperPlugin::updateGraspedStaticTargetPose() {
       p.rot = math::Quaternion(1,0,0,0);
       attachedTargetModel->SetWorldPose(p,true);
       attachedTargetModel->PlaceOnNearestEntityBelow();
-      cout << attachedTargetModel->GetWorldPose() << " Applied " << dropStaticTargetCounter << " times" << endl;
-      
+            
       if ( dropStaticTargetCounter++ > 100 )
       {
         isAttached = false;
@@ -810,11 +806,7 @@ void GripperPlugin::updateGraspedStaticTargetPose() {
         dropStaticTarget = false;
         dropStaticTargetCounter = 0;
       }
-      return;
     }
-
-    cout << attachedTargetModel->GetWorldPose() << endl;
-    
   }
 }
 
