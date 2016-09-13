@@ -7,6 +7,7 @@
 #include "Diagnostics.h"
 #include <string>
 #include <signal.h>
+#include <gazebo/gazebo.hh>
 
 using namespace std;
 
@@ -14,6 +15,11 @@ using namespace std;
 void sigintEventHandler(int signal);
 
 int main(int argc, char** argv) {
+
+  // For processing gazebo messages from the world stats topic.
+  // Used to gather information for simulated rovers
+  gazebo::setupClient(argc, argv);
+
   char host[128];
   gethostname(host, sizeof (host));
   std::string hostname(host);

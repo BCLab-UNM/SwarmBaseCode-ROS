@@ -31,6 +31,9 @@
   <property name="windowTitle">
    <string>    Rover Interface</string>
   </property>
+  <property name="toolTip">
+   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select custom target distribution&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(0, 0, 0);
 border-color: rgb(255, 255, 255);</string>
@@ -106,7 +109,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -425,7 +428,7 @@ border-color: rgb(255, 255, 255);</string>
         <string>Clustered</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QRadioButton" name="custom_distribution_radio_button">
@@ -440,11 +443,17 @@ border-color: rgb(255, 255, 255);</string>
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Select a custom target distribution</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
         <string>Custom</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
@@ -532,7 +541,7 @@ border-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>220</y>
+        <y>200</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -543,12 +552,15 @@ border-color: rgb(255, 255, 255);</string>
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ground Texture&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+      </property>
      </widget>
      <widget class="QComboBox" name="texture_combobox">
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>220</y>
+        <y>200</y>
         <width>131</width>
         <height>27</height>
        </rect>
@@ -591,6 +603,81 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="text">
        <string/>
       </property>
+     </widget>
+     <widget class="QCheckBox" name="override_num_rovers_checkbox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>240</y>
+        <width>171</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GPS aligned with the map output (mutually recursive with MAP)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Override Num Rovers</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="custom_num_rovers_combobox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>240</y>
+        <width>71</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>6</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -2569,7 +2656,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rover_control_button_group"/>
   <buttongroup name="map_display_button_group"/>
+  <buttongroup name="rover_control_button_group"/>
  </buttongroups>
 </ui>

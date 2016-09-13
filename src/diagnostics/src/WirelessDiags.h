@@ -19,12 +19,17 @@ class WirelessDiags {
 
 public:
 
+  WirelessDiags();
+  
   // The constructor takes the name of the interface
   // about which to provide information
-  WirelessDiags(std::string);
+  void setInterface(std::string);
 
   WirelessInfo getInfo();
 
+  // We don't want to try and get info about a network interface that doesn't exist
+  bool isInterfaceUp(std::string name);
+  
 private:
 
   float calcBitRate();

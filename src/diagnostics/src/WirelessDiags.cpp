@@ -6,18 +6,40 @@
 #include <unistd.h> // For socket close
 #include <stdexcept> // For runtime_error
 #include <linux/wireless.h> // For wifi stats 
-#include <sys/ioctl.h> // For comminication with the kernel
+#include <sys/ioctl.h> // For communication with the kernel
 #include <iostream> // For reading system info
 #include <fstream> // "
 #include <cstring> // For memset
+#include <arpa/inet.h> // For IPPROTO_IP
 
 using namespace std;
 
-WirelessDiags::WirelessDiags( string name) {
-  interfaceName = name;
+WirelessDiags::WirelessDiags() {
   prev_total_bytes = 0;
   gettimeofday(&prev_time,NULL); // Set the prevtime to be the time this object was created using the default time zone
+}
+
+void WirelessDiags::setInterface(std::string name) {
+
+  if (!isInterfaceUp(name)) throw runtime_error("No such network interface: " + name);
+  interfaceName = name;
+
   calcBitRate(); // Initialize the previous byte counts
+}
+
+
+// Check if the interface we were told to use exists
+bool WirelessDiags::isInterfaceUp(string name) {
+    struct ifreq ifr;
+    int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_IP);
+    memset(&ifr, 0, sizeof(ifr));
+    strcpy(ifr.ifr_name, name.c_str());
+    if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
+      string errorMsg = "Unable to open ioctl socket: "+ string(strerror(errno));
+      throw runtime_error(errorMsg);
+    }
+    close(sock);
+    return !!(ifr.ifr_flags & IFF_UP);
 }
 
 // Helper function to read the number of bytes sent and received over time to calculate
@@ -26,8 +48,8 @@ float WirelessDiags::calcBitRate() {
 
   // Path to the linux provided stats. These files are pointers to memory locations
   // and are not on disk.
-  string receive_bytes_stat_path = "/sys/class/net/wlan1/statistics/rx_bytes";
-  string transmit_bytes_stat_path = "/sys/class/net/wlan1/statistics/tx_bytes";
+  string receive_bytes_stat_path = "/sys/class/net/"+interfaceName+"/statistics/rx_bytes";
+  string transmit_bytes_stat_path = "/sys/class/net/"+interfaceName+"/statistics/tx_bytes";
 
   // Open, read and close the bytes received and bytes sent file pointers. 
   ifstream receive_bytes_stat, transmit_bytes_stat;

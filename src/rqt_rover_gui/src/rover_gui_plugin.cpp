@@ -141,6 +141,8 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
+    connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
+
 
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
@@ -168,8 +170,11 @@ namespace rqt_rover_gui
 
     ui.joystick_frame->setHidden(false);
 
-    ui.custom_world_path_button->setDisabled(true);
-    ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.custom_world_path_button->setEnabled(true);
+    ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white;");
+
+    // Make the custom rover number combo box look greyed out to begin with
+    ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
 
     ui.tab_widget->setCurrentIndex(0);
 
@@ -885,6 +890,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     // Read data from the message array
     int wireless_quality = static_cast<int>(msg->data[0]); // Wireless quality is an integer value
     float byte_rate = msg->data[1]; // Bandwidth used by the wireless interface
+    float sim_rate = msg->data[2]; // Simulation update rate
 
     // Convert to strings
 
@@ -948,21 +954,41 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     // We don't want the user to interact with this display item so make non-selectable
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     
-    // Change the color of the text based on the link quality. These numbers are from
-    // experience but need tuning. The raw quality value is scaled into a new range to make the colors more meaningful
-    int quality_max = 70;
-    int quality_min = 0;
-    int scaled_max = 10;
-    int scaled_min = 0;
-    int quality_range = quality_max - quality_min; // Max minus min
-    int scaled_range = scaled_max - scaled_min; // Scaled to match the experimental quality of the connection. Below 30 should be red = bad
-    int scaled_wireless_quality = (((wireless_quality - quality_min)*static_cast<float>(scaled_range))/quality_range) + scaled_min; // scale the quality to the new range
-    
-    int green = 255 * scaled_wireless_quality/static_cast<float>(scaled_range);
-    int red = 255 * (2*scaled_range - (scaled_wireless_quality))/static_cast<float>(2*scaled_range);
-    int blue = 0;
+    // Check whether there is sim update data. If so assume the diagnostic data is coming from a simulated rover.
+    // TODO: replace with a proper message type so we don't need to use in stream flags like this.
+    if ( sim_rate < 0 )
+      {
+	// Change the color of the text based on the link quality. These numbers are from
+	// experience but need tuning. The raw quality value is scaled into a new range to make the colors more meaningful
+	int quality_max = 70;
+	int quality_min = 0;
+	int scaled_max = 10;
+	int scaled_min = 0;
+	int quality_range = quality_max - quality_min; // Max minus min
+	int scaled_range = scaled_max - scaled_min; // Scaled to match the experimental quality of the connection. Below 30 should be red = bad
+	int scaled_wireless_quality = (((wireless_quality - quality_min)*static_cast<float>(scaled_range))/quality_range) + scaled_min; // scale the quality to the new range
+	
+	int green = 255 * scaled_wireless_quality/static_cast<float>(scaled_range);
+	int red = 255 * (2*scaled_range - (scaled_wireless_quality))/static_cast<float>(2*scaled_range);
+	int blue = 0;
+	
+	item->setTextColor(QColor(red, green, blue));
+      }
+    else
+      {
+	string sim_rate_str = to_string(sim_rate);
 
-    item->setTextColor(QColor(red, green, blue));
+	// Truncate to 1 digit
+	if (sim_rate_str[sim_rate_str.find(".")+1] != '0')
+	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find(".")+3,string::npos);
+	else
+	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find("."),string::npos);
+
+	item->setTextColor(QColor(255*(1-sim_rate),255*sim_rate,0));
+
+	diagnostic_display = sim_rate_str + " sim rate";
+      }
+
     item->setText(QString::fromStdString(diagnostic_display));
 }
 
@@ -1309,6 +1335,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     int n_rovers = 3;
     if (ui.final_radio_button->isChecked()) n_rovers = 6;
 
+    // If the user chose to override the number of rovers to add to the simulation read the selected value
+    if (ui.override_num_rovers_checkbox->isChecked()) n_rovers = ui.custom_num_rovers_combobox->currentText().toInt();
+
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Creating rovers");
     progress_dialog.setCancelButton(NULL); // no cancel button
@@ -1317,76 +1346,24 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.resize(500, 50);
     progress_dialog.show();
 
-    emit sendInfoLogMessage("Adding rover achilles...");
-    return_msg = sim_mgr.addRover("achilles", 0, 1, 0);
-    emit sendInfoLogMessage(return_msg);
+    QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
+    QPoint rover_positions[6] = {QPoint(0,1), QPoint(1,1), QPoint(1,0), QPoint(-1,0), QPoint(0,-1), QPoint(-1,-1)};
 
-    emit sendInfoLogMessage("Starting rover node for achilles...");
-    return_msg = sim_mgr.startRoverNode("achilles");
-    emit sendInfoLogMessage(return_msg);
+    // Add rovers to the simulation and start the associated ROS nodes
+    for (int i = 0; i < n_rovers; i++)
+    {
+        emit sendInfoLogMessage("Adding rover "+rovers[i]+"...");
+        return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0);
+        emit sendInfoLogMessage(return_msg);
 
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-    emit sendInfoLogMessage("Adding rover aeneas...");
-    return_msg = sim_mgr.addRover("aeneas", -1, 0, 0);
-    emit sendInfoLogMessage(return_msg);
-
-    emit sendInfoLogMessage("Starting rover node for aeneas...");
-    return_msg = sim_mgr.startRoverNode("aeneas");
-    emit sendInfoLogMessage(return_msg);
-
-    progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-    emit sendInfoLogMessage("Adding rover ajax...");
-    return_msg = sim_mgr.addRover("ajax", 1, 0, 0);
-    emit sendInfoLogMessage(return_msg);
-
-   emit sendInfoLogMessage("Starting rover node for ajax...");
-   return_msg = sim_mgr.startRoverNode("ajax");
-   emit sendInfoLogMessage(return_msg);
-
-   progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-   if (ui.final_radio_button->isChecked())
-   {
-
-       emit sendInfoLogMessage("Adding rover diomedes...");
-       return_msg = sim_mgr.addRover("diomedes", 1, 1, 0);
-       emit sendInfoLogMessage(return_msg);
-
-       emit sendInfoLogMessage("Starting rover node for diomedes...");
-       return_msg = sim_mgr.startRoverNode("diomedes");
-       emit sendInfoLogMessage(return_msg);
-
-       progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-       qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-       emit sendInfoLogMessage("Adding rover hector...");
-       return_msg = sim_mgr.addRover("hector", -1, -1, 0);
-       emit sendInfoLogMessage(return_msg);
-
-       emit sendInfoLogMessage("Starting rover node for hector...");
-       return_msg = sim_mgr.startRoverNode("hector");
-       emit sendInfoLogMessage(return_msg);
+        emit sendInfoLogMessage("Starting rover node for "+rovers[i]+"...");
+        return_msg = sim_mgr.startRoverNode(rovers[i]);
+        emit sendInfoLogMessage(return_msg);
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
 
-       emit sendInfoLogMessage("Adding rover paris...");
-       return_msg = sim_mgr.addRover("paris", 1, -1, 0);
-       emit sendInfoLogMessage(return_msg);
-
-       emit sendInfoLogMessage("Starting rover node for paris...");
-       return_msg = sim_mgr.startRoverNode("paris");
-       emit sendInfoLogMessage(return_msg);
-
-        progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-
-}
    if (ui.powerlaw_distribution_radio_button->isChecked())
    {
        emit sendInfoLogMessage("Adding powerlaw distribution of targets...");
@@ -2242,6 +2219,13 @@ void RoverGUIPlugin::diagLogMessageEventHandler(const ros::MessageEvent<std_msgs
     string log_msg = msg->data;
 
     emit sendDiagLogMessage(QString::fromStdString(log_msg));
+}
+
+void RoverGUIPlugin::overrideNumRoversCheckboxToggledEventHandler(bool checked)
+{
+    ui.custom_num_rovers_combobox->setEnabled(checked);
+    if (checked) ui.custom_num_rovers_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px"); // The padding makes the item list color change work
+    else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey;");
 }
 
 // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.

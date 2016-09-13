@@ -1,6 +1,10 @@
 #ifndef Diagnostics_h
 #define Diagnostics_h
 
+#include <gazebo/gazebo.hh>
+#include <gazebo/transport/transport.hh>
+#include <gazebo/msgs/msgs.hh>
+
 #include <ros/ros.h>
 
 #include "WirelessDiags.h"
@@ -22,24 +26,32 @@ public:
   void publishErrorLogMessage(std::string);
   void publishInfoLogMessage(std::string);
   
+  
   // This function sends an array of floats
   // corresponding to predefined diagnostic values 
   // to be displayed in the GUI
   // For example, the wireless signal quality.
   void publishDiagnosticData();
 
+  void simWorldStatsEventHandler(ConstWorldStatisticsPtr &msg);
+  
   std::string getHumanFriendlyTime();
   
 private:
 
   // These functions are called on a timer and check for problems with the sensors
   void sensorCheckTimerEventHandler(const ros::TimerEvent&);
+  void simCheckTimerEventHandler(const ros::TimerEvent&);
+  
+
+  // Get the rate the simulation is running for simulated rovers
+  float checkSimRate();
+  
   void checkIMU();
   void checkGPS();
   void checkSonar();
   void checkCamera();
-  void checkWireless();
-  
+    
   bool checkGPSExists();
   bool checkCameraExists();
 
@@ -61,13 +73,24 @@ private:
   
   float sensorCheckInterval = 2; // Check sensors every 2 seconds
   ros::Timer sensorCheckTimer;
+  ros::Timer simCheckTimer;
 
   // Store some state about the current health of the rover
   bool cameraConnected = true;
   bool GPSConnected = true;
   bool simulated = false;
 
+  // Simulation update rate as a fraction of real time
+  float simRate;
+  gazebo::common::Time prevSimTime;
+  gazebo::common::Time prevRealTime;
+  
+  
   WirelessDiags wirelessDiags;
+
+  // So we can get Gazebo world stats
+  gazebo::transport::NodePtr gazeboNode;
+  gazebo::transport::SubscriberPtr worldStatsSubscriber;
 };
 
 #endif // End Diagnostics_h
