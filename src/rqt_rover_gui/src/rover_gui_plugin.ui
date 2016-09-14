@@ -691,7 +691,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <rect>
        <x>80</x>
        <y>50</y>
-       <width>131</width>
+       <width>121</width>
        <height>20</height>
       </rect>
      </property>
@@ -971,22 +971,6 @@ border: 1px solid white;
       </property>
       <property name="text">
        <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_10">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>-10</y>
-        <width>81</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Ultrasound</string>
       </property>
      </widget>
     </widget>
@@ -1303,8 +1287,8 @@ border: 1px solid white;
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
-       <x>340</x>
-       <y>140</y>
+       <x>360</x>
+       <y>130</y>
        <width>31</width>
        <height>17</height>
       </rect>
@@ -1705,7 +1689,7 @@ border: 1px solid white;
       <rect>
        <x>520</x>
        <y>0</y>
-       <width>61</width>
+       <width>51</width>
        <height>17</height>
       </rect>
      </property>
@@ -1958,6 +1942,22 @@ border: 1px solid white;
       <string>Toggle Visualization</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>320</y>
+       <width>81</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Ultrasound</string>
+     </property>
+    </widget>
     <zorder>rover_image_label</zorder>
     <zorder>setup_group</zorder>
     <zorder>label_7</zorder>
@@ -1971,6 +1971,7 @@ border: 1px solid white;
     <zorder>frame_6</zorder>
     <zorder>label_17</zorder>
     <zorder>visualize_simulation_button</zorder>
+    <zorder>label_10</zorder>
    </widget>
    <widget class="QWidget" name="stats_tab">
     <attribute name="title">
