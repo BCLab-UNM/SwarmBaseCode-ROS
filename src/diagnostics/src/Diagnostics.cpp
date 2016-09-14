@@ -25,14 +25,23 @@ Diagnostics::Diagnostics(std::string name) {
   
  simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
 
-  // Create Gazebo node and init
+  if ( checkIfSimulatedRover() ) {
+    // For processing gazebo messages from the world stats topic.
+    // Used to gather information for simulated rovers
+
+    // Create fake argv and argc for the gazebo setup
+    char  arg0[] = "diagnostics";
+    char* argv[] = { &arg0[0], NULL };
+    int   argc   = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
+    gazebo::setupClient(argc, argv);
+
+    // Create Gazebo node and init
     gazebo::transport::NodePtr newNode(new gazebo::transport::Node());
     gazeboNode = newNode;
     gazeboNode->Init();
     string worldStatsTopic = "/gazebo/default/world_stats";
     worldStatsSubscriber = gazeboNode->Subscribe(worldStatsTopic, &Diagnostics::simWorldStatsEventHandler, this);
  
-  if ( checkIfSimulatedRover() ) {
     simulated = true;
     publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
   } else {
