@@ -35,17 +35,16 @@ Diagnostics::Diagnostics(std::string name) {
   if ( checkIfSimulatedRover() ) {
     simulated = true;
     publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
-     
   } else {
-    try {
-    wirelessDiags.setInterface("wlan0");
-    } catch(exception &e) {
-      publishErrorLogMessage("Error setting interface name for wireless diagnostics: " + string(e.what()));
-  }
-
-
     simulated = false;
-    publishInfoLogMessage("Diagnostic Package Started. Physical Rover.");
+    publishInfoLogMessage("Diagnostic Package Started. Physical Rover. ");
+    
+    try {       
+      string name = wirelessDiags.setInterface();
+      publishInfoLogMessage("Monitoring wireless interface " + name);
+    } catch( exception &e ) {
+      publishErrorLogMessage("Error setting interface name for wireless diagnostics: " + string(e.what()));
+    }
   }
 }
 
