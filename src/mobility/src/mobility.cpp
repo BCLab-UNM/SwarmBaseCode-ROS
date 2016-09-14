@@ -128,8 +128,8 @@ int main(int argc, char **argv) {
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
-    fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngleDisabled"), 1, true);
-    wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngleDisabled"), 1, true);
+    fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle"), 1, true);
+    wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
@@ -280,6 +280,9 @@ void setVelocity(double linearVel, double angularVel)
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
 
+        // If in manual mode do not try to automatically pick up the target
+        if (currentMode == 1) return;
+ 
 	if (message->detections.size() > 0) {
 		
 		geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
