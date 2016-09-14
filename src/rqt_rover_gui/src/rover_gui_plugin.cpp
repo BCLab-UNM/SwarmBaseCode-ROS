@@ -53,6 +53,10 @@ namespace rqt_rover_gui
     info_log_messages = "";
     diag_log_messages = "";
 
+    // Arbitrarily chosen 10000. These values should be set after experimentation.
+    max_info_log_length = 10000;
+    max_diag_log_length = 10000;
+
     joy_process = NULL;
     joystickGripperInterface = NULL;
 
@@ -1041,6 +1045,11 @@ void RoverGUIPlugin::displayDiagLogMessage(QString msg)
 
     QString new_message = msg+"<br>";
     diag_log_messages = diag_log_messages+new_message;
+
+    // Prevent the log from growning too large. Maintain a maximum specified size by removing characters from the beginning of the log
+    int overflow_size = diag_log_messages.size() - max_diag_log_length;
+    if (overflow_size > 0) diag_log_messages.remove(0, overflow_size);
+
     ui.diag_log->setText("<font color='white'>"+diag_log_messages+"</font>");
 
     QScrollBar *sb = ui.diag_log->verticalScrollBar();
@@ -1058,6 +1067,11 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
 
     QString new_message = msg+"<br>";
     info_log_messages = info_log_messages+new_message;
+
+    // Prevent the log from growning too large. Maintain a maximum specified size by removing characters from the beginning of the log
+    int overflow_size = info_log_messages.size() - max_info_log_length;
+    if (overflow_size > 0) info_log_messages.remove(0,overflow_size);
+
     ui.info_log->setText("<font color='white'>"+info_log_messages+"</font>");
 
     QScrollBar *sb = ui.info_log->verticalScrollBar();

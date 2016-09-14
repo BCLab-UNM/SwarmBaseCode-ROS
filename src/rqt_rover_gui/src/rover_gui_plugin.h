@@ -252,6 +252,10 @@ namespace rqt_rover_gui {
 
     MapData* map_data;
 
+    // Limit the length of log messages in characters to prevent slowdowns when lots of data is added
+    size_t max_info_log_length;
+    size_t max_diag_log_length;
+
   };
 } // end namespace
 
