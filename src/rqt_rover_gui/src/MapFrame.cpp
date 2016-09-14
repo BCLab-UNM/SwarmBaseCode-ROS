@@ -340,6 +340,7 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
         QPainterPath scaled_encoder_rover_path;
         for(std::vector< pair<float,float> >::iterator it = map_data->getEncoderPath(rover_to_display)->begin(); it < map_data->getEncoderPath(rover_to_display)->end(); ++it) {
+         
             pair<float,float> coordinate  = *it;
             QPoint point;
             float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
@@ -370,7 +371,9 @@ void MapFrame::paintEvent(QPaintEvent* event)
 
         // Draw a yellow circle at the current EKF estimated rover location
         painter.setPen(Qt::yellow);
-        pair<float,float> current_coordinate = map_data->getEKFPath(rover_to_display)->back();
+	pair<float,float> current_coordinate; //check if EKFPath is empty before takeing coordinates off the back
+        if(!map_data->getEKFPath(rover_to_display)->empty())
+	  current_coordinate = map_data->getEKFPath(rover_to_display)->back();
         QPoint point;
         float x = map_origin_x+((current_coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
         float y = map_origin_y+((current_coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
