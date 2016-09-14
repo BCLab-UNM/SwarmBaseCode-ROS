@@ -21,17 +21,23 @@ public:
 
   WirelessDiags();
   
-  // The constructor takes the name of the interface
+  // Sets the name of the interface
   // about which to provide information
-  void setInterface(std::string);
+  // returns the name of the wireless interface
+  std::string setInterface();
 
   WirelessInfo getInfo();
-
-  // We don't want to try and get info about a network interface that doesn't exist
-  bool isInterfaceUp(std::string name);
   
 private:
 
+
+  // We don't want to try and get info about a network interface that doesn't exist
+  bool isInterfaceUp(std::string name);
+
+  std::string findWirelessInterface();
+
+  // checks if a network interface is wireless or not
+  bool isWireless(const char* name);
   float calcBitRate();
 
   std::string interfaceName;

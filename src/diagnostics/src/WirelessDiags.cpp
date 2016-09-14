@@ -11,20 +11,28 @@
 #include <fstream> // "
 #include <cstring> // For memset
 #include <arpa/inet.h> // For IPPROTO_IP
+#include <ifaddrs.h> // For network interface struct
 
 using namespace std;
 
 WirelessDiags::WirelessDiags() {
   prev_total_bytes = 0;
   gettimeofday(&prev_time,NULL); // Set the prevtime to be the time this object was created using the default time zone
+
 }
 
-void WirelessDiags::setInterface(std::string name) {
+// Sets the diagnostics to use the first wireless interfact found
+string WirelessDiags::setInterface() {
 
-  if (!isInterfaceUp(name)) throw runtime_error("No such network interface: " + name);
+  string name = findWirelessInterface();
+
+   if (!isInterfaceUp(name)) throw runtime_error("No such network interface: " + name);
+
   interfaceName = name;
 
   calcBitRate(); // Initialize the previous byte counts
+
+  return name;
 }
 
 
@@ -40,6 +48,56 @@ bool WirelessDiags::isInterfaceUp(string name) {
     }
     close(sock);
     return !!(ifr.ifr_flags & IFF_UP);
+}
+
+string WirelessDiags::findWirelessInterface() {
+  
+  string wirelessName = "none";
+    struct ifaddrs *ifaddr, *ifa;
+    
+    // Populate the struct
+    if (getifaddrs(&ifaddr) == -1) {
+	perror("getifaddrs");
+	return "fail";
+      }
+
+    // Iterate over the network interfaces and return the first one that is wireless
+    for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
+      
+      // Interface is null or not a network interface
+      if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET) continue;
+      
+      // Check if the interface is wireless and return it's name if so
+      if (isWireless(ifa->ifa_name)) {
+	wirelessName = string(ifa->ifa_name);
+	break;
+      } 
+    }
+    
+    // Free the struct containing interface information
+    freeifaddrs(ifaddr);
+
+    return wirelessName;
+}
+
+// Code to check whether a network interface is wireless or not.
+bool WirelessDiags::isWireless(const char* name) {
+  int sock = -1;
+  struct iwreq pwrq;
+  memset(&pwrq, 0, sizeof(pwrq));
+  strncpy(pwrq.ifr_name, name, IFNAMSIZ);
+
+  // Try to open a socket to the interface
+  sock = socket(AF_INET, SOCK_STREAM, 0);
+
+  bool wireless = false;
+  
+  // Check if wireless by asking for verfification
+  // of wireless extensions (the SIOCGIWNAME directive)
+  if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1) wireless =  true;
+
+  close(sock);
+  return wireless;
 }
 
 // Helper function to read the number of bytes sent and received over time to calculate
