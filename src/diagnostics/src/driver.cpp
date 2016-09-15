@@ -16,10 +16,7 @@ void sigintEventHandler(int signal);
 
 int main(int argc, char** argv) {
 
-  // For processing gazebo messages from the world stats topic.
-  // Used to gather information for simulated rovers
-  gazebo::setupClient(argc, argv);
-
+  sleep(10);
   char host[128];
   gethostname(host, sizeof (host));
   std::string hostname(host);
