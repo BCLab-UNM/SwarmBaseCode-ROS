@@ -7,6 +7,7 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
@@ -26,6 +27,8 @@ void publishRosTopics();
 void parseData(string data);
 
 //Globals
+geometry_msgs::QuaternionStamped fingerAngle;
+geometry_msgs::QuaternionStamped wristAngle;
 sensor_msgs::Imu imu;
 nav_msgs::Odometry odom;
 sensor_msgs::Range sonarLeft;
@@ -43,6 +46,8 @@ float turnSpeed = 0.;
 const float deltaTime = 0.1;
 
 //Publishers
+ros::Publisher fingerAnglePublish;
+ros::Publisher wristAnglePublish;
 ros::Publisher imuPublish;
 ros::Publisher odomPublish;
 ros::Publisher sonarLeftPublish;
@@ -81,6 +86,8 @@ int main(int argc, char **argv) {
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
     
+    fingerAnglePublish = aNH.advertise<geometry_msgs::QuaternionStamped>((publishedName + "/fingerAngle/prev_cmd"), 10);
+    wristAnglePublish = aNH.advertise<geometry_msgs::QuaternionStamped>((publishedName + "/wristAngle/prev_cmd"), 10);
     imuPublish = aNH.advertise<sensor_msgs::Imu>((publishedName + "/imu"), 10);
     odomPublish = aNH.advertise<nav_msgs::Odometry>((publishedName + "/odom"), 10);
     sonarLeftPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarLeft"), 10);
@@ -160,6 +167,8 @@ void serialActivityTimer(const ros::TimerEvent& e) {
 }
 
 void publishRosTopics() {
+    fingerAnglePublish.publish(fingerAngle);
+    wristAnglePublish.publish(wristAngle);
     imuPublish.publish(imu);
     odomPublish.publish(odom);
     sonarLeftPublish.publish(sonarLeft);
