@@ -88,8 +88,8 @@ int main(int argc, char **argv) {
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     
     velocitySubscriber = aNH.subscribe((publishedName + "/velocity"), 10, cmdHandler);
-    fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle"), 1, fingerAngleHandler);
-    wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle"), 1, wristAngleHandler);
+    fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle/cmd"), 1, fingerAngleHandler);
+    wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle/cmd"), 1, wristAngleHandler);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
