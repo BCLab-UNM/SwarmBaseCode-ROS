@@ -178,33 +178,60 @@ void publishRosTopics() {
 
 void parseData(string str) {
     istringstream oss(str);
-    string word;
-    while (getline(oss, word, delimiter)) {
-        dataSet.push_back(word);
-    }
-    if (dataSet.size() == 18) {
-        imu.header.stamp = ros::Time::now();
-        imu.linear_acceleration.x = atof(dataSet.at(0).c_str());
-        imu.linear_acceleration.y = atof(dataSet.at(1).c_str());
-        imu.linear_acceleration.z = atof(dataSet.at(2).c_str());
-        imu.angular_velocity.x = atof(dataSet.at(3).c_str());
-        imu.angular_velocity.y = atof(dataSet.at(4).c_str());
-        imu.angular_velocity.z = atof(dataSet.at(5).c_str());
-        imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(6).c_str()), atof(dataSet.at(7).c_str()), atof(dataSet.at(8).c_str()));
-        
-        odom.header.stamp = ros::Time::now();
-        odom.pose.pose.position.x += atof(dataSet.at(9).c_str()) / 100.0;
-        odom.pose.pose.position.y += atof(dataSet.at(10).c_str()) / 100.0;
-        odom.pose.pose.position.z = 0.0;
-        odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(atof(dataSet.at(11).c_str()));
-        odom.twist.twist.linear.x = atof(dataSet.at(12).c_str()) / 100.0;
-        odom.twist.twist.linear.y = atof(dataSet.at(13).c_str()) / 100.0;
-        odom.twist.twist.angular.z = atof(dataSet.at(14).c_str());
-        
-        sonarLeft.range = atof(dataSet.at(15).c_str()) / 100.0;
-        sonarCenter.range = atof(dataSet.at(16).c_str()) / 100.0;
-        sonarRight.range = atof(dataSet.at(17).c_str()) / 100.0;
-    }
+    string sentence;
     
-    dataSet.clear();
+    while (getline(oss, sentence, '\n')) {
+		istringstream wss(sentence);
+		string word;
+
+		vector<string> dataSet;
+		while (getline(wss, word, ',')) {
+			dataSet.push_back(word);
+		}
+
+		if (dataSet.size() >= 3 && dataSet.at(1) == "1") {
+
+			if (dataSet.at(0) == "GRF") {
+				fingerAngle.header.stamp = ros::Time::now();
+				fingerAngle.quaternion = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(2).c_str()), 0.0, 0.0);
+			}
+			else if (dataSet.at(0) == "GRW") {
+				wristAngle.header.stamp = ros::Time::now();
+				wristAngle.quaternion = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(2).c_str()), 0.0, 0.0);
+			}
+			else if (dataSet.at(0) == "IMU") {
+				imu.header.stamp = ros::Time::now();
+				imu.linear_acceleration.x = atof(dataSet.at(2).c_str());
+				imu.linear_acceleration.y = atof(dataSet.at(3).c_str());
+				imu.linear_acceleration.z = atof(dataSet.at(4).c_str());
+				imu.angular_velocity.x = atof(dataSet.at(5).c_str());
+				imu.angular_velocity.y = atof(dataSet.at(6).c_str());
+				imu.angular_velocity.z = atof(dataSet.at(7).c_str());
+				imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(8).c_str()), atof(dataSet.at(9).c_str()), atof(dataSet.at(10).c_str()));
+			}
+			else if (dataSet.at(0) == "ODOM") {
+				odom.header.stamp = ros::Time::now();
+				odom.pose.pose.position.x += atof(dataSet.at(2).c_str()) / 100.0;
+				odom.pose.pose.position.y += atof(dataSet.at(3).c_str()) / 100.0;
+				odom.pose.pose.position.z = 0.0;
+				odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(atof(dataSet.at(4).c_str()));
+				odom.twist.twist.linear.x = atof(dataSet.at(5).c_str()) / 100.0;
+				odom.twist.twist.linear.y = atof(dataSet.at(6).c_str()) / 100.0;
+				odom.twist.twist.angular.z = atof(dataSet.at(7).c_str());
+			}
+			else if (dataSet.at(0) == "USL") {
+				sonarLeft.header.stamp = ros::Time::now();
+				sonarLeft.range = atof(dataSet.at(2).c_str()) / 100.0;
+			}
+			else if (dataSet.at(0) == "USC") {
+				sonarCenter.header.stamp = ros::Time::now();
+				sonarCenter.range = atof(dataSet.at(2).c_str()) / 100.0;
+			}
+			else if (dataSet.at(0) == "USR") {
+				sonarRight.header.stamp = ros::Time::now();
+				sonarRight.range = atof(dataSet.at(2).c_str()) / 100.0;
+			}
+
+		}
+	}
 }
