@@ -223,6 +223,7 @@ void Diagnostics::checkCamera() {
     if (!cameraConnected) publishInfoLogMessage("Camera reconnected");
     cameraConnected = true;
   } else {
+    if (cameraConnected)
     publishErrorLogMessage("Camera not connected");
     cameraConnected = false;
   }
