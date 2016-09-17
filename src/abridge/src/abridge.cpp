@@ -39,8 +39,6 @@ const int baud = 115200;
 char dataCmd[] = "d\n";
 char moveCmd[16];
 char host[128];
-char delimiter = ',';
-vector<string> dataSet;
 float linearSpeed = 0.;
 float turnSpeed = 0.;
 const float deltaTime = 0.1;
