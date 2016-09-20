@@ -4,6 +4,7 @@
 #include <tf/transform_datatypes.h>
 
 //ROS messages
+#include <std_msgs/Float32.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Twist.h>
@@ -18,6 +19,8 @@ using namespace std;
 
 //aBridge functions
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
+void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle);
+void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void serialActivityTimer(const ros::TimerEvent& e);
 void publishRosTopics();
 void parseData(string data);
@@ -48,6 +51,8 @@ ros::Publisher sonarRightPublish;
 
 //Subscribers
 ros::Subscriber velocitySubscriber;
+ros::Subscriber fingerAngleSubscriber;
+ros::Subscriber wristAngleSubscriber;
 
 //Timers
 ros::Timer publishTimer;
@@ -83,6 +88,8 @@ int main(int argc, char **argv) {
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     
     velocitySubscriber = aNH.subscribe((publishedName + "/velocity"), 10, cmdHandler);
+    fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle"), 1, fingerAngleHandler);
+    wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle"), 1, wristAngleHandler);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
@@ -90,7 +97,7 @@ int main(int argc, char **argv) {
     
     odom.header.frame_id = publishedName+"/odom";
     odom.child_frame_id = publishedName+"/base_link";
-    
+
     ros::spin();
     
     return EXIT_SUCCESS;
@@ -98,8 +105,8 @@ int main(int argc, char **argv) {
 
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     // remove artificial factor that was multiplied for simulation. this scales it back down to -1.0 to +1.0
-    linearSpeed = (message->linear.x) / 1.5;
-    turnSpeed = (message->angular.z) / 8;
+  linearSpeed = (message->linear.x); // / 1.5;
+  turnSpeed = (message->angular.z); // / 8;
     
     if (linearSpeed != 0.) {
         sprintf(moveCmd, "m,%d\n", (int) (linearSpeed * 255));
@@ -113,6 +120,37 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     }
     
     memset(&moveCmd, '\0', sizeof (moveCmd));
+}
+
+// The finger and wrist handlers receive gripper angle commands in floating point
+// radians, write them to a string and send that to the arduino
+// for processing.
+void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle) {
+  char cmd[16]={'\0'};
+
+  // Avoid dealing with negative exponents which confuse the conversion to string by checking if the angle is small
+  if (angle->data < 0.01) {
+    // 'f' indicates this is a finger command to the arduino
+    sprintf(cmd, "f,0\n");
+  } else {
+    sprintf(cmd, "f,%.4g\n", angle->data);
+  }
+  usb.sendData(cmd);
+  memset(&cmd, '\0', sizeof (cmd));
+}
+
+void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle) {
+    char cmd[16]={'\0'};
+
+    // Avoid dealing with negative exponents which confuse the conversion to string by checking if the angle is small
+  if (angle->data < 0.01) {
+    // 'w' indicates this is a wrist command to the arduino
+    sprintf(cmd, "w,0\n");
+  } else {
+    sprintf(cmd, "w,%.4g\n", angle->data);
+  }
+  usb.sendData(cmd);
+  memset(&cmd, '\0', sizeof (cmd));
 }
 
 void serialActivityTimer(const ros::TimerEvent& e) {

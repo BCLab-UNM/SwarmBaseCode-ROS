@@ -7,6 +7,11 @@ export GAZEBO_MODEL_PATH="$PWD/simulation/models"
 export GAZEBO_PLUGIN_PATH="$PWD/build/gazebo_plugins"
 source "$PWD/devel/setup.bash"
 echo Cleaning up ROS and Gazebo Processes
+
+#Delete the rqt cache - can take 24 hours for changes in the UI
+# to show up otherwise
+rm ~/.config/ros.org/rqt_gui.ini
+
 ./cleanup.sh
 echo Killing rosmaster
 pkill rosmaster

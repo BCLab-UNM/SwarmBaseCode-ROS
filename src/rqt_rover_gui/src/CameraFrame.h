@@ -10,11 +10,15 @@
 #ifndef CAMERAFRAME_H
 #define CAMERAFRAME_H
 
+#include <cmath>
+#include <utility>
+#include <vector>
 #include <QTime> // for frame rate
 #include <QFrame>
 #include <QImage>
 #include <QMutex>
 #include <QPainter>
+#include <QPointF>
 
 namespace rqt_rover_gui
 {
@@ -26,6 +30,8 @@ public:
     CameraFrame(QWidget *parent, Qt::WFlags = 0);
 
     void setImage(const QImage& image);
+    // four corners of tag
+    void addTarget(std::pair<double,double> c1, std::pair<double,double> c2, std::pair<double,double> c3, std::pair<double,double> c4, std::pair<double,double> center);
 
 signals:
 
@@ -45,6 +51,12 @@ private:
 
     QTime frame_rate_timer;
     int frames;
+
+    std::vector<std::pair<double, double>> target_corners_1;
+    std::vector<std::pair<double, double>> target_corners_2;
+    std::vector<std::pair<double, double>> target_corners_3;
+    std::vector<std::pair<double, double>> target_corners_4;
+    std::vector<std::pair<double, double>> target_centers;
 };
 
 }

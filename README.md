@@ -28,6 +28,19 @@ Our simulated and physical Swarmies use existing ROS plugins, external to this r
 sudo apt-get install ros-indigo-robot-localization
 ```
 
+We additionally make use of an AprilTag detection plugin to decode tags within images, as well as provide pose estimates for tag positions relative to the lens of the camera. This plugin is contained in the [apriltags_ros](http://wiki.ros.org/apriltags_ros) package, which should be installed using apt-get:
+
+```
+sudo apt-get install ros-indigo-apriltags-ros
+```
+
+Finally, our physical Swarmies use a USB camera driver, contained in the [usb_cam](http://wiki.ros.org/usb_cam) package, to interface with the built-in Logitech C170 webcam:
+
+```
+sudo apt-get install ros-indigo-usb-cam
+```
+
+
 ##### 3. Install additional Gazebo plugins
 
 Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) package, which should be installed using the apt-get package management tool:
