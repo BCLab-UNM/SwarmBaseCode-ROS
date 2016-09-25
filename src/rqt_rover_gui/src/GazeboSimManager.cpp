@@ -130,45 +130,29 @@ QString GazeboSimManager::stopRoverNode( QString rover_name )
     rover_processes[rover_name]->waitForFinished();
     rover_processes.erase(rover_name);
 
+    // Names of the nodes to kill. 
+    vector<QString> nodes;
+    nodes.push_back("APRILTAG");
+    nodes.push_back("BASE2CAM");
+    nodes.push_back("DIAGNOSTICS");
+    nodes.push_back("MAP");
+    nodes.push_back("MOBILITY");
+    nodes.push_back("NAVSAT");
+    nodes.push_back("OBSTACLE");
+    nodes.push_back("ODOM");
+
     // Kill nodes
-    QString argument = "rosnode kill "+rover_name+"_MOBILITY";
-    QProcess sh;
-    sh.start("sh", QStringList() << "-c" << argument);
-    sh.waitForFinished();
-    QString output = sh.readAll();
-    sh.close();
+    QString output = "";
+    for (int i = 0; i < nodes.size(); i++) {
+      QString argument = "rosnode kill "+rover_name+"_"+nodes[i];
+      QProcess sh;
+      sh.start("sh", QStringList() << "-c" << argument);
+      sh.waitForFinished();
+      output += "<br>" + sh.readAll();
+      sh.close();
+    }
 
-    argument = "rosnode kill "+rover_name+"_NAVSAT";
-    sh.start("sh", QStringList() << "-c" << argument);
-    sh.waitForFinished();
-    output += "<br>" + sh.readAll();
-    sh.close();
-
-    argument = "rosnode kill "+rover_name+"_TARGET";
-    sh.start("sh", QStringList() << "-c" << argument);
-    sh.waitForFinished();
-    output += "<br>" + sh.readAll();
-    sh.close();
-
-    argument = "rosnode kill "+rover_name+"_OBSTACLE";
-    sh.start("sh", QStringList() << "-c" << argument);
-    sh.waitForFinished();
-    output += "<br>" + sh.readAll();
-    sh.close();
-
-    argument = "rosnode kill "+rover_name+"_EKF";
-    sh.start("sh", QStringList() << "-c" << argument);
-    sh.waitForFinished();
-    output += "<br>" + sh.readAll();
-    sh.close();
-
-    argument = "rosnode kill "+rover_name+"_DIAGNOSTICS";
-    sh.start("sh", QStringList() << "-c" << argument);
-    sh.waitForFinished();
-    output += "<br>" + sh.readAll();
-    sh.close();
-
-    return output+"<br>rover process " + rover_name + " terminated along with <font color='green'>navsat, target, obstacle, and mobility</font> nodes";
+    return output;
 }
 
 QString GazeboSimManager::startRoverNode( QString rover_name )

@@ -212,7 +212,7 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 2. Build the workspace:
 
   ```
-  catkin clean -a
+  catkin clean --yes
   catkin build
   ```
 
