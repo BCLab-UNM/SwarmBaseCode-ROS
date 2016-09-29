@@ -38,6 +38,14 @@ QProcess* GazeboSimManager::startGazeboServer( QString path )
 {
     if (gazebo_server_process != NULL) return gazebo_server_process;
 
+    QString argument = QString("rosparam set /use_sim_time true");
+    QProcess sh;
+    sh.start("sh", QStringList() << "-c" << argument);
+
+    sh.waitForFinished();
+    QByteArray output = sh.readAll();
+    sh.close();
+
     gazebo_server_process = new QProcess();
 
     QString command = QString("rosrun gazebo_ros gzserver ") + path;
