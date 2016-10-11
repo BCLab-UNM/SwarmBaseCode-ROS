@@ -141,10 +141,10 @@
 				</inertia>
 			</inertial>
 			<collision name="collision">
-				<pose>0.215 0.018 0.01 0 0 -0.38</pose>
+				<pose>0.225 0.012 0.01 0 0 -0.2</pose>
 				<geometry>
 					<box>
-						<size>0.06 0.01 0.007</size>
+						<size>0.07 0.01 0.007</size>
 					</box>
 				</geometry>
 				<surface>
@@ -205,10 +205,10 @@
 				</inertia>
 			</inertial>
 			<collision name="collision">
-				<pose>0.215 -0.018 0.01 0 0 0.38</pose>
+				<pose>0.225 -0.012 0.01 0 0 0.2</pose>
 				<geometry>
 					<box>
-						<size>0.06 0.01 0.007</size>
+						<size>0.07 0.01 0.007</size>
 					</box>
 				</geometry>
 				<surface>
