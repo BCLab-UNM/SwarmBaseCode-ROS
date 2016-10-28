@@ -2,16 +2,56 @@
 #define SCORE_PLUGIN_H
 
 #include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/msgs/msgs.hh>
+#include <ros/ros.h>
+#include <std_msgs/String.h>
+#include <string>
+#include <thread>
 
 /**
  * This class implements a score counter which keeps track of the number of
  * tags within the nest radius.
  */
 namespace gazebo {
+
     class ScorePlugin : public ModelPlugin {
+
         public:
+
+            ~ScorePlugin();
+
             // required overloaded function from ModelPlugin class
-            void Load(gazebo::physics::ModelPtr parent, sdf::ElementPtr sdf);
+            void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf);
+
+            // Gazebo actuation function
+            void updateWorldEventHandler();
+
+        private:
+
+            std::string loadPublisherTopic();
+            void loadUpdatePeriod();
+            void updateScore();
+
+        private:
+
+            physics::Model_V modelList;
+            int score;
+
+            // time management variables
+            common::Time previousUpdateTime;
+            float updatePeriodInSeconds;
+
+            // pointers to gazebo model and xml configuration file
+            physics::ModelPtr model;
+            sdf::ElementPtr sdf;
+
+            // interface for processing ROS message queue
+            event::ConnectionPtr updateConnection;
+            std::unique_ptr<ros::NodeHandle> rosNode;
+
+           // ROS Publishers
+           ros::Publisher scorePublisher;
     };
 
     // Register this plugin with the simulator
