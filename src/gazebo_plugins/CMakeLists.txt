@@ -28,5 +28,8 @@ add_library(${PROJECT_NAME}_gripper
   src/GripperPlugin/PIDController.cpp 
   src/GripperPlugin/GripperManager.cpp)
 
+add_library(${PROJECT_NAME}_score
+  src/ScorePlugin/ScorePlugin.cpp)
+
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
