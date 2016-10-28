@@ -38,5 +38,9 @@
                 </material>
             </visual>
         </link>     
+        <plugin name="score_sim" filename="libgazebo_plugins_score.so">
+            <scoreTopic>/collectionZone/score</scoreTopic>
+            <updateRate>0.1</updateRate>
+        </plugin>
     </model>
 </sdf>
