@@ -10,6 +10,8 @@ This repository contains:
 
 - Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
+- We recommend Jason M. O'Kane's [A Gentle Introduction to ROS](https://cse.sc.edu/~jokane/agitr/) for an in-depth walkthrough.
+
 - Please consult the [git scm](https://git-scm.com/) and [git best practices](https://sethrobertson.github.io/GitBestPractices/) for guidelines on the most effective approaches to maintaining code. Teams will be expected to commit new code at least every two weeks, and ideally commit one or more times per week. Consult the [NASA Swarmathon Timeline](http://www.nasaswarmathon.com) for specifics on how often code should be committed, as well as the cutoff date for final code revision before the competition.
 
 ### Quick Start Installation Guide
@@ -212,7 +214,7 @@ Source code for Swarmathon-ROS can be found in the ```~/rover_workspace/src``` d
 2. Build the workspace:
 
   ```
-  catkin clean -a
+  catkin clean --yes
   catkin build
   ```
 
