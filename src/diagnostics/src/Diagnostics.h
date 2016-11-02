@@ -7,6 +7,11 @@
 
 #include <ros/ros.h>
 
+#include <geometry_msgs/QuaternionStamped.h>
+#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/Range.h>
+
 #include "WirelessDiags.h"
 
 // The following multiarray headers are for the diagnostics data publisher
@@ -26,6 +31,13 @@ public:
   void publishErrorLogMessage(std::string);
   void publishInfoLogMessage(std::string);
   
+  void fingerTimestampUpdate(const geometry_msgs::QuaternionStamped::ConstPtr& message);
+  void wristTimestampUpdate(const geometry_msgs::QuaternionStamped::ConstPtr& message);
+  void imuTimestampUpdate(const sensor_msgs::Imu::ConstPtr& message);
+  void odometryTimestampUpdate(const nav_msgs::Odometry::ConstPtr & message);
+  void sonarLeftTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
+  void sonarCenterTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
+  void sonarRightTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
   
   // This function sends an array of floats
   // corresponding to predefined diagnostic values 
@@ -51,6 +63,8 @@ private:
   void checkGPS();
   void checkSonar();
   void checkCamera();
+  void checkGripper();
+  void checkOdometry();
     
   bool checkGPSExists();
   bool checkCameraExists();
@@ -70,6 +84,13 @@ private:
   ros::Publisher diagnosticDataPublisher;
   std::string publishedName;
 
+  ros::Subscriber fingerAngleSubscribe;
+  ros::Subscriber wristAngleSubscribe;
+  ros::Subscriber imuSubscribe;
+  ros::Subscriber odometrySubscribe;
+  ros::Subscriber sonarLeftSubscribe;
+  ros::Subscriber sonarCenterSubscribe;
+  ros::Subscriber sonarRightSubscribe;
   
   float sensorCheckInterval = 2; // Check sensors every 2 seconds
   ros::Timer sensorCheckTimer;
@@ -79,6 +100,20 @@ private:
   bool cameraConnected = true;
   bool GPSConnected = true;
   bool simulated = false;
+  bool fingersConnected;
+  bool wristConnected;
+  bool imuConnected;
+  bool odometryConnected;
+  bool sonarLeftConnected;
+  bool sonarCenterConnected;
+  bool sonarRightConnected;
+  ros::Time fingersTimestamp;
+  ros::Time wristTimestamp;
+  ros::Time imuTimestamp;
+  ros::Time odometryTimestamp;
+  ros::Time sonarLeftTimestamp;
+  ros::Time sonarCenterTimestamp;
+  ros::Time sonarRightTimestamp;
 
   // Simulation update rate as a fraction of real time
   float simRate;

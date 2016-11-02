@@ -85,8 +85,8 @@ JoystickGripperInterface::JoystickGripperInterface(ros::NodeHandle nh, string ro
     // us to consider the user to have centered the stick
 
     // Setup the gripper angle command publishers
-    gripperWristAnglePublisher = nh.advertise<std_msgs::Float32>("/"+roverName+"/wristAngle", 10, this);
-    gripperFingerAnglePublisher = nh.advertise<std_msgs::Float32>("/"+roverName+"/fingerAngle", 10, this);
+    gripperWristAnglePublisher = nh.advertise<std_msgs::Float32>("/"+roverName+"/wristAngle/cmd", 10, this);
+    gripperFingerAnglePublisher = nh.advertise<std_msgs::Float32>("/"+roverName+"/fingerAngle/cmd", 10, this);
 
     this->roverName = roverName;
 
