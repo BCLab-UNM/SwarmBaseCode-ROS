@@ -271,7 +271,7 @@ void Diagnostics::checkGripper() {
 	// Example
 	//publishWarningLogMessage("Gripper Warning");
 
-	if (ros::Time::now() - fingersTimestamp > ros::Duration(2.0)) {
+	if (ros::Time::now() - fingersTimestamp <= ros::Duration(2.0)) {
 		if (!fingersConnected) {
 			fingersConnected = true;
 			publishInfoLogMessage("Gripper fingers connected");
@@ -282,7 +282,7 @@ void Diagnostics::checkGripper() {
 		publishErrorLogMessage("Gripper fingers are not connected");
 	}
 
-	if (ros::Time::now() - wristTimestamp > ros::Duration(2.0)) {
+	if (ros::Time::now() - wristTimestamp <= ros::Duration(2.0)) {
 		if (!wristConnected) {
 			wristConnected = true;
 			publishInfoLogMessage("Gripper wrist connected");
