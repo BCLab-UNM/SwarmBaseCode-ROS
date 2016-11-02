@@ -2,7 +2,8 @@
 
 //ROS libraries
 #include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 
 //ROS messages
 #include <std_msgs/UInt8.h>
@@ -40,9 +41,12 @@ int main(int argc, char** argv) {
     
     message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(oNH, (publishedName + "/sonarLeft"), 10);
     message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(oNH, (publishedName + "/sonarCenter"), 10);
-    message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(oNH, (publishedName + "/sonarRight"), 10);	
-    message_filters::TimeSynchronizer<sensor_msgs::Range, sensor_msgs::Range, sensor_msgs::Range> sonarSync(sonarLeftSubscriber, sonarCenterSubscriber, sonarRightSubscriber, 10);
-	sonarSync.registerCallback(boost::bind(&sonarHandler, _1, _2, _3));
+    message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(oNH, (publishedName + "/sonarRight"), 10);
+
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Range, sensor_msgs::Range, sensor_msgs::Range> sonarSyncPolicy;
+
+    message_filters::Synchronizer<sonarSyncPolicy> sonarSync(sonarSyncPolicy(10), sonarLeftSubscriber, sonarCenterSubscriber, sonarRightSubscriber);
+    sonarSync.registerCallback(boost::bind(&sonarHandler, _1, _2, _3));
 
     ros::spin();
 
