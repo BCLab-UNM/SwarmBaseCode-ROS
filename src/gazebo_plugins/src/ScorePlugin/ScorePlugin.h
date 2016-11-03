@@ -26,17 +26,23 @@ namespace gazebo {
 
             // Gazebo actuation function
             void updateWorldEventHandler();
+            void collectionZoneContactsEventHandler(ConstContactsPtr& msg);
 
-        private:
+            // For sending informational messages to the UI
+            void sendInfoLogMessage(std::string text);
 
+        private: // functions
+
+            void updateScore();
             std::string loadPublisherTopic();
             void loadUpdatePeriod();
-            void updateScore();
+            void loadCollectionZoneRadius();
 
-        private:
+        private: // variables
 
             physics::Model_V modelList;
             int score;
+            float collectionZoneRadius;
 
             // time management variables
             common::Time previousUpdateTime;
@@ -50,8 +56,9 @@ namespace gazebo {
             event::ConnectionPtr updateConnection;
             std::unique_ptr<ros::NodeHandle> rosNode;
 
-           // ROS Publishers
-           ros::Publisher scorePublisher;
+            // ROS Publishers
+            ros::Publisher scorePublisher;
+            ros::Publisher infoLogPublisher;
     };
 
     // Register this plugin with the simulator
