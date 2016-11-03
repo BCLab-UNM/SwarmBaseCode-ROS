@@ -200,7 +200,6 @@ namespace rqt_rover_gui
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
-    score_subscriber = nh.subscribe("/collectionZone/score", 10, &RoverGUIPlugin::scoreEventHandler, this);
 
   }
 
@@ -1357,6 +1356,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     emit sendInfoLogMessage("Adding collection disk...");
     float collection_disk_radius = 0.5; // meters
     sim_mgr.addModel("collection_disk", "collection_disk", 0, 0, 0, collection_disk_radius);
+    score_subscriber = nh.subscribe("/collectionZone/score", 10, &RoverGUIPlugin::scoreEventHandler, this);
 
     int n_rovers_created = 0;
     int n_rovers = 3;
