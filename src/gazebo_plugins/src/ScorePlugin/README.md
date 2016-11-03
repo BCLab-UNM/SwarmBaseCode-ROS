@@ -1,6 +1,6 @@
 # ScorePlugin README
 
-This plugin implements a Score Plugin for the NASA Swarmathon GUI. There is one required XML tags and a few optional XML tags that can be used to customize the plugin.
+This plugin implements a Score Plugin for the NASA Swarmathon GUI. There is one required XML tag and a few optional XML tags that can be used to customize the plugin.
 
 | Required XML Tag | Value  | Definition                                                       |
 |-----------------:|:------:|:-----------------------------------------------------------------|
