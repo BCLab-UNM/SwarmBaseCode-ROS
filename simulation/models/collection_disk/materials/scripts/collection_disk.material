@@ -6,9 +6,7 @@ material collection_disk/Diffuse
     {
       texture_unit
       {
-        texture collection_disk.png
-        filtering anistropic
-        max_anisotropy 16
+        texture collection_disk.png        
       }
     }
   }
