@@ -3,7 +3,9 @@
 using namespace gazebo;
 using namespace std;
 
-// required overloaded function from ModelPlugin class
+/**
+ * This function loads the plugin and initializes it from an SDF file.
+ */
 void ScorePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     score = 0;
     model = _model;
@@ -39,23 +41,27 @@ void ScorePlugin::updateWorldEventHandler() {
     previousUpdateTime = currentTime;
 
     updateScore();
+
     std_msgs::String msg;
     msg.data = std::to_string(score);
     scorePublisher.publish(msg);
 }
 
 /**
- * updates the score based on the proximity of tag models in the tagModels list.
+ * Updates the score based on the proximity of tag models in the tagModels list.
  */
 void ScorePlugin::updateScore() {
+    if(modelList.size() == 0 || modelList.size() != model->GetWorld()->GetModels().size()) {
+        modelList = model->GetWorld()->GetModels();
+    }
+
     math::Pose nestPose = model->GetWorldPose();
-    physics::Model_V m = model->GetWorld()->GetModels();
 
     score = 0;
 
-    for(unsigned int i = 0; i < m.size(); i++) {
-        if (m[i]->GetName().substr(0,2).compare("at") == 0) {
-            if(m[i]->GetWorldPose().pos.Distance(nestPose.pos) <= collectionZoneRadius) {
+    for(unsigned int i = 0; i < modelList.size(); i++) {
+        if (modelList[i]->GetName().substr(0,2).compare("at") == 0) {
+            if(modelList[i]->GetWorldPose().pos.Distance(nestPose.pos) <= collectionZoneRadius) {
                 score++;
             }
         }

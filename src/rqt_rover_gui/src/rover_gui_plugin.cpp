@@ -140,6 +140,7 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
 
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
+    connect(this, SIGNAL(updateNumberOfTagsCollected(QString)), ui.num_targets_collected_label, SLOT(setText(QString)));
 
     connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
@@ -199,7 +200,7 @@ namespace rqt_rover_gui
 
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
-
+    score_subscriber = nh.subscribe("/collectionZone/score", 10, &RoverGUIPlugin::scoreEventHandler, this);
 
   }
 
@@ -512,6 +513,18 @@ void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs
     {
         emit updateObstacleCallCount("<font color='white'>"+QString::number(++obstacle_call_count)+"</font>");
     }
+}
+
+// Takes the published score value from the ScorePlugin and updates the GUI
+void RoverGUIPlugin::scoreEventHandler(const ros::MessageEvent<const std_msgs::String> &event) {
+    const std::string& publisher_name = event.getPublisherName();
+    const ros::M_string& header = event.getConnectionHeader();
+    ros::Time receipt_time = event.getReceiptTime();
+
+    const std_msgs::StringConstPtr& msg = event.getMessage();
+    std::string tags_collected = msg->data;
+
+    emit updateNumberOfTagsCollected("<font color='white'>"+QString::fromStdString(tags_collected)+"</font>");
 }
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
@@ -1478,6 +1491,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
     obstacle_subscribers.clear();
 
+    score_subscriber.shutdown();
+
     camera_subscriber.shutdown();
 
     emit sendInfoLogMessage("Shutting down publishers...");
@@ -1503,6 +1518,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Clear the task status values
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
+    emit updateNumberOfTagsCollected("<font color='white'>0</font>");
  }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
