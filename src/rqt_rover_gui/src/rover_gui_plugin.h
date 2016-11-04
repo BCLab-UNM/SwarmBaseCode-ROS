@@ -103,7 +103,8 @@ namespace rqt_rover_gui {
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
-    void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const>& event);
+    void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const> &event);
+    void scoreEventHandler(const ros::MessageEvent<std_msgs::String const> &event);
     void diagnosticEventHandler(const ros::MessageEvent<std_msgs::Float32MultiArray const> &event);
 
     void centerUSEventHandler(const sensor_msgs::Range::ConstPtr& msg);
@@ -149,6 +150,7 @@ namespace rqt_rover_gui {
     void joystickGripperFingersOpenUpdate(double);
 
     void updateObstacleCallCount(QString text);
+    void updateNumberOfTagsCollected(QString text);
 
   private slots:
 
@@ -205,6 +207,7 @@ namespace rqt_rover_gui {
     ros::Subscriber imu_subscriber;
     ros::Subscriber info_log_subscriber;
     ros::Subscriber diag_log_subscriber;
+    ros::Subscriber score_subscriber;
 
     map<string,ros::Subscriber> status_subscribers;
     map<string,ros::Subscriber> obstacle_subscribers;

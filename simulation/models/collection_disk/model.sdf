@@ -14,7 +14,6 @@
 	  <izz>0.083</izz>
 	</inertia>
 	</inertial>
-
             <collision name ='collision'>
                 <geometry>
                     <box>
@@ -37,6 +36,22 @@
                     </script>
                 </material>
             </visual>
-        </link>     
+			<sensor name='collection_disk' type='contact'>
+			  <contact>
+			    <collision>collision</collision>
+			  </contact>
+			</sensor>
+        </link>
+		<!-- Score Plugin -->
+        <plugin name="score_sim" filename="libgazebo_plugins_score.so">
+			<!-- required: publishing topic for the collection score -->
+            <scoreTopic>/collectionZone/score</scoreTopic>
+
+			<!-- optional: the radius used for scoring (default = 0.525) -->
+			<collectionZoneRadius>0.525</collectionZoneRadius>
+
+			<!-- optional: updates per second (default = 0.2, i.e. 1 update very 5 seconds) -->
+            <updateRate>0.2</updateRate>
+        </plugin>
     </model>
 </sdf>
