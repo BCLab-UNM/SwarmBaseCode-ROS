@@ -40,8 +40,25 @@ char dataCmd[] = "d\n";
 char moveCmd[16];
 char host[128];
 float linearSpeed = 0.;
-float turnSpeed = 0.;
+float yawError = 0.;
 const float deltaTime = 0.1;
+
+
+//PID constants and arrays
+float Kpv = 0; //Proportinal Velocity
+float Kiv = 0; //Integral Velocity
+float Kdv = 0; //Derivative Velocity
+int stepV = 0; //keeps track of the point in the array for adding new error each update cycle.
+float evArray[1000]; //array of previous error for (arraySize/hz) seconds (error Velocity Array)
+float pvError = 0; //previouse velocity error
+
+float Kpy = 0; //Proportinal Yaw   
+float Kiy = 0; //Inegral Yaw
+float Kdy = 0; //Derivative Yaw
+int stepY = 0; //keeps track of the point in the array for adding new error each update cycle.
+float eyArray[1000]; //array of previous error for (arraySize/hz) seconds (error Yaw Array)
+float pyError = 0; //previouse yaw error
+
 
 //Publishers
 ros::Publisher fingerAnglePublish;
@@ -105,27 +122,156 @@ int main(int argc, char **argv) {
 
     ros::spin();
     
+    for (int i = 0; i < 1000; i++)
+    {
+    evArray[i] = 0;
+    eyArray[i] = 0;
+    }
+    
     return EXIT_SUCCESS;
 }
+
 
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     // remove artificial factor that was multiplied for simulation. this scales it back down to -1.0 to +1.0
   linearSpeed = (message->linear.x); // / 1.5;
-  turnSpeed = (message->angular.z); // / 8;
+  yawError = (message->angular.z); // / 8;
+  
+  
+  //PID Code {
+  float sat = 255; //Saturation point
+  
+  //Velocity--------------------------
+  float xVel = odom.twist.twist.linear.x;
+  float yVel = odom.twist.twist.linear.y;
+  float vel = sqrt(xVel*xVel + yVel*yVel);
+  float velError = linearSpeed - vel; //calculate the error
+  float IV = 0;
+  
+  //Propotinal
+  float PV = Kpv * velError; 
+  if (PV > sat) //limit the max and minimum output of proportinal
+  PV = sat;
+  if (PV < -sat)
+  PV= -sat;
+  
+  //Integral
+  if (velError > 1 || velError < -1) //only use integral when error is larger than presumed noise.
+  {
+    evArray[stepV] = velError; //add error into the error Array.
+    stepV++;
     
-    if (linearSpeed != 0.) {
-        sprintf(moveCmd, "m,%d\n", (int) (linearSpeed * 255));
-        usb.sendData(moveCmd);
-    } else if (turnSpeed != 0.) {
-        sprintf(moveCmd, "t,%d\n", (int) (turnSpeed * 255));
-        usb.sendData(moveCmd);
-    } else {
-        sprintf(moveCmd, "s\n");
-        usb.sendData(moveCmd);
+    if (stepV >= 1000)
+    stepV = 0;
+    
+    float sumV= 0;
+    for (int i= 0; i < 1000; i++) //sum the array to get the error over time from t = 0 to present.
+    {
+        sumV += evArray[i];
     }
     
+    IV = Kiv * sumV;
+   }  
+   
+    //anti windup                             //if PV is already commanding greater than half power dont use the integrel
+    if (fabs(IV) > sat/2 || fabs(PV) > sat/2) //reset the integral to 0 if it hits its cap of half max power
+    {
+       for (int i= 0; i < 1000; i++)
+        {
+           evArray[i] = 0;
+        }            
+        IV = 0;
+    }
+
+    float DV = 0;
+    if (!(fabs(PV) > sat/2)) 
+    {
+    //Derivative
+       DV = Kdv * (velError - pvError) * 10; //10 being the frequency of the system giving us a one second prediction base.
+    }
+    pvError = velError; //set previouse error to current error 
+    
+    float velOut = PV + IV + DV;
+    if (velOut > sat) //cap vel command
+    {
+        velOut = sat;
+    }
+    else if (velOut < -sat)
+    {
+        velOut = -sat;
+    }
+  
+    
+  //Yaw-----------------------------
+  float IY = 0;
+    
+  //Propotinal
+  float PY = Kpv * yawError; 
+  if (PY > sat) //limit the max and minimum output of proportinal
+  PY = sat;
+  if (PY < -sat)
+  PY= -sat;
+  
+  //Integral
+  if (yawError > 0.1 || yawError < -0.1) //only use integral when error is larger than presumed noise.
+  {
+    eyArray[stepY] = yawError; //add error into the error Array.
+    stepY++;
+    
+    if (stepY >= 1000)
+    stepY = 0;
+    
+    float sumY= 0;
+    for (int i= 0; i < 1000; i++) //sum the array to get the error over time from t = 0 to present.
+    {
+        sumY += eyArray[i];
+    }
+    
+    IY = Kiy * sumY;
+   } 
+   
+    //anti windup                                     //if PV is already commanding greater than half power dont use the integrel;
+    if (fabs(IY) > sat/2 || fabs(PY) > sat/2) //reset the integral to 0 if it hits its cap
+    {
+       for (int i= 0; i < 1000; i++)
+        {
+           eyArray[i] = 0;
+        }            
+        IY = 0;
+    }
+
+    float DY = 0;
+    if (!(fabs(PY) > sat/2)) 
+    {
+    //Derivative
+       DY = Kdy * (yawError - pyError) * 10; //10 being the frequency of the system giving us a one second prediction base.
+    }
+    pyError = yawError;
+    
+    float yawOut = PY + IY + DY;
+    if (yawOut > sat) //cap yaw command
+    {
+        yawOut = sat;
+    }
+    else if (yawOut < -sat)
+    {
+        yawOut = -sat;
+    }
+    // } end PID
+   
+   int left = velOut + yawOut;
+   int right = velOut - yawOut;
+   
+   if (left > sat)  {left = sat;}
+   if (left < -sat) {left = -sat;}
+   if (right > sat) {right = sat;}
+   if (right < -sat){right = -sat;}
+    
+    sprintf(moveCmd, "v,%d%d\n", left, right);
+    usb.sendData(moveCmd);    
     memset(&moveCmd, '\0', sizeof (moveCmd));
 }
+
 
 // The finger and wrist handlers receive gripper angle commands in floating point
 // radians, write them to a string and send that to the arduino
