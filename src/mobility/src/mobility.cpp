@@ -75,6 +75,8 @@ ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 ros::Timer killSwitchTimer;
 ros::Timer targetDetectedTimer;
+time_t start; //records time for delays in sequanced actions, 1 second resolution.
+float tDiff = 0;
 
 //Transforms
 tf::TransformListener *tfListener;
@@ -143,14 +145,19 @@ int main(int argc, char **argv) {
     msg.data = "Log Started";
     infoLogPublisher.publish(msg);
     ros::spin();
+start = time(0);
     
     return EXIT_SUCCESS;
 }
 
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
+    std_msgs::String msg;
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
+
+
+stateMachineState = STATE_MACHINE_ROTATE; //rotate
 
 		switch(stateMachineState) {
 			
@@ -159,7 +166,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			case STATE_MACHINE_TRANSFORM: {
 				stateMachineMsg.data = "TRANSFORMING";
 				//If angle between current and goal is significant
-				if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if error in heading is greater than0.8 radians
+				if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if error in heading is greater than 0.8 radians
 				{
 					stateMachineState = STATE_MACHINE_ROTATE; //rotate
 				}
@@ -213,7 +220,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the diffrence between current heading and desired heading.
 				
 			    if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if angle is greater than 0.8 radians rotate but dont drive forward.
-			    {
+			    {		
 					setVelocity(0.0, errorYaw); //rotate but dont drive
 					break;
 			    }

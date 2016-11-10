@@ -12,6 +12,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Range.h>
+#include <std_msgs/UInt8.h>
 
 //Package include
 #include <usbSerial.h>
@@ -39,25 +40,26 @@ const int baud = 115200;
 char dataCmd[] = "d\n";
 char moveCmd[16];
 char host[128];
-float linearSpeed = 0.;
-float yawError = 0.;
 const float deltaTime = 0.1;
+int currentMode = 0;
 
 
 //PID constants and arrays
-float Kpv = 0; //Proportinal Velocity
-float Kiv = 0; //Integral Velocity
-float Kdv = 0; //Derivative Velocity
+float linearSpeed = 0.;
+float Kpv = 40; //Proportinal Velocity
+float Kiv = 5; //Integral Velocity
+float Kdv = 5; //Derivative Velocity
 int stepV = 0; //keeps track of the point in the array for adding new error each update cycle.
 float evArray[1000]; //array of previous error for (arraySize/hz) seconds (error Velocity Array)
-float pvError = 0; //previouse velocity error
+float velError[4] = {0,0,0,0}; //contains current velocity error and error 4 steps in the past.
 
-float Kpy = 0; //Proportinal Yaw   
-float Kiy = 0; //Inegral Yaw
-float Kdy = 0; //Derivative Yaw
+float Kpy = 200; //Proportinal Yaw   
+float Kiy = 15; //Inegral Yaw
+float Kdy = 15; //Derivative Yaw
 int stepY = 0; //keeps track of the point in the array for adding new error each update cycle.
 float eyArray[1000]; //array of previous error for (arraySize/hz) seconds (error Yaw Array)
-float pyError = 0; //previouse yaw error
+float yawError[4] = {0,0,0,0}; //contains current yaw error and error 4 steps in the past.
+
 
 
 //Publishers
@@ -68,11 +70,13 @@ ros::Publisher odomPublish;
 ros::Publisher sonarLeftPublish;
 ros::Publisher sonarCenterPublish;
 ros::Publisher sonarRightPublish;
+ros::Publisher infoLogPublisher;
 
 //Subscribers
 ros::Subscriber velocitySubscriber;
 ros::Subscriber fingerAngleSubscriber;
 ros::Subscriber wristAngleSubscriber;
+ros::Subscriber modeSubscriber;
 
 //Timers
 ros::Timer publishTimer;
@@ -88,6 +92,7 @@ int main(int argc, char **argv) {
     string devicePath;
     param.param("device", devicePath, string("/dev/ttyUSB0"));
     usb.openUSBPort(devicePath, baud);
+    void modeHandler(const std_msgs::UInt8::ConstPtr& message);
     
     sleep(5);
     
@@ -108,10 +113,13 @@ int main(int argc, char **argv) {
     sonarLeftPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarLeft"), 10);
     sonarCenterPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarCenter"), 10);
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
+    infoLogPublisher = aNH.advertise<std_msgs::String>("/infoLog", 1, true);
     
     velocitySubscriber = aNH.subscribe((publishedName + "/velocity"), 10, cmdHandler);
     fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle/cmd"), 1, fingerAngleHandler);
     wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle/cmd"), 1, wristAngleHandler);
+    modeSubscriber = aNH.subscribe((publishedName + "/mode"), 1, modeHandler);
+
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     
@@ -135,30 +143,44 @@ int main(int argc, char **argv) {
 void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     // remove artificial factor that was multiplied for simulation. this scales it back down to -1.0 to +1.0
   linearSpeed = (message->linear.x); // / 1.5;
-  yawError = (message->angular.z); // / 8;
-  
-  
-  //PID Code {
-  float sat = 255; //Saturation point
-  
-  //Velocity--------------------------
+  yawError[0] = (message->angular.z); // / 8;
+
   float xVel = odom.twist.twist.linear.x;
   float yVel = odom.twist.twist.linear.y;
   float vel = sqrt(xVel*xVel + yVel*yVel);
-  float velError = linearSpeed - vel; //calculate the error
   float IV = 0;
+  float sat = 255; //Saturation point
+
+
+
+  if (currentMode == 1)
+  {
+	yawError[0] *= 255/Kpy;
+	velError[0] = linearSpeed * 255/Kpv; //scale values between -255 and 255;
+  }
+  else
+  {
+    velError[0] = linearSpeed - vel; //calculate the error
+  }
+  
+  
+  //PID Code {
+
+  
+  //Velocity--------------------------
+
   
   //Propotinal
-  float PV = Kpv * velError; 
+  float PV = Kpv * ((velError[0]+velError[1])/2); 
   if (PV > sat) //limit the max and minimum output of proportinal
   PV = sat;
   if (PV < -sat)
   PV= -sat;
   
   //Integral
-  if (velError > 1 || velError < -1) //only use integral when error is larger than presumed noise.
+  if (velError[0] > 1 || velError[0] < -1) //only use integral when error is larger than presumed noise.
   {
-    evArray[stepV] = velError; //add error into the error Array.
+    evArray[stepV] = velError[0]; //add error into the error Array.
     stepV++;
     
     if (stepV >= 1000)
@@ -187,9 +209,11 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     if (!(fabs(PV) > sat/2)) 
     {
     //Derivative
-       DV = Kdv * (velError - pvError) * 10; //10 being the frequency of the system giving us a one second prediction base.
+       DV = Kdv * ((velError[0]+velError[1])/2 - (velError[2]+velError[3])/2) * 10; //10 being the frequency of the system giving us a one second prediction base.
     }
-    pvError = velError; //set previouse error to current error 
+    velError[3] = velError[2];
+    velError[2] = velError[1];
+    velError[1] = velError[0]; //set previouse error to current error 
     
     float velOut = PV + IV + DV;
     if (velOut > sat) //cap vel command
@@ -206,16 +230,16 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float IY = 0;
     
   //Propotinal
-  float PY = Kpv * yawError; 
+  float PY = Kpy * ((yawError[0]+yawError[1])/2); 
   if (PY > sat) //limit the max and minimum output of proportinal
   PY = sat;
   if (PY < -sat)
   PY= -sat;
   
   //Integral
-  if (yawError > 0.1 || yawError < -0.1) //only use integral when error is larger than presumed noise.
+  if (yawError[0] > 0.1 || yawError[0] < -0.1) //only use integral when error is larger than presumed noise.
   {
-    eyArray[stepY] = yawError; //add error into the error Array.
+    eyArray[stepY] = yawError[0]; //add error into the error Array.
     stepY++;
     
     if (stepY >= 1000)
@@ -244,9 +268,11 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     if (!(fabs(PY) > sat/2)) 
     {
     //Derivative
-       DY = Kdy * (yawError - pyError) * 10; //10 being the frequency of the system giving us a one second prediction base.
+       DY = Kdy * ((yawError[0]+yawError[1])/2 - (yawError[2]+yawError[3])/2) * 10; //10 being the frequency of the system giving us a one second prediction base.
     }
-    pyError = yawError;
+    yawError[3] = yawError[2];
+    yawError[2] = yawError[1];
+    yawError[1] = yawError[0]; //set previouse error to current error 
     
     float yawOut = PY + IY + DY;
     if (yawOut > sat) //cap yaw command
@@ -257,17 +283,48 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     {
         yawOut = -sat;
     }
+
+    if (PV > 0)
+	if(velOut < 0) velOut = 0;
+    else if(PV < 0)
+	if(velOut > 0) velOut = 0;
+
+    if (PY > 0)
+	if(yawOut < 0) yawOut = 0;
+    else if(PY < 0)
+	if(yawOut > 0) yawOut = 0;
+
+
     // } end PID
+
+      if (currentMode == 1)
+  	{
+	yawOut = PY;
+	velOut = PV;	
+  	}
    
-   int left = velOut + yawOut;
-   int right = velOut - yawOut;
+   int left = velOut - yawOut;
+   int right = velOut + yawOut;
    
    if (left > sat)  {left = sat;}
    if (left < -sat) {left = -sat;}
    if (right > sat) {right = sat;}
    if (right < -sat){right = -sat;}
+
+   if(linearSpeed == 0 && yawError[0] == 0)
+	{
+		left = 0;
+		right = 0;
+	}
+
+
+	/*stringstream ss;
+	ss << "PY : " << PY << " PV : " << PV << " left : " << left;
+	std_msgs::String msg;
+	msg.data = ss.str();
+    	infoLogPublisher.publish(msg);*///good for tunning and bug fixing
     
-    sprintf(moveCmd, "v,%d%d\n", left, right);
+    sprintf(moveCmd, "v,%d,%d\n", left, right);
     usb.sendData(moveCmd);    
     memset(&moveCmd, '\0', sizeof (moveCmd));
 }
@@ -378,4 +435,10 @@ void parseData(string str) {
 
 		}
 	}
+}
+
+
+
+void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
+	currentMode = message->data;
 }

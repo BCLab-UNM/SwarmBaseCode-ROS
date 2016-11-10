@@ -2140,7 +2140,7 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 
             bool direction_key = true;
 
-            float speed = 0.5;
+            float speed = 1;
 
             // displayLogMessage("Key press");
 
