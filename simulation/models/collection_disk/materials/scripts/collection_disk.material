@@ -4,11 +4,12 @@ material collection_disk/Diffuse
   {
     pass
     {
+      transparent_sorting off
+      alpha_rejection greater_equal 128
+
       texture_unit
       {
         texture collection_disk.png
-        filtering anistropic
-        max_anisotropy 16
       }
     }
   }
