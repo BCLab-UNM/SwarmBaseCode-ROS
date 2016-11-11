@@ -4,11 +4,11 @@ material at0/Diffuse
   {
     pass
     {
+      transparent_sorting on
+
       texture_unit
       {
         texture atag-0.png
-        filtering anistropic
-        max_anisotropy 16
       }
     }
   }
