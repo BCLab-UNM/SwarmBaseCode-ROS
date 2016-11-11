@@ -52,6 +52,14 @@
 					<izz>0.0002</izz>
 				</inertia>
 			</inertial>
+			<collision name='collision'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.25 0.30 0.005</size>
+					</box>
+				</geometry>
+			</collision>
 			<visual name='visual'>
 				<geometry>
 					<mesh>

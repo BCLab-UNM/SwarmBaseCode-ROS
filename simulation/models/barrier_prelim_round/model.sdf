@@ -15,7 +15,7 @@
 	</inertia>
 	</inertial>
 
-     <collision name=’collision’>
+     <collision name="collision">
               <geometry>    
           <box>
 	    <size>0.05 15 0.33</size>
@@ -39,8 +39,6 @@
 	    <size>0.05 15 0.33</size>
           </box>
         </geometry>
-	<!-->Transparency must be set for rendering in vmware<!-->
-	<transparency>0.1</transparency>
 	<!-->Set the barrier colour to bright orange<!-->
 	<material>
 	  <ambient>255 131 0 1</ambient>
