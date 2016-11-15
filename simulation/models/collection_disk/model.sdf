@@ -22,7 +22,6 @@
                 </geometry>
             </collision>
             <visual name='visual'>
-		<transparency>0.1</transparency>
                 <geometry>
                     <box>
                         <size>1.0 1.0 .001</size>

@@ -1,9 +1,8 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
 	<model name="at0">
-		<static>true</static>
+		<static>false</static>
 		<link name='link'>
-			<pose>0 0 0.025 0 0 0</pose>
 			<inertial>
 				<mass>0.1</mass>
 				<inertia>
@@ -16,7 +15,6 @@
 				</inertia>
 			</inertial>
 			<visual name='visual'>
-			  <transparency>0.1</transparency>
 				<geometry>
 					<box>
 						<size>0.05 0.05 0.05</size>
@@ -31,10 +29,9 @@
 				</material>
 			</visual>
 			<collision name ='collision'>
-				<pose>0 0 -0.0125 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.05 0.05 0.025</size>
+						<size>0.05 0.05 0.05</size>
 					</box>
 				</geometry>
 				<surface>
