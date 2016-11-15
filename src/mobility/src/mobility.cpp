@@ -29,6 +29,7 @@ random_numbers::RandomNumberGenerator* rng;
 
 //Mobility Logic Functions
 void setVelocity(double linearVel, double angularVel);
+void simP(double linearVel, double angularVel);
 void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
@@ -62,6 +63,7 @@ ros::Publisher status_publisher;
 ros::Publisher fingerAnglePublish;
 ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
+ros::Publisher physVelocityPublish;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -70,11 +72,14 @@ ros::Subscriber targetSubscriber;
 ros::Subscriber obstacleSubscriber;
 ros::Subscriber odometrySubscriber;
 
+
 //Timers
 ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 ros::Timer killSwitchTimer;
 ros::Timer targetDetectedTimer;
+time_t start; //records time for delays in sequanced actions, 1 second resolution.
+float tDiff = 0;
 
 //Transforms
 tf::TransformListener *tfListener;
@@ -92,6 +97,7 @@ void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void killSwitchTimerEventHandler(const ros::TimerEvent& event);
 void targetDetectedReset(const ros::TimerEvent& event);
+
 
 int main(int argc, char **argv) {
 
@@ -131,6 +137,7 @@ int main(int argc, char **argv) {
     fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);
     wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
+    physVelocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/physVelocity"), 10);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     //killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
@@ -143,14 +150,19 @@ int main(int argc, char **argv) {
     msg.data = "Log Started";
     infoLogPublisher.publish(msg);
     ros::spin();
+start = time(0);
     
     return EXIT_SUCCESS;
 }
 
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
+    std_msgs::String msg;
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
+
+
+stateMachineState = STATE_MACHINE_ROTATE; //rotate
 
 		switch(stateMachineState) {
 			
@@ -159,7 +171,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			case STATE_MACHINE_TRANSFORM: {
 				stateMachineMsg.data = "TRANSFORMING";
 				//If angle between current and goal is significant
-				if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if error in heading is greater than0.8 radians
+				if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if error in heading is greater than 0.8 radians
 				{
 					stateMachineState = STATE_MACHINE_ROTATE; //rotate
 				}
@@ -213,7 +225,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the diffrence between current heading and desired heading.
 				
 			    if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if angle is greater than 0.8 radians rotate but dont drive forward.
-			    {
+			    {		
 					setVelocity(0.0, errorYaw); //rotate but dont drive
 					break;
 			    }
@@ -279,10 +291,15 @@ void setVelocity(double linearVel, double angularVel)
   // the rover's kill switch wont be called.
   killSwitchTimer.stop();
   killSwitchTimer.start();
+
+  physVelocity.linear.x = forward, // * 1.5;
+  physVelocity.angular.z = turn; // * 8; //scaling factor for sim; removed by aBridge node
+  physVelocityPublish.publish(physVelocity);
+
+
+
+  simP(linearVel,angularVel);
   
-  velocity.linear.x = linearVel, // * 1.5;
-  velocity.angular.z = angularVel; // * 8; //scaling factor for sim; removed by aBridge node
-  velocityPublish.publish(velocity);
 }
 
 /***********************
@@ -438,4 +455,42 @@ void sigintEventHandler(int sig)
 {
      // All the default sigint handler does is call shutdown()
      ros::shutdown();
+}
+
+void simP(double linearVel, double angularVel)
+{
+
+  int sat = 255;
+  int Kpv = 255;
+  int Kpa = 200;
+
+  //Propotinal
+  float PV = Kpv * linearVel; 
+  if (PV > sat) //limit the max and minimum output of proportinal
+  PV = sat;
+  if (PV < -sat)
+  PV= -sat;
+
+  //Propotinal
+  float PA = Kpa * angularVel; 
+  if (PA > sat) //limit the max and minimum output of proportinal
+  PA = sat;
+  if (PA < -sat)
+  PA= -sat;
+
+   float turn = PA/60;  
+   float forward = PV/255-(abs(turn)/5);
+   if (linearVel >= 0 && forward <= 0)
+   {
+   forward = 0;
+   }
+   if (linearVel <= 0 && forward >= 0)
+   {
+   forward = 0;
+   }
+
+
+  velocity.linear.x = forward, // * 1.5;
+  velocity.angular.z = turn; // * 8; //scaling factor for sim; removed by aBridge node
+  velocityPublish.publish(velocity);
 }

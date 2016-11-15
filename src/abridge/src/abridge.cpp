@@ -70,7 +70,7 @@ ros::Publisher sonarCenterPublish;
 ros::Publisher sonarRightPublish;
 
 //Subscribers
-ros::Subscriber velocitySubscriber;
+ros::Subscriber physVelocitySubscriber;
 ros::Subscriber fingerAngleSubscriber;
 ros::Subscriber wristAngleSubscriber;
 
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
     sonarCenterPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarCenter"), 10);
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     
-    velocitySubscriber = aNH.subscribe((publishedName + "/velocity"), 10, cmdHandler);
+    physVelocitySubscriber = aNH.subscribe((publishedName + "/physVelocity"), 10, cmdHandler);
     fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle/cmd"), 1, fingerAngleHandler);
     wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle/cmd"), 1, wristAngleHandler);
     
