@@ -292,9 +292,9 @@ void setVelocity(double linearVel, double angularVel)
   killSwitchTimer.stop();
   killSwitchTimer.start();
 
-  physVelocity.linear.x = forward, // * 1.5;
-  physVelocity.angular.z = turn; // * 8; //scaling factor for sim; removed by aBridge node
-  physVelocityPublish.publish(physVelocity);
+  velocity.linear.x = linearVel, // * 1.5;
+  velocity.angular.z = angularVel; // * 8; //scaling factor for sim; removed by aBridge node
+  physVelocityPublish.publish(velocity);
 
 
 
