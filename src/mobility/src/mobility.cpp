@@ -162,8 +162,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
 
-stateMachineState = STATE_MACHINE_ROTATE; //rotate
-
 		switch(stateMachineState) {
 			
 			//Select rotation or translation based on required adjustment
@@ -206,6 +204,7 @@ stateMachineState = STATE_MACHINE_ROTATE; //rotate
 				}
 				//If no targets have been detected, assign a new goal
 				else if (!targetDetected) {
+
 					//select new heading from Gaussian distribution around current heading
 					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
 					
