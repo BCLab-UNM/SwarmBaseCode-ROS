@@ -22,6 +22,7 @@
 #include <ros/ros.h>
 #include <signal.h>
 
+
 using namespace std;
 
 //Random number generator
@@ -44,11 +45,17 @@ float status_publish_interval = 5;
 float killSwitchTimeout = 10;
 bool targetDetected = false;
 bool targetCollected = false;
+bool lockTarget = false;
+bool timeOut = false;
+
+double blockDist = 0;
+double blockYawError = 0;
 
 // state machine states
 #define STATE_MACHINE_TRANSFORM	0
 #define STATE_MACHINE_ROTATE	1
 #define STATE_MACHINE_TRANSLATE	2
+#define STATE_MACHINE_PICKUP    3
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
@@ -81,6 +88,8 @@ ros::Timer targetDetectedTimer;
 time_t start; //records time for delays in sequanced actions, 1 second resolution.
 float tDiff = 0;
 
+boost::posix_time::ptime millTimer;
+
 //Transforms
 tf::TransformListener *tfListener;
 
@@ -105,11 +114,11 @@ int main(int argc, char **argv) {
     string hostname(host);
 
     rng = new random_numbers::RandomNumberGenerator(); //instantiate random number generator
-    goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
+    //goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
 
     //select initial search position 50 cm from center (0,0)
-	goalLocation.x = 0.5 * cos(goalLocation.theta);
-	goalLocation.y = 0.5 * sin(goalLocation.theta);
+	//goalLocation.x = 0.5 * cos(goalLocation.theta);
+	//goalLocation.y = 0.5 * sin(goalLocation.theta);
 
     if (argc >= 2) {
         publishedName = argv[1];
@@ -158,6 +167,7 @@ start = time(0);
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
     std_msgs::String msg;
+
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
@@ -198,6 +208,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 						
 						//reset flag
 						targetCollected = false;
+						targetDetected = false;
+						lockTarget = false;
 						
 						goalLocation.theta = rng->uniformReal(0, 2 * M_PI);
 					}
@@ -206,7 +218,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				else if (!targetDetected) {
 
 					//select new heading from Gaussian distribution around current heading
-					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+					goalLocation.theta = currentLocation.theta;//rng->gaussian(currentLocation.theta, 0.25);
 					
 					//select new position 50 cm from current location
 					goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
@@ -221,7 +233,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			//Stay in this state until angle is minimized
 			case STATE_MACHINE_ROTATE: {
 				stateMachineMsg.data = "ROTATING";
-				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the diffrence between current heading and desired heading.
+				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the diffrence between current and desired heading in radians.
 				
 			    if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.8) //if angle is greater than 0.8 radians rotate but dont drive forward.
 			    {		
@@ -240,11 +252,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			//Stay in this state until angle is at least PI/2
 			case STATE_MACHINE_TRANSLATE: {
 				stateMachineMsg.data = "TRANSLATING";
-				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the distance between current heading and desired heading.
+				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the distance between current and desired heading in radians
 				
 				//goal not yet reached drive while maintaining proper heading.
 				if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
-					setVelocity(4.0, errorYaw); //drive and turn simultaniously
+					setVelocity(0.5, errorYaw); //drive and turn simultaniously
 				}
 				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) //goal is reached but desired heading is still wrong turn only
 				{
@@ -262,6 +274,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
 				}
 			    break;
+			}
+			case STATE_MACHINE_PICKUP: {
+			//this is a blocker to prevent transform, rotate, and translate from operating
+			//however you can put any code you like in here
+			break;
 			}
 		
 			default: {
@@ -308,72 +325,140 @@ void setVelocity(double linearVel, double angularVel)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
 
         // If in manual mode do not try to automatically pick up the target
-        if (currentMode == 1) return;
+        if (currentMode == 1 || currentMode == 0) return;
+
+
+        //if this is the goal target
+	if (message->detections.size() > 0)
+	{
+	  if (message->detections[0].id == 256) {
+	    //open fingers to drop off target
+	    std_msgs::Float32 angle;
+	    angle.data = M_PI_2;
+	    fingerAnglePublish.publish(angle);
+	  }
+	}
+
  
-	if (message->detections.size() > 0) {
+	if (message->detections.size() > 0 && !targetCollected) 
+	{
+
+	targetDetected = true;
+	stateMachineState = STATE_MACHINE_PICKUP;
 		
-		geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
+		double closest = 100; //this loop selects the closest visible block to make goals for
+		int target  = 0;
+		for (int i = 0; i < message->detections.size(); i++)
+		{
+		  geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
+		  double test = hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z);
+
+		  if (closest > test)
+		   {
+		     target = i;
+		     closest = test;
+		     blockDist = hypot(tagPose.pose.position.z, tagPose.pose.position.y);
+		     blockDist = sqrt(blockDist*blockDist - 0.195*0.195);
+		     blockYawError = atan(((tagPose.pose.position.x + 0.020)/blockDist));
+		   }
+		}
+		if ( blockYawError > 10) blockYawError = 10;
+		if ( blockYawError < - 10) blockYawError = -10;
+
+
+		
+		geometry_msgs::PoseStamped tagPose = message->detections[target].pose;
 		
 		//if target is close enough
 		if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.2) {
 			//assume target has been picked up by gripper
 			targetCollected = true;
+			stateMachineState = STATE_MACHINE_TRANSFORM;
+
+			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+						
+			//set center as goal position
+			goalLocation.x = 0.0;
+			goalLocation.y = 0.0;
+
+			std_msgs::String msg;
+			stringstream ss;
+			ss << "targetCollected";
+			msg.data = ss.str();
+			infoLogPublisher.publish(msg);
 			
 			//lower wrist to avoid ultrasound sensors
 			std_msgs::Float32 angle;
-			angle.data = M_PI_2/4;
+			angle.data = M_PI_2/4.2;
 			wristAnglePublish.publish(angle);
 		}
-		
-		else {
-			tagPose.header.stamp = ros::Time(0);
-			geometry_msgs::PoseStamped odomPose;
 
-			try {
-				tfListener->waitForTransform(publishedName + "/odom", publishedName + "/camera_link", ros::Time(0), ros::Duration(1.0));
-				tfListener->transformPose(publishedName + "/odom", tagPose, odomPose);
-			}
-
-			catch(tf::TransformException& ex) {
-				ROS_INFO("Received an exception trying to transform a point from \"odom\" to \"camera_link\": %s", ex.what());
-			}
-
-			//if this is the goal target
-			if (message->detections[0].id == 256) {
-				//open fingers to drop off target
-				std_msgs::Float32 angle;
-				angle.data = M_PI_2;
-				fingerAnglePublish.publish(angle);
-			}
-
-			//Otherwise, if no target has been collected, set target pose as goal
-			else if (!targetCollected) {
-				//set goal heading
-				goalLocation.theta = atan2(odomPose.pose.position.y - currentLocation.y, odomPose.pose.position.x - currentLocation.x);
-				
-				//set goal position
-				goalLocation.x = odomPose.pose.position.x - (0.26 * cos(goalLocation.theta));
-				goalLocation.y = odomPose.pose.position.y - (0.26 * sin(goalLocation.theta));
-				
-				//set gripper
-				std_msgs::Float32 angle;
-				//open fingers
-				angle.data = M_PI_2;
-				fingerAnglePublish.publish(angle);
-				//lower wrist
-				angle.data = 0.8;
-				wristAnglePublish.publish(angle);
-				
-				//set state and timeout
-				targetDetected = true;
-				targetDetectedTimer.setPeriod(ros::Duration(5.0));
-				targetDetectedTimer.start();
-				
-				//switch to transform state to trigger return to center
-				stateMachineState = STATE_MACHINE_TRANSFORM;
-			}
+		//Otherwise, if no target has been collected, set target pose as goal
+		else if (!lockTarget) 
+		{
+		   //set gripper
+		   std_msgs::Float32 angle;
+		   //open fingers
+		   angle.data = M_PI_2;
+		   fingerAnglePublish.publish(angle);
+		   //lower wrist
+		   angle.data = 1.2;
+		   wristAnglePublish.publish(angle);
 		}
 	}
+	
+	if (targetDetected && !targetCollected)
+	{
+
+		boost::posix_time::time_duration Td = boost::posix_time::microsec_clock::local_time() - millTimer;
+
+		if (!(message->detections.size() > 0) && !lockTarget)
+		{
+		   setVelocity(-0.2,0);
+		   timeOut = true;
+		}
+		else if (blockDist > 0.2 && !lockTarget)
+		{
+		  float vel = blockDist * 0.20;
+		  if (vel < 0.08) vel = 0.08;
+		  if (vel > 0.2) vel = 0.2;
+		  setVelocity(vel,-blockYawError/2);
+		  timeOut = false;
+		}
+		else if (!lockTarget)
+		{
+		  lockTarget = true;
+		  millTimer = boost::posix_time::microsec_clock::local_time();
+		  setVelocity(0.1,0);
+		  timeOut = true;
+		}
+		else if (Td.total_milliseconds() > 1500)
+		{
+		   setVelocity(-0.25,0);
+		   std_msgs::Float32 angle;
+		   angle.data = 0;
+		   wristAnglePublish.publish(angle); //raise wrist
+		}
+		else if (Td.total_milliseconds() > 1000)
+		{
+		   setVelocity(0.0,0);
+		   std_msgs::Float32 angle;
+		   angle.data = 0;
+		   fingerAnglePublish.publish(angle); //close fingers	   
+		}
+		if (!timeOut) millTimer = boost::posix_time::microsec_clock::local_time();
+		if (Td.total_milliseconds() > 3000)
+		{
+		  targetDetected = false;
+		  lockTarget = false;
+		  stateMachineState = STATE_MACHINE_TRANSFORM;
+		  setVelocity(0.0,0);
+		}
+	
+	}
+
+
+
 }
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {

@@ -46,9 +46,10 @@ int currentMode = 0;
 
 //PID constants and arrays
 float linearSpeed = 0.;
-float Kpv = 40; //Proportinal Velocity
-float Kiv = 5; //Integral Velocity
-float Kdv = 5; //Derivative Velocity
+float Kpv = 120; //Proportinal Velocity
+float Kiv = 10; //Integral Velocity
+float Kdv = 15; //Derivative Velocity
+float velFF = 0; //velocity feed forward
 int stepV = 0; //keeps track of the point in the array for adding new error each update cycle.
 float evArray[1000]; //array of previous error for (arraySize/hz) seconds (error Velocity Array)
 float velError[4] = {0,0,0,0}; //contains current velocity error and error 4 steps in the past.
@@ -160,6 +161,12 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
   }
   else
   {
+    if (linearSpeed > 0.5) velFF = 255;
+    else if (linearSpeed > 0.4) velFF = 180;
+    else if (linearSpeed > 0.3) velFF = 120;
+    else if (linearSpeed > 0.2) velFF = 50;
+    else if (linearSpeed > 0.1) velFF = 25;
+
     velError[0] = linearSpeed - vel; //calculate the error
   }
   
@@ -178,13 +185,14 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
   PV= -sat;
   
   //Integral
-  if (velError[0] > 1 || velError[0] < -1) //only use integral when error is larger than presumed noise.
+  if (velError[0] > 0.01 || velError[0] < -0.01) //only use integral when error is larger than presumed noise.
   {
     evArray[stepV] = velError[0]; //add error into the error Array.
     stepV++;
     
     if (stepV >= 1000)
     stepV = 0;
+  }
     
     float sumV= 0;
     for (int i= 0; i < 1000; i++) //sum the array to get the error over time from t = 0 to present.
@@ -193,7 +201,7 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     }
     
     IV = Kiv * sumV;
-   }  
+     
    
     //anti windup                             //if PV is already commanding greater than half power dont use the integrel
     if (fabs(IV) > sat/2 || fabs(PV) > sat/2) //reset the integral to 0 if it hits its cap of half max power
@@ -215,7 +223,7 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     velError[2] = velError[1];
     velError[1] = velError[0]; //set previouse error to current error 
     
-    float velOut = PV + IV + DV;
+    float velOut = PV + IV + DV + velFF;
     if (velOut > sat) //cap vel command
     {
         velOut = sat;
@@ -319,10 +327,10 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
 
 
 	/*stringstream ss;
-	ss << "PY : " << PY << " PV : " << PV << " left : " << left;
+	ss << "linearSpeed : " << xVel << " error : " << velError[0] << " comSpeed : " << linearSpeed << " IV : " << IV;
 	std_msgs::String msg;
 	msg.data = ss.str();
-    	infoLogPublisher.publish(msg);*///good for tunning and bug fixing
+    	infoLogPublisher.publish(msg);//good for tunning and bug fixing*/
     
     sprintf(moveCmd, "v,%d,%d\n", left, right);
     usb.sendData(moveCmd);    
