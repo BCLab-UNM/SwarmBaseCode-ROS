@@ -115,11 +115,11 @@ int main(int argc, char **argv) {
     string hostname(host);
 
     rng = new random_numbers::RandomNumberGenerator(); //instantiate random number generator
-    //goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
+    goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
 
     //select initial search position 50 cm from center (0,0)
-	//goalLocation.x = 0.5 * cos(goalLocation.theta);
-	//goalLocation.y = 0.5 * sin(goalLocation.theta);
+	goalLocation.x = 0.5 * cos(goalLocation.theta);
+	goalLocation.y = 0.5 * sin(goalLocation.theta);
 
     if (argc >= 2) {
         publishedName = argv[1];
@@ -337,6 +337,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	    std_msgs::Float32 angle;
 	    angle.data = M_PI_2;
 	    fingerAnglePublish.publish(angle);
+	    return;
 	  }
 	}
 
@@ -381,12 +382,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 			//set center as goal position
 			goalLocation.x = 0.0;
 			goalLocation.y = 0.0;
-
-			std_msgs::String msg;
-			stringstream ss;
-			ss << "targetCollected";
-			msg.data = ss.str();
-			infoLogPublisher.publish(msg);
 			
 			//lower wrist to avoid ultrasound sensors
 			std_msgs::Float32 angle;
@@ -397,6 +392,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		//Otherwise, if no target has been collected, set target pose as goal
 		else if (!lockTarget) 
 		{
+
 		   //set gripper
 		   std_msgs::Float32 angle;
 		   //open fingers
@@ -468,12 +464,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 			//set center as goal position
 			goalLocation.x = 0.0;
 			goalLocation.y = 0.0;
-
-			std_msgs::String msg;
-			stringstream ss;
-			ss << "targetCollected";
-			msg.data = ss.str();
-			infoLogPublisher.publish(msg);
 			
 			//lower wrist to avoid ultrasound sensors
 			std_msgs::Float32 angle;
@@ -507,7 +497,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 }
 
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
-	/*if (!targetDetected && (message->data > 0)) {
+	if (!targetDetected && (message->data > 0)) {
 		//obstacle on right side
 		if (message->data == 1) {
 			//select new heading 0.2 radians to the left
@@ -526,7 +516,7 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
 		
 		//switch to transform state to trigger collision avoidance
 		stateMachineState = STATE_MACHINE_TRANSFORM;
-	}*/
+	}
 
 
 	if (message->data == 4)
@@ -622,6 +612,11 @@ void simP(double linearVel, double angularVel)
    {
    forward = 0;
    }
+   /*std_msgs::String msg;
+   stringstream ss;
+   ss << "";
+   msg.data = ss.str();
+   infoLogPublisher.publish(msg);*/
 
 
   velocity.linear.x = forward, // * 1.5;
