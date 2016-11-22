@@ -47,6 +47,7 @@ bool targetDetected = false;
 bool targetCollected = false;
 bool lockTarget = false;
 bool timeOut = false;
+bool blockBlock = false;
 
 double blockDist = 0;
 double blockYawError = 0;
@@ -256,7 +257,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				
 				//goal not yet reached drive while maintaining proper heading.
 				if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
-					setVelocity(0.5, errorYaw); //drive and turn simultaniously
+					setVelocity(0.3, errorYaw); //drive and turn simultaniously
 				}
 				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) //goal is reached but desired heading is still wrong turn only
 				{
@@ -409,48 +410,87 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	
 	if (targetDetected && !targetCollected)
 	{
+		if (!timeOut) millTimer = boost::posix_time::microsec_clock::local_time(); // millisecond time = current time if not in a counting state
 
-		boost::posix_time::time_duration Td = boost::posix_time::microsec_clock::local_time() - millTimer;
+		boost::posix_time::time_duration Td = boost::posix_time::microsec_clock::local_time() - millTimer; //diffrence between current time and millisecond time
 
-		if (!(message->detections.size() > 0) && !lockTarget)
+		if (!(message->detections.size() > 0) && !lockTarget) //if not targets detected and a target has not been locked in
 		{
-		   setVelocity(-0.2,0);
-		   timeOut = true;
+		   if(!timeOut) //if not in a counting state
+		   {
+		     setVelocity(0.0,0.0);
+		     timeOut = true;
+		   }
+		   else if (Td.total_milliseconds() > 1000 && Td.total_milliseconds() < 2500) //if in a counting state and has been counting for 1 second
+		   {
+		     setVelocity(-0.15,0.0);
+		   }
 		}
-		else if (blockDist > 0.2 && !lockTarget)
+		else if (blockDist > 0.19 && !lockTarget) //if a target is detected but not locked, and not too close.
 		{
 		  float vel = blockDist * 0.20;
-		  if (vel < 0.08) vel = 0.08;
+		  if (vel < 0.1) vel = 0.1;
 		  if (vel > 0.2) vel = 0.2;
 		  setVelocity(vel,-blockYawError/2);
 		  timeOut = false;
 		}
-		else if (!lockTarget)
+		else if (!lockTarget) //if a target hasn't been locked lock it and entert a counting state while slowly driving forward.
 		{
 		  lockTarget = true;
-		  millTimer = boost::posix_time::microsec_clock::local_time();
-		  setVelocity(0.1,0);
+		  setVelocity(0.15,0);
 		  timeOut = true;
 		}
-		else if (Td.total_milliseconds() > 1500)
+		else if (Td.total_milliseconds() > 1700) //raise the rist and start slowly drivng backwards
 		{
-		   setVelocity(-0.25,0);
+		   setVelocity(-0.15,0);
 		   std_msgs::Float32 angle;
 		   angle.data = 0;
 		   wristAnglePublish.publish(angle); //raise wrist
 		}
-		else if (Td.total_milliseconds() > 1000)
+		else if (Td.total_milliseconds() > 1200) //close the fingers and stop driving
 		{
 		   setVelocity(0.0,0);
 		   std_msgs::Float32 angle;
 		   angle.data = 0;
 		   fingerAnglePublish.publish(angle); //close fingers	   
 		}
-		if (!timeOut) millTimer = boost::posix_time::microsec_clock::local_time();
-		if (Td.total_milliseconds() > 3000)
+
+		if (Td.total_milliseconds() > 2500 && timeOut) //if enough time has pasted enter a recovery state to reattempt a pickup
+		{
+		  if (blockBlock) //if the ultrasound is blocked at less than .12 meters a block has been picked up no new pickup required
+		  {
+		     //assume target has been picked up by gripper
+			targetCollected = true;
+			stateMachineState = STATE_MACHINE_TRANSFORM;
+
+			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+						
+			//set center as goal position
+			goalLocation.x = 0.0;
+			goalLocation.y = 0.0;
+
+			std_msgs::String msg;
+			stringstream ss;
+			ss << "targetCollected";
+			msg.data = ss.str();
+			infoLogPublisher.publish(msg);
+			
+			//lower wrist to avoid ultrasound sensors
+			std_msgs::Float32 angle;
+			angle.data = M_PI_2/4.2;
+			wristAnglePublish.publish(angle);
+		  }
+		  else //recover begin looking for targets again
+		  {
+		  lockTarget = false;
+		  setVelocity(0.0,0);
+		  }
+		}
+		if (Td.total_milliseconds() > 3500 && timeOut) //if no targets are found after too long a period go back to search pattern
 		{
 		  targetDetected = false;
 		  lockTarget = false;
+		  timeOut = false;
 		  stateMachineState = STATE_MACHINE_TRANSFORM;
 		  setVelocity(0.0,0);
 		}
@@ -467,7 +507,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 }
 
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
-	if (!targetDetected && (message->data > 0)) {
+	/*if (!targetDetected && (message->data > 0)) {
 		//obstacle on right side
 		if (message->data == 1) {
 			//select new heading 0.2 radians to the left
@@ -486,7 +526,17 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
 		
 		//switch to transform state to trigger collision avoidance
 		stateMachineState = STATE_MACHINE_TRANSFORM;
+	}*/
+
+
+	if (message->data == 4)
+	{
+		blockBlock = true;
 	}
+	else
+	{
+		blockBlock = false;
+	}		
 }
 
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
@@ -563,7 +613,7 @@ void simP(double linearVel, double angularVel)
   PA= -sat;
 
    float turn = PA/60;  
-   float forward = PV/255-(abs(turn)/5);
+   float forward = PV/355-(abs(turn)/5);
    if (linearVel >= 0 && forward <= 0)
    {
    forward = 0;
