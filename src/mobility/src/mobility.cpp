@@ -39,6 +39,8 @@ void lowerWrist();  // Lower wrist to 50 degrees
 //Numeric Variables
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D goalLocation;
+geometry_msgs::Pose2D centerLocation;
+
 int currentMode = 0;
 float mobilityLoopTimeStep = 0.1; //time between the mobility loop calls
 float status_publish_interval = 5;
@@ -48,6 +50,8 @@ bool targetCollected = false;
 bool lockTarget = false;
 bool timeOut = false;
 bool blockBlock = false;
+bool centerSeen = false;
+bool dropRoute = false;
 
 double blockDist = 0;
 double blockYawError = 0;
@@ -86,7 +90,7 @@ ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 ros::Timer killSwitchTimer;
 ros::Timer targetDetectedTimer;
-time_t start; //records time for delays in sequanced actions, 1 second resolution.
+time_t startupDelay; //records time for delays in sequanced actions, 1 second resolution.
 float tDiff = 0;
 
 boost::posix_time::ptime millTimer;
@@ -120,6 +124,9 @@ int main(int argc, char **argv) {
     //select initial search position 50 cm from center (0,0)
 	goalLocation.x = 0.5 * cos(goalLocation.theta);
 	goalLocation.y = 0.5 * sin(goalLocation.theta);
+
+        centerLocation.x = 0;
+        centerLocation.y = 0;
 
     if (argc >= 2) {
         publishedName = argv[1];
@@ -160,7 +167,7 @@ int main(int argc, char **argv) {
     msg.data = "Log Started";
     infoLogPublisher.publish(msg);
     ros::spin();
-start = time(0);
+    startupDelay = time(0);
     
     return EXIT_SUCCESS;
 }
@@ -172,10 +179,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
+    tDiff = time(0) - startupDelay;
 
 		switch(stateMachineState) {
 			
 			//Select rotation or translation based on required adjustment
+   
 			//If no adjustment needed, select new goal
 			case STATE_MACHINE_TRANSFORM: {
 				stateMachineMsg.data = "TRANSFORMING";
@@ -190,18 +199,19 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
 				//If returning with a target
-				else if (targetCollected) {
+				else if (targetCollected && !centerSeen) {
 					//If goal has not yet been reached
 					if (hypot(0.0 - currentLocation.x, 0.0 - currentLocation.y) > 0.5) {
 				        //set angle to center as goal heading
 						goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
 						
 						//set center as goal position
-						goalLocation.x = 0.0;
-						goalLocation.y = 0.0;
+						goalLocation.x = centerLocation.x;
+						goalLocation.y = centerLocation.y;
 					}
 					//Otherwise, drop off target and select new random uniform heading
-					else {
+					else if(dropRoute)
+					{
 						//open fingers
 						std_msgs::Float32 angle;
 						angle.data = M_PI_2;
@@ -211,12 +221,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 						targetCollected = false;
 						targetDetected = false;
 						lockTarget = false;
+						dropRoute = false;
+						startupDelay = time(0);
 						
-						goalLocation.theta = rng->uniformReal(0, 2 * M_PI);
+						setVelocity(-0.3,0.0);
 					}
 				}
 				//If no targets have been detected, assign a new goal
-				else if (!targetDetected) {
+				else if (!targetDetected && tDiff > 10) {
 
 					//select new heading from Gaussian distribution around current heading
 					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
@@ -331,27 +343,57 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
 
         //if this is the goal target
-	if (message->detections.size() > 0)
+	if (message->detections.size() > 0 && !dropRoute)
 	{
-	  if (message->detections[0].id == 256) {
-	    //open fingers to drop off target
-	    std_msgs::Float32 angle;
-	    angle.data = M_PI_2;
-	    fingerAnglePublish.publish(angle);
-	    return;
+	  double avAngle = 0;
+	  double count = 0;
+	  geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
+	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the average location of all the center tags
+	  {
+       	    if (message->detections[i].id == 256) 
+       	    {
+	     tagPose = message->detections[i].pose;
+             centerSeen = true;
+	     count++;
+             avAngle += atan((tagPose.pose.position.x + 0.020)/hypot(tagPose.pose.position.z, tagPose.pose.position.y));
+	    }
+	  }
+	  if (centerSeen && targetCollected)
+	  {
+		if ( avAngle > 15) avAngle = 15;
+		if ( avAngle < - 15) avAngle = -15;
+                setVelocity(0.2, avAngle);
+
+		if (count > 10)
+		{
+	           dropRoute = true; //enter drop of routine
+		   centerSeen = false;
+                   //select new heading from current Heading and direction to center.
+		   goalLocation.theta = currentLocation.theta + avAngle;
+					
+		   //select new position 50 cm from current location
+		   goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
+		   goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
+                   
+		}
+		
 	  }
 	}
-
+	     //open fingers to drop off target
+	     std_msgs::Float32 angle;
+	     angle.data = M_PI_2;
+	     fingerAnglePublish.publish(angle);
+	     return;
  
-	if (message->detections.size() > 0 && !targetCollected) 
+	if (message->detections.size() > 0 && !targetCollected && tDiff > 10) 
 	{
 
 	targetDetected = true;
 	stateMachineState = STATE_MACHINE_PICKUP;
 		
-		double closest = 100; //this loop selects the closest visible block to make goals for
+		double closest = 100; 
 		int target  = 0;
-		for (int i = 0; i < message->detections.size(); i++)
+		for (int i = 0; i < message->detections.size(); i++) //this loop selects the closest visible block to make goals for
 		{
 		  geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
 		  double test = hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z);
@@ -362,7 +404,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		     closest = test;
 		     blockDist = hypot(tagPose.pose.position.z, tagPose.pose.position.y);
 		     blockDist = sqrt(blockDist*blockDist - 0.195*0.195);
-		     blockYawError = atan(((tagPose.pose.position.x + 0.020)/blockDist));
+		     blockYawError = atan((tagPose.pose.position.x + 0.020)/blockDist);
 		   }
 		}
 		if ( blockYawError > 10) blockYawError = 10;
@@ -624,3 +666,23 @@ void simP(double linearVel, double angularVel)
   velocity.angular.z = turn; // * 8; //scaling factor for sim; removed by aBridge node
   velocityPublish.publish(velocity);
 }
+
+
+
+
+//This is code for camera link to odom link
+/*
+	    	tagPose.header.stamp = ros::Time(0);
+		geometry_msgs::PoseStamped odomPose;
+
+		try {
+		tfListener->waitForTransform(publishedName + "/odom", publishedName + "/camera_link", ros::Time(0), ros::Duration(1.0));
+		tfListener->transformPose(publishedName + "/odom", tagPose, odomPose);
+		}
+
+		catch(tf::TransformException& ex) {
+		ROS_INFO("Received an exception trying to transform a point from \"odom\" to \"camera_link\": %s", ex.what());
+		}
+
+		//x coord = odomPose.pose.position.x;
+*/
