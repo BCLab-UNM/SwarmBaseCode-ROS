@@ -47,7 +47,7 @@ int currentMode = 0;
 //PID constants and arrays
 float linearSpeed = 0.;
 float Kpv = 120; //Proportinal Velocity
-float Kiv = 10; //Integral Velocity
+float Kiv = 20; //Integral Velocity
 float Kdv = 15; //Derivative Velocity
 float velFF = 0; //velocity feed forward
 int stepV = 0; //keeps track of the point in the array for adding new error each update cycle.
