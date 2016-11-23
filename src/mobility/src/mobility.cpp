@@ -219,7 +219,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				else if (!targetDetected) {
 
 					//select new heading from Gaussian distribution around current heading
-					goalLocation.theta = currentLocation.theta;//rng->gaussian(currentLocation.theta, 0.25);
+					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
 					
 					//select new position 50 cm from current location
 					goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
@@ -271,6 +271,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					std_msgs::Float32 angle;
 					angle.data = 0;
 					fingerAnglePublish.publish(angle);
+					std_msgs::String msg;
 					
 					stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
 				}
