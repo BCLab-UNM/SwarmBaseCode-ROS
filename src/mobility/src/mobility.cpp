@@ -52,6 +52,7 @@ bool timeOut = false;
 bool blockBlock = false;
 bool centerSeen = false;
 bool dropRoute = false;
+bool count30 = false; 
 
 double blockDist = 0;
 double blockYawError = 0;
@@ -61,6 +62,7 @@ double blockYawError = 0;
 #define STATE_MACHINE_ROTATE	1
 #define STATE_MACHINE_TRANSLATE	2
 #define STATE_MACHINE_PICKUP    3
+#define STATE_MACHINE_DROPOFF   4
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
@@ -122,8 +124,8 @@ int main(int argc, char **argv) {
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
 
     //select initial search position 50 cm from center (0,0)
-	goalLocation.x = 0.5 * cos(goalLocation.theta);
-	goalLocation.y = 0.5 * sin(goalLocation.theta);
+	goalLocation.x = 0.5 * cos(goalLocation.theta+3.1415);
+	goalLocation.y = 0.5 * sin(goalLocation.theta+3.1415);
 
         centerLocation.x = 0;
         centerLocation.y = 0;
@@ -209,31 +211,35 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 						goalLocation.x = centerLocation.x;
 						goalLocation.y = centerLocation.y;
 					}
-					//Otherwise, drop off target and select new random uniform heading
-					else if(dropRoute)
+					else
 					{
-					    if (startupDelay > 5)
-					    {
-						//open fingers
-						std_msgs::Float32 angle;
-						angle.data = M_PI_2;
-						fingerAnglePublish.publish(angle);
-						if (strtupDelay > 10)
-						{
-						//reset flag
-						targetCollected = false;
-						targetDetected = false;
-						lockTarget = false;
-						dropRoute = false;
-						startupDelay = time(0);
-						goalLocation.x = currentLocation.x;
-						goalLocation.y = currentLocation.y;
-						goalLocation.theta = currentLocation.theta;
-						}
-						
-						setVelocity(-0.3,0.0);
-					    }
+					setVelocity(0.0,0.1);
+					stateMachineState = STATE_MACHINE_DROPOFF;
 					}
+				}
+					//Otherwise, drop off target and select new random uniform heading
+			        else if(dropRoute)
+				{
+					   
+					//open fingers
+					std_msgs::Float32 angle;
+					angle.data = M_PI_2;
+					fingerAnglePublish.publish(angle);
+					if (tDiff > 5)
+					{
+					//reset flag
+					targetCollected = false;
+					targetDetected = false;
+					lockTarget = false;
+					dropRoute = false;
+					startupDelay = time(0);
+					goalLocation.x = currentLocation.x;
+					goalLocation.y = currentLocation.y;
+					goalLocation.theta = currentLocation.theta;
+					}
+						
+					setVelocity(-0.2,0.0);
+
 				}
 				//If no targets have been detected, assign a new goal
 				else if (!targetDetected && tDiff > 10) {
@@ -302,6 +308,9 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			//however you can put any code you like in here
 			break;
 			}
+			case STATE_MACHINE_DROPOFF: {
+			if (!centerSeen) dropRoute = true;
+			}
 		
 			default: {
 			    break;
@@ -354,7 +363,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	if (message->detections.size() > 0 && !dropRoute)
 	{
 	  centerSeen = false;
-	  double avAngle = 0;
 	  double count = 0;
 	  geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
 	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the average location of all the center tags
@@ -364,37 +372,30 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	     tagPose = message->detections[i].pose;
              centerSeen = true;
 	     count++;
-             avAngle += atan((tagPose.pose.position.x + 0.020)/hypot(tagPose.pose.position.z, tagPose.pose.position.y));
 	    }
 	  }
 	  if (centerSeen && targetCollected)
 	  {
-		if ( avAngle > 15) avAngle = 15;
-		if ( avAngle < - 15) avAngle = -15;
-                setVelocity(0.2, avAngle);
+                setVelocity(0.15, 0.0);
+		if (count > 30) count30 = true;
+		if (count < 10 && count30) centerSeen = false;
 
-		if (count > 30)
-		{
-		   startupDelay = time(0);
-	           dropRoute = true; //enter drop of routine
-		   centerSeen = false;
-                   //select new heading from current Heading and direction to center.
-		   goalLocation.theta = currentLocation.theta + avAngle;
-					
-		   //select new position 50 cm from current location
-		   goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-		   goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
-                   
-		}
+		std_msgs::String msg;
+   		stringstream ss;
+   		ss << "Center " << count << " : " << centerSeen;
+   		msg.data = ss.str();
+   		infoLogPublisher.publish(msg);
+		stateMachineState = STATE_MACHINE_DROPOFF;
+		
 		
 	  }
 	  else if (count > 10 && centerSeen)
 	  {
-		centerLocation.x = currentLocation.x + (0.8 * cos(currentLocation.theta + avAngle));
-		centerLocation.y = currentLocation.y + (0.8 * sin(currentLocation.theta + avAngle));
+		centerLocation.x = currentLocation.x + (0.5 * cos(currentLocation.theta));
+		centerLocation.y = currentLocation.y + (0.5 * sin(currentLocation.theta));
 		std_msgs::String msg;
    		stringstream ss;
-   		ss << "Center but nothing collected Count : " << count <<" : " << centerLocation.x << " : " << centerLocation.y << " : " << avAngle;
+   		ss << "Center but nothing collected Count : ";
    		msg.data = ss.str();
    		infoLogPublisher.publish(msg);
 	  }
