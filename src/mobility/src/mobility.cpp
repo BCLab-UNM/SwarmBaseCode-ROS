@@ -212,19 +212,27 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					//Otherwise, drop off target and select new random uniform heading
 					else if(dropRoute)
 					{
+					    if (startupDelay > 5)
+					    {
 						//open fingers
 						std_msgs::Float32 angle;
 						angle.data = M_PI_2;
 						fingerAnglePublish.publish(angle);
-						
+						if (strtupDelay > 10)
+						{
 						//reset flag
 						targetCollected = false;
 						targetDetected = false;
 						lockTarget = false;
 						dropRoute = false;
 						startupDelay = time(0);
+						goalLocation.x = currentLocation.x;
+						goalLocation.y = currentLocation.y;
+						goalLocation.theta = currentLocation.theta;
+						}
 						
 						setVelocity(-0.3,0.0);
+					    }
 					}
 				}
 				//If no targets have been detected, assign a new goal
@@ -345,6 +353,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
         //if this is the goal target
 	if (message->detections.size() > 0 && !dropRoute)
 	{
+	  centerSeen = false;
 	  double avAngle = 0;
 	  double count = 0;
 	  geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
@@ -364,8 +373,9 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		if ( avAngle < - 15) avAngle = -15;
                 setVelocity(0.2, avAngle);
 
-		if (count > 10)
+		if (count > 30)
 		{
+		   startupDelay = time(0);
 	           dropRoute = true; //enter drop of routine
 		   centerSeen = false;
                    //select new heading from current Heading and direction to center.
@@ -378,14 +388,20 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		}
 		
 	  }
+	  else if (count > 10 && centerSeen)
+	  {
+		centerLocation.x = currentLocation.x + (0.8 * cos(currentLocation.theta + avAngle));
+		centerLocation.y = currentLocation.y + (0.8 * sin(currentLocation.theta + avAngle));
+		std_msgs::String msg;
+   		stringstream ss;
+   		ss << "Center but nothing collected Count : " << count <<" : " << centerLocation.x << " : " << centerLocation.y << " : " << avAngle;
+   		msg.data = ss.str();
+   		infoLogPublisher.publish(msg);
+	  }
 	}
-	     //open fingers to drop off target
-	     std_msgs::Float32 angle;
-	     angle.data = M_PI_2;
-	     fingerAnglePublish.publish(angle);
-	     return;
+
  
-	if (message->detections.size() > 0 && !targetCollected && tDiff > 10) 
+	if (message->detections.size() > 0 && !targetCollected && tDiff > 15) 
 	{
 
 	targetDetected = true;
