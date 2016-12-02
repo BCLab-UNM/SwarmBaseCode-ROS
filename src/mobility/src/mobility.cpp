@@ -52,7 +52,11 @@ bool timeOut = false;
 bool blockBlock = false;
 bool centerSeen = false;
 bool dropRoute = false;
+<<<<<<< HEAD
 bool count30 = false;
+=======
+bool count30 = false; 
+>>>>>>> 466df27e9f8b38f682a6b3a46cb5a75c7b7c97b6
 
 double blockDist = 0;
 double blockYawError = 0;
@@ -63,7 +67,10 @@ double blockYawError = 0;
 #define STATE_MACHINE_TRANSLATE	2
 #define STATE_MACHINE_PICKUP    3
 #define STATE_MACHINE_DROPOFF   4
+<<<<<<< HEAD
 
+=======
+>>>>>>> 466df27e9f8b38f682a6b3a46cb5a75c7b7c97b6
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
@@ -125,8 +132,9 @@ int main(int argc, char **argv) {
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
 
     //select initial search position 50 cm from center (0,0)
-	goalLocation.x = 0.5 * cos(goalLocation.theta+180);
-	goalLocation.y = 0.5 * sin(goalLocation.theta+180);
+
+	goalLocation.x = 0.5 * cos(goalLocation.theta+3.1415);
+	goalLocation.y = 0.5 * sin(goalLocation.theta+3.1415);
 
         centerLocation.x = 0;
         centerLocation.y = 0;
@@ -376,7 +384,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	if (message->detections.size() > 0 && !dropRoute)
 	{
 	  centerSeen = false;
-	  double avAngle = 0;
 	  double count = 0;
 	  geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
 	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the average location of all the center tags
@@ -390,22 +397,17 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	  }
 	  if (centerSeen && targetCollected)
 	  {
-		setVelocity(0.1,0.0);
+                setVelocity(0.15, 0.0);
+		if (count > 30) count30 = true;
+		if (count < 10 && count30) centerSeen = false;
 
 		std_msgs::String msg;
    		stringstream ss;
-   		ss << "center seen and count > 30 with target";
+   		ss << "Center " << count << " : " << centerSeen;
    		msg.data = ss.str();
    		infoLogPublisher.publish(msg);
 		stateMachineState = STATE_MACHINE_DROPOFF;
-
-		startupDelay = time(0);
-		if (count < 10 && count30)
-		{
-		   centerSeen = false;
-		}
-		if ( count >= 30) count30 = true;
-                   
+		
 	  }
 	  else if (count > 10 && centerSeen)
 	  {
