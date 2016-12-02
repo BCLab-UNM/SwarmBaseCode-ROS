@@ -52,6 +52,7 @@ bool timeOut = false;
 bool blockBlock = false;
 bool centerSeen = false;
 bool dropRoute = false;
+bool count30 = false;
 
 double blockDist = 0;
 double blockYawError = 0;
@@ -61,6 +62,8 @@ double blockYawError = 0;
 #define STATE_MACHINE_ROTATE	1
 #define STATE_MACHINE_TRANSLATE	2
 #define STATE_MACHINE_PICKUP    3
+#define STATE_MACHINE_DROPOFF   4
+
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
@@ -122,8 +125,8 @@ int main(int argc, char **argv) {
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
 
     //select initial search position 50 cm from center (0,0)
-	goalLocation.x = 0.5 * cos(goalLocation.theta);
-	goalLocation.y = 0.5 * sin(goalLocation.theta);
+	goalLocation.x = 0.5 * cos(goalLocation.theta+180);
+	goalLocation.y = 0.5 * sin(goalLocation.theta+180);
 
         centerLocation.x = 0;
         centerLocation.y = 0;
@@ -201,7 +204,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				//If returning with a target
 				else if (targetCollected && !centerSeen) {
 					//If goal has not yet been reached
-					if (hypot(0.0 - currentLocation.x, 0.0 - currentLocation.y) > 0.5) {
+					if (hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y) > 0.3) {
 				        //set angle to center as goal heading
 						goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
 						
@@ -209,32 +212,42 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 						goalLocation.x = centerLocation.x;
 						goalLocation.y = centerLocation.y;
 					}
-					//Otherwise, drop off target and select new random uniform heading
-					else if(dropRoute)
+					else
 					{
-					    if (startupDelay > 5)
-					    {
-						//open fingers
-						std_msgs::Float32 angle;
-						angle.data = M_PI_2;
-						fingerAnglePublish.publish(angle);
-						if (strtupDelay > 10)
-						{
-						//reset flag
-						targetCollected = false;
-						targetDetected = false;
-						lockTarget = false;
-						dropRoute = false;
-						startupDelay = time(0);
-						goalLocation.x = currentLocation.x;
-						goalLocation.y = currentLocation.y;
-						goalLocation.theta = currentLocation.theta;
-						}
-						
-						setVelocity(-0.3,0.0);
-					    }
+					setVelocity(0.0,0.1);
 					}
 				}
+					//Otherwise, drop off target and select new random uniform heading
+				else if(dropRoute)
+				{
+		std_msgs::String msg;
+   		stringstream ss;
+   		ss << "dropRoute";
+   		msg.data = ss.str();
+   		infoLogPublisher.publish(msg);
+					if (tDiff > 0)
+					{
+					  //open fingers
+					  std_msgs::Float32 angle;
+					  angle.data = M_PI_2;
+					  fingerAnglePublish.publish(angle);
+					  if (tDiff > 5)
+					  {
+					    //reset flag
+				  	    targetCollected = false;
+				  	    targetDetected = false;
+					    lockTarget = false;
+					    dropRoute = false;
+					    count30 = false;
+					    startupDelay = time(0);
+					    goalLocation.x = currentLocation.x;
+					    goalLocation.y = currentLocation.y;
+					    goalLocation.theta = currentLocation.theta;
+					  }
+						
+					  setVelocity(-0.3,0.0);
+					}
+				  }
 				//If no targets have been detected, assign a new goal
 				else if (!targetDetected && tDiff > 10) {
 
@@ -277,7 +290,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				
 				//goal not yet reached drive while maintaining proper heading.
 				if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
-					setVelocity(0.3, errorYaw); //drive and turn simultaniously
+					setVelocity(0.15, errorYaw); //drive and turn simultaniously
 				}
 				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) //goal is reached but desired heading is still wrong turn only
 				{
@@ -300,6 +313,15 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			case STATE_MACHINE_PICKUP: {
 			//this is a blocker to prevent transform, rotate, and translate from operating
 			//however you can put any code you like in here
+			break;
+			}
+			case STATE_MACHINE_DROPOFF: {
+			if (!centerSeen)
+			{
+			  dropRoute = true;
+			  centerLocation.x = currentLocation.x;
+			  centerLocation.y = currentLocation.y;
+			}
 			break;
 			}
 		
@@ -364,37 +386,34 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	     tagPose = message->detections[i].pose;
              centerSeen = true;
 	     count++;
-             avAngle += atan((tagPose.pose.position.x + 0.020)/hypot(tagPose.pose.position.z, tagPose.pose.position.y));
 	    }
 	  }
 	  if (centerSeen && targetCollected)
 	  {
-		if ( avAngle > 15) avAngle = 15;
-		if ( avAngle < - 15) avAngle = -15;
-                setVelocity(0.2, avAngle);
+		setVelocity(0.1,0.0);
 
-		if (count > 30)
+		std_msgs::String msg;
+   		stringstream ss;
+   		ss << "center seen and count > 30 with target";
+   		msg.data = ss.str();
+   		infoLogPublisher.publish(msg);
+		stateMachineState = STATE_MACHINE_DROPOFF;
+
+		startupDelay = time(0);
+		if (count < 10 && count30)
 		{
-		   startupDelay = time(0);
-	           dropRoute = true; //enter drop of routine
 		   centerSeen = false;
-                   //select new heading from current Heading and direction to center.
-		   goalLocation.theta = currentLocation.theta + avAngle;
-					
-		   //select new position 50 cm from current location
-		   goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-		   goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
-                   
 		}
-		
+		if ( count >= 30) count30 = true;
+                   
 	  }
 	  else if (count > 10 && centerSeen)
 	  {
-		centerLocation.x = currentLocation.x + (0.8 * cos(currentLocation.theta + avAngle));
-		centerLocation.y = currentLocation.y + (0.8 * sin(currentLocation.theta + avAngle));
+		centerLocation.x = currentLocation.x + (0.5 * cos(currentLocation.theta));
+		centerLocation.y = currentLocation.y + (0.5 * sin(currentLocation.theta));
 		std_msgs::String msg;
    		stringstream ss;
-   		ss << "Center but nothing collected Count : " << count <<" : " << centerLocation.x << " : " << centerLocation.y << " : " << avAngle;
+   		ss << "Center but nothing collected Count : ";
    		msg.data = ss.str();
    		infoLogPublisher.publish(msg);
 	  }
@@ -497,7 +516,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		}
 		else if (Td.total_milliseconds() > 1700) //raise the rist and start slowly drivng backwards
 		{
-		   setVelocity(-0.15,0);
+		   setVelocity(-0.2,0);
 		   std_msgs::Float32 angle;
 		   angle.data = 0;
 		   wristAnglePublish.publish(angle); //raise wrist
