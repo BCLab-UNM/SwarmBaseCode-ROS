@@ -204,7 +204,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
 				//If returning with a target
-				else if (targetCollected && !centerSeen) {
+				else if (targetCollected && !centerSeen && !dropRoute) {
 					//If goal has not yet been reached
 					if (hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y) > 0.3) {
 				        //set angle to center as goal heading
@@ -216,7 +216,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					}
 					else
 					{
-					setVelocity(0.0,0.1);
+							std_msgs::String msg;
+   		stringstream ss;
+   		ss << "spin;";
+   		msg.data = ss.str();
+   		infoLogPublisher.publish(msg);
+					setVelocity(0.0,0.05);
 					}
 				}
 					//Otherwise, drop off target and select new random uniform heading
@@ -224,31 +229,33 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				{
 		std_msgs::String msg;
    		stringstream ss;
-   		ss << "dropRoute";
+   		ss << "dropRoute : " << tDiff;
    		msg.data = ss.str();
    		infoLogPublisher.publish(msg);
-					if (tDiff > 0)
+					if (tDiff > 2)
+					 {
+					   //reset flag
+				  	   targetCollected = false;
+				  	   targetDetected = false;
+					   lockTarget = false;
+					   dropRoute = false;
+					   count30 = false;
+					   startupDelay = time(0);
+					   goalLocation.x = currentLocation.x;
+					   goalLocation.y = currentLocation.y;
+					   goalLocation.theta = currentLocation.theta;
+					   setVelocity(0.0,0);
+					 }
+					else if (tDiff > 0)
 					{
 					  //open fingers
 					  std_msgs::Float32 angle;
 					  angle.data = M_PI_2;
 					  fingerAnglePublish.publish(angle);
-					  if (tDiff > 5)
-					  {
-					    //reset flag
-				  	    targetCollected = false;
-				  	    targetDetected = false;
-					    lockTarget = false;
-					    dropRoute = false;
-					    count30 = false;
-					    startupDelay = time(0);
-					    goalLocation.x = currentLocation.x;
-					    goalLocation.y = currentLocation.y;
-					    goalLocation.theta = currentLocation.theta;
-					  }
 						
 					  setVelocity(-0.3,0.0);
 					}
+					break;
 				  }
 				//If no targets have been detected, assign a new goal
 				else if (!targetDetected && tDiff > 10) {
@@ -302,12 +309,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 				{
 					setVelocity(0.0, 0.0); //stop
 					
-					//close fingers
-					std_msgs::Float32 angle;
-					angle.data = 0;
-					fingerAnglePublish.publish(angle);
-					std_msgs::String msg;
-					
 					stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
 				}
 			    break;
@@ -318,12 +319,16 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			break;
 			}
 			case STATE_MACHINE_DROPOFF: {
-			if (!centerSeen)
+			if (!centerSeen && count30)
 			{
 			  dropRoute = true;
 			  centerLocation.x = currentLocation.x; //we are sitting on top of the circle so set the center as our location.
 			  centerLocation.y = currentLocation.y;
 			  stateMachineState = STATE_MACHINE_TRANSFORM;
+			  startupDelay = time(0);
+			  goalLocation.x = currentLocation.x;
+			  goalLocation.y = currentLocation.y;
+			  goalLocation.theta = currentLocation.theta;
 			}
 			break;
 			}
@@ -382,11 +387,11 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	  double count = 0;
 	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the number of center tags
 	  {
-       	 if (message->detections[i].id == 256) 
-       	 {
-           centerSeen = true;
-	       count++;
-	    }
+       	   if (message->detections[i].id == 256) 
+       	   {
+             centerSeen = true;
+	     count++;
+	   }
 	  }
 	  
 	  //note:below currently ignores the edge case of seeing the center at such a shallow angle that driving forward would not enter the circle.
@@ -414,6 +419,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
    		msg.data = ss.str();
    		infoLogPublisher.publish(msg);
 	  }
+	  if (centerSeen) return;
 	}
 
  
@@ -452,16 +458,17 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 			targetCollected = true;
 			stateMachineState = STATE_MACHINE_TRANSFORM;
 
-			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+			goalLocation.theta = M_PI + atan2(currentLocation.y - centerLocation.y, currentLocation.x - centerLocation.y);
 						
 			//set center as goal position
-			goalLocation.x = 0.0;
-			goalLocation.y = 0.0;
+			goalLocation.x = centerLocation.x;
+			goalLocation.y = centerLocation.y;
 			
 			//lower wrist to avoid ultrasound sensors
 			std_msgs::Float32 angle;
 			angle.data = M_PI_2/4.2;
 			wristAnglePublish.publish(angle);
+			setVelocity(0.0,0);
 		}
 
 		//Otherwise, if no target has been collected, set target pose as goal
@@ -497,7 +504,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		     setVelocity(-0.15,0.0);
 		   }
 		}
-		else if (blockDist > 0.19 && !lockTarget) //if a target is detected but not locked, and not too close.
+		else if (blockDist > 0.22 && !lockTarget) //if a target is detected but not locked, and not too close.
 		{
 		  float vel = blockDist * 0.20;
 		  if (vel < 0.1) vel = 0.1;
@@ -505,22 +512,22 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		  setVelocity(vel,-blockYawError/2);
 		  timeOut = false;
 		}
-		else if (!lockTarget) //if a target hasn't been locked lock it and entert a counting state while slowly driving forward.
+		else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
 		{
 		  lockTarget = true;
 		  setVelocity(0.15,0);
 		  timeOut = true;
 		}
-		else if (Td.total_milliseconds() > 1700) //raise the rist and start slowly drivng backwards
+		else if (Td.total_milliseconds() > 1800) //raise the rist and start slowly drivng backwards
 		{
-		   setVelocity(-0.2,0);
+		   setVelocity(-0.15,0);
 		   std_msgs::Float32 angle;
 		   angle.data = 0;
 		   wristAnglePublish.publish(angle); //raise wrist
 		}
-		else if (Td.total_milliseconds() > 1200) //close the fingers and stop driving
+		else if (Td.total_milliseconds() > 1500) //close the fingers and stop driving
 		{
-		   setVelocity(0.0,0);
+		   setVelocity(-0.15,0);
 		   std_msgs::Float32 angle;
 		   angle.data = 0;
 		   fingerAnglePublish.publish(angle); //close fingers	   
@@ -534,21 +541,22 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 			targetCollected = true;
 			stateMachineState = STATE_MACHINE_TRANSFORM;
 
-			goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+			goalLocation.theta = M_PI + atan2(currentLocation.y - centerLocation.y, currentLocation.x - centerLocation.y);
 						
 			//set center as goal position
-			goalLocation.x = 0.0;
-			goalLocation.y = 0.0;
+			goalLocation.x = centerLocation.x;
+			goalLocation.y = centerLocation.y;
 			
 			//lower wrist to avoid ultrasound sensors
 			std_msgs::Float32 angle;
 			angle.data = M_PI_2/4.2;
 			wristAnglePublish.publish(angle);
+			setVelocity(0.0,0);
 		  }
 		  else //recover begin looking for targets again
 		  {
 		  lockTarget = false;
-		  setVelocity(0.0,0);
+		  setVelocity(-0.1,0);
 		  }
 		}
 		if (Td.total_milliseconds() > 3500 && timeOut) //if no targets are found after too long a period go back to search pattern
