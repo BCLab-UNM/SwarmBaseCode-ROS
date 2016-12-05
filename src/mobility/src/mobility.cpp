@@ -52,11 +52,8 @@ bool timeOut = false;
 bool blockBlock = false;
 bool centerSeen = false;
 bool dropRoute = false;
-<<<<<<< HEAD
-bool count30 = false;
-=======
 bool count30 = false; 
->>>>>>> 466df27e9f8b38f682a6b3a46cb5a75c7b7c97b6
+
 
 double blockDist = 0;
 double blockYawError = 0;
@@ -67,10 +64,7 @@ double blockYawError = 0;
 #define STATE_MACHINE_TRANSLATE	2
 #define STATE_MACHINE_PICKUP    3
 #define STATE_MACHINE_DROPOFF   4
-<<<<<<< HEAD
 
-=======
->>>>>>> 466df27e9f8b38f682a6b3a46cb5a75c7b7c97b6
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
@@ -327,8 +321,9 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			if (!centerSeen)
 			{
 			  dropRoute = true;
-			  centerLocation.x = currentLocation.x;
+			  centerLocation.x = currentLocation.x; //we are sitting on top of the circle so set the center as our location.
 			  centerLocation.y = currentLocation.y;
+			  stateMachineState = STATE_MACHINE_TRANSFORM;
 			}
 			break;
 			}
@@ -380,36 +375,36 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
         if (currentMode == 1 || currentMode == 0) return;
 
 
-        //if this is the goal target
+    //if a target is detected
 	if (message->detections.size() > 0 && !dropRoute)
 	{
 	  centerSeen = false;
 	  double count = 0;
-	  geometry_msgs::PoseStamped tagPose = message->detections[0].pose;
-	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the average location of all the center tags
+	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the number of center tags
 	  {
-       	    if (message->detections[i].id == 256) 
-       	    {
-	     tagPose = message->detections[i].pose;
-             centerSeen = true;
-	     count++;
+       	 if (message->detections[i].id == 256) 
+       	 {
+           centerSeen = true;
+	       count++;
 	    }
 	  }
-	  if (centerSeen && targetCollected)
+	  
+	  //note:below currently ignores the edge case of seeing the center at such a shallow angle that driving forward would not enter the circle.
+	  if (centerSeen && targetCollected) //if we have a target and the center is located drive towards it.
 	  {
-                setVelocity(0.15, 0.0);
-		if (count > 30) count30 = true;
-		if (count < 10 && count30) centerSeen = false;
+        setVelocity(0.15, 0.0);
+		if (count > 30) count30 = true; //we have driven far enough forward to be in the circle.
+		if (count < 10 && count30) centerSeen = false; //we have driven far enough forward to have passed over the circle.
 
 		std_msgs::String msg;
    		stringstream ss;
    		ss << "Center " << count << " : " << centerSeen;
    		msg.data = ss.str();
    		infoLogPublisher.publish(msg);
-		stateMachineState = STATE_MACHINE_DROPOFF;
+		stateMachineState = STATE_MACHINE_DROPOFF; //go to dropoff mode to prevent velocity overrides.
 		
 	  }
-	  else if (count > 10 && centerSeen)
+	  else if (count > 10 && centerSeen) //reset center location if just driving around and its seen.
 	  {
 		centerLocation.x = currentLocation.x + (0.5 * cos(currentLocation.theta));
 		centerLocation.y = currentLocation.y + (0.5 * sin(currentLocation.theta));
