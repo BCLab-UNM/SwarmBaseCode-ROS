@@ -46,7 +46,7 @@ int currentMode = 0;
 
 //PID constants and arrays
 float linearSpeed = 0.;
-float Kpv = 120; //Proportinal Velocity
+float Kpv = 140; //Proportinal Velocity
 float Kiv = 20; //Integral Velocity
 float Kdv = 15; //Derivative Velocity
 float velFF = 0; //velocity feed forward
@@ -163,9 +163,9 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
   {
     if (linearSpeed > 0.5) velFF = 255;
     else if (linearSpeed > 0.4) velFF = 180;
-    else if (linearSpeed > 0.3) velFF = 120;
-    else if (linearSpeed > 0.2) velFF = 50;
-    else if (linearSpeed > 0.1) velFF = 25;
+    else if (linearSpeed > 0.3) velFF = 130;
+    else if (linearSpeed > 0.2) velFF = 75;
+    else if (linearSpeed > 0.1) velFF = 40;
 
     velError[0] = linearSpeed - vel; //calculate the error
   }
@@ -283,13 +283,13 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     yawError[1] = yawError[0]; //set previouse error to current error 
     
     float yawOut = PY + IY + DY;
-    if (yawOut > sat) //cap yaw command
+    if (yawOut > sat/2) //cap yaw command
     {
-        yawOut = sat;
+        yawOut = sat/2;
     }
-    else if (yawOut < -sat)
+    else if (yawOut < -sat/2)
     {
-        yawOut = -sat;
+        yawOut = -sat/2;
     }
 
     if (PV > 0)
