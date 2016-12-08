@@ -61,6 +61,9 @@ int stepY = 0; //keeps track of the point in the array for adding new error each
 float eyArray[1000]; //array of previous error for (arraySize/hz) seconds (error Yaw Array)
 float yawError[4] = {0,0,0,0}; //contains current yaw error and error 4 steps in the past.
 
+float prevLin = 0;
+float prevYaw = 0;
+
 
 
 //Publishers
@@ -152,7 +155,30 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float IV = 0;
   float sat = 255; //Saturation point
 
-
+  if (!(linearSpeed == prevLin))
+  {
+     for (int i= 0; i < 1000; i++)
+     {
+       evArray[i] = 0;
+     }   
+     velError[0] = 0;
+     velError[1] = 0;
+     velError[2] = 0;
+     velError[3] = 0;
+     prevLin = linearSpeed; 
+   }
+  if (prevYaw > 0 && yawError[0] < 0 || prevYaw < 0 && yawError > 0)
+  {
+     for (int i= 0; i < 1000; i++)
+     {
+       eyArray[i] = 0;
+     } 
+     yawError[1] = 0;
+     yawError[2] = 0;
+     yawError[3] = 0;
+     prevYaw = yawError[0];
+  }  
+ 
 
   if (currentMode == 1)
   {
@@ -166,6 +192,7 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     else if (linearSpeed > 0.3) velFF = 130;
     else if (linearSpeed > 0.2) velFF = 75;
     else if (linearSpeed > 0.1) velFF = 40;
+    else if (linearSpeed > 0.0) velFF = 10;
 
     velError[0] = linearSpeed - vel; //calculate the error
   }
@@ -292,9 +319,9 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
         yawOut = -sat/2;
     }
 
-    if (PV > 0)
+    if (linearSpeed > 0)
 	if(velOut < 0) velOut = 0;
-    else if(PV < 0)
+    else if(linearSpeed < 0)
 	if(velOut > 0) velOut = 0;
 
     if (PY > 0)
@@ -327,7 +354,7 @@ void cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
 
 
 	/*stringstream ss;
-	ss << "linearSpeed : " << xVel << " error : " << velError[0] << " comSpeed : " << linearSpeed << " IV : " << IV;
+	ss << "l : r  ::" << left << " : " << right;//<< xVel << " error : " << velError[0] << " comSpeed : " << linearSpeed << " IV : " << IV;
 	std_msgs::String msg;
 	msg.data = ss.str();
     	infoLogPublisher.publish(msg);//good for tunning and bug fixing*/
