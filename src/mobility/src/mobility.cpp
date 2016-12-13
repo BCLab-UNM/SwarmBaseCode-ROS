@@ -56,6 +56,7 @@ bool countDropGuard = false;
 bool approach = false;
 double blockDist = 0;
 double blockYawError = 0;
+bool spinWasTrue = false;
 std_msgs::String msg;
 
 // state machine states
@@ -187,16 +188,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
     tDiff = time(0) - startupDelay;
 
-
-/*if (targetCollected || !targetDetected)
-{
-		std_msgs::String msg;
-   		stringstream ss;
-   		ss << "driving : " << hypot(goalLocation.x - currentLocation.x, goalLocation.y - currentLocation.y);
-   		msg.data = ss.str();
-   		infoLogPublisher.publish(msg);
-}*/
-		if (!targetCollected && !targetDetected)
+	if (!targetCollected && !targetDetected)
 		{
 		   //set gripper
 		   std_msgs::Float32 angle;
@@ -227,6 +219,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					   lockTarget = false;
 					   dropRoute = false;
 					   countDropGuard = false;
+					   spinWasTrue = false;
 					   startupDelay = time(0);
 					   setVelocity(0.0,0);
 				   	   stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
@@ -237,6 +230,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					  std_msgs::Float32 angle;
 					  angle.data = M_PI_2;
 					  fingerAnglePublish.publish(angle);
+		   			  angle.data = 0;
+		   			  wristAnglePublish.publish(angle); //raise wrist
 						
 					  setVelocity(-0.3,0.0);
 					}
@@ -257,21 +252,39 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					//If goal has not yet been reached
 					if (hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y) > 0.3) {
 				        //set angle to center as goal heading
-						goalLocation.theta = M_PI + atan2(currentLocation.y, currentLocation.x);
+						goalLocation.theta = atan2(centerLocation.y - currentLocation.y, centerLocation.x - currentLocation.x);
 						
 						//set center as goal position
 						goalLocation.x = centerLocation.x;
 						goalLocation.y = centerLocation.y;
+						stateMachineState = STATE_MACHINE_ROTATE;
+						//spinWasTrue = true; only turn on for random walk to center
+					}
+					else //spin search for center
+					{
+					bool randomWalkToCenter = false;
+					if (randomWalkToCenter)
+					{
+					spinWasTrue = true;
+					//select new heading to the left to spin and look for the center.
+					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.45)-0.05;
+					
+					//select new position 30 cm from current location
+					centerLocation.x = currentLocation.x + 0.3 * cos(goalLocation.theta);
+					centerLocation.y = currentLocation.y + 0.3 * sin(goalLocation.theta);
+					goalLocation.x = centerLocation.x;
+					goalLocation.y = centerLocation.y;
+					stateMachineState = STATE_MACHINE_ROTATE;
 					}
 					else
 					{
-					
-					//select new heading to the left to spin and look for the center.
-					goalLocation.theta = currentLocation.theta + 0.2;
-					
-					//select new position 50 cm from current location
-					goalLocation.x = currentLocation.x;
-					goalLocation.y = currentLocation.y;
+					 goalLocation.theta = currentLocation.theta + 0.3;
+					 centerLocation.x = currentLocation.x + 0.1 * cos(goalLocation.theta);
+					 centerLocation.y = currentLocation.y + 0.1 * sin(goalLocation.theta);
+					 goalLocation.x = centerLocation.x;
+					 goalLocation.y = centerLocation.y;
+					 stateMachineState = STATE_MACHINE_ROTATE;					
+					}
 					}
 				}
 					//Otherwise, drop off target and select new random uniform heading
@@ -314,20 +327,21 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			case STATE_MACHINE_TRANSLATE: {
 				stateMachineMsg.data = "TRANSLATING";
 				float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta); //calculate the distance between current and desired heading in radians
-				
 				//goal not yet reached drive while maintaining proper heading.
-				if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
+				if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) 
+				{
 					setVelocity(0.15, errorYaw/2); //drive and turn simultaniously
 				}
 				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) //goal is reached but desired heading is still wrong turn only
 				{
 					setVelocity(0.0, errorYaw); //rotate but dont drive
 			        }
-			    else
+			   	else
 				{
 					setVelocity(0.0, 0.0); //stop
 					
 					stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
+
 				}
 			    break;
 			}
@@ -429,12 +443,12 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	  if (centerSeen && targetCollected) //if we have a target and the center is located drive towards it.
 	  {
 		float mod = 1;
-		if (countDropGuard) mod = -1; //reverse tag rejection when we have seen enough tags that we are on a trajectory in to the square we dont want to follow an edge.
-		if (left && right) setVelocity(0.15, 0.0); //otherwise turn till tags on both sideds of image then drive straight
+		//if (countDropGuard) mod = -1; //reverse tag rejection when we have seen enough tags that we are on a trajectory in to the square we dont want to follow an edge.
+		if (left && right) setVelocity(0.15, 0.0); //otherwise turn till tags on both sides of image then drive straight
 		else if (right) setVelocity(0.15, -0.15*mod);
 		else setVelocity(0.15, 0.15*mod);
 
-		if (count > 20) //must see over this many tags before assuming we are driving into the center and not a long an edge.
+		if (count > 20) //must see greater than this many tags before assuming we are driving into the center and not along an edge.
 		{
 		countDropGuard = true; //we have driven far enough forward to be in the circle.
 		dropCheck = time(0);
@@ -476,7 +490,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	else if (approach)
  	{
 	  tDiff2 = time(0) - dropCheck;
-	  if (tDiff2 > 8) 
+	  if (tDiff2 > 4) 
 	  {
 	   stateMachineState = STATE_MACHINE_TRANSFORM;
 	   countDropGuard = false;
@@ -505,7 +519,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		     closest = test;
 		     blockDist = hypot(tagPose.pose.position.z, tagPose.pose.position.y); //distance from bottom center of chassis ignoring height.
 		     blockDist = sqrt(blockDist*blockDist - 0.195*0.195);
-		     blockYawError = atan((tagPose.pose.position.x + 0.020)/blockDist); //angle to block from bottom center of chassis on the horizontal.
+		     blockYawError = atan((tagPose.pose.position.x + 0.020)/blockDist)*1.05; //angle to block from bottom center of chassis on the horizontal.
 		   }
 		}
 		if ( blockYawError > 10) blockYawError = 10; //limits block angle error to prevent overspeed from PID.
@@ -516,7 +530,8 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		geometry_msgs::PoseStamped tagPose = message->detections[target].pose;
 		
 		//if target is close enough
-		if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.2) {
+		boost::posix_time::time_duration Td = boost::posix_time::microsec_clock::local_time() - millTimer; //diffrence between current time and millisecond time
+		if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.2 && Td.total_milliseconds() < 3800) {
 			//assume target has been picked up by gripper
 			targetCollected = true;
 			stateMachineState = STATE_MACHINE_TRANSFORM;
@@ -568,7 +583,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		     setVelocity(-0.2,0.0);
 		   }
 		}
-		else if (blockDist > 0.23 && !lockTarget) //if a target is detected but not locked, and not too close.
+		else if (blockDist > 0.25 && !lockTarget) //if a target is detected but not locked, and not too close.
 		{
 		  float vel = blockDist * 0.20;
 		  if (vel < 0.1) vel = 0.1;
@@ -582,14 +597,14 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		  setVelocity(0.18,0);
 		  timeOut = true;
 		}
-		else if (Td.total_milliseconds() > 2200) //raise the wrist
+		else if (Td.total_milliseconds() > 2400) //raise the wrist
 		{
 		   setVelocity(-0.25,0);
 		   std_msgs::Float32 angle;
 		   angle.data = 0;
 		   wristAnglePublish.publish(angle); //raise wrist
 		}
-		else if (Td.total_milliseconds() > 1500) //close the fingers and stop driving
+		else if (Td.total_milliseconds() > 1900) //close the fingers and stop driving
 		{
 		   setVelocity(-0.1,0);
 		   std_msgs::Float32 angle;
@@ -656,7 +671,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 }
 
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
-	if (!targetDetected && (message->data > 0)) {
+	if ((!targetDetected || targetCollected) && (message->data > 0)) {
 		//obstacle on right side
 		if (message->data == 1) {
 			//select new heading 0.2 radians to the left
@@ -672,6 +687,11 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
 		//select new position 50 cm from current location
 		goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
 		goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
+		if (spinWasTrue)
+		{
+			centerLocation.x = goalLocation.x;
+			centerLocation.y = goalLocation.y;
+		}
 		
 		//switch to transform state to trigger collision avoidance
 		stateMachineState = STATE_MACHINE_TRANSFORM;
