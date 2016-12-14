@@ -808,16 +808,16 @@ void simP(double linearVel, double angularVel)
 
 //This is code for camera link to odom link
 /*
-	    	tagPose.header.stamp = ros::Time(0);
+		geometry_msgs::PoseStamped mapOrigin;
 		geometry_msgs::PoseStamped odomPose;
 
 		try {
-		tfListener->waitForTransform(publishedName + "/odom", publishedName + "/camera_link", ros::Time(0), ros::Duration(1.0));
-		tfListener->transformPose(publishedName + "/odom", tagPose, odomPose);
+			tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time(0), ros::Duration(1.0));
+			tfListener->transformPose(publishedName + "/odom", mapOrigin, odomPose);
 		}
 
 		catch(tf::TransformException& ex) {
-		ROS_INFO("Received an exception trying to transform a point from \"odom\" to \"camera_link\": %s", ex.what());
+			ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
 		}
 
 		//x coord = odomPose.pose.position.x;
