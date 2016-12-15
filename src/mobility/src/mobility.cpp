@@ -35,11 +35,17 @@ void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
 void lowerWrist();  // Lower wrist to 50 degrees
+void mapAverage();  //constantly averages last 100 positions from map
+
 
 //Numeric Variables
 geometry_msgs::Pose2D currentLocation;
+geometry_msgs::Pose2D currentLocationMap;
+geometry_msgs::Pose2D currentLocationAverage;
 geometry_msgs::Pose2D goalLocation;
 geometry_msgs::Pose2D centerLocation;
+geometry_msgs::Pose2D centerLocationMap;
+geometry_msgs::Pose2D mapLocation[100];
 
 int currentMode = 0;
 float mobilityLoopTimeStep = 0.1; //time between the mobility loop calls
@@ -56,7 +62,12 @@ bool countDropGuard = false;
 bool approach = false;
 double blockDist = 0;
 double blockYawError = 0;
-bool spinWasTrue = false;
+float spinner = 0;
+bool init = false;
+int mapCount = 0;
+bool spinning = false;
+
+
 std_msgs::String msg;
 
 // state machine states
@@ -88,6 +99,7 @@ ros::Subscriber modeSubscriber;
 ros::Subscriber targetSubscriber;
 ros::Subscriber obstacleSubscriber;
 ros::Subscriber odometrySubscriber;
+ros::Subscriber mapSubscriber;
 
 
 //Timers
@@ -114,6 +126,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
+void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void killSwitchTimerEventHandler(const ros::TimerEvent& event);
@@ -136,6 +149,13 @@ int main(int argc, char **argv) {
         centerLocation.x = 0;
         centerLocation.y = 0;
 
+	for (int i = 0; i < 100; i++)
+	{
+	  mapLocation[i].x = 0;
+	  mapLocation[i].y = 0;
+	  mapLocation[i].theta = 0;
+	}
+
     if (argc >= 2) {
         publishedName = argv[1];
         cout << "Welcome to the world of tomorrow " << publishedName << "!  Mobility module started." << endl;
@@ -155,6 +175,7 @@ int main(int argc, char **argv) {
     targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
     obstacleSubscriber = mNH.subscribe((publishedName + "/obstacle"), 10, obstacleHandler);
     odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
+    mapSubscriber = mNH.subscribe((publishedName + "/odom/EKF"), 10, mapHandler);
 
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
@@ -183,34 +204,18 @@ int main(int argc, char **argv) {
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
 
-
-
-        geometry_msgs::PoseStamped mapOrigin;
-	mapOrigin.header.stamp = ros::Time::now();
-	mapOrigin.header.frame_id = publishedName + "/map";
-	mapOrigin.pose.orientation.w = 1;
-	geometry_msgs::PoseStamped odomPose;
-	string x = "";
-
-		try {
-			tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time::now(), ros::Duration(1.0));
-			tfListener->transformPose(publishedName + "/odom", mapOrigin, odomPose);
-		}
-
-		catch(tf::TransformException& ex) {
-			ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
-			x = "Exception thrown " + (string)ex.what();
-		}
-
-   stringstream ss;
-   ss << "map x : y  " << odomPose.pose.position.x << " : " << odomPose.pose.position.y << " : " << currentLocation.x << " : " << currentLocation.y << " : " << x;
-   msg.data = ss.str();
-   infoLogPublisher.publish(msg);
-
+    mapAverage();
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
     tDiff = time(0) - startupDelay; 
+
+	if (!init) //initiliation code goes here.
+	{
+	  centerLocationMap.x = currentLocationAverage.x;
+	  centerLocationMap.y = currentLocationAverage.y;
+	  centerLocationMap.theta = currentLocationAverage.theta;
+	}
 
 	if (!targetCollected && !targetDetected)
 		{
@@ -243,7 +248,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					   lockTarget = false;
 					   dropRoute = false;
 					   countDropGuard = false;
-					   spinWasTrue = false;
+					   spinning = false;
 					   startupDelay = time(0);
 					   setVelocity(0.0,0);
 				   	   stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
@@ -267,14 +272,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					stateMachineState = STATE_MACHINE_ROTATE; //rotate
 				}
 				//If goal has not yet been reached
-				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2)
+				else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) //pi/2
 				{
 					stateMachineState = STATE_MACHINE_TRANSLATE; //translate
 				}
 				//If returning with a target
 				else if (targetCollected && !centerSeen && !dropRoute) {
 					//If goal has not yet been reached
-					if (hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y) > 0.3) {
+					if (hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y) > 0.3 && !spinning) {
 				        //set angle to center as goal heading
 						goalLocation.theta = atan2(centerLocation.y - currentLocation.y, centerLocation.x - currentLocation.x);
 						
@@ -286,29 +291,17 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					}
 					else //spin search for center
 					{
-					bool randomWalkToCenter = false;
-					if (randomWalkToCenter)
-					{
-					spinWasTrue = true;
-					//select new heading to the left to spin and look for the center.
-					goalLocation.theta = rng->gaussian(currentLocation.theta, 0.45)-0.05;
-					
-					//select new position 30 cm from current location
-					centerLocation.x = currentLocation.x + 0.3 * cos(goalLocation.theta);
-					centerLocation.y = currentLocation.y + 0.3 * sin(goalLocation.theta);
-					goalLocation.x = centerLocation.x;
-					goalLocation.y = centerLocation.y;
-					stateMachineState = STATE_MACHINE_ROTATE;
-					}
-					else
-					{
-					 goalLocation.theta = currentLocation.theta + 0.3;
-					 centerLocation.x = currentLocation.x + 0.1 * cos(goalLocation.theta);
-					 centerLocation.y = currentLocation.y + 0.1 * sin(goalLocation.theta);
-					 goalLocation.x = centerLocation.x;
-					 goalLocation.y = centerLocation.y;
-					 stateMachineState = STATE_MACHINE_ROTATE;					
-					}
+					 goalLocation.x = centerLocation.x + 0.3 * cos(spinner);
+					 goalLocation.y = centerLocation.y + 0.3 * sin(spinner);
+					 goalLocation.theta = atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x);
+					 
+					 spinner += 45*(M_PI/180);
+					 if (spinner > 2*M_PI)
+					 {
+					    spinner -= 2*M_PI;
+					 }
+					 spinning = true;
+					 stateMachineState = STATE_MACHINE_ROTATE;		
 					}
 				}
 					//Otherwise, drop off target and select new random uniform heading
@@ -378,8 +371,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			if (!centerSeen && countDropGuard)
 			{
 			  dropRoute = true;
-			  centerLocation.x = currentLocation.x; //we are sitting on top of the circle so set the center as our location.
-			  centerLocation.y = currentLocation.y;
 			  stateMachineState = STATE_MACHINE_TRANSFORM;
 			  startupDelay = time(0);
 			  goalLocation.x = currentLocation.x;
@@ -484,11 +475,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		stateMachineState = STATE_MACHINE_DROPOFF; //go to dropoff mode to prevent velocity overrides.
 		approach = true;
 		
-	  }
-	  else if (count > 10 && centerSeen) //reset center location if driving around and its seen.
-	  {
-		centerLocation.x = currentLocation.x + (0.5 * cos(currentLocation.theta));
-		centerLocation.y = currentLocation.y + (0.5 * sin(currentLocation.theta));
 	  }
 	  if (centerSeen) 
 	  {
@@ -711,13 +697,8 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
 		//select new position 50 cm from current location
 		goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
 		goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
-		if (spinWasTrue)
-		{
-			centerLocation.x = goalLocation.x;
-			centerLocation.y = goalLocation.y;
-		}
 		
-		//switch to transform state to trigger collision avoidance
+		//switch to transform state to trigger collision avoidanc	e
 		stateMachineState = STATE_MACHINE_TRANSFORM;
 	}
 
@@ -743,6 +724,19 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 	double roll, pitch, yaw;
 	m.getRPY(roll, pitch, yaw);
 	currentLocation.theta = yaw;
+}
+
+void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
+	//Get (x,y) location directly from pose
+	currentLocationMap.x = message->pose.pose.position.x;
+	currentLocationMap.y = message->pose.pose.position.y;
+	
+	//Get theta rotation by converting quaternion orientation to pitch/roll/yaw
+	tf::Quaternion q(message->pose.pose.orientation.x, message->pose.pose.orientation.y, message->pose.pose.orientation.z, message->pose.pose.orientation.w);
+	tf::Matrix3x3 m(q);
+	double roll, pitch, yaw;
+	m.getRPY(roll, pitch, yaw);
+	currentLocationMap.theta = yaw;
 }
 
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
@@ -822,9 +816,61 @@ void simP(double linearVel, double angularVel)
    infoLogPublisher.publish(msg);*/
 
 
-  velocity.linear.x = forward, // * 1.5;
-  velocity.angular.z = turn; // * 8; //scaling factor for sim; removed by aBridge node
+  velocity.linear.x = forward, 
+  velocity.angular.z = turn;
   velocityPublish.publish(velocity);
+}
+
+
+void mapAverage()
+{
+	mapLocation[mapCount].x = currentLocationMap.x;
+	mapLocation[mapCount].y = currentLocationMap.y;
+	mapLocation[mapCount].theta = currentLocationMap.theta;
+	mapCount++;
+	if (mapCount >= 100) {mapCount = 0;}
+
+	double x = 0;
+	double y = 0;
+	double theta = 0;
+	for (int i = 0; i < 100; i++)
+	{
+	  x += mapLocation[i].x;
+	  y += mapLocation[i].y;
+	  theta += mapLocation[i].theta;
+	}
+	x = x/100;
+	y = y/100;
+	theta = theta/100;
+	currentLocationAverage.x = x;
+	currentLocationAverage.y = y;
+	currentLocationAverage.theta = theta;
+
+
+	if (init)
+	{
+		geometry_msgs::PoseStamped mapPose;
+		mapPose.header.stamp = ros::Time::now();
+		mapPose.header.frame_id = publishedName + "/map";
+		mapPose.pose.orientation.w = 1;
+		mapPose.pose.position.x = centerLocationMap.x;
+		mapPose.pose.position.y = centerLocationMap.y;
+		geometry_msgs::PoseStamped odomPose;
+		string x = "";
+
+		try {
+			tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time::now(), ros::Duration(1.0));
+			tfListener->transformPose(publishedName + "/odom", mapPose, odomPose);
+		}
+
+		catch(tf::TransformException& ex) {
+			ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
+			x = "Exception thrown " + (string)ex.what();
+		}
+
+		centerLocation.x = odomPose.pose.position.x;
+		centerLocation.y = odomPose.pose.position.y;
+	}
 }
 
 
@@ -832,19 +878,24 @@ void simP(double linearVel, double angularVel)
 
 //This is code for map link to odom link
 /*
-		geometry_msgs::PoseStamped mapOrigin;
-		geometry_msgs::PoseStamped odomPose;
+	geometry_msgs::PoseStamped mapOrigin;
+	mapOrigin.header.stamp = ros::Time::now();
+	mapOrigin.header.frame_id = publishedName + "/map";
+	mapOrigin.pose.orientation.w = 1;
+	geometry_msgs::PoseStamped odomPose;
+	string x = "";
 
 		try {
-			tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time(0), ros::Duration(1.0));
+			tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time::now(), ros::Duration(1.0));
 			tfListener->transformPose(publishedName + "/odom", mapOrigin, odomPose);
 		}
 
 		catch(tf::TransformException& ex) {
 			ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
+			x = "Exception thrown " + (string)ex.what();
 		}
+	x = odomPose.pose.position.x;
 
-		//x coord = odomPose.pose.position.x;
 */
 
 
