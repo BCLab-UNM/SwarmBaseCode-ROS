@@ -175,7 +175,7 @@ int main(int argc, char **argv) {
     targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
     obstacleSubscriber = mNH.subscribe((publishedName + "/obstacle"), 10, obstacleHandler);
     odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
-    mapSubscriber = mNH.subscribe((publishedName + "/odom/EKF"), 10, mapHandler);
+    mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
 
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
@@ -205,6 +205,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
 
     mapAverage();
+
+   std_msgs::String msg;
+   stringstream ss;
+   ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << "curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
+   msg.data = ss.str();
+   infoLogPublisher.publish(msg);
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
@@ -215,6 +221,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 	  centerLocationMap.x = currentLocationAverage.x;
 	  centerLocationMap.y = currentLocationAverage.y;
 	  centerLocationMap.theta = currentLocationAverage.theta;
+	  init = true;
 	}
 
 	if (!targetCollected && !targetDetected)
@@ -655,6 +662,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		  wristAnglePublish.publish(angle); //raise wrist
 		  }
 		}
+
 		if (Td.total_milliseconds() > 5000 && timeOut) //if no targets are found after too long a period go back to search pattern
 		{
 		  targetDetected = false;
@@ -841,7 +849,7 @@ void mapAverage()
 	}
 	x = x/100;
 	y = y/100;
-	theta = theta/100;
+	theta = theta/100;//Get theta rotation by converting quaternion orientation to pitch/roll/yaw
 	currentLocationAverage.x = x;
 	currentLocationAverage.y = y;
 	currentLocationAverage.theta = theta;
@@ -852,7 +860,7 @@ void mapAverage()
 		geometry_msgs::PoseStamped mapPose;
 		mapPose.header.stamp = ros::Time::now();
 		mapPose.header.frame_id = publishedName + "/map";
-		mapPose.pose.orientation.w = 1;
+		mapPose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
 		mapPose.pose.position.x = centerLocationMap.x;
 		mapPose.pose.position.y = centerLocationMap.y;
 		geometry_msgs::PoseStamped odomPose;
@@ -866,6 +874,11 @@ void mapAverage()
 		catch(tf::TransformException& ex) {
 			ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
 			x = "Exception thrown " + (string)ex.what();
+			 std_msgs::String msg;
+  			 stringstream ss;
+  			 ss << "Exception in mapAverage() " + (string)ex.what();
+   			 msg.data = ss.str();
+  			 infoLogPublisher.publish(msg);
 		}
 
 		centerLocation.x = odomPose.pose.position.x;

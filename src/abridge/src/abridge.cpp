@@ -55,7 +55,7 @@ float evArray[1000]; //array of previous error for (arraySize/hz) seconds (error
 float velError[4] = {0,0,0,0}; //contains current velocity error and error 4 steps in the past.
 
 float Kpy = 200; //Proportinal Yaw   
-float Kiy = 15; //Inegral Yaw
+float Kiy = 20; //Inegral Yaw
 float Kdy = 15; //Derivative Yaw
 int stepY = 0; //keeps track of the point in the array for adding new error each update cycle.
 float eyArray[1000]; //array of previous error for (arraySize/hz) seconds (error Yaw Array)
