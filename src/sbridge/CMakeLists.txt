@@ -1,17 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(abridge)
+project(sbridge)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
-  sensor_msgs
   std_msgs
-  tf
-  nav_msgs
 )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs tf nav_msgs
+  CATKIN_DEPENDS geometry_msgs roscpp std_msgs
 )
 
 include_directories(
@@ -19,11 +16,11 @@ include_directories(
 )
 
 add_executable(
-  abridge src/abridge.cpp src/usbSerial.cpp
+  sbridge src/main.cpp
 )
 
 target_link_libraries(
-  abridge
+  sbridge
   ${catkin_LIBRARIES}
 )
 
