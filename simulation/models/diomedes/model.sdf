@@ -715,7 +715,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>diomedes/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/diomedes/velocity</commandTopic>
+			<commandTopic>/diomedes/skidsteer</commandTopic>
 			<odometryTopic>/diomedes/odom</odometryTopic>
 			<odometryFrame>diomedes/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>
