@@ -205,12 +205,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
 
     mapAverage(); //calls the averaging function, also responsible for transform from Map frame to odom frame.
-
-   std_msgs::String msg;
-   stringstream ss;
-   ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << "curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
-   msg.data = ss.str();
-   infoLogPublisher.publish(msg);
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
@@ -832,9 +826,7 @@ void simP(double linearVel, double angularVel)
 
 void mapAverage()
 {
-	mapLocation[mapCount].x = currentLocationMap.x;
-	mapLocation[mapCount].y = currentLocationMap.y;
-	mapLocation[mapCount].theta = currentLocationMap.theta;
+	mapLocation[mapCount] = currentLocationMap; //store currentLocation in the averaging array
 	mapCount++;
 	
 	if (mapCount >= 100) {mapCount = 0;}
@@ -842,13 +834,13 @@ void mapAverage()
 	double x = 0;
 	double y = 0;
 	double theta = 0;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 100; i++) //add up all the positions in the array
 	{
 	  x += mapLocation[i].x;
 	  y += mapLocation[i].y;
 	  theta += mapLocation[i].theta;
 	}
-	x = x/100;
+	x = x/100; //find the average
 	y = y/100;
 	theta = theta/100;//Get theta rotation by converting quaternion orientation to pitch/roll/yaw
 	currentLocationAverage.x = x;
@@ -856,10 +848,10 @@ void mapAverage()
 	currentLocationAverage.theta = theta;
 
 
-	if (init)
+	if (init) //only run below code if a centerLocation has been set by initilization
 	{
-		geometry_msgs::PoseStamped mapPose;
-		mapPose.header.stamp = ros::Time::now();
+		geometry_msgs::PoseStamped mapPose; //map frame
+		mapPose.header.stamp = ros::Time::now(); //setup msg to represent the center location in map frame
 		mapPose.header.frame_id = publishedName + "/map";
 		mapPose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
 		mapPose.pose.position.x = centerLocationMap.x;
@@ -867,7 +859,7 @@ void mapAverage()
 		geometry_msgs::PoseStamped odomPose;
 		string x = "";
 
-		try {
+		try { //attempt to get the transform of the center point in map frame to odom frame.
 			tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time::now(), ros::Duration(1.0));
 			tfListener->transformPose(publishedName + "/odom", mapPose, odomPose);
 		}
@@ -882,7 +874,7 @@ void mapAverage()
   			 infoLogPublisher.publish(msg);
 		}
 
-		centerLocation.x = odomPose.pose.position.x;
+		centerLocation.x = odomPose.pose.position.x; //set centerLocation in odom frame
 		centerLocation.y = odomPose.pose.position.y;
 	}
 }
@@ -926,3 +918,11 @@ void mapAverage()
 		}
 		//x coord = odomPose.pose.position.x;
 */
+
+/*
+   std_msgs::String msg;
+   stringstream ss;
+   ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << "curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
+   msg.data = ss.str();
+   infoLogPublisher.publish(msg);
+   */
