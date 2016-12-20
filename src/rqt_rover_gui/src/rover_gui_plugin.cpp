@@ -108,7 +108,7 @@ namespace rqt_rover_gui
     ui.rover_name->setText(rover_name_msg_qstr);
 
     // Setup QT message connections
-    connect(this, SIGNAL(sendDiagsDataUpdate(QString, QString, QColor)), this, SLOT(recieveDiagsDataUpdate(QString, QString,QColor)));
+    connect(this, SIGNAL(sendDiagsDataUpdate(QString, QString, QColor)), this, SLOT(receiveDiagsDataUpdate(QString, QString,QColor)));
     connect(ui.rover_list, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentRoverChangedEventHandler(QListWidgetItem*,QListWidgetItem*)));
     connect(ui.rover_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(refocusKeyboardEventHandler()));
     connect(ui.rover_list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(refocusKeyboardEventHandler()));
@@ -222,7 +222,7 @@ void RoverGUIPlugin::restoreSettings(const qt_gui_cpp::Settings& plugin_settings
 }
 
 
-// Recieves messages from the ROS joystick driver and used them to articulate the gripper and drive the rover.
+// Receives messages from the ROS joystick driver and used them to articulate the gripper and drive the rover.
 void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
 {
      // Give the array values some helpful names:
@@ -2248,7 +2248,7 @@ void RoverGUIPlugin::overrideNumRoversCheckboxToggledEventHandler(bool checked)
 }
 
 // Slot used to update the GUI diagnostic data output. Ensures we update from the correct process.
-void RoverGUIPlugin::recieveDiagsDataUpdate(QString rover_name, QString text, QColor colour)
+void RoverGUIPlugin::receiveDiagsDataUpdate(QString rover_name, QString text, QColor colour)
 {
     if (!diag_update_mutex.try_lock()) return;
 
