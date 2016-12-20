@@ -44,9 +44,12 @@
 #include <QGraphicsView>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QListWidget> // Provides QListWidgetItem
 #include <QProcess>
 #include <map>
 #include <set>
+#include <mutex>
+
 
 //ROS msg types
 //#include "rover_onboard_target_detection/ATag.h"
@@ -135,7 +138,8 @@ namespace rqt_rover_gui {
   signals:
 
     void sendInfoLogMessage(QString); // log message updates need to be implemented as signals so they can be used in ROS event handlers.
-    void sendDiagLogMessage(QString);
+    void sendDiagLogMessage(QString);    
+    void sendDiagsDataUpdate(QString, QString, QColor); // Provide the item to update and the diags text and text color
 
     // Joystick output - Drive
     void joystickDriveForwardUpdate(double);
@@ -154,6 +158,7 @@ namespace rqt_rover_gui {
 
   private slots:
 
+    void recieveDiagsDataUpdate(QString, QString, QColor);
     void receiveInfoLogMessage(QString);
     void receiveDiagLogMessage(QString);
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
@@ -258,6 +263,8 @@ namespace rqt_rover_gui {
     // Limit the length of log messages in characters to prevent slowdowns when lots of data is added
     size_t max_info_log_length;
     size_t max_diag_log_length;
+
+    std::mutex diag_update_mutex;
 
   };
 } // end namespace
