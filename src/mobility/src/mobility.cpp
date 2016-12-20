@@ -30,7 +30,6 @@ random_numbers::RandomNumberGenerator* rng;
 
 //Mobility Logic Functions
 void setVelocity(double linearVel, double angularVel);
-void simP(double linearVel, double angularVel);
 void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
@@ -85,13 +84,12 @@ string publishedName;
 char prev_state_machine[128];
 
 //Publishers
-ros::Publisher velocityPublish;
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
 ros::Publisher fingerAnglePublish;
 ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
-ros::Publisher bridgeVelocityPublish;
+ros::Publisher driveControlPublish;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -178,12 +176,11 @@ int main(int argc, char **argv) {
     mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
 
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
-    velocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/velocity"), 10);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
     fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);
     wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
-    bridgeVelocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/bridgeVelocity"), 10);
+    driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     //killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
@@ -411,12 +408,7 @@ void setVelocity(double linearVel, double angularVel)
 
   velocity.linear.x = linearVel, // * 1.5;
   velocity.angular.z = angularVel; // * 8; //scaling factor for sim; removed by aBridge node
-  bridgeVelocityPublish.publish(velocity);
-
-
-
-  simP(linearVel,angularVel);
-  
+  driveControlPublish.publish(velocity);
 }
 
 /***********************
@@ -779,50 +771,6 @@ void sigintEventHandler(int sig)
      // All the default sigint handler does is call shutdown()
      ros::shutdown();
 }
-
-void simP(double linearVel, double angularVel)
-{
-
-  int sat = 255;
-  int Kpv = 255;
-  int Kpa = 200;
-
-  //Propotinal
-  float PV = Kpv * linearVel; 
-  if (PV > sat) //limit the max and minimum output of proportinal
-  PV = sat;
-  if (PV < -sat)
-  PV= -sat;
-
-  //Propotinal
-  float PA = Kpa * angularVel; 
-  if (PA > sat) //limit the max and minimum output of proportinal
-  PA = sat;
-  if (PA < -sat)
-  PA= -sat;
-
-   float turn = PA/60;  
-   float forward = PV/355-(abs(turn)/5);
-   if (linearVel >= 0 && forward <= 0)
-   {
-   forward = 0;
-   }
-   if (linearVel <= 0 && forward >= 0)
-   {
-   forward = 0;
-   }
-   /*std_msgs::String msg;
-   stringstream ss;
-   ss << "";
-   msg.data = ss.str();
-   infoLogPublisher.publish(msg);*/
-
-
-  velocity.linear.x = forward, 
-  velocity.angular.z = turn;
-  velocityPublish.publish(velocity);
-}
-
 
 void mapAverage()
 {
