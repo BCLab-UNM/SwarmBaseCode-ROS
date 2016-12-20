@@ -16,7 +16,7 @@ include_directories(
 )
 
 add_executable(
-  sbridge src/main.cpp
+  sbridge src/main.cpp src/sbridge.cpp
 )
 
 target_link_libraries(
