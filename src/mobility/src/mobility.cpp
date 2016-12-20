@@ -91,7 +91,7 @@ ros::Publisher status_publisher;
 ros::Publisher fingerAnglePublish;
 ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
-ros::Publisher physVelocityPublish;
+ros::Publisher bridgeVelocityPublish;
 
 //Subscribers
 ros::Subscriber joySubscriber;
@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
     fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);
     wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
-    physVelocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/physVelocity"), 10);
+    bridgeVelocityPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/bridgeVelocity"), 10);
 
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     //killSwitchTimer = mNH.createTimer(ros::Duration(killSwitchTimeout), killSwitchTimerEventHandler);
@@ -204,7 +204,7 @@ int main(int argc, char **argv) {
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
 
-    mapAverage();
+    mapAverage(); //calls the averaging function, also responsible for transform from Map frame to odom frame.
 
    std_msgs::String msg;
    stringstream ss;
@@ -214,17 +214,17 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
 
-    tDiff = time(0) - startupDelay; 
+    tDiff = time(0) - startupDelay; //time since startDelay was set
 
-	if (!init) //initiliation code goes here.
+	if (!init) //initiliation code goes here. (code the runs only once at start of auto mode but wont work in main)
 	{
-	  centerLocationMap.x = currentLocationAverage.x;
-	  centerLocationMap.y = currentLocationAverage.y;
+	  centerLocationMap.x = currentLocationAverage.x; // set the location of the center circle location in the map frame
+	  centerLocationMap.y = currentLocationAverage.y; // based upon our current average location on the map.
 	  centerLocationMap.theta = currentLocationAverage.theta;
-	  init = true;
+	  init = true; //initiliation has run
 	}
 
-	if (!targetCollected && !targetDetected)
+	if (!targetCollected && !targetDetected) //if no collected or detected blocks set fingers toopen wide and raised position.
 		{
 		   //set gripper
 		   std_msgs::Float32 angle;
@@ -242,12 +242,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 			//If no adjustment needed, select new goal
 			case STATE_MACHINE_TRANSFORM: {
 				stateMachineMsg.data = "TRANSFORMING";
-				if(dropRoute)
+				if(dropRoute) //if we are in the routine for exciting the circle once we have droppeda block off and reseting all our flags to resart our search.
 				{
-					goalLocation.x = currentLocation.x;
+					goalLocation.x = currentLocation.x; //set goalLocation to currentLocation so we can drive how we want to instead of using translate and rotate
 					goalLocation.y = currentLocation.y;
 					goalLocation.theta = currentLocation.theta;
-					if (tDiff > 2)
+					if (tDiff >= 3) //startupDelay was reset before we entered dropRoute so we can now use it for our timeing of 2 seconds backwards driving
 					 {
 					   //reset flag
 				  	   targetCollected = false;
@@ -260,7 +260,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					   setVelocity(0.0,0);
 				   	   stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
 					 }
-					else if (tDiff > 0)
+					else if (tDiff >= 1)
 					{
 					  //open fingers
 					  std_msgs::Float32 angle;
@@ -269,7 +269,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 		   			  angle.data = 0;
 		   			  wristAnglePublish.publish(angle); //raise wrist
 						
-					  setVelocity(-0.3,0.0);
+					  setVelocity(-0.3,0.0); //drive backwards out of the circle
 					}
 					break;
 				}
@@ -298,16 +298,16 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 					}
 					else //spin search for center
 					{
-					 goalLocation.x = centerLocation.x + 0.3 * cos(spinner);
-					 goalLocation.y = centerLocation.y + 0.3 * sin(spinner);
+					 goalLocation.x = centerLocation.x + 0.6 * cos(spinner); //sets a goal that is 60cm from the centerLocation and spinner radians counterclockwise from being purly along the x-axis.
+					 goalLocation.y = centerLocation.y + 0.6 * sin(spinner);
 					 goalLocation.theta = atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x);
 					 
-					 spinner += 45*(M_PI/180);
+					 spinner += 45*(M_PI/180); //add 45 degrees in radians to spinner.
 					 if (spinner > 2*M_PI)
 					 {
 					    spinner -= 2*M_PI;
 					 }
-					 spinning = true;
+					 spinning = true; //safty flag to prevent us trying to drive back to the center since we have a block with us and the above point is 60cm from the center.
 					 stateMachineState = STATE_MACHINE_ROTATE;		
 					}
 				}
@@ -417,7 +417,7 @@ void setVelocity(double linearVel, double angularVel)
 
   velocity.linear.x = linearVel, // * 1.5;
   velocity.angular.z = angularVel; // * 8; //scaling factor for sim; removed by aBridge node
-  physVelocityPublish.publish(velocity);
+  bridgeVelocityPublish.publish(velocity);
 
 
 
@@ -444,20 +444,20 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	  bool left = false;
 	  for (int i = 0; i < message->detections.size(); i++) //this loop is to get the number of center tags
 	  {
-       	   if (message->detections[i].id == 256) 
-       	   {
+       	if (message->detections[i].id == 256) 
+       	{
 	     geometry_msgs::PoseStamped cenPose = message->detections[i].pose;
 	     if (cenPose.pose.position.x + 0.020 > 0) //checks if tag is on the right or left side of the image
 	     {
-		right = true;
+		  right = true;
 	     }
 	     else
 	     {
-		left = true;
+		  left = true;
 	     }
-             centerSeen = true;
+         centerSeen = true;
 	     count++;
-	   }
+	    }
 	  }
 
 	  if (!approach || !countDropGuard) dropCheck = time(0);
@@ -465,6 +465,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	  if (centerSeen && targetCollected) //if we have a target and the center is located drive towards it.
 	  {
 		float mod = 1;
+		//below is only usfull for the new center design as opposed to the current circle.
 		//if (countDropGuard) mod = -1; //reverse tag rejection when we have seen enough tags that we are on a trajectory in to the square we dont want to follow an edge.
 		if (left && right) setVelocity(0.15, 0.0); //otherwise turn till tags on both sides of image then drive straight
 		else if (right) setVelocity(0.15, -0.15*mod);
@@ -483,28 +484,27 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		approach = true;
 		
 	  }
-	  if (centerSeen) 
+	  else if (centerSeen) 
 	  {
-		if (!targetCollected) //if you want to drive around the center diffrently mod here
-		{
-		  stateMachineState = STATE_MACHINE_TRANSFORM;
-		  if (right)
-		  {
-		  goalLocation.theta += 0.15; //turn away from the center to the left if just driving around/searching.
-		  }
-		  else
-		  {
-		  goalLocation.theta -= 0.15; //turn away from the center to the right if just driving around/searching.
-		  }
-		  double tmpDist = hypot(goalLocation.x - currentLocation.x, goalLocation.y - currentLocation.y);
-		  goalLocation.x = currentLocation.x + (tmpDist * cos(goalLocation.theta));
-		  goalLocation.y = currentLocation.y + (tmpDist * sin(goalLocation.theta));
-		}
+	     //if you want to avoid the center diffrently mod here
+		 stateMachineState = STATE_MACHINE_TRANSFORM;
+		 if (right)
+		 {
+		 goalLocation.theta += 0.15; //turn away from the center to the left if just driving around/searching.
+		 }
+		 else
+		 {
+		 goalLocation.theta -= 0.15; //turn away from the center to the right if just driving around/searching.
+		 }
+		 double tmpDist = hypot(goalLocation.x - currentLocation.x, goalLocation.y - currentLocation.y); //tmpDist avoids magic numbers by calculating the the dist
+		 goalLocation.x = currentLocation.x + (tmpDist * cos(goalLocation.theta)); //this of course assumes random walk continuation as opposed to a diffrent search method.
+		 goalLocation.y = currentLocation.y + (tmpDist * sin(goalLocation.theta));
+		
 		targetDetected = false;		
 		return;
 	  }	  	
 	}
-	else if (approach)
+	else if (approach) //was on approach to center and failed drop checksfor longer than 4 seconds so reset.
  	{
 	  tDiff2 = time(0) - dropCheck;
 	  if (tDiff2 > 4) 
@@ -521,7 +521,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 	{
 
 	targetDetected = true;
-	stateMachineState = STATE_MACHINE_PICKUP;
+	stateMachineState = STATE_MACHINE_PICKUP; //pickup state so target handler can take overdriving.
 		
 		double closest = 100; 
 		int target  = 0;
@@ -582,7 +582,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 		}
 	}
 	
-	if (targetDetected && !targetCollected)
+	if (targetDetected && !targetCollected) //we see a block andhave not picked one up yet
 	{
 		if (!timeOut) millTimer = boost::posix_time::microsec_clock::local_time(); // millisecond time = current time if not in a counting state
 
@@ -711,7 +711,7 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
 	}
 
 
-	if (message->data == 4)
+	if (message->data == 4) //the front ultrasond is blocked very closely. 0.14m currently 
 	{
 		blockBlock = true;
 	}
@@ -836,6 +836,7 @@ void mapAverage()
 	mapLocation[mapCount].y = currentLocationMap.y;
 	mapLocation[mapCount].theta = currentLocationMap.theta;
 	mapCount++;
+	
 	if (mapCount >= 100) {mapCount = 0;}
 
 	double x = 0;

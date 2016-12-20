@@ -77,7 +77,7 @@ ros::Publisher sonarRightPublish;
 ros::Publisher infoLogPublisher;
 
 //Subscribers
-ros::Subscriber physVelocitySubscriber;
+ros::Subscriber bridgeVelocitySubscriber;
 ros::Subscriber fingerAngleSubscriber;
 ros::Subscriber wristAngleSubscriber;
 ros::Subscriber modeSubscriber;
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     infoLogPublisher = aNH.advertise<std_msgs::String>("/infoLog", 1, true);
     
-    physVelocitySubscriber = aNH.subscribe((publishedName + "/physVelocity"), 10, cmdHandler);
+    bridgeVelocitySubscriber = aNH.subscribe((publishedName + "/bridgeVelocity"), 10, cmdHandler);
     fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle/cmd"), 1, fingerAngleHandler);
     wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle/cmd"), 1, wristAngleHandler);
     modeSubscriber = aNH.subscribe((publishedName + "/mode"), 1, modeHandler);
