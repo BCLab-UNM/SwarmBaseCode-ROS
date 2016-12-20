@@ -10,7 +10,6 @@
 #include <QDir>
 #include <QtXml>
 #include <QFile>
-#include <QListWidget>
 #include <QScrollBar>
 #include <QProcess>
 #include <QPalette>
@@ -109,6 +108,7 @@ namespace rqt_rover_gui
     ui.rover_name->setText(rover_name_msg_qstr);
 
     // Setup QT message connections
+    connect(this, SIGNAL(sendDiagsDataUpdate(QString, QString, QColor)), this, SLOT(recieveDiagsDataUpdate(QString, QString,QColor)));
     connect(ui.rover_list, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentRoverChangedEventHandler(QListWidgetItem*,QListWidgetItem*)));
     connect(ui.rover_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(refocusKeyboardEventHandler()));
     connect(ui.rover_list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(refocusKeyboardEventHandler()));
@@ -896,104 +896,109 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     float byte_rate = msg->data[1]; // Bandwidth used by the wireless interface
     float sim_rate = msg->data[2]; // Simulation update rate
 
-    // Convert to strings
-
-    diagnostic_display = to_string(wireless_quality);
-
-    // Convert the byte rate into a string with units
-    // Rate in B/s
-       float rate = byte_rate;
-
-       // Conversion factors to make the rate human friendly
-       int KB = 1024;
-       int MB = 1024*1024;
-
-       string rate_str;
-       string units;
-       if (rate < KB) {
-         rate_str = to_string(rate);
-         units = "B/s";
-       } else if (rate < MB) {
-         rate = rate/KB;
-         units = "KB/s";
-       } else {
-         rate = rate/MB;
-         units = "MB/s";
-       }
-
-       rate_str = to_string(rate);
-       if (rate_str[rate_str.find(".")+1] != '0')
-         rate_str = rate_str.erase(rate_str.find(".")+2,string::npos);
-       else
-         rate_str = rate_str.erase(rate_str.find("."),string::npos);
-
-       diagnostic_display += " | " + rate_str + " " + units;
-
-    // Find the row in the rover list that corresponds to the rover that sent us the diagnostics message
-    // this is just to make sure the diagnostic data is displayed in the row that matches the rover
-    // it came from
-    int row = 0; // declare here so we can use it to index into the rover_diags_list
-    for(; row < ui.rover_list->count(); row++)
-    {
-        QListWidgetItem *item = ui.rover_list->item(row);
-
-        // Extract rover name
-        string rover_name_and_status = item->text().toStdString();
-
-        // Rover names start at the begining of the rover name and status string and end at the first space
-        size_t rover_name_length = rover_name_and_status.find_first_of(" ");
-        string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
-        if (ui_rover_name.compare(rover_name)==0) break; // We found a rover with the right name
-    }
-
-    // Check the the rover was found in the rover list
-    if (row >= ui.rover_list->count())
-    {
-        emit sendInfoLogMessage(QString::fromStdString("Received diagnostic data from an unknown rover: " + rover_name));
-        return;
-    }
-
-    // Update the UI
-    QListWidgetItem *item = ui.rover_diags_list->item(row);
-    // We don't want the user to interact with this display item so make non-selectable
-    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    // Declare the output colour variables
+    int red = 255;
+    int green = 255;
+    int blue = 255;
     
-    // Check whether there is sim update data. If so assume the diagnostic data is coming from a simulated rover.
+    // Check whether there is sim update data. Will be < 0 for the sim rate if a physical rover is sending the data.
+    // If so assume the diagnostic data is coming from a simulated rover.
     // TODO: replace with a proper message type so we don't need to use in stream flags like this.
     if ( sim_rate < 0 )
-      {
-	// Change the color of the text based on the link quality. These numbers are from
-	// experience but need tuning. The raw quality value is scaled into a new range to make the colors more meaningful
-	int quality_max = 70;
-	int quality_min = 0;
-	int scaled_max = 10;
-	int scaled_min = 0;
-	int quality_range = quality_max - quality_min; // Max minus min
-	int scaled_range = scaled_max - scaled_min; // Scaled to match the experimental quality of the connection. Below 30 should be red = bad
-	int scaled_wireless_quality = (((wireless_quality - quality_min)*static_cast<float>(scaled_range))/quality_range) + scaled_min; // scale the quality to the new range
-	
-	int green = 255 * scaled_wireless_quality/static_cast<float>(scaled_range);
-	int red = 255 * (2*scaled_range - (scaled_wireless_quality))/static_cast<float>(2*scaled_range);
-	int blue = 0;
-	
-	item->setTextColor(QColor(red, green, blue));
-      }
+    {
+        // Change the color of the text based on the link quality. These numbers are from
+        // experience but need tuning. The raw quality value is scaled into a new range to make the colors more meaningful
+        int quality_max = 70;
+        int quality_min = 0;
+        int scaled_max = 10;
+        int scaled_min = 0;
+        int quality_range = quality_max - quality_min; // Max minus min
+        int scaled_range = scaled_max - scaled_min; // Scaled to match the experimental quality of the connection. Below 30 should be red = bad
+        int scaled_wireless_quality = (((wireless_quality - quality_min)*static_cast<float>(scaled_range))/quality_range) + scaled_min; // scale the quality to the new range
+
+        if (scaled_range != 0)
+        {
+            green = 255 * scaled_wireless_quality/static_cast<float>(scaled_range);
+            red = 255 * (2*scaled_range - (scaled_wireless_quality))/static_cast<float>(2*scaled_range);
+        }
+        else
+        {
+            green = 0;
+            red = 0;
+        }
+
+        blue = 0;
+
+        // Make sure color is in a valid range
+        if (green > 255) green = 255;
+        if (blue > 255) blue = 255;
+        if (red > 255) red = 255;
+
+        if (green < 0) green = 0;
+        if (blue < 0) blue = 0;
+        if (red < 0) red = 0;
+
+        diagnostic_display = to_string(wireless_quality);
+
+        // Convert the byte rate into a string with units
+        // Rate in B/s
+        float rate = byte_rate;
+
+        // Conversion factors to make the rate human friendly
+        int KB = 1024;
+        int MB = 1024*1024;
+
+        string rate_str;
+        string units;
+        if (rate < KB) {
+            rate_str = to_string(rate);
+            units = "B/s";
+        } else if (rate < MB) {
+            rate = rate/KB;
+            units = "KB/s";
+        } else {
+            rate = rate/MB;
+            units = "MB/s";
+        }
+
+        rate_str = to_string(rate);
+
+        if (rate_str[rate_str.find(".")+1] != '0')
+            rate_str = rate_str.erase(rate_str.find(".")+2,string::npos);
+        else
+            rate_str = rate_str.erase(rate_str.find("."),string::npos);
+
+        diagnostic_display += " | " + rate_str + " " + units;
+
+    }
     else
-      {
-	string sim_rate_str = to_string(sim_rate);
+    {
+        string sim_rate_str = to_string(sim_rate);
 
-	// Truncate to 1 digit
-	if (sim_rate_str[sim_rate_str.find(".")+1] != '0')
-	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find(".")+3,string::npos);
-	else
-	  sim_rate_str = sim_rate_str.erase(sim_rate_str.find("."),string::npos);
+        // Truncate to 1 digit
+        if (sim_rate_str[sim_rate_str.find(".")+1] != '0')
+            sim_rate_str = sim_rate_str.erase(sim_rate_str.find(".")+3,string::npos);
+        else
+            sim_rate_str = sim_rate_str.erase(sim_rate_str.find("."),string::npos);
 
-	item->setTextColor(QColor(255*(1-sim_rate),255*sim_rate,0));
+        red = 255*(1-sim_rate);
+        green = 255*sim_rate;
+        blue = 0;
 
-	diagnostic_display = sim_rate_str + " sim rate";
-      }
+        // Make sure color is in a valid range
+        if (green > 255) green = 255;
+        if (blue > 255) blue = 255;
+        if (red > 255) red = 255;
 
-    item->setText(QString::fromStdString(diagnostic_display));
+        if (green < 0) green = 0;
+        if (blue < 0) blue = 0;
+        if (red < 0) red = 0;
+
+        diagnostic_display = sim_rate_str + " sim rate";
+    }
+
+    emit sendDiagsDataUpdate(QString::fromStdString(rover_name), QString::fromStdString(diagnostic_display), QColor(red, green, blue));
+
 }
 
 // We use item changed signal as a proxy for the checkbox being clicked
@@ -2241,6 +2246,49 @@ void RoverGUIPlugin::overrideNumRoversCheckboxToggledEventHandler(bool checked)
     if (checked) ui.custom_num_rovers_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px"); // The padding makes the item list color change work
     else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey;");
 }
+
+// Slot used to update the GUI diagnostic data output. Ensures we update from the correct process.
+void RoverGUIPlugin::recieveDiagsDataUpdate(QString rover_name, QString text, QColor colour)
+{
+    if (!diag_update_mutex.try_lock()) return;
+
+    // Find the row in the rover list that corresponds to the rover that sent us the diagnostics message
+    // this is just to make sure the diagnostic data is displayed in the row that matches the rover
+    // it came from
+    int row = 0; // declare here so we can use it to index into the rover_diags_list
+    for(; row < ui.rover_list->count(); row++)
+    {
+        QListWidgetItem *item = ui.rover_list->item(row);
+
+        // Extract rover name
+        string rover_name_and_status = item->text().toStdString();
+
+        // Rover names start at the begining of the rover name and status string and end at the first space
+        size_t rover_name_length = rover_name_and_status.find_first_of(" ");
+        string ui_rover_name = rover_name_and_status.substr(0, rover_name_length);
+        if (ui_rover_name.compare(rover_name.toStdString())==0) break; // We found a rover with the right name
+    }
+
+    // Check the the rover was found in the rover list
+    if (row >= ui.rover_list->count())
+    {
+        emit sendInfoLogMessage("Received diagnostic data from an unknown rover: " + rover_name);
+        return;
+    }
+
+    // Update the UI - needs to happen in the UI thread
+    QListWidgetItem *item = ui.rover_diags_list->item(row);
+
+    // We don't want the user to interact with this display item so make non-selectable
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+
+    // Set the text and colour
+    item->setText(text);
+    item->setTextColor(colour);
+
+    diag_update_mutex.unlock();
+}
+
 
 // Refocus on the main ui widget so the rover list doesn't start capturing key strokes making keyboard rover driving not work.
 void RoverGUIPlugin::refocusKeyboardEventHandler()
