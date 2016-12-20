@@ -668,8 +668,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/achilles/wristAngle/cmd</wristTopic>
-			<fingerTopic>/achilles/fingerAngle/cmd</fingerTopic>
+			<wristTopic>/achilles/wristAngle</wristTopic>
+			<fingerTopic>/achilles/fingerAngle</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
