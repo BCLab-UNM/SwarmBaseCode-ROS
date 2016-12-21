@@ -39,7 +39,7 @@ geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D goalLocation;
 int currentMode = 0;
 float mobilityLoopTimeStep = 0.1; //time between the mobility loop calls
-float status_publish_interval = 5;
+float status_publish_interval = 1;
 float killSwitchTimeout = 10;
 bool targetDetected = false;
 bool targetCollected = false;
