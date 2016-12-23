@@ -270,18 +270,24 @@ void GripperPlugin::setWristAngleHandler(const std_msgs::Float32ConstPtr& msg) {
  *            which represents an angle in radians.
  */ 
 void GripperPlugin::setFingerAngleHandler(const std_msgs::Float32ConstPtr& msg) {
-  float fingerAngle = msg->data;
+
+  double fingerAngle = msg->data;
   desiredFingerAngle = fingerAngle;
 
   // Force drop static models when the gripper is open
-  if (isAttached)
-    if (desiredFingerAngle > M_PI/2)
-      if (attachedTargetModel->IsStatic()) 
-	try { 
-	  detach(); 
-	} catch (exception &e) {
+  if (isAttached) {
+    // 1.39626 is approximately equal to 80 degrees
+    double maxGrippingAngle = 1.39626;
+
+    if (desiredFingerAngle >= maxGrippingAngle) {
+      sendInfoLogMessage("GripperPlugin: detach() trying to detach due to finger angle failsafe");
+      try {
+        detach(); 
+      } catch (exception &e) {
 	  sendInfoLogMessage("GripperPlugin: detach() failed with: " + string(e.what()));
-	}
+      }
+    }
+  }
 }
 
 /**
@@ -587,6 +593,13 @@ void GripperPlugin::attach() {
 
   if (isAttached) throw runtime_error("already attached");
 
+  // 1.39626 is approximately equal to 80 degrees
+  float maxGrippingAngle = 1.39626;
+
+  // Do not attach in the edge case where the gripper fingers are fully open.
+  // Gripping will occur once the rover begins to grasp and the desiredFingerAngle is lowered.
+  if (desiredFingerAngle >= 1.39626) return;
+
   // Get the target model
   physics::ModelPtr targetModel = rightFingerTargetLink->GetModel(); // It doesn't matter whether we use the left or right target link here.
   attachedTargetModel = targetModel;
@@ -682,6 +695,7 @@ void GripperPlugin::detach() {
     targetAttachJoint.reset();
     isAttached = false;
     attachedTargetModel = NULL;
+    contactTime = common::Time(0.0);
     
     return;
     
