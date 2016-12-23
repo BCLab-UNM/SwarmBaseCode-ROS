@@ -48,8 +48,9 @@ geometry_msgs::Pose2D mapLocation[100];
 
 int currentMode = 0;
 float mobilityLoopTimeStep = 0.1; //time between the mobility loop calls
-float status_publish_interval = 5;
-bool targetDetected = false; 
+float status_publish_interval = 1;
+float killSwitchTimeout = 10;
+bool targetDetected = false;
 bool targetCollected = false;
 
 //set true when the target block is less than targetDist so we continue attempting to pick it up rather than

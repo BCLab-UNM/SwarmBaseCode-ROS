@@ -158,7 +158,7 @@ namespace rqt_rover_gui {
 
   private slots:
 
-    void recieveDiagsDataUpdate(QString, QString, QColor);
+    void receiveDiagsDataUpdate(QString, QString, QColor);
     void receiveInfoLogMessage(QString);
     void receiveDiagLogMessage(QString);
     void currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous);
