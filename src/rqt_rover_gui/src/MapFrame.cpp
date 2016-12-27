@@ -32,7 +32,7 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     translate_y = 0;
 
     scale_speed = 0.1; // The amount of zoom per mouse wheel angle change
-    translate_speed = 1.5;
+    translate_speed = 0.01;
 
     display_ekf_data = false;
     display_gps_data = false;
@@ -455,41 +455,39 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
         QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
 
         // The mouse tolerance is to make sure only deliberate movements pan the map
-        int mouse_tolerance = 0;
+        int mouse_tolerance = 10;
 
-        //if ((mouse_event->pos().x()-width()/2) > 0)
+        translate_speed = scale / 100.0;
+
         float x_difference = mouse_event->pos().x() - previous_mouse_position.x();
         float y_difference = mouse_event->pos().y() - previous_mouse_position.y();
 
-        if (fabs(x_difference) < mouse_tolerance)
-        if (x_difference < 0)
-        {
+        if (fabs(x_difference) < mouse_tolerance) {
+          if (x_difference < 0) {
+            //translate_x += translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
+            translate_x += translate_speed;
+          }
+          else {
+            //translate_x -= translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
+            translate_x -= translate_speed;
+          }
+        }
 
-            translate_x += translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
-        }
-        else
-        {
-            translate_x -= translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
-        }
-
-        //if ((mouse_event->pos().y()-height()/2) > 0)
-        if (fabs(y_difference) < mouse_tolerance)
-        if (y_difference < 0)
-        {
-            translate_y += translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
-        }
-        else
-        {
-            translate_y -= translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
+        if (fabs(y_difference) < mouse_tolerance) {
+          if (y_difference < 0) {
+            //translate_y += translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
+            translate_y += translate_speed;
+          }
+          else {
+            //translate_y -= translate_speed*scale; // half frame offset to make the translation relative to the center of the map frame
+            translate_y -= translate_speed;
+          }
         }
 
         previous_mouse_position = mouse_event->pos();
 
         //emit sendInfoLogMessage("MapFrame: mouse move. x difference: " + QString::number(x_difference) + " y difference: " + QString::number(y_difference) + " translate_y: " + QString::number(translate_x));
-
     }
-
-
 }
 
 void MapFrame::wheelEvent(QWheelEvent *event)
