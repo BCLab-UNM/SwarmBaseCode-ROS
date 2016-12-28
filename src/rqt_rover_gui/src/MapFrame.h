@@ -118,6 +118,8 @@ namespace rqt_rover_gui
       QPoint previous_clicked_position;
       float translate_x;
       float translate_y;
+      float scroll_translate_x;
+      float scroll_translate_y;
       float previous_translate_x;
       float previous_translate_y;
       float translate_speed; // Amount to pan by as the mouse position changes

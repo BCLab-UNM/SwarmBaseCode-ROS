@@ -30,10 +30,12 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     auto_transform = true;
     scale = 1.0f;
 
-    translate_x = 0.0;
-    translate_y = 0.0;
-    previous_translate_x = 0.0;
-    previous_translate_y = 0.0;
+    translate_x = 0.0f;
+    translate_y = 0.0f;
+    scroll_translate_x = 0.0f;
+    scroll_translate_y = 0.0f;
+    previous_translate_x = 0.0f;
+    previous_translate_y = 0.0f;
 
     scale_speed = 0.1; // The amount of zoom per mouse wheel angle change
     translate_speed = 0.01;
@@ -188,8 +190,8 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         max_seen_width = max_seen_width_when_manual_enabled*scale;
         max_seen_height = max_seen_height_when_manual_enabled*scale;
 
-        min_seen_x = min_seen_x_when_manual_enabled+translate_x;
-        min_seen_y = min_seen_y_when_manual_enabled+translate_y;
+        min_seen_x = min_seen_x_when_manual_enabled + translate_x + scroll_translate_x;
+        min_seen_y = min_seen_y_when_manual_enabled + translate_y + scroll_translate_y;
     }
 
     // Maintain aspect ratio
@@ -363,9 +365,10 @@ void MapFrame::paintEvent(QPaintEvent* event) {
 
         // Draw a yellow circle at the current EKF estimated rover location
         painter.setPen(Qt::yellow);
-	pair<float,float> current_coordinate; //check if EKFPath is empty before takeing coordinates off the back
-        if(!map_data->getEKFPath(rover_to_display)->empty())
-	  current_coordinate = map_data->getEKFPath(rover_to_display)->back();
+        pair<float,float> current_coordinate; //check if EKFPath is empty before takeing coordinates off the back
+        if(!map_data->getEKFPath(rover_to_display)->empty()) {
+          current_coordinate = map_data->getEKFPath(rover_to_display)->back();
+        }
         QPoint point;
         float x = map_origin_x+((current_coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
         float y = map_origin_y+((current_coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
@@ -450,6 +453,11 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
 
 void MapFrame::mouseMoveEvent(QMouseEvent *event)
 {
+    // Do not adjust panning in auto-transform mode.. the changes will not be reflected
+    // and will be applied only when the user clicks on manual panning mode which will
+    // cause undesired results.
+    if (auto_transform == true) return;
+
     if (event->type() == QEvent::MouseMove) {
         QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
         previous_mouse_position = mouse_event->pos();
@@ -461,11 +469,11 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
 
         // in addition to the translate speed, further panning speed modification happens
         // based on these scale values for the x and y direction when panning
-        float x_speed_scale = 2.5;
-        float y_speed_scale = 1.0;
+        float x_speed_scale = translate_speed / 4.0;
+        float y_speed_scale = translate_speed / 2.0;
 
-        translate_x = previous_translate_x + (previous_clicked_position.x() - mouse_event->pos().x())/max_seen_width_when_manual_enabled * (translate_speed/x_speed_scale);
-        translate_y = previous_translate_y + (previous_clicked_position.y() - mouse_event->pos().y())/max_seen_height_when_manual_enabled * (translate_speed/y_speed_scale);
+        translate_x = previous_translate_x + (previous_clicked_position.x() - mouse_event->pos().x()) / max_seen_width_when_manual_enabled * x_speed_scale;
+        translate_y = previous_translate_y + (previous_clicked_position.y() - mouse_event->pos().y()) / max_seen_height_when_manual_enabled * y_speed_scale;
 
         // emit sendInfoLogMessage(" translate_x: " + QString::number(translate_x) + " translate_y: " + QString::number(translate_y));
         // emit sendInfoLogMessage(" x: " + QString::number(mouse_event->pos().x()) + " y: " + QString::number(mouse_event->pos().y()));
@@ -475,6 +483,11 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
 
 void MapFrame::wheelEvent(QWheelEvent *event)
 {
+    // Do not adjust the zoom in auto-transform mode.. the changes will not be reflected
+    // and will be applied only when the user clicks on manual panning mode which will
+    // cause undesired results.
+    if (auto_transform == true) return;
+
     // Most mice have 15 degree wheel steps but some have finer resolution. The num_degrees conversion
     // takes care of this (I think?)
     int num_degrees = event->delta() / 8;
@@ -482,8 +495,14 @@ void MapFrame::wheelEvent(QWheelEvent *event)
 
     scale -= num_steps*scale_speed;
 
-    event->accept();
-    emit sendInfoLogMessage("MapFrame: mouse wheel. Degrees: " + QString::number(num_degrees) + " Scale: " + QString::number(scale));
+    // dynamic scrolling is disabled for now until a future feature update
+    //scroll_translate_x = 2.0 * scale;
+    //scroll_translate_y = 2.0 * scale;
+    //scroll_translate_x = (max_seen_width_when_manual_enabled - (scale * max_seen_width_when_manual_enabled));
+    //scroll_translate_y = (max_seen_height_when_manual_enabled - (scale * max_seen_height_when_manual_enabled));
+
+    // emit sendInfoLogMessage("MapFrame: mouse wheel. Degrees: " + QString::number(num_degrees) + " Scale: " + QString::number(scale));
+    // emit sendInfoLogMessage("MapFrame: mouse wheel. x: " + QString::number(event->pos().x()) + " y: " + QString::number(event->pos().y()));
 }
 
 void MapFrame::setManualTransform()
@@ -540,6 +559,8 @@ void MapFrame::setAutoTransform()
     scale = 1.0f;
     translate_x = 0.0f;
     translate_y = 0.0f;
+    scroll_translate_x = 0.0f;
+    scroll_translate_y = 0.0f;
     previous_translate_x = 0.0f;
     previous_translate_y = 0.0f;
 }
