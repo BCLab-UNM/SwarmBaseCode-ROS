@@ -56,7 +56,6 @@ void MapFrame::createPopoutWindow( MapData * map_data )
     popout_mapframe = new MapFrame(popout_window, 0);
     popout_mapframe->setMapData(map_data);
 
-
     QGridLayout* layout = new QGridLayout();
     layout->addWidget(popout_mapframe);
 
@@ -290,7 +289,6 @@ void MapFrame::paintEvent(QPaintEvent* event) {
 
         painter.drawText(x_axis_ticks[i].x()+x_labels_offset_x, axes_origin.y()+x_labels_offset_y, x_label);
         painter.drawText(axes_origin.x()+y_labels_offset_x, y_axis_ticks[i].y()+y_labels_offset_y, y_label);
-
     }
 
     // End draw scale bars
@@ -468,8 +466,6 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
         float max_width = this->width();
         float max_height = this->height();
 
-        translate_speed =
-
         // start with the previous translate
         translate_x = previous_translate_x;
         translate_y = previous_translate_y;
@@ -500,7 +496,7 @@ void MapFrame::wheelEvent(QWheelEvent *event)
     int num_degrees = event->delta() / 8;
     int num_steps = num_degrees / 15;
 
-    scale -= num_steps*scale_speed;
+    scale -= num_steps * scale_speed;
 
     // debug info log messages
     // emit sendInfoLogMessage("MapFrame: mouse wheel. Delta: " + QString::number(event->delta()) + " Scale: " + QString::number(scale));
@@ -554,12 +550,17 @@ void MapFrame::setManualTransform()
     max_seen_width_when_manual_enabled = max_seen_width;
     max_seen_height_when_manual_enabled = max_seen_height;
 
+    /* scale the translate speed with the max seen width and height */
+    translate_speed = (max_seen_width * 0.75) + (max_seen_height * 0.75);
+
     /*
     emit sendInfoLogMessage(
-        "setManualTransform(): min_manual_x: " +
-        QString::number(min_seen_x_when_manual_enabled) +
-        " min_manual_y: " +
-        QString::number(min_seen_y_when_manual_enabled)
+        "setManualTransform(): translate_speed: " +
+        QString::number(translate_speed) +
+        " max_seen_width: " +
+        QString::number(max_seen_width) +
+        " min_seen_height: " +
+        QString::number(max_seen_height)
     );
     */
 }
