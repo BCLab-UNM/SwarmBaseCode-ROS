@@ -27,7 +27,7 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     previous_clicked_position = QPoint(0,0);
 
     auto_transform = true;
-    scale = 1.0f;
+    scale = 10;
 
     translate_x = 0.0f;
     translate_y = 0.0f;
@@ -35,7 +35,7 @@ MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
     previous_translate_y = 0.0f;
 
     scale_speed = 0.1; // The amount of zoom per mouse wheel angle change
-    translate_speed = 1.5;
+    translate_speed = 1.5f;
 
     display_ekf_data = false;
     display_gps_data = false;
@@ -189,11 +189,11 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     {
         // Perform the manual zoom and pan transform
 
-        max_seen_width = max_seen_width_when_manual_enabled * scale;
-        max_seen_height = max_seen_height_when_manual_enabled * scale;
+        max_seen_width = max_seen_width_when_manual_enabled * (scale * scale_speed);
+        max_seen_height = max_seen_height_when_manual_enabled * (scale * scale_speed);
 
-        min_seen_x = (min_seen_x_when_manual_enabled + translate_x) * scale;
-        min_seen_y = (min_seen_y_when_manual_enabled + translate_y) * scale;
+        min_seen_x = (min_seen_x_when_manual_enabled + translate_x) * (scale * scale_speed);
+        min_seen_y = (min_seen_y_when_manual_enabled + translate_y) * (scale * scale_speed);
 
         // emit sendInfoLogMessage("MapFrame: paint event: manual transform: min_seen_x: " + QString::number(min_seen_x) + " min_seen_y: " + QString::number(min_seen_y));
     }
@@ -491,15 +491,24 @@ void MapFrame::wheelEvent(QWheelEvent *event)
     // cause undesired results.
     if (auto_transform == true) return;
 
-    // Most mice have 15 degree wheel steps but some have finer resolution. The num_degrees conversion
-    // takes care of this (I think?)
-    int num_degrees = event->delta() / 8;
-    int num_steps = num_degrees / 15;
+    // 100% map zoom is set when scale = 10; 10% adjustments to 
+    // the zoom occur with each mouse wheel adjustment
+    if (event->delta() < 0) {
+      scale++;
+    } else {
+      scale--;
+    }
 
-    scale -= num_steps * scale_speed;
+    // limit the lower bound of the scale so we do not invert the map and have
+    // negative zoom values
+    if (scale <= 0) {
+      scale = 1;
+      // emit sendInfoLogMessage("Map Zoom Set: " + QString::number(scale * 10) + "% (Minimum Zoom)");
+    } else {
+      // emit sendInfoLogMessage("Map Zoom Set: " + QString::number(scale * 10) + "%");
+    }
 
     // debug info log messages
-    // emit sendInfoLogMessage("MapFrame: mouse wheel. Delta: " + QString::number(event->delta()) + " Scale: " + QString::number(scale));
     // emit sendInfoLogMessage("MapFrame: mouse wheel. Degrees: " + QString::number(num_degrees) + " Scale: " + QString::number(scale));
     // emit sendInfoLogMessage("MapFrame: mouse wheel. x: " + QString::number(event->pos().x()) + " y: " + QString::number(event->pos().y()));
 }
@@ -552,24 +561,13 @@ void MapFrame::setManualTransform()
 
     /* scale the translate speed with the max seen width and height */
     translate_speed = (max_seen_width * 0.75) + (max_seen_height * 0.75);
-
-    /*
-    emit sendInfoLogMessage(
-        "setManualTransform(): translate_speed: " +
-        QString::number(translate_speed) +
-        " max_seen_width: " +
-        QString::number(max_seen_width) +
-        " min_seen_height: " +
-        QString::number(max_seen_height)
-    );
-    */
 }
 
 void MapFrame::setAutoTransform()
 {
     if (popout_mapframe) popout_mapframe->setAutoTransform();
     auto_transform = true;
-    scale = 1.0f;
+    scale = 10;
     translate_x = 0.0f;
     translate_y = 0.0f;
     previous_translate_x = 0.0f;

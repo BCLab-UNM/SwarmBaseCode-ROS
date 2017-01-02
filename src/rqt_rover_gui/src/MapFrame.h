@@ -111,7 +111,7 @@ namespace rqt_rover_gui
       MapFrame* popout_mapframe;
 
       // State for panning and zooming the map
-      float scale;
+      int scale;
       float scale_speed; // Amount to zoom as the mouse wheel angle changes
 
       QPoint previous_clicked_position;
