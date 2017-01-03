@@ -31,9 +31,6 @@
   <property name="windowTitle">
    <string>    Rover Interface</string>
   </property>
-  <property name="toolTip">
-   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-  </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(0, 0, 0);
 border-color: rgb(255, 255, 255);</string>
@@ -346,9 +343,6 @@ border: 1px solid white;
        <height>271</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -621,9 +615,6 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
         <width>181</width>
         <height>22</height>
        </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GPS aligned with the map output (mutually recursive with MAP)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
