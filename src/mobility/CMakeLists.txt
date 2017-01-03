@@ -19,7 +19,10 @@ include_directories(
 )
 
 add_executable(
-  mobility src/mobility.cpp
+  mobility 
+  src/PickUpController.cpp
+  src/DropOffController.cpp
+  src/mobility.cpp
 )
 
 add_dependencies(mobility ${catkin_EXPORTED_TARGETS})
