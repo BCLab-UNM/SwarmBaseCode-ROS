@@ -13,7 +13,11 @@ class SearchController {
   public:
 
     SearchController();
+
+    // performs search pattern
     geometry_msgs::Pose2D search(geometry_msgs::Pose2D currentLocation);
+
+    // continues search pattern after interruption
     geometry_msgs::Pose2D continueInterruptedSearch(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D oldGoalLocation);
 
   private:

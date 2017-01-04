@@ -21,8 +21,8 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 }
 
 /**
- * If you want to avoid the center diffrently place code here.
- * This code keeps the robot from driving over the center when searching for blocks.
+ * Continues search pattern after interruption. For example, avoiding the
+ * center or collisions.
  */
 geometry_msgs::Pose2D SearchController::continueInterruptedSearch(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D oldGoalLocation) {
   geometry_msgs::Pose2D newGoalLocation;
