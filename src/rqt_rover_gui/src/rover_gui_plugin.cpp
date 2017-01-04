@@ -1487,11 +1487,23 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     emit sendInfoLogMessage("Shutting down subscribers...");
 
-    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     encoder_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it)
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     gps_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     ekf_subscribers.clear();
     us_center_subscriber.shutdown();
     us_left_subscriber.shutdown();
@@ -1500,22 +1512,36 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     // Possible error - the following seems to shutdown all subscribers not just those from simulation
 
-    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     status_subscribers.clear();
 
-    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     obstacle_subscribers.clear();
 
     camera_subscriber.shutdown();
 
     emit sendInfoLogMessage("Shutting down publishers...");
 
-    for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it)
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     control_mode_publishers.clear();
 
     return_msg += sim_mgr.stopGazeboClient();
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return_msg += "<br>";
     return_msg += sim_mgr.stopGazeboServer();
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     emit sendInfoLogMessage(return_msg);
 
     ui.visualize_simulation_button->setEnabled(false);
