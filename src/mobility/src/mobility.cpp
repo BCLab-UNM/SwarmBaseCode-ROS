@@ -254,20 +254,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         case STATE_MACHINE_TRANSFORM: {
             stateMachineMsg.data = "TRANSFORMING";
 
-            //If angle between current and goal is significant
-            //if error in heading is greater than 0.4 radians
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > rotateOnlyAngleTolerance)
-            {
-                stateMachineState = STATE_MACHINE_ROTATE; //rotate
-            }
-            //If goal has not yet been reached drive and maintane heading
-            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) //pi/2
-            {
-                stateMachineState = STATE_MACHINE_DIFFERENTIAL_DRIVE; //differential drive
-            }
-
             //If returning with a target
-            else if (targetCollected) { // && !centerSeen && !reachedCollectionPoint) {
+            if (targetCollected) { // && !centerSeen && !reachedCollectionPoint) {
 
 
                 //calculate the euclidean distance between centerLocation and currentLocation
@@ -334,6 +322,18 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 }
 
             }
+            //If angle between current and goal is significant
+            //if error in heading is greater than 0.4 radians
+            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > rotateOnlyAngleTolerance)
+            {
+                stateMachineState = STATE_MACHINE_ROTATE; //rotate
+            }
+            //If goal has not yet been reached drive and maintane heading
+            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) //pi/2
+            {
+                stateMachineState = STATE_MACHINE_DIFFERENTIAL_DRIVE; //differential drive
+            }
+
             //Otherwise, drop off target and select new random uniform heading
             //If no targets have been detected, assign a new goal
             else if (!targetDetected && timerTimeElapsed > returnToSearchDelay) {

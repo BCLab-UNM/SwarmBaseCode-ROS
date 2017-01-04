@@ -48,7 +48,7 @@ void DropOffController::calculateDecision() {
         //timerStartTime was reset before we entered reachedCollectionPoint so
         //we can now use it for our timeing of 2 seconds
 
-        if (timerTimeElapsed >= 3)
+        if (timerTimeElapsed >= 4)
         {
             result.reset = true; //tell mobility to reset to search parameters
         }
