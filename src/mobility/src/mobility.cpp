@@ -21,6 +21,7 @@
 // Include Controllers
 #include "PickUpController.h"
 #include "DropOffController.h"
+#include "SearchController.h"
 
 // To handle shutdown signals so the node quits properly in response to "rosnode kill"
 #include <ros/ros.h>
@@ -35,6 +36,7 @@ random_numbers::RandomNumberGenerator* rng;
 // Create controllers
 PickUpController pickUpController;
 DropOffController dropOffController;
+SearchController searchController;
 
 //Mobility Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
@@ -155,7 +157,6 @@ int main(int argc, char **argv) {
     goalLocation.theta = rng->uniformReal(0, 2 * M_PI); //set initial random heading
 
     //select initial search position 50 cm from center (0,0)
-
     goalLocation.x = 0.5 * cos(goalLocation.theta+M_PI);
     goalLocation.y = 0.5 * sin(goalLocation.theta+M_PI);
 
@@ -337,13 +338,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             //Otherwise, drop off target and select new random uniform heading
             //If no targets have been detected, assign a new goal
             else if (!targetDetected && timerTimeElapsed > returnToSearchDelay) {
-
-                //select new heading from Gaussian distribution around current heading
-                goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
-
-                //select new position 50 cm from current location
-                goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-                goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
+                goalLocation = searchController.search(currentLocation);
             }
 
             //Purposefully fall through to next case without breaking
@@ -497,7 +492,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
         float cameraOffsetCorrection = 0.020; //meters;
         bool right = false;
         bool left = false;
-        float centeringTurn = 0.15; //radians
 
         centerSeen = false;
         double count = 0;
@@ -531,9 +525,10 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
         //if we see the center and we dont have a target collected
         if (centerSeen && !targetCollected)
         {
-            //if you want to avoid the center diffrently place code here
-            //this code keeps the robot from driving over the center when searching for blocks
+            float centeringTurn = 0.15; //radians
             stateMachineState = STATE_MACHINE_TRANSFORM;
+
+            //this code keeps the robot from driving over the center when searching for blocks
             if (right)
             {
                 goalLocation.theta += centeringTurn; //turn away from the center to the left if just driving around/searching.
@@ -542,11 +537,9 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
             {
                 goalLocation.theta -= centeringTurn; //turn away from the center to the right if just driving around/searching.
             }
-            //remainingGoalDist avoids magic numbers by calculating the dist
-            double remainingGoalDist = hypot(goalLocation.x - currentLocation.x, goalLocation.y - currentLocation.y);
-            //this of course assumes random walk continuation. Change for diffrent search methods.
-            goalLocation.x = currentLocation.x + (remainingGoalDist * cos(goalLocation.theta));
-            goalLocation.y = currentLocation.y + (remainingGoalDist * sin(goalLocation.theta));
+
+            // continues an interrupted search
+            goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
 
             targetDetected = false;
             return;
@@ -601,11 +594,10 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
             goalLocation.theta = currentLocation.theta - 0.3;
         }
 
-        //select new position 50 cm from current location
-        goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-        goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
+        // continues an interrupted search
+        goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
 
-        //switch to transform state to trigger collision avoidanc	e
+        //switch to transform state to trigger collision avoidance
         stateMachineState = STATE_MACHINE_TRANSFORM;
     }
 
