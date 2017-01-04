@@ -1045,17 +1045,29 @@ void RoverGUIPlugin::displayDiagLogMessage(QString msg)
     if (msg == NULL) msg = "Message was a NULL pointer";
 
 
-    // replace new lines with <br> in the message
-    msg.replace("\n","<br>");
+     // replace new lines with <BR> in the message. Uppercase in order to differentiate from <br> below
+    msg.replace("\n","<BR>");
 
-    QString new_message = msg+"<br>";
-    diag_log_messages = diag_log_messages+new_message;
 
-    // Prevent the log from growning too large. Maintain a maximum specified size by removing characters from the beginning of the log
-    int overflow_size = diag_log_messages.size() - max_diag_log_length;
-    if (overflow_size > 0) diag_log_messages.remove(0, overflow_size);
+    // Prevent the log from growning too large. Maintain a maximum specified size
+    // by removing characters from the beginning of the log.
+    // Calculate the number of characters in the log. If the log size is larger than the max size specified
+    // then find the position of the first newline that reduces the log size to less than the max size.
+    // Delete all characters up to that position.
+    int overflow = diag_log_messages.size() - max_diag_log_length; 
+    
+    // Get the position of the the first newline after the overflow amount
+    int newline_pos = diag_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
+    
+    // If the max size is exceeded and the number of characters to remove is less than
+    // the size of the log remove those characters.
+    if ( overflow > 0 && newline_pos < diag_log_messages.size() ) {   
+      diag_log_messages.remove(0, newline_pos);
+    }
 
-    ui.diag_log->setText("<font color='white'>"+diag_log_messages+"</font>");
+    diag_log_messages += "<font color='white'>"+msg+"</font><br>";
+
+    ui.diag_log->setText(diag_log_messages);
 
     QScrollBar *sb = ui.diag_log->verticalScrollBar();
     sb->setValue(sb->maximum());
@@ -1066,18 +1078,29 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
     if (msg.isEmpty()) msg = "Message is empty";
     if (msg == NULL) msg = "Message was a NULL pointer";
 
+    // replace new lines with <BR> in the message. Uppercase in order to differentiate from <br> below
+    msg.replace("\n","<BR>");
 
-    // replace new lines with <br> in the message
-    msg.replace("\n","<br>");
+    // Prevent the log from growning too large. Maintain a maximum specified size
+    // by removing characters from the beginning of the log.
+    // Calculate the number of characters in the log. If the log size is larger than the max size specified
+    // then find the position of the first newline that reduces the log size to less than the max size.
+    // Delete all characters up to that position.
+    int overflow = info_log_messages.size() - max_info_log_length; 
+    
+    // Get the position of the the first newline after the overflow amount
+    int newline_pos = info_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
+    
+    // If the max size is exceeded and the number of characters to remove is less than
+    // the size of the log remove those characters.
+    if ( overflow > 0 && newline_pos < info_log_messages.size() ) {   
+      info_log_messages.remove(0, newline_pos);
+    }
+    
+    // Use the <br> tag to make log messages atomic for easier deletion later.
+    info_log_messages += "<font color='white'>"+msg+"</font><br>";
 
-    QString new_message = msg+"<br>";
-    info_log_messages = info_log_messages+new_message;
-
-    // Prevent the log from growning too large. Maintain a maximum specified size by removing characters from the beginning of the log
-    int overflow_size = info_log_messages.size() - max_info_log_length;
-    if (overflow_size > 0) info_log_messages.remove(0,overflow_size);
-
-    ui.info_log->setText("<font color='white'>"+info_log_messages+"</font>");
+    ui.info_log->setText(info_log_messages);
 
     QScrollBar *sb = ui.info_log->verticalScrollBar();
     sb->setValue(sb->maximum());
