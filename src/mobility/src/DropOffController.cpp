@@ -4,7 +4,7 @@ DropOffController::DropOffController() {
     cameraOffsetCorrection = 0.020; //meters
     centeringTurn = 0.15; //radians
     seenEnoughCenterTagsCount = 20;
-    collectionPointVisualDistance = 0.3; //in meters
+    collectionPointVisualDistance = 0.5; //in meters
     reachedCollectionPoint = false;
 
     result.cmdVel = 0;
@@ -82,8 +82,8 @@ void DropOffController::calculateDecision() {
     {
         //sets a goal that is 60cm from the centerLocation and spinner
         //radians counterclockwise from being purly along the x-axis.
-        result.centerGoal.x = centerLocation.x + 0.2 * cos(spinner);
-        result.centerGoal.y = centerLocation.y + 0.2 * sin(spinner);
+        result.centerGoal.x = centerLocation.x + 0.6 * cos(spinner);
+        result.centerGoal.y = centerLocation.y + 0.6 * sin(spinner);
         result.centerGoal.theta = atan2(result.centerGoal.y - currentLocation.y, result.centerGoal.x - currentLocation.x);
 
         spinner += 45*(M_PI/180); //add 45 degrees in radians to spinner.

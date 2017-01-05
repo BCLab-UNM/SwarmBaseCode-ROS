@@ -155,7 +155,7 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float Kdv = 15; //Derivative Velocity
   
   float Kpy = 200; //Proportinal Yaw   
-  float Kiy = 20; //Inegral Yaw
+  float Kiy = 15; //Inegral Yaw
   float Kdy = 15; //Derivative Yaw
   
     
@@ -302,22 +302,22 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
     
   //Yaw-----------------------------
     
-  //Propotinal
-  PY = Kpy * ((yawError[0]+yawError[1])/2); 
-  if (PY > sat) //limit the max and minimum output of proportinal
-    PY = sat;
+
+  //Proportional
+  PY = Kpy * ((yawError[0]+yawError[1])/2);  //this is the proportional output
+  if (PY > sat) //limit the max and minimum output of proportional
+  PY = sat;
   if (PY < -sat)
-    PY= -sat;
+  PY = -sat; 
   
   //Integral
   //only use integral when error is larger than presumed noise.
   if (yawError[0] > yawIntegralDeadspace || yawError[0] < -yawIntegralDeadspace)
   {
-    eyArray[stepY] = yawError[0]; //add error into the error Array.
-    stepY++;
+    evArray[stepV] = velError[0]; //add error into the error Array.
+    stepV++;
     
-    if (stepY >= histArrayLength)
-    stepY = 0;
+    if (stepY >= histArrayLength) stepY = 0;
     
     float sumY= 0;
     for (int i= 0; i < histArrayLength; i++) //sum the array to get the error over time from t = 0 to present.
@@ -325,11 +325,17 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
         sumY += eyArray[i];
     }
     
-    IY = Kiy * sumY;
-   } //deadzone ends here no integrel unless there is error.
-   
-    //anti windup                                     //if PV is already commanding greater than half power dont use the integrel;
-    if (fabs(IY) > sat/2 || fabs(PY) > sat/2) //reset the integral to 0 if it hits its cap
+    IY = Kiy * sumY; //this is integrated output
+
+   }//deadzone ends here use integrel only with error as there is no force to disturb our heading.
+     
+
+    //anti windup 
+    //anti windup reduces overshoot by limiting the acting time of the integral to areas where the 
+    //proportional term is less than half its saturation point.           
+    
+    //if PY is already commanding greater than half max PWM dont use the integral       
+    if (fabs(IY) > sat/2 || fabs(PY) > sat/2) //reset the integral to 0 if it hits its cap of half max PWM
     {
        for (int i= 0; i < histArrayLength; i++)
         {
@@ -342,6 +348,8 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
     if (!(fabs(PY) > sat/2)) 
     {
        //10 being the frequency of the system giving us a one second prediction base.
+       //calculates the derivative of the error using average of last 2 error values for current error
+       //and average of error 2 and 3 steps in the past as previouse error
        DY = Kdy * ((yawError[0]+yawError[1])/2 - (yawError[2]+yawError[3])/2) * hz; 
     }
     yawError[3] = yawError[2];

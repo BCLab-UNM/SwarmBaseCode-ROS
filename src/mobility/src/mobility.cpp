@@ -697,7 +697,10 @@ void mapAverage()
         geometry_msgs::PoseStamped mapPose; //map frame
         mapPose.header.stamp = ros::Time::now(); //setup msg to represent the center location in map frame
         mapPose.header.frame_id = publishedName + "/map";
-        mapPose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
+        mapPose.pose.orientation.x = 0;//tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
+	mapPose.pose.orientation.y = 0;
+	mapPose.pose.orientation.z = 0;
+	mapPose.pose.orientation.w = 1;
         mapPose.pose.position.x = centerLocationMap.x;
         mapPose.pose.position.y = centerLocationMap.y;
         geometry_msgs::PoseStamped odomPose;
