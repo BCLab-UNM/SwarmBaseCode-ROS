@@ -237,6 +237,7 @@ namespace rqt_rover_gui {
     GazeboSimManager sim_mgr;
 
     map<string,int> rover_control_state;
+    map<string,int> rover_numSV_state;
     map<string, RoverStatus> rover_statuses;
 
     float arena_dim; // in meters

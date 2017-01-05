@@ -408,13 +408,15 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
 void RoverGUIPlugin::GPSNavSolutionEventHandler(const ros::MessageEvent<const ublox_msgs::NavSOL> &event) {
     const boost::shared_ptr<const ublox_msgs::NavSOL> msg = event.getMessage();
 
-    // Extract rover name from the message source. Publisher is in the format /rover_name/navsol
-    size_t found = event.getPublisherName().find("navsol");
-    string rover_name = event.getPublisherName().substr(1,found-1);
-    QString Rover_Name = rover_name.c_str();
-    emit sendInfoLogMessage(Rover_Name);
+    // Extract rover name from the message source. Publisher is in the format /*rover_name*_UBLOX
+    size_t found = event.getPublisherName().find("_UBLOX");
+    QString rover_name = event.getPublisherName().substr(1,found-1).c_str();
 
-    QString newLabelText = "Number of GPS Satellites: " + QString::number(msg.get()->numSV);
+    // Update the number of sattellites detected for the specified rover
+    rover_numSV_state[rover_name.toStdString()] = msg.get()->numSV;
+
+    // Update the label in the GUI with the selected rover's information
+    QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
     emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
 }
 
@@ -620,6 +622,9 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         emit sendInfoLogMessage("Existing rover selected");
     }
 
+    QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
+    emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setEnabled(true);
@@ -642,6 +647,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         map_data->clear(*it);
         ui.map_frame->clear(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
+        rover_numSV_state.erase(*it);
         rover_statuses.erase(*it);
 
         // If the currently selected rover disconnected, shutdown its subscribers and publishers
@@ -687,6 +693,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         //displayLogMessage("Waiting for rover to connect...");
         selected_rover_name = "";
         rover_control_state.clear();
+        rover_numSV_state.clear();
         rover_names.clear();        
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
