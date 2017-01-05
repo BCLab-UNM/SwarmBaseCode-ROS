@@ -106,7 +106,7 @@ namespace rqt_rover_gui {
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
-    void GPSNavSolutionEventHandler(const ublox_msgs::NavSOL& msg);
+    void GPSNavSolutionEventHandler(const ros::MessageEvent<const ublox_msgs::NavSOL> &event);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const> &event);
     void scoreEventHandler(const ros::MessageEvent<std_msgs::String const> &event);

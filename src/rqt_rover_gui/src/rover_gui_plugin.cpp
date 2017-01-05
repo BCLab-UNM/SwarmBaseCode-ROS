@@ -405,8 +405,16 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     ui.map_frame->addToGPSRoverPath(rover_name, x, y);
 }
 
-void RoverGUIPlugin::GPSNavSolutionEventHandler(const ublox_msgs::NavSOL& msg) {
-    QString newLabelText = "Number of GPS Satellites: " + QString::number(msg.numSV);
+void RoverGUIPlugin::GPSNavSolutionEventHandler(const ros::MessageEvent<const ublox_msgs::NavSOL> &event) {
+    const boost::shared_ptr<const ublox_msgs::NavSOL> msg = event.getMessage();
+
+    // Extract rover name from the message source. Publisher is in the format /rover_name/navsol
+    size_t found = event.getPublisherName().find("navsol");
+    string rover_name = event.getPublisherName().substr(1,found-1);
+    QString Rover_Name = rover_name.c_str();
+    emit sendInfoLogMessage(Rover_Name);
+
+    QString newLabelText = "Number of GPS Satellites: " + QString::number(msg.get()->numSV);
     emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
 }
 
