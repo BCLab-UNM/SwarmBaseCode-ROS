@@ -141,7 +141,7 @@ namespace rqt_rover_gui
 
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
     connect(this, SIGNAL(updateNumberOfTagsCollected(QString)), ui.num_targets_collected_label, SLOT(setText(QString)));
-
+    connect(this, SIGNAL(updateNumberOfSatellites(QString)), ui.gps_numSV_label, SLOT(setText(QString)));
     connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
@@ -201,6 +201,7 @@ namespace rqt_rover_gui
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
+    emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -402,6 +403,11 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
 
     // Store map info for the appropriate rover name
     ui.map_frame->addToGPSRoverPath(rover_name, x, y);
+}
+
+void RoverGUIPlugin::GPSNavSolutionEventHandler(const ublox_msgs::NavSOL& msg) {
+    QString newLabelText = "Number of GPS Satellites: " + QString::number(msg.numSV);
+    emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)
@@ -650,12 +656,14 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         status_subscribers[*it].shutdown();
         encoder_subscribers[*it].shutdown();
         gps_subscribers[*it].shutdown();
+        gps_nav_solution_subscribers[*it].shutdown();
         ekf_subscribers[*it].shutdown();
 
         // Delete the subscribers
         status_subscribers.erase(*it);
         encoder_subscribers.erase(*it);
         gps_subscribers.erase(*it);
+        gps_nav_solution_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
         
         // Shudown Publishers
@@ -754,6 +762,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
+        gps_nav_solution_subscribers[*i] = nh.subscribe("/"+*i+"/navsol", 10, &RoverGUIPlugin::GPSNavSolutionEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 10, &RoverGUIPlugin::diagnosticEventHandler, this);
 
         RoverStatus rover_status;
@@ -1329,7 +1338,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     emit sendInfoLogMessage("Building simulation...");
 
     ui.build_simulation_button->setEnabled(false);
-
     ui.build_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     QString return_msg;
@@ -1505,18 +1513,27 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
+
     encoder_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it)
-      {
-	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-	it->second.shutdown();
-      }
+
+    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it) {
+      qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+      it->second.shutdown();
+    }
+
+    for (map<string,ros::Subscriber>::iterator it=gps_nav_solution_subscribers.begin(); it!=gps_nav_solution_subscribers.end(); ++it) {
+      qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+      it->second.shutdown();
+    }
+
     gps_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) 
-      {
-	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-	it->second.shutdown();
-      }
+    gps_nav_solution_subscribers.clear();
+
+    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) {
+      qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+      it->second.shutdown();
+    }
+
     ekf_subscribers.clear();
     us_center_subscriber.shutdown();
     us_left_subscriber.shutdown();
@@ -1573,6 +1590,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
     emit updateNumberOfTagsCollected("<font color='white'>0</font>");
+    emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
  }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()

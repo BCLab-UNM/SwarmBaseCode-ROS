@@ -49,7 +49,7 @@
 #include <map>
 #include <set>
 #include <mutex>
-
+#include <ublox_msgs/NavSOL.h>
 
 //ROS msg types
 //#include "rover_onboard_target_detection/ATag.h"
@@ -87,6 +87,7 @@ namespace rqt_rover_gui {
     Q_OBJECT
       
   public:
+
     RoverGUIPlugin();
     ~RoverGUIPlugin();
     virtual void initPlugin(qt_gui_cpp::PluginContext& context);
@@ -105,6 +106,7 @@ namespace rqt_rover_gui {
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
+    void GPSNavSolutionEventHandler(const ublox_msgs::NavSOL& msg);
     void encoderEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
     void obstacleEventHandler(const ros::MessageEvent<std_msgs::UInt8 const> &event);
     void scoreEventHandler(const ros::MessageEvent<std_msgs::String const> &event);
@@ -155,6 +157,7 @@ namespace rqt_rover_gui {
 
     void updateObstacleCallCount(QString text);
     void updateNumberOfTagsCollected(QString text);
+    void updateNumberOfSatellites(QString text);
 
   private slots:
 
@@ -204,6 +207,7 @@ namespace rqt_rover_gui {
     ros::Subscriber joystick_subscriber;
     map<string,ros::Subscriber> encoder_subscribers;
     map<string,ros::Subscriber> gps_subscribers;
+    map<string,ros::Subscriber> gps_nav_solution_subscribers;
     map<string,ros::Subscriber> ekf_subscribers;
     map<string,ros::Subscriber> rover_diagnostic_subscribers;
     ros::Subscriber us_center_subscriber;
