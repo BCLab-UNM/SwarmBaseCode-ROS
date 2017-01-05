@@ -1057,17 +1057,29 @@ void RoverGUIPlugin::displayDiagLogMessage(QString msg)
     if (msg == NULL) msg = "Message was a NULL pointer";
 
 
-    // replace new lines with <br> in the message
-    msg.replace("\n","<br>");
+     // replace new lines with <BR> in the message. Uppercase in order to differentiate from <br> below
+    msg.replace("\n","<BR>");
 
-    QString new_message = msg+"<br>";
-    diag_log_messages = diag_log_messages+new_message;
 
-    // Prevent the log from growning too large. Maintain a maximum specified size by removing characters from the beginning of the log
-    int overflow_size = diag_log_messages.size() - max_diag_log_length;
-    if (overflow_size > 0) diag_log_messages.remove(0, overflow_size);
+    // Prevent the log from growning too large. Maintain a maximum specified size
+    // by removing characters from the beginning of the log.
+    // Calculate the number of characters in the log. If the log size is larger than the max size specified
+    // then find the position of the first newline that reduces the log size to less than the max size.
+    // Delete all characters up to that position.
+    int overflow = diag_log_messages.size() - max_diag_log_length; 
+    
+    // Get the position of the the first newline after the overflow amount
+    int newline_pos = diag_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
+    
+    // If the max size is exceeded and the number of characters to remove is less than
+    // the size of the log remove those characters.
+    if ( overflow > 0 && newline_pos < diag_log_messages.size() ) {   
+      diag_log_messages.remove(0, newline_pos);
+    }
 
-    ui.diag_log->setText("<font color='white'>"+diag_log_messages+"</font>");
+    diag_log_messages += "<font color='white'>"+msg+"</font><br>";
+
+    ui.diag_log->setText(diag_log_messages);
 
     QScrollBar *sb = ui.diag_log->verticalScrollBar();
     sb->setValue(sb->maximum());
@@ -1078,18 +1090,29 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
     if (msg.isEmpty()) msg = "Message is empty";
     if (msg == NULL) msg = "Message was a NULL pointer";
 
+    // replace new lines with <BR> in the message. Uppercase in order to differentiate from <br> below
+    msg.replace("\n","<BR>");
 
-    // replace new lines with <br> in the message
-    msg.replace("\n","<br>");
+    // Prevent the log from growning too large. Maintain a maximum specified size
+    // by removing characters from the beginning of the log.
+    // Calculate the number of characters in the log. If the log size is larger than the max size specified
+    // then find the position of the first newline that reduces the log size to less than the max size.
+    // Delete all characters up to that position.
+    int overflow = info_log_messages.size() - max_info_log_length; 
+    
+    // Get the position of the the first newline after the overflow amount
+    int newline_pos = info_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
+    
+    // If the max size is exceeded and the number of characters to remove is less than
+    // the size of the log remove those characters.
+    if ( overflow > 0 && newline_pos < info_log_messages.size() ) {   
+      info_log_messages.remove(0, newline_pos);
+    }
+    
+    // Use the <br> tag to make log messages atomic for easier deletion later.
+    info_log_messages += "<font color='white'>"+msg+"</font><br>";
 
-    QString new_message = msg+"<br>";
-    info_log_messages = info_log_messages+new_message;
-
-    // Prevent the log from growning too large. Maintain a maximum specified size by removing characters from the beginning of the log
-    int overflow_size = info_log_messages.size() - max_info_log_length;
-    if (overflow_size > 0) info_log_messages.remove(0,overflow_size);
-
-    ui.info_log->setText("<font color='white'>"+info_log_messages+"</font>");
+    ui.info_log->setText(info_log_messages);
 
     QScrollBar *sb = ui.info_log->verticalScrollBar();
     sb->setValue(sb->maximum());
@@ -1379,7 +1402,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.show();
 
     QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
-    QPoint rover_positions[6] = {QPoint(0,1), QPoint(1,1), QPoint(1,0), QPoint(-1,0), QPoint(0,-1), QPoint(-1,-1)};
+    QPointF rover_positions[6] = {QPointF(0.0,1.0), QPointF(1.0,1.0), QPointF(1.0,0.0), QPointF(-1.0,0.0), QPointF(0.0,-1.0), QPointF(-1.0,-1.0)};
 
     // Add rovers to the simulation and start the associated ROS nodes
     for (int i = 0; i < n_rovers; i++)
@@ -1477,11 +1500,23 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     emit sendInfoLogMessage("Shutting down subscribers...");
 
-    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     encoder_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it)
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     gps_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     ekf_subscribers.clear();
     us_center_subscriber.shutdown();
     us_left_subscriber.shutdown();
@@ -1490,10 +1525,18 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     // Possible error - the following seems to shutdown all subscribers not just those from simulation
 
-    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     status_subscribers.clear();
 
-    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     obstacle_subscribers.clear();
 
     score_subscriber.shutdown();
@@ -1502,12 +1545,18 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     emit sendInfoLogMessage("Shutting down publishers...");
 
-    for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it) it->second.shutdown();
+    for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it)
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
     control_mode_publishers.clear();
 
     return_msg += sim_mgr.stopGazeboClient();
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return_msg += "<br>";
     return_msg += sim_mgr.stopGazeboServer();
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     emit sendInfoLogMessage(return_msg);
 
     ui.visualize_simulation_button->setEnabled(false);
