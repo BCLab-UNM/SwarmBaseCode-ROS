@@ -201,7 +201,7 @@ namespace rqt_rover_gui
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
-    emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
+    emit updateNumberOfSatellites("<font color='white'> </font>");
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -415,9 +415,14 @@ void RoverGUIPlugin::GPSNavSolutionEventHandler(const ros::MessageEvent<const ub
     // Update the number of sattellites detected for the specified rover
     rover_numSV_state[rover_name.toStdString()] = msg.get()->numSV;
 
-    // Update the label in the GUI with the selected rover's information
-    QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
-    emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+    // only update the label if a rover is selected by the user in the GUI
+    if (selected_rover_name != "") {
+        // Update the label in the GUI with the selected rover's information
+        QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
+        emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+    } else {
+        emit updateNumberOfSatellites("<font color='white'> </font>");
+    }
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)
@@ -622,8 +627,13 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         emit sendInfoLogMessage("Existing rover selected");
     }
 
-    QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
-    emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+    // only update the number of satellites if a valid rover name has been selected
+    if (selected_rover_name != "") {
+        QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
+        emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+    } else {
+        emit updateNumberOfSatellites("<font color='white'> </font>");
+    }
 
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
@@ -1605,7 +1615,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
     emit updateNumberOfTagsCollected("<font color='white'>0</font>");
-    emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
+    emit updateNumberOfSatellites("<font color='white'> </font>");
  }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
