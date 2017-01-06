@@ -159,13 +159,13 @@ PickUpResult PickUpController::selectTarget(const apriltags_ros::AprilTagDetecti
         result.pickedUp = true;
     }
 
-    //Otherwise, if no target has been collected, set target pose as goal
+    //Lower wrist and open fingures if no locked targt
     else if (!lockTarget)
     {
 
         //set gripper;
         result.fingerAngle = M_PI_2;
-        result.wristAngle = 1.3;
+        result.wristAngle = 1.25;
     }
 
     return result;
