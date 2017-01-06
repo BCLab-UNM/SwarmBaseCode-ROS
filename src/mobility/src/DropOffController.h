@@ -67,6 +67,9 @@ private:
     float timerTimeElapsed;
     time_t timerStartTime;
     float timeElapsedSinceTimeSinceSeeingEnoughCenterTags;
+    float spinSize;
+    float addSpinSize;
+    float addSpinSizeAmmount;
 
     float searchVelocity;
 

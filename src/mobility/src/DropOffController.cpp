@@ -6,6 +6,8 @@ DropOffController::DropOffController() {
     seenEnoughCenterTagsCount = 20;
     collectionPointVisualDistance = 0.5; //in meters
     reachedCollectionPoint = false;
+    spinSize = 0.10; //in meters aka 10cm 
+    addSpinSizeAmmount = 0.10; //in meters
 
     result.cmdVel = 0;
     result.angleError = 0;
@@ -78,18 +80,19 @@ void DropOffController::calculateDecision() {
         result.centerGoal.y = centerLocation.y;
         //spinWasTrue = true; only turn on for random walk to center
     }
-    else //spin search for center
+    else if (timerTimeElapsed >=5)//spin search for center
     {
         //sets a goal that is 60cm from the centerLocation and spinner
         //radians counterclockwise from being purly along the x-axis.
-        result.centerGoal.x = centerLocation.x + 0.6 * cos(spinner);
-        result.centerGoal.y = centerLocation.y + 0.6 * sin(spinner);
+        result.centerGoal.x = centerLocation.x + (spinSize + addSpinSize) * cos(spinner);
+        result.centerGoal.y = centerLocation.y + (spinSize + addSpinSize) * sin(spinner);
         result.centerGoal.theta = atan2(result.centerGoal.y - currentLocation.y, result.centerGoal.x - currentLocation.x);
 
         spinner += 45*(M_PI/180); //add 45 degrees in radians to spinner.
         if (spinner > 2*M_PI)
         {
             spinner -= 2*M_PI;
+	    addSpinSize += addSpinSizeAmmount;
         }
         circularCenterSearching = true;
         //safety flag to prevent us trying to drive back to the
@@ -196,6 +199,8 @@ void DropOffController::reset() {
     result.goalDriving = false; //set true for when driving is goal location oriented and false when it is target or time oriented
     result.centerGoal; //goal that is center location or based upon the center location.
     result.reset = false;
+    spinner = 0;
+    addSpinSize = 0;
 
     left = false;
     right = false;
