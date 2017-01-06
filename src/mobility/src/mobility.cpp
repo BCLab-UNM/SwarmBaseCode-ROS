@@ -443,6 +443,10 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     return;
                 }
             }
+	    else
+	    {
+		stateMachineState = STATE_MACHINE_TRANSFORM;
+	    }
             break;
         }
         case STATE_MACHINE_DROPOFF: {
