@@ -639,12 +639,14 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         encoder_subscribers[*it].shutdown();
         gps_subscribers[*it].shutdown();
         ekf_subscribers[*it].shutdown();
+        rover_diagnostic_subscribers[*it].shutdown();
 
         // Delete the subscribers
         status_subscribers.erase(*it);
         encoder_subscribers.erase(*it);
         gps_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
+        rover_diagnostic_subscribers.erase(*it);
         
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
