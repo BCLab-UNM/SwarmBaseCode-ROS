@@ -45,7 +45,9 @@ using boost::property_tree::ptree;
 
 namespace rqt_rover_gui 
 {
-  RoverGUIPlugin::RoverGUIPlugin() : rqt_gui_cpp::Plugin(), widget(0),
+  RoverGUIPlugin::RoverGUIPlugin() :
+      rqt_gui_cpp::Plugin(),
+      widget(0),
       disconnect_threshold(5.0) // Rovers are marked as diconnected if they haven't sent a status message for 5 seconds
   {
     setObjectName("RoverGUI");
@@ -141,7 +143,7 @@ namespace rqt_rover_gui
 
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
     connect(this, SIGNAL(updateNumberOfTagsCollected(QString)), ui.num_targets_collected_label, SLOT(setText(QString)));
-
+    connect(this, SIGNAL(updateNumberOfSatellites(QString)), ui.gps_numSV_label, SLOT(setText(QString)));
     connect(this, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
     connect(this, SIGNAL(sendDiagLogMessage(QString)), this, SLOT(receiveDiagLogMessage(QString)));
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
@@ -201,6 +203,7 @@ namespace rqt_rover_gui
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
+    emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -402,6 +405,26 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
 
     // Store map info for the appropriate rover name
     ui.map_frame->addToGPSRoverPath(rover_name, x, y);
+}
+
+void RoverGUIPlugin::GPSNavSolutionEventHandler(const ros::MessageEvent<const ublox_msgs::NavSOL> &event) {
+    const boost::shared_ptr<const ublox_msgs::NavSOL> msg = event.getMessage();
+
+    // Extract rover name from the message source. Publisher is in the format /*rover_name*_UBLOX
+    size_t found = event.getPublisherName().find("_UBLOX");
+    QString rover_name = event.getPublisherName().substr(1,found-1).c_str();
+
+    // Update the number of sattellites detected for the specified rover
+    rover_numSV_state[rover_name.toStdString()] = msg.get()->numSV;
+
+    // only update the label if a rover is selected by the user in the GUI
+    if (selected_rover_name.compare("") != 0) {
+        // Update the label in the GUI with the selected rover's information
+        QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
+        emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+    } else {
+        emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
+    }
 }
 
  void RoverGUIPlugin::cameraEventHandler(const sensor_msgs::ImageConstPtr& image)
@@ -606,6 +629,14 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         emit sendInfoLogMessage("Existing rover selected");
     }
 
+    // only update the number of satellites if a valid rover name has been selected
+    if (selected_rover_name.compare("") != 0) {
+        QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
+        emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
+    } else {
+        emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
+    }
+
     // Enable control mode radio group now that a rover has been selected
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setEnabled(true);
@@ -628,6 +659,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         map_data->clear(*it);
         ui.map_frame->clear(*it);
         rover_control_state.erase(*it); // Remove the control state for orphaned rovers
+        rover_numSV_state.erase(*it);
         rover_statuses.erase(*it);
 
         // If the currently selected rover disconnected, shutdown its subscribers and publishers
@@ -650,6 +682,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         status_subscribers[*it].shutdown();
         encoder_subscribers[*it].shutdown();
         gps_subscribers[*it].shutdown();
+        gps_nav_solution_subscribers[*it].shutdown();
         ekf_subscribers[*it].shutdown();
         rover_diagnostic_subscribers[*it].shutdown();
 
@@ -657,6 +690,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         status_subscribers.erase(*it);
         encoder_subscribers.erase(*it);
         gps_subscribers.erase(*it);
+        gps_nav_solution_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
         rover_diagnostic_subscribers.erase(*it);
         
@@ -673,6 +707,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         //displayLogMessage("Waiting for rover to connect...");
         selected_rover_name = "";
         rover_control_state.clear();
+        rover_numSV_state.clear();
         rover_names.clear();        
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
@@ -756,6 +791,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
         gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
+        gps_nav_solution_subscribers[*i] = nh.subscribe("/"+*i+"/navsol", 10, &RoverGUIPlugin::GPSNavSolutionEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 10, &RoverGUIPlugin::diagnosticEventHandler, this);
 
         RoverStatus rover_status;
@@ -1331,7 +1367,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     emit sendInfoLogMessage("Building simulation...");
 
     ui.build_simulation_button->setEnabled(false);
-
     ui.build_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     QString return_msg;
@@ -1507,18 +1542,27 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
+
     encoder_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it)
-      {
-	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-	it->second.shutdown();
-      }
+
+    for (map<string,ros::Subscriber>::iterator it=gps_subscribers.begin(); it!=gps_subscribers.end(); ++it) {
+      qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+      it->second.shutdown();
+    }
+
+    for (map<string,ros::Subscriber>::iterator it=gps_nav_solution_subscribers.begin(); it!=gps_nav_solution_subscribers.end(); ++it) {
+      qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+      it->second.shutdown();
+    }
+
     gps_subscribers.clear();
-    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) 
-      {
-	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-	it->second.shutdown();
-      }
+    gps_nav_solution_subscribers.clear();
+
+    for (map<string,ros::Subscriber>::iterator it=ekf_subscribers.begin(); it!=ekf_subscribers.end(); ++it) {
+      qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+      it->second.shutdown();
+    }
+
     ekf_subscribers.clear();
     us_center_subscriber.shutdown();
     us_left_subscriber.shutdown();
@@ -1575,7 +1619,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     obstacle_call_count = 0;
     emit updateObstacleCallCount("<font color='white'>0</font>");
     emit updateNumberOfTagsCollected("<font color='white'>0</font>");
- }
+    emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
+}
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
 {
