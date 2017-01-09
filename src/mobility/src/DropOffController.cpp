@@ -110,7 +110,7 @@ void DropOffController::calculateDecision() {
         result.goalDriving = false;
 
         float turnDirection = 1;
-        //below is only usfull for the new center design as opposed to the current circle.
+        //below commented out code is only usfull for the new center design as opposed to the current circle.
         //reverse tag rejection when we have seen enough tags that we are on a
         //trajectory in to the square we dont want to follow an edge.
         //if (seenEnoughCenterTags) turnDirection = -1;
@@ -121,11 +121,11 @@ void DropOffController::calculateDecision() {
             result.angleError = 0.0;
         }
         else if (right) {
-            result.cmdVel = searchVelocity;
+            result.cmdVel = searchVelocity/2;
             result.angleError = -centeringTurn*turnDirection;
         }
         else {
-            result.cmdVel = searchVelocity;
+            result.cmdVel = searchVelocity/2;
             result.angleError = centeringTurn*turnDirection;
         }
 

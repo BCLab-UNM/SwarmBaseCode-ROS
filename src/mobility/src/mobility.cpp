@@ -398,7 +398,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             {
 
                 result = pickUpController.pickUpSelectedTarget(blockBlock);
-
+		
                 sendDriveCommand(result.cmdVel,result.angleError);
 
                 std_msgs::Float32 angle;
@@ -418,6 +418,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     targetDetected = false;
                     stateMachineState = STATE_MACHINE_TRANSFORM;
                     sendDriveCommand(0,0);
+		    pickUpController.reset();
                 }
 
                 if (result.pickedUp)
@@ -544,6 +545,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
             goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
 
             targetDetected = false;
+	    pickUpController.reset();
             return;
         }
     }
@@ -552,7 +554,6 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
     //found a target april tag and looking for april cubes; with safety timer at greater than 5 seconds.
     PickUpResult result;
-    result.pickedUp = false;
 
     if (message->detections.size() > 0 && !targetCollected && timerTimeElapsed > 5)
     {
