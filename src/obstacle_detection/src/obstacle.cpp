@@ -12,7 +12,7 @@
 using namespace std;
 
 //Globals
-double collisionDistance = 0.4; //meters the ultrasonic detectors will flag obstacles
+double collisionDistance = 0.6; //meters the ultrasonic detectors will flag obstacles
 string publishedName;
 char host[128];
 
@@ -64,6 +64,10 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
 	}
 	else {
 		obstacleMode.data = 2; //collision in front or on left side
+	}
+	if (sonarCenter->range < 0.12) //block in front of center unltrasound.
+	{
+		obstacleMode.data = 4;
 	}
 	
         obstaclePublish.publish(obstacleMode);

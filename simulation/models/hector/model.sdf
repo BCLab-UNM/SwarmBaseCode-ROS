@@ -746,7 +746,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>hector/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/hector/velocity</commandTopic>
+			<commandTopic>/hector/skidsteer</commandTopic>
 			<odometryTopic>/hector/odom</odometryTopic>
 			<odometryFrame>hector/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>

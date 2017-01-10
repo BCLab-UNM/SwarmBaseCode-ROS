@@ -746,7 +746,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>paris/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/paris/velocity</commandTopic>
+			<commandTopic>/paris/skidsteer</commandTopic>
 			<odometryTopic>/paris/odom</odometryTopic>
 			<odometryFrame>paris/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>
