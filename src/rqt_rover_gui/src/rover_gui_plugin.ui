@@ -685,7 +685,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
         <x>150</x>
         <y>280</y>
         <width>131</width>
-        <height>27</height>
+        <height>23</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -701,6 +701,18 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+      </property>
+      <property name="minimumContentsLength">
+       <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>4</width>
+        <height>4</height>
+       </size>
+      </property>
       <item>
        <property name="text">
         <string>no time limit</string>
@@ -708,12 +720,17 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </item>
       <item>
        <property name="text">
-        <string>30 minutes</string>
+        <string>10 min (Testing)</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>60 minutes</string>
+        <string>30 min (Preliminary)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>60 min (Final)</string>
        </property>
       </item>
      </widget>
