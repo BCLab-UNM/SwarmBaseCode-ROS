@@ -559,9 +559,12 @@ void RoverGUIPlugin::simulationTimerEventHandler(const rosgraph_msgs::Clock& msg
 
     if (is_timer_on == true) {
         if (current_time_in_seconds >= timer_stop_time_in_seconds) {
-            //emit allStopButtonEventHandler();
-            emit allStopButtonSignal();
             is_timer_on = false;
+            emit allStopButtonSignal();
+            emit sendInfoLogMessage("\nSimulation timer complete at: " +
+                                    QString::number(getHours(current_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(current_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(current_time_in_seconds)) + " seconds\n");
         }
     }
 }
@@ -1301,7 +1304,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
         is_timer_on = false;
     } else if (ui.simulation_timer_combo_box->currentText() == "10 min (Testing)") {
         timer_start_time_in_seconds = current_time_in_seconds;
-        timer_stop_time_in_seconds = timer_start_time_in_seconds + 20.0;//testing 600.0;
+        timer_stop_time_in_seconds = timer_start_time_in_seconds + 600.0;
         is_timer_on = true;
         emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
                                 QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
