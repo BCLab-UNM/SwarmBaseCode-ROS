@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -340,7 +340,7 @@ border: 1px solid white;
        <x>10</x>
        <y>60</y>
        <width>301</width>
-       <height>271</height>
+       <height>331</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -676,6 +676,83 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        </property>
       </item>
      </widget>
+     <widget class="QComboBox" name="simulation_timer_combo_box">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>280</y>
+        <width>131</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+      </property>
+      <property name="minimumContentsLength">
+       <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>4</width>
+        <height>4</height>
+       </size>
+      </property>
+      <item>
+       <property name="text">
+        <string>no time limit</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 min (Testing)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>30 min (Preliminary)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>60 min (Final)</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="simulation_timer_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>280</y>
+        <width>130</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simulation Length&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QLabel" name="label_7">
      <property name="geometry">
@@ -710,7 +787,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>350</y>
+       <y>400</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -972,7 +1049,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>400</y>
+       <y>430</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -1918,7 +1995,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>450</y>
+       <y>460</y>
        <width>161</width>
        <height>27</height>
       </rect>

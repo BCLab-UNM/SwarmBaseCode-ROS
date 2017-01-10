@@ -48,7 +48,11 @@ namespace rqt_rover_gui
   RoverGUIPlugin::RoverGUIPlugin() :
       rqt_gui_cpp::Plugin(),
       widget(0),
-      disconnect_threshold(5.0) // Rovers are marked as diconnected if they haven't sent a status message for 5 seconds
+      disconnect_threshold(5.0), // Rovers are marked as diconnected if they haven't sent a status message for 5 seconds
+      current_time_in_seconds(0.0),
+      timer_start_time_in_seconds(0.0),
+      timer_stop_time_in_seconds(0.0),
+      is_timer_on(false)
   {
     setObjectName("RoverGUI");
     info_log_messages = "";
@@ -127,6 +131,7 @@ namespace rqt_rover_gui
     connect(ui.map_auto_radio_button, SIGNAL(toggled(bool)), this, SLOT(mapAutoRadioButtonEventHandler(bool)));
     connect(ui.map_manual_radio_button, SIGNAL(toggled(bool)), this, SLOT(mapManualRadioButtonEventHandler(bool)));
     connect(ui.map_popout_button, SIGNAL(pressed()), this, SLOT(mapPopoutButtonEventHandler()));
+    connect(this, SIGNAL(allStopButtonSignal()), this, SLOT(allStopButtonEventHandler()));
 
 
     // Joystick output display - Drive
@@ -149,7 +154,6 @@ namespace rqt_rover_gui
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
     connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
-
 
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
@@ -547,6 +551,26 @@ void RoverGUIPlugin::scoreEventHandler(const ros::MessageEvent<const std_msgs::S
     std::string tags_collected = msg->data;
 
     emit updateNumberOfTagsCollected("<font color='white'>"+QString::fromStdString(tags_collected)+"</font>");
+}
+
+void RoverGUIPlugin::simulationTimerEventHandler(const rosgraph_msgs::Clock& msg) {
+
+    current_time_in_seconds = msg.clock.toSec();
+
+    // this catches the case when the /clock timer is not running
+    // AKA: when we are not running a simulation
+    if (current_time_in_seconds <= 0.0) return;
+    
+    if (is_timer_on == true) {
+        if (current_time_in_seconds >= timer_stop_time_in_seconds) {
+            is_timer_on = false;
+            emit allStopButtonSignal();
+            emit sendInfoLogMessage("\nSimulation timer complete at: " +
+                                    QString::number(getHours(current_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(current_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(current_time_in_seconds)) + " seconds\n");
+        }
+    }
 }
 
 void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, QListWidgetItem *previous)
@@ -1276,6 +1300,92 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
     //Disable all autonomous button
     ui.all_autonomous_button->setEnabled(false);
     ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+
+    //Experiment Timer START
+
+    // this catches the case when the /clock timer is not running
+    // AKA: when we are not running a simulation
+    if (current_time_in_seconds > 0.0) {
+        if (ui.simulation_timer_combo_box->currentText() == "no time limit") {
+            timer_start_time_in_seconds = 0.0;
+            timer_stop_time_in_seconds = 0.0;
+            is_timer_on = false;
+        } else if (ui.simulation_timer_combo_box->currentText() == "10 min (Testing)") {
+            timer_start_time_in_seconds = current_time_in_seconds;
+            timer_stop_time_in_seconds = timer_start_time_in_seconds + 600.0;
+            is_timer_on = true;
+            emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
+                                    QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
+            emit sendInfoLogMessage("Setting experiment timer to stop at: " +
+                                    QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+        } else if (ui.simulation_timer_combo_box->currentText() == "30 min (Preliminary)") {
+            timer_start_time_in_seconds = current_time_in_seconds;
+            timer_stop_time_in_seconds = timer_start_time_in_seconds + 1800.0;
+            is_timer_on = true;
+            emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
+                                    QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
+            emit sendInfoLogMessage("Setting experiment timer to stop at: " +
+                                    QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+        } else if (ui.simulation_timer_combo_box->currentText() == "60 min (Final)") {
+            timer_start_time_in_seconds = current_time_in_seconds;
+            timer_stop_time_in_seconds = timer_start_time_in_seconds + 3600.0;
+            is_timer_on = true;
+            emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
+                                    QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
+            emit sendInfoLogMessage("Setting experiment timer to stop at: " +
+                                    QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+        }
+    }
+    //Experiment Timer END
+}
+
+double RoverGUIPlugin::getHours(double seconds) {
+    if (seconds < 3600.0) return 0.0;
+
+    double hours = 0.0;
+
+    while (seconds >= 3600.0) {
+        seconds -= 3600.0;
+        hours++;
+    }
+
+    return hours;
+}
+
+double RoverGUIPlugin::getMinutes(double seconds) {
+    double hours = getHours(seconds);
+    seconds -= hours * 3600.0;
+
+    if (seconds < 60.0) return 0.0;
+
+    double minutes = 0.0;
+
+    while (seconds >= 60.0) {
+        seconds -= 60.0;
+        minutes++;
+    }
+
+    return minutes;
+}
+
+double RoverGUIPlugin::getSeconds(double seconds) {
+    double hours = getHours(seconds);
+    double minutes = getMinutes(seconds);
+    seconds -= (hours * 3600.0) + (minutes * 60.0);
+
+    return seconds;
 }
 
 void RoverGUIPlugin::allStopButtonEventHandler()
@@ -1422,6 +1532,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     float collection_disk_radius = 0.5; // meters
     sim_mgr.addModel("collection_disk", "collection_disk", 0, 0, 0, collection_disk_radius);
     score_subscriber = nh.subscribe("/collectionZone/score", 10, &RoverGUIPlugin::scoreEventHandler, this);
+    simulation_timer_subscriber = nh.subscribe("/clock", 10, &RoverGUIPlugin::simulationTimerEventHandler, this);
 
     int n_rovers_created = 0;
     int n_rovers = 3;
@@ -1497,7 +1608,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
   // Visualize the simulation by default call button event handler
    visualizeSimulationButtonEventHandler();
-
 }
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
@@ -1583,10 +1693,10 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
+
     obstacle_subscribers.clear();
-
     score_subscriber.shutdown();
-
+    simulation_timer_subscriber.shutdown();
     camera_subscriber.shutdown();
 
     emit sendInfoLogMessage("Shutting down publishers...");
@@ -1620,6 +1730,11 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     emit updateObstacleCallCount("<font color='white'>0</font>");
     emit updateNumberOfTagsCollected("<font color='white'>0</font>");
     emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
+
+    // reset the simulation timer variables
+    timer_start_time_in_seconds = 0.0;
+    timer_stop_time_in_seconds = 0.0;
+    is_timer_on = false;
 }
 
 void RoverGUIPlugin::visualizeSimulationButtonEventHandler()
