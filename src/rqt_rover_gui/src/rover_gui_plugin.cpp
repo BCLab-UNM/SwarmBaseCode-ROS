@@ -557,6 +557,10 @@ void RoverGUIPlugin::simulationTimerEventHandler(const rosgraph_msgs::Clock& msg
 
     current_time_in_seconds = msg.clock.toSec();
 
+    // this catches the case when the /clock timer is not running
+    // AKA: when we are not running a simulation
+    if (current_time_in_seconds <= 0.0) return;
+    
     if (is_timer_on == true) {
         if (current_time_in_seconds >= timer_stop_time_in_seconds) {
             is_timer_on = false;
@@ -1298,46 +1302,51 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
     ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
 
     //Experiment Timer START
-    if (ui.simulation_timer_combo_box->currentText() == "no time limit") {
-        timer_start_time_in_seconds = 0.0;
-        timer_stop_time_in_seconds = 0.0;
-        is_timer_on = false;
-    } else if (ui.simulation_timer_combo_box->currentText() == "10 min (Testing)") {
-        timer_start_time_in_seconds = current_time_in_seconds;
-        timer_stop_time_in_seconds = timer_start_time_in_seconds + 600.0;
-        is_timer_on = true;
-        emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
-                                QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
-                                QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
-                                QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
-        emit sendInfoLogMessage("Setting experiment timer to stop at: " +
-                                QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
-                                QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
-                                QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
-    } else if (ui.simulation_timer_combo_box->currentText() == "30 min (Preliminary)") {
-        timer_start_time_in_seconds = current_time_in_seconds;
-        timer_stop_time_in_seconds = timer_start_time_in_seconds + 1800.0;
-        is_timer_on = true;
-        emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
-                                QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
-                                QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
-                                QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
-        emit sendInfoLogMessage("Setting experiment timer to stop at: " +
-                                QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
-                                QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
-                                QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
-    } else if (ui.simulation_timer_combo_box->currentText() == "60 min (Final)") {
-        timer_start_time_in_seconds = current_time_in_seconds;
-        timer_stop_time_in_seconds = timer_start_time_in_seconds + 3600.0;
-        is_timer_on = true;
-        emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
-                                QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
-                                QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
-                                QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
-        emit sendInfoLogMessage("Setting experiment timer to stop at: " +
-                                QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
-                                QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
-                                QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+
+    // this catches the case when the /clock timer is not running
+    // AKA: when we are not running a simulation
+    if (current_time_in_seconds > 0.0) {
+        if (ui.simulation_timer_combo_box->currentText() == "no time limit") {
+            timer_start_time_in_seconds = 0.0;
+            timer_stop_time_in_seconds = 0.0;
+            is_timer_on = false;
+        } else if (ui.simulation_timer_combo_box->currentText() == "10 min (Testing)") {
+            timer_start_time_in_seconds = current_time_in_seconds;
+            timer_stop_time_in_seconds = timer_start_time_in_seconds + 600.0;
+            is_timer_on = true;
+            emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
+                                    QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
+            emit sendInfoLogMessage("Setting experiment timer to stop at: " +
+                                    QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+        } else if (ui.simulation_timer_combo_box->currentText() == "30 min (Preliminary)") {
+            timer_start_time_in_seconds = current_time_in_seconds;
+            timer_stop_time_in_seconds = timer_start_time_in_seconds + 1800.0;
+            is_timer_on = true;
+            emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
+                                    QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
+            emit sendInfoLogMessage("Setting experiment timer to stop at: " +
+                                    QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+        } else if (ui.simulation_timer_combo_box->currentText() == "60 min (Final)") {
+            timer_start_time_in_seconds = current_time_in_seconds;
+            timer_stop_time_in_seconds = timer_start_time_in_seconds + 3600.0;
+            is_timer_on = true;
+            emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
+                                    QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds");
+            emit sendInfoLogMessage("Setting experiment timer to stop at: " +
+                                    QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
+                                    QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
+                                    QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds\n");
+        }
     }
     //Experiment Timer END
 }
