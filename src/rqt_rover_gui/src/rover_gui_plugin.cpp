@@ -424,7 +424,8 @@ void RoverGUIPlugin::GPSNavSolutionEventHandler(const ros::MessageEvent<const ub
     rover_numSV_state[rover_name.toStdString()] = msg.get()->numSV;
 
     // only update the label if a rover is selected by the user in the GUI
-    if (selected_rover_name.compare("") != 0) {
+    // and the number of detected satellites is > 0
+    if (selected_rover_name.compare("") != 0 && msg.get()->numSV > 0) {
         // Update the label in the GUI with the selected rover's information
         QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
         emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
@@ -670,7 +671,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     }
 
     // only update the number of satellites if a valid rover name has been selected
-    if (selected_rover_name.compare("") != 0) {
+    if (selected_rover_name.compare("") != 0 && rover_numSV_state[selected_rover_name] > 0) {
         QString newLabelText = "Number of GPS Satellites: " + QString::number(rover_numSV_state[selected_rover_name]);
         emit updateNumberOfSatellites("<font color='white'>" + newLabelText + "</font>");
     } else {
