@@ -1672,7 +1672,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    emit sendInfoLogMessage("Finished building simulation.");
 
    // Visualize the simulation by default call button event handler
-   // visualizeSimulationButtonEventHandler();
+   visualizeSimulationButtonEventHandler();
 }
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
