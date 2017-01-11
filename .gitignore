@@ -2,6 +2,6 @@
 \#*#
 build
 devel
-src/rqt_rover_gui/CMakeLists.txt.user*
+**/CMakeLists.txt.user*
 *.swp
 logs
