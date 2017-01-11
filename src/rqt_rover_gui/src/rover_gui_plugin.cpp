@@ -1652,9 +1652,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    //addWalls(-arena_dim/2, -arena_dim/2, arena_dim, arena_dim);
 
    //   // Test rover movement
-//   displayLogMessage("Moving aeneas");
-//   return_msg = sim_mgr.moveRover("aeneas", 10, 0, 0);
-//   displayLogMessage(return_msg);
+   //   displayLogMessage("Moving aeneas");
+   //   return_msg = sim_mgr.moveRover("aeneas", 10, 0, 0);
+   //   displayLogMessage(return_msg);
 
    //displayLogMessage("Starting the gazebo client to visualize the simulation.");
    //sim_mgr.startGazeboClient();
@@ -1670,8 +1670,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
    emit sendInfoLogMessage("Finished building simulation.");
 
-  // Visualize the simulation by default call button event handler
-   visualizeSimulationButtonEventHandler();
+   // Visualize the simulation by default call button event handler
+   // visualizeSimulationButtonEventHandler();
 }
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
