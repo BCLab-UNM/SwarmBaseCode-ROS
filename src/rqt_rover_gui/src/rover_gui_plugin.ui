@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -2127,7 +2127,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>220</y>
+       <y>250</y>
        <width>250</width>
        <height>17</height>
       </rect>
@@ -2140,7 +2140,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>250</y>
+       <y>280</y>
        <width>250</width>
        <height>17</height>
       </rect>
@@ -2153,7 +2153,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>280</y>
+       <y>310</y>
        <width>250</width>
        <height>17</height>
       </rect>
@@ -2166,7 +2166,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>220</y>
+       <y>250</y>
        <width>100</width>
        <height>17</height>
       </rect>
@@ -2182,7 +2182,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>250</y>
+       <y>280</y>
        <width>100</width>
        <height>17</height>
       </rect>
@@ -2198,7 +2198,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>280</y>
+       <y>310</y>
        <width>100</width>
        <height>17</height>
       </rect>
@@ -2217,8 +2217,8 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>200</y>
-       <width>410</width>
+       <y>220</y>
+       <width>400</width>
        <height>120</height>
       </rect>
      </property>
@@ -2233,10 +2233,15 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>190</y>
+       <y>210</y>
        <width>310</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Simulation Timer (for simulated rovers only)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
