@@ -248,6 +248,7 @@ namespace rqt_rover_gui {
 
     // simulation timer variables
     double current_time_in_seconds;
+    double last_current_time_update_in_seconds;
     double timer_start_time_in_seconds;
     double timer_stop_time_in_seconds;
     bool is_timer_on;
