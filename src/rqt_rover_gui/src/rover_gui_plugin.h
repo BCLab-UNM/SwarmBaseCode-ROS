@@ -161,6 +161,7 @@ namespace rqt_rover_gui {
     void updateNumberOfTagsCollected(QString text);
     void updateNumberOfSatellites(QString text);
     void allStopButtonSignal();
+    void updateCurrentSimulationTimeLabel(QString text);
 
   private slots:
 

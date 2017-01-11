@@ -147,6 +147,7 @@ namespace rqt_rover_gui
     connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(display(double)));
     connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
 
+    connect(this, SIGNAL(updateCurrentSimulationTimeLabel(QString)), ui.currentSimulationTimeLabel, SLOT(setText(QString)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
     connect(this, SIGNAL(updateNumberOfTagsCollected(QString)), ui.num_targets_collected_label, SLOT(setText(QString)));
     connect(this, SIGNAL(updateNumberOfSatellites(QString)), ui.gps_numSV_label, SLOT(setText(QString)));
@@ -563,10 +564,10 @@ void RoverGUIPlugin::simulationTimerEventHandler(const rosgraph_msgs::Clock& msg
     // only update the current time once per second; faster update rates make the GUI unstable
     // and in the worst cases it will hang and/or crash
     if (updateTimeLabel == true) {
-        ui.currentSimulationTimeLabel->setText("<font color='white'>" +
-                                               QString::number(getHours(current_simulated_time_in_seconds)) + " hours, " +
-                                               QString::number(getMinutes(current_simulated_time_in_seconds)) + " minutes, " +
-                                               QString::number(floor(getSeconds(current_simulated_time_in_seconds))) + " seconds</font>");
+        emit updateCurrentSimulationTimeLabel("<font color='white'>" +
+                                              QString::number(getHours(current_simulated_time_in_seconds)) + " hours, " +
+                                              QString::number(getMinutes(current_simulated_time_in_seconds)) + " minutes, " +
+                                              QString::number(floor(getSeconds(current_simulated_time_in_seconds))) + " seconds</font>");
         last_current_time_update_in_seconds = current_simulated_time_in_seconds;
     }
 
@@ -1336,7 +1337,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             ui.simulationTimerStartLabel->setText("<font color='white'>" +
                                                   QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                                   QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
-                                                  QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds</font>");
+                                                  QString::number(floor(getSeconds(timer_start_time_in_seconds))) + " seconds</font>");
             emit sendInfoLogMessage("Setting experiment timer to stop at: " +
                                     QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
@@ -1344,8 +1345,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             ui.simulationTimerStopLabel->setText("<font color='white'>" +
                                                  QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
                                                  QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
-                                                 QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds</font>");
+                                                 QString::number(floor(getSeconds(timer_stop_time_in_seconds))) + " seconds</font>");
             ui.simulation_timer_combo_box->setEnabled(false);
+            ui.simulation_timer_combo_box->setStyleSheet("color: grey; border:2px solid grey;");
         } else if (ui.simulation_timer_combo_box->currentText() == "30 min (Preliminary)") {
             timer_start_time_in_seconds = current_simulated_time_in_seconds;
             timer_stop_time_in_seconds = timer_start_time_in_seconds + 1800.0;
@@ -1357,7 +1359,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             ui.simulationTimerStartLabel->setText("<font color='white'>" +
                                                   QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                                   QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
-                                                  QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds</font>");
+                                                  QString::number(floor(getSeconds(timer_start_time_in_seconds))) + " seconds</font>");
             emit sendInfoLogMessage("Setting experiment timer to stop at: " +
                                     QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
@@ -1365,8 +1367,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             ui.simulationTimerStopLabel->setText("<font color='white'>" +
                                                  QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
                                                  QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
-                                                 QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds</font>");
+                                                 QString::number(floor(getSeconds(timer_stop_time_in_seconds))) + " seconds</font>");
             ui.simulation_timer_combo_box->setEnabled(false);
+            ui.simulation_timer_combo_box->setStyleSheet("color: grey; border:2px solid grey;");
         } else if (ui.simulation_timer_combo_box->currentText() == "60 min (Final)") {
             timer_start_time_in_seconds = current_simulated_time_in_seconds;
             timer_stop_time_in_seconds = timer_start_time_in_seconds + 3600.0;
@@ -1378,7 +1381,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             ui.simulationTimerStartLabel->setText("<font color='white'>" +
                                                   QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                                   QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
-                                                  QString::number(getSeconds(timer_start_time_in_seconds)) + " seconds</font>");
+                                                  QString::number(floor(getSeconds(timer_start_time_in_seconds))) + " seconds</font>");
             emit sendInfoLogMessage("Setting experiment timer to stop at: " +
                                     QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
@@ -1386,8 +1389,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             ui.simulationTimerStopLabel->setText("<font color='white'>" +
                                                  QString::number(getHours(timer_stop_time_in_seconds)) + " hours, " +
                                                  QString::number(getMinutes(timer_stop_time_in_seconds)) + " minutes, " +
-                                                 QString::number(getSeconds(timer_stop_time_in_seconds)) + " seconds</font>");
+                                                 QString::number(floor(getSeconds(timer_stop_time_in_seconds))) + " seconds</font>");
             ui.simulation_timer_combo_box->setEnabled(false);
+            ui.simulation_timer_combo_box->setStyleSheet("color: grey; border:2px solid grey;");
         }
     }
     //Experiment Timer END
@@ -1473,6 +1477,7 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.simulationTimerStartLabel->setText("<font color='white'>---</font>");
     ui.simulationTimerStopLabel->setText("<font color='white'>---</font>");
     ui.simulation_timer_combo_box->setEnabled(true);
+    ui.simulation_timer_combo_box->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
 
     if (is_timer_on == true) {
         is_timer_on = false;
@@ -1660,6 +1665,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white;");
    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
 
+    ui.simulation_timer_combo_box->setEnabled(true);
+    ui.simulation_timer_combo_box->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
+
    emit sendInfoLogMessage("Finished building simulation.");
 
   // Visualize the simulation by default call button event handler
@@ -1788,6 +1796,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     emit updateNumberOfSatellites("<font color='white'>Number of GPS Satellites: ---</font>");
 
     // reset the simulation timer variables
+    ui.simulation_timer_combo_box->setEnabled(true);
+    ui.simulation_timer_combo_box->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
     timer_start_time_in_seconds = 0.0;
     timer_stop_time_in_seconds = 0.0;
     is_timer_on = false;
