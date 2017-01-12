@@ -1479,10 +1479,8 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.simulation_timer_combo_box->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
     ui.simulationTimerStartLabel->setText("<font color='white'>---</font>");
     ui.simulationTimerStopLabel->setText("<font color='white'>---</font>");
-    ui.currentSimulationTimeLabel->setText("<font color='white'>---</font>");
     timer_start_time_in_seconds = 0.0;
     timer_stop_time_in_seconds = 0.0;
-    current_simulated_time_in_seconds = 0.0;
 
     if (is_timer_on == true) {
         is_timer_on = false;
