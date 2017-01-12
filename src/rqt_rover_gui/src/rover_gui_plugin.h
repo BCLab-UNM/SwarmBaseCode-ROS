@@ -161,6 +161,7 @@ namespace rqt_rover_gui {
     void updateNumberOfTagsCollected(QString text);
     void updateNumberOfSatellites(QString text);
     void allStopButtonSignal();
+    void updateCurrentSimulationTimeLabel(QString text);
 
   private slots:
 
@@ -247,7 +248,8 @@ namespace rqt_rover_gui {
     float arena_dim; // in meters
 
     // simulation timer variables
-    double current_time_in_seconds;
+    double current_simulated_time_in_seconds;
+    double last_current_time_update_in_seconds;
     double timer_start_time_in_seconds;
     double timer_stop_time_in_seconds;
     bool is_timer_on;
