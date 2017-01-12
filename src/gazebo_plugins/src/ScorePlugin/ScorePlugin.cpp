@@ -14,7 +14,7 @@ void ScorePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     // set the update period (number of updates per second) for this plugin
     previousUpdateTime = model->GetWorld()->GetSimTime();
     loadUpdatePeriod();
-    loadCollectionZoneRadius();
+    loadCollectionZoneSquareSize();
 
     // Create a ros node
     rosNode.reset(new ros::NodeHandle(string(model->GetName()) + "_score"));
@@ -56,12 +56,19 @@ void ScorePlugin::updateScore() {
     }
 
     math::Pose nestPose = model->GetWorldPose();
+    float x_min = nestPose.pos.x - (collectionZoneSquareSize / 2.0);
+    float x_max = nestPose.pos.x + (collectionZoneSquareSize / 2.0);
+    float y_min = nestPose.pos.y - (collectionZoneSquareSize / 2.0);
+    float y_max = nestPose.pos.y + (collectionZoneSquareSize / 2.0);
 
     score = 0;
 
     for(unsigned int i = 0; i < modelList.size(); i++) {
         if (modelList[i]->GetName().substr(0,2).compare("at") == 0) {
-            if(modelList[i]->GetWorldPose().pos.Distance(nestPose.pos) <= collectionZoneRadius) {
+            if(modelList[i]->GetWorldPose().pos.x <= x_max &&
+               modelList[i]->GetWorldPose().pos.x >= x_min &&
+               modelList[i]->GetWorldPose().pos.y <= y_max &&
+               modelList[i]->GetWorldPose().pos.y >= y_min) {
                 score++;
             }
         }
@@ -127,25 +134,26 @@ void ScorePlugin::loadUpdatePeriod() {
 }
 
 /**
- * This function loads the collection zone radius from the SDF configuration
- * file. Effectively, the collectionZoneRadius variable defines how many far
- * away a tag must be from the nest to count towards the score value.
+ * This function loads the collection zone square size from the SDF
+ * configuration file. Effectively, the collectionZoneSquareSize variable
+ * defines how many far away a tag must be from the nest to count towards the
+ * score value.
  */
-void ScorePlugin::loadCollectionZoneRadius() {
-  if(!sdf->HasElement("collectionZoneRadius")) {
+void ScorePlugin::loadCollectionZoneSquareSize() {
+  if(!sdf->HasElement("collectionZoneSquareSize")) {
     ROS_INFO_STREAM("[Score Plugin : " << model->GetName()
-      << "]: In ScorePlugin.cpp: loadCollectionZoneRadius(): "
-      << "missing <collectionZoneRadius> tag, defaulting to 0.525");
-    collectionZoneRadius = 0.525;
+      << "]: In ScorePlugin.cpp: loadCollectionZoneSquareSize(): "
+      << "missing <collectionZoneSquareSize> tag, defaulting to 1.016");
+    collectionZoneSquareSize = 1.016;
   } else {
-    collectionZoneRadius = sdf->GetElement("collectionZoneRadius")->Get<float>();
+    collectionZoneSquareSize = sdf->GetElement("collectionZoneSquareSize")->Get<float>();
 
-    // fatal error: the radius cannot be <= 0 and especially cannot = 0
-    if(collectionZoneRadius <= 0) {
+    // fatal error: the square size cannot be <= 0 and especially cannot = 0
+    if(collectionZoneSquareSize <= 0) {
       ROS_ERROR_STREAM("[Score Plugin : " << model->GetName()
-        << "]: In ScorePlugin.cpp: loadCollectionZoneRadius(): "
-        << "collectionZoneRadius = " << collectionZoneRadius
-        << ", collectionZoneRadius cannot be <= 0.0");
+        << "]: In ScorePlugin.cpp: loadCollectionZoneSquareSize(): "
+        << "collectionZoneSquareSize = " << collectionZoneSquareSize
+        << ", collectionZoneSquareSize cannot be <= 0.0");
       exit(1);
     }
   }

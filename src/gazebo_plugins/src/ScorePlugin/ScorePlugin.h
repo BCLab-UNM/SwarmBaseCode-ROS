@@ -11,7 +11,7 @@
 
 /**
  * This class implements a score counter which keeps track of the number of
- * tags within the nest radius.
+ * tags within a square collection zone.
  */
 namespace gazebo {
 
@@ -36,13 +36,13 @@ namespace gazebo {
             void updateScore();
             std::string loadPublisherTopic();
             void loadUpdatePeriod();
-            void loadCollectionZoneRadius();
+            void loadCollectionZoneSquareSize();
 
         private: // variables
 
             physics::Model_V modelList;
             int score;
-            float collectionZoneRadius;
+            float collectionZoneSquareSize;
 
             // time management variables
             common::Time previousUpdateTime;
