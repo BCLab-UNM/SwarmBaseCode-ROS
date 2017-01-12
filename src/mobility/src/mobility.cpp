@@ -228,23 +228,29 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
     mapAverage(); //calls the averaging function, also responsible for transform from Map frame to odom frame.
 
+
     if (currentMode == 2 || currentMode == 3) { //Robot is in automode
+
+        stringstream ss;
+        ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << "curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
+        msg.data = ss.str();
+        infoLogPublisher.publish(msg);
 
         timerTimeElapsed = time(0) - timerStartTime; //time since timerStartTime was set to current time
 
         if (!init) //initiliation code goes here. (code that runs only once at start of auto mode but wont work in main goes here)
         {
-	    if (timerTimeElapsed > 60) {
-              centerLocationMap.x = currentLocationAverage.x; // set the location of the center circle location in the map frame
-              centerLocationMap.y = currentLocationAverage.y; // based upon our current average location on the map.
-              centerLocationMap.theta = currentLocationAverage.theta;
- 	      init = true; //initiliation has run
+            if (timerTimeElapsed > 60) {
+                centerLocationMap.x = currentLocationAverage.x; // set the location of the center circle location in the map frame
+                centerLocationMap.y = currentLocationAverage.y; // based upon our current average location on the map.
+                centerLocationMap.theta = currentLocationAverage.theta;
+                init = true; //initiliation has run
 
-	    }
+            }
             else
-	    {
-	      return;
-	    }
+            {
+                return;
+            }
 
         }
 
@@ -303,7 +309,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     sendDriveCommand(0.0,0);
                     stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
                     reachedCollectionPoint = false;;
-		    centerLocationOdom = currentLocation;
+                    centerLocationOdom = currentLocation;
 
 
                     dropOffController.reset();
@@ -314,7 +320,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
                     goalLocation = result.centerGoal;
                     stateMachineState = STATE_MACHINE_ROTATE;
-		    timerStartTime = time(0);
+                    timerStartTime = time(0);
                 }
                 else //we are in precision/timed driving
                 {
@@ -371,7 +377,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             //Drive forward
             //Stay in this state until angle is at least PI/2
         case STATE_MACHINE_DIFFERENTIAL_DRIVE: {
-            stateMachineMsg.data = "TRANSLATING";
+            stateMachineMsg.data = "DIFFERENTIAL_DRIVE";
             //calculate the distance between current and desired heading in radians
             float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
             //goal not yet reached drive while maintaining proper heading.
@@ -384,7 +390,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             else {
                 sendDriveCommand(0.0, 0.0); //stop
-		avoidingObstacle = false;
+                avoidingObstacle = false;
 
                 stateMachineState = STATE_MACHINE_TRANSFORM; //move back to transform step
 
@@ -392,13 +398,15 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             break;
         }
         case STATE_MACHINE_PICKUP: {
+            stateMachineMsg.data = "PICKUP";
+
             PickUpResult result;
 
             if (targetDetected && !targetCollected) //we see a block and have not picked one up yet
             {
 
                 result = pickUpController.pickUpSelectedTarget(blockBlock);
-		
+
                 sendDriveCommand(result.cmdVel,result.angleError);
 
                 std_msgs::Float32 angle;
@@ -418,7 +426,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     targetDetected = false;
                     stateMachineState = STATE_MACHINE_TRANSFORM;
                     sendDriveCommand(0,0);
-		    pickUpController.reset();
+                    pickUpController.reset();
                 }
 
                 if (result.pickedUp)
@@ -444,13 +452,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     return;
                 }
             }
-	    else
-	    {
-		stateMachineState = STATE_MACHINE_TRANSFORM;
-	    }
+            else
+            {
+                stateMachineState = STATE_MACHINE_TRANSFORM;
+            }
             break;
         }
         case STATE_MACHINE_DROPOFF: {
+            stateMachineMsg.data = "DROPOFF";
 
             break;
         }
@@ -545,7 +554,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
             goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
 
             targetDetected = false;
-	    pickUpController.reset();
+            pickUpController.reset();
             return;
         }
     }
@@ -601,7 +610,7 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
         //switch to transform state to trigger collision avoidance
         stateMachineState = STATE_MACHINE_ROTATE;
 
-	avoidingObstacle = true;
+        avoidingObstacle = true;
     }
 
 
@@ -700,10 +709,11 @@ void mapAverage()
         geometry_msgs::PoseStamped mapPose; //map frame
         mapPose.header.stamp = ros::Time::now(); //setup msg to represent the center location in map frame
         mapPose.header.frame_id = publishedName + "/map";
-        mapPose.pose.orientation.x = 0;//tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
-	mapPose.pose.orientation.y = 0;
-	mapPose.pose.orientation.z = 0;
-	mapPose.pose.orientation.w = 1;
+        mapPose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
+        //mapPose.pose.orientation.x = 0;
+        //mapPose.pose.orientation.y = 0;
+        //mapPose.pose.orientation.z = 0;
+        //mapPose.pose.orientation.w = 1;
         mapPose.pose.position.x = centerLocationMap.x;
         mapPose.pose.position.y = centerLocationMap.y;
         geometry_msgs::PoseStamped odomPose;
@@ -726,11 +736,15 @@ void mapAverage()
 
         centerLocation.x = odomPose.pose.position.x; //set centerLocation in odom frame
         centerLocation.y = odomPose.pose.position.y;
+
     }
 }
 
 
 
+
+//below is some saved example code
+//************************************************************************************************************************************************
 
 //This is code for map link to odom link
 /*

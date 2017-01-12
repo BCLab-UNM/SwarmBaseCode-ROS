@@ -3,7 +3,7 @@
 DropOffController::DropOffController() {
     cameraOffsetCorrection = 0.020; //meters
     centeringTurn = 0.15; //radians
-    seenEnoughCenterTagsCount = 20;
+    seenEnoughCenterTagsCount = 10;
     collectionPointVisualDistance = 0.5; //in meters
     reachedCollectionPoint = false;
     spinSize = 0.10; //in meters aka 10cm 
@@ -102,7 +102,7 @@ void DropOffController::calculateDecision() {
 
 
     //reset timeWithoutSeeingEnoughCenterTags timout timer to current time
-    if (!centerApproach || !seenEnoughCenterTags) timeWithoutSeeingEnoughCenterTags = time(0);
+    if ((!centerApproach && !seenEnoughCenterTags) || (count > 0 && !seenEnoughCenterTags)) timeWithoutSeeingEnoughCenterTags = time(0);
 
     if (count > 0) //if we have a target and the center is located drive towards it.
     {
@@ -121,11 +121,11 @@ void DropOffController::calculateDecision() {
             result.angleError = 0.0;
         }
         else if (right) {
-            result.cmdVel = searchVelocity/2;
+            result.cmdVel = -0.1;
             result.angleError = -centeringTurn*turnDirection;
         }
-        else {
-            result.cmdVel = searchVelocity/2;
+        else if (left){
+            result.cmdVel = -0.1;
             result.angleError = centeringTurn*turnDirection;
         }
 
@@ -149,7 +149,7 @@ void DropOffController::calculateDecision() {
     //for maxTimeAllowedWithoutSeeingCenterTags seconds so reset.
     else if (centerApproach) {
         result.goalDriving = false;
-        int maxTimeAllowedWithoutSeeingCenterTags = 4; //seconds
+        int maxTimeAllowedWithoutSeeingCenterTags = 6; //seconds
 
         timeElapsedSinceTimeSinceSeeingEnoughCenterTags = time(0) - timeWithoutSeeingEnoughCenterTags;
         if (timeElapsedSinceTimeSinceSeeingEnoughCenterTags > maxTimeAllowedWithoutSeeingCenterTags)
@@ -158,6 +158,11 @@ void DropOffController::calculateDecision() {
             reachedCollectionPoint = false;
             seenEnoughCenterTags = false;
             centerApproach = false;
+        }
+        else
+        {
+            result.cmdVel = searchVelocity;
+            result.angleError = 0.0;
         }
 
         right = false;
