@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -2123,6 +2123,147 @@ border: 1px solid white;
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
+    <widget class="QLabel" name="currentSimulationTimeLabel">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>250</y>
+       <width>250</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="simulationTimerStartLabel">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>280</y>
+       <width>250</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="simulationTimerStopLabel">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>310</y>
+       <width>250</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="currentSimulationTimeTitle">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>250</y>
+       <width>100</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Current Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="simulationTimerStartTitle">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>280</y>
+       <width>100</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Timer Start:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="simulationTimerStopTitle">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>310</y>
+       <width>100</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Timer Stop:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QFrame" name="Simulation_Timer_Frame">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>220</y>
+       <width>400</width>
+       <height>120</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="simulation_timer_frame_label">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>210</y>
+       <width>310</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Simulation Timer (for simulated rovers only)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <zorder>Simulation_Timer_Frame</zorder>
+    <zorder>label_6</zorder>
+    <zorder>num_targets_detected_label</zorder>
+    <zorder>label_8</zorder>
+    <zorder>num_targets_collected_label</zorder>
+    <zorder>label_9</zorder>
+    <zorder>perc_of_time_avoiding_obstacles</zorder>
+    <zorder>currentSimulationTimeLabel</zorder>
+    <zorder>simulationTimerStartLabel</zorder>
+    <zorder>simulationTimerStopLabel</zorder>
+    <zorder>currentSimulationTimeTitle</zorder>
+    <zorder>simulationTimerStartTitle</zorder>
+    <zorder>simulationTimerStopTitle</zorder>
+    <zorder>simulation_timer_frame_label</zorder>
    </widget>
   </widget>
   <widget class="QFrame" name="control_frame">
@@ -2707,7 +2848,7 @@ QTabBar::tab:only-one {
     <bool>true</bool>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the number of GPS Satellites detected by the selected physical rover. Simulated rovers will always display a value of zero here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the number of GPS Satellites detected by the selected physical rover. Simulated rovers will not display a value here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -2750,7 +2891,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rover_control_button_group"/>
   <buttongroup name="map_display_button_group"/>
+  <buttongroup name="rover_control_button_group"/>
  </buttongroups>
 </ui>
