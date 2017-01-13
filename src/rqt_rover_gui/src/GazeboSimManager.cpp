@@ -200,7 +200,7 @@ QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z
                + "-model " + rover_name
                + " -x " + QString::number(x)
                + " -y " + QString::number(y)
-               + " -z " + QString::number(z);
+               + " -z " + QString::number(z)
                + " -Y " + QString::number(M_PI);
 
     QProcess sh;
