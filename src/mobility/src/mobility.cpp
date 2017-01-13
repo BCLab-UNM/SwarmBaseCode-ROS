@@ -766,8 +766,22 @@ void mapAverage() {
             infoLogPublisher.publish(msg);
         }
 
+    bool useCustomTransform = true;
+    if (useCustomTransform)
+    {
+        geometry_msgs::Pose2D offset;
+        offset.x = currentLocation.x - currentLocationMap.x;
+        offset.y = currentLocation.y - currentLocationMap.y;
+
+        centerLocation.x = offset.x - centerLocationMap.x;
+        centerLocation.y = offset.y - centerLocationMap.y;
+
+    }
+    else
+    {
         centerLocation.x = odomPose.pose.position.x; //set centerLocation in odom frame
         centerLocation.y = odomPose.pose.position.y;
+    }
 
     }
 }
@@ -817,7 +831,8 @@ void mapAverage() {
 
 /*
    stringstream ss;
-   ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << "curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
+   ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << " curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
    msg.data = ss.str();
    infoLogPublisher.publish(msg);
    */
+
