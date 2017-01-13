@@ -61,7 +61,6 @@ qt4_wrap_cpp(
   src/GPSFrame.h
   src/IMUFrame.h
   src/JoystickGripperInterface.h
-  #src/IMUWidget.h
 )
 
 qt4_wrap_ui(
