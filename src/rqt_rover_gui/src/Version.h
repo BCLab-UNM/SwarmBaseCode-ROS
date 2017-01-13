@@ -1,4 +1,4 @@
-// This header exports the git version anf build time for display by the GUI
+// This header exports the git version and build time for display by the GUI
 
 #ifndef VERSION_H
 #define VERSION_H
