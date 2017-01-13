@@ -1,10 +1,12 @@
 /*!
- * \brief   This frame is intended to show information about the quality of the GPS sensor data,
- *          for example, the number of satellites current sending data.
- * \author  Matthew Fricke
- * \date    November 11th 2015
- * \todo    This frame is not currently being used and is currently just a place holder class.
- * \class   GPSFrame
+ * \brief  This frame is intended to show information about the quality of
+ *         the GPS sensor data, for example, the number of satellites current
+ *         sending data.
+ * \author Matthew Fricke
+ * \date   November 11th 2015
+ * \todo   This frame is not currently being used and is currently just a place
+ *         holder class.
+ * \class  GPSFrame
  */
 
 #ifndef GPSFRAME_H
@@ -16,38 +18,32 @@
 #include <QMutex>
 #include <QPainter>
 #include <vector>
-#include <utility> // For STL pair
+#include <utility> // for STL pair
 
 using namespace std;
 
 namespace rqt_rover_gui
 {
-
-class GPSFrame : public QFrame
-{
+  class GPSFrame : public QFrame
+  {
     Q_OBJECT
-public:
-    GPSFrame(QWidget *parent, Qt::WFlags = 0);
 
+    public:
+      GPSFrame(QWidget *parent, Qt::WFlags = 0);
 
-signals:
+    signals:
+      void delayedUpdate();
+      
+    public slots:
+      // currently, no class-defined slots are being used
 
-    void delayedUpdate();
+    protected:
+      void paintEvent(QPaintEvent *event);
 
-public slots:
-
-
-protected:
-
-    void paintEvent(QPaintEvent *event);
-
-private:
-
-    QTime frame_rate_timer;
-    int frames;
-
-};
-
+    private:
+      QTime frame_rate_timer;
+      int frames;
+  };
 }
 
 #endif // GPSFrame_H
