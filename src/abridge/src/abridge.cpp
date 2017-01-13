@@ -482,7 +482,7 @@ void parseData(string str) {
 			else if (dataSet.at(0) == "IMU") {
 				imu.header.stamp = ros::Time::now();
 				imu.linear_acceleration.x = atof(dataSet.at(2).c_str());
-				imu.linear_acceleration.y = atof(dataSet.at(3).c_str());
+				imu.linear_acceleration.y = 0; //atof(dataSet.at(3).c_str());
 				imu.linear_acceleration.z = atof(dataSet.at(4).c_str());
 				imu.angular_velocity.x = atof(dataSet.at(5).c_str());
 				imu.angular_velocity.y = atof(dataSet.at(6).c_str());
