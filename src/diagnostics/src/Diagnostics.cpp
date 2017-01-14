@@ -14,6 +14,13 @@ Diagnostics::Diagnostics(std::string name) {
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
   diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
+  fingerAngleSubscribe = nodeHandle.subscribe(publishedName + "/fingerAngle/prev_cmd", 10, &Diagnostics::fingerTimestampUpdate, this);
+  wristAngleSubscribe = nodeHandle.subscribe(publishedName + "/fingerAngle/prev_cmd", 10, &Diagnostics::wristTimestampUpdate, this);
+  imuSubscribe = nodeHandle.subscribe(publishedName + "/imu", 10, &Diagnostics::imuTimestampUpdate, this);
+  odometrySubscribe = nodeHandle.subscribe(publishedName + "/odom", 10, &Diagnostics::odometryTimestampUpdate, this);
+  sonarLeftSubscribe = nodeHandle.subscribe(publishedName + "/sonarLeft", 10, &Diagnostics::sonarLeftTimestampUpdate, this);
+  sonarCenterSubscribe = nodeHandle.subscribe(publishedName + "/sonarCenter", 10, &Diagnostics::sonarCenterTimestampUpdate, this);
+  sonarRightSubscribe = nodeHandle.subscribe(publishedName + "/sonarRight", 10, &Diagnostics::sonarRightTimestampUpdate, this);
 
   // Initialize the variables we use to track the simulation update rate
   prevRealTime = common::Time(0.0);
@@ -99,6 +106,34 @@ void Diagnostics::publishInfoLogMessage(std::string msg) {
   diagLogPublisher.publish(ros_msg);
 }
 
+void Diagnostics::fingerTimestampUpdate(const geometry_msgs::QuaternionStamped::ConstPtr& message) {
+	fingersTimestamp = message->header.stamp;
+}
+
+void Diagnostics::wristTimestampUpdate(const geometry_msgs::QuaternionStamped::ConstPtr& message) {
+	wristTimestamp = message->header.stamp;
+}
+
+void Diagnostics::imuTimestampUpdate(const sensor_msgs::Imu::ConstPtr& message) {
+	imuTimestamp = message->header.stamp;
+}
+
+void Diagnostics::odometryTimestampUpdate(const nav_msgs::Odometry::ConstPtr& message) {
+	odometryTimestamp = message->header.stamp;
+}
+
+void Diagnostics::sonarLeftTimestampUpdate(const sensor_msgs::Range::ConstPtr& message) {
+	sonarLeftTimestamp = message->header.stamp;
+}
+
+void Diagnostics::sonarCenterTimestampUpdate(const sensor_msgs::Range::ConstPtr& message) {
+	sonarCenterTimestamp = message->header.stamp;
+}
+
+void Diagnostics::sonarRightTimestampUpdate(const sensor_msgs::Range::ConstPtr& message) {
+	sonarRightTimestamp = message->header.stamp;
+}
+
 // Return the current time in this timezone in "WeekDay Month Day hr:mni:sec year" format.
 // We use this instead of asctime or ctime because it is thread safe
 string Diagnostics::getHumanFriendlyTime() {
@@ -121,6 +156,8 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
   checkGPS();
   checkSonar();
   checkCamera();
+  checkGripper();
+  checkOdometry();
   
   publishDiagnosticData();
   }
@@ -147,6 +184,16 @@ float Diagnostics::checkSimRate() {
 void Diagnostics::checkIMU() {
   // Example
   //publishWarningLogMessage("IMU Warning");
+	if (ros::Time::now() - imuTimestamp <= ros::Duration(2.0)) {
+		if (!imuConnected) {
+			imuConnected = true;
+			publishInfoLogMessage("IMU connected");
+		}
+	}
+	else if (imuConnected) {
+		imuConnected = false;
+		publishErrorLogMessage("IMU is not connected");
+	}
 }
 
 void Diagnostics::checkGPS() {
@@ -176,6 +223,7 @@ void Diagnostics::checkCamera() {
     if (!cameraConnected) publishInfoLogMessage("Camera reconnected");
     cameraConnected = true;
   } else {
+    if (cameraConnected)
     publishErrorLogMessage("Camera not connected");
     cameraConnected = false;
   }
@@ -184,6 +232,82 @@ void Diagnostics::checkCamera() {
 void Diagnostics::checkSonar() {
   //Example
   //publishErrorLogMessage("Sonar Error");
+
+	if (ros::Time::now() - sonarLeftTimestamp <= ros::Duration(2.0)) {
+		if (!sonarLeftConnected) {
+			sonarLeftConnected = true;
+			publishInfoLogMessage("Left ultrasound connected");
+		}
+	}
+	else if (sonarLeftConnected) {
+		sonarLeftConnected = false;
+		publishErrorLogMessage("Left ultrasound is not connected");
+	}
+
+	if (ros::Time::now() - sonarCenterTimestamp <= ros::Duration(2.0)) {
+		if (!sonarCenterConnected) {
+			sonarCenterConnected = true;
+			publishInfoLogMessage("Center ultrasound connected");
+		}
+	}
+	else if (sonarCenterConnected) {
+		sonarCenterConnected = false;
+		publishErrorLogMessage("Center ultrasound is not connected");
+	}
+
+	if (ros::Time::now() - sonarRightTimestamp <= ros::Duration(2.0)) {
+		if (!sonarRightConnected) {
+			sonarRightConnected = true;
+			publishInfoLogMessage("Right ultrasound connected");
+		}
+	}
+	else if (sonarRightConnected) {
+		sonarRightConnected = false;
+		publishErrorLogMessage("Right ultrasound is not connected");
+	}
+}
+
+void Diagnostics::checkGripper() {
+	// Example
+	//publishWarningLogMessage("Gripper Warning");
+
+	if (ros::Time::now() - fingersTimestamp <= ros::Duration(2.0)) {
+		if (!fingersConnected) {
+			fingersConnected = true;
+			publishInfoLogMessage("Gripper fingers connected");
+		}
+	}
+	else if (fingersConnected) {
+		fingersConnected = false;
+		publishErrorLogMessage("Gripper fingers are not connected");
+	}
+
+	if (ros::Time::now() - wristTimestamp <= ros::Duration(2.0)) {
+		if (!wristConnected) {
+			wristConnected = true;
+			publishInfoLogMessage("Gripper wrist connected");
+		}
+	}
+	else if (wristConnected) {
+		wristConnected = false;
+		publishErrorLogMessage("Gripper wrist is not connected");
+	}
+}
+
+void Diagnostics::checkOdometry() {
+	// Example
+	//publishWarningLogMessage("Odometry Warning");
+
+	if (ros::Time::now() - odometryTimestamp <= ros::Duration(2.0)) {
+		if (!odometryConnected) {
+			odometryConnected = true;
+			publishInfoLogMessage("Encoders connected");
+		}
+	}
+	else if (odometryConnected) {
+		odometryConnected = false;
+		publishErrorLogMessage("Encoders are not connected");
+	}
 }
 
 // Check if the U-Blox GPS is connected

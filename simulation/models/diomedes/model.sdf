@@ -699,8 +699,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/diomedes/wristAngle</wristTopic>
-			<fingerTopic>/diomedes/fingerAngle</fingerTopic>
+			<wristTopic>/diomedes/wristAngle/cmd</wristTopic>
+			<fingerTopic>/diomedes/fingerAngle/cmd</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
@@ -746,7 +746,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>diomedes/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/diomedes/velocity</commandTopic>
+			<commandTopic>/diomedes/skidsteer</commandTopic>
 			<odometryTopic>/diomedes/odom</odometryTopic>
 			<odometryFrame>diomedes/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>

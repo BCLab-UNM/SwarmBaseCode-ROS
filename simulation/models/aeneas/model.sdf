@@ -698,8 +698,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/aeneas/wristAngle</wristTopic>
-			<fingerTopic>/aeneas/fingerAngle</fingerTopic>
+			<wristTopic>/aeneas/wristAngle/cmd</wristTopic>
+			<fingerTopic>/aeneas/fingerAngle/cmd</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
@@ -745,7 +745,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>aeneas/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/aeneas/velocity</commandTopic>
+			<commandTopic>/aeneas/skidsteer</commandTopic>
 			<odometryTopic>/aeneas/odom</odometryTopic>
 			<odometryFrame>aeneas/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>

@@ -699,8 +699,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/hector/wristAngle</wristTopic>
-			<fingerTopic>/hector/fingerAngle</fingerTopic>
+			<wristTopic>/hector/wristAngle/cmd</wristTopic>
+			<fingerTopic>/hector/fingerAngle/cmd</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
@@ -746,7 +746,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>hector/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/hector/velocity</commandTopic>
+			<commandTopic>/hector/skidsteer</commandTopic>
 			<odometryTopic>/hector/odom</odometryTopic>
 			<odometryFrame>hector/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>

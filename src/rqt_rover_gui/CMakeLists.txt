@@ -29,6 +29,8 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   geometry_msgs
+  ublox_msgs
+  ublox_serialization
 )
 
 find_package(Qt4 REQUIRED COMPONENTS
@@ -59,7 +61,6 @@ qt4_wrap_cpp(
   src/GPSFrame.h
   src/IMUFrame.h
   src/JoystickGripperInterface.h
-  #src/IMUWidget.h
 )
 
 qt4_wrap_ui(
@@ -100,7 +101,10 @@ add_library(
   ${OpenCV_LIBS}
 )
 
-add_dependencies(rqt_rover_gui ${catkin_EXPORTED_TARGETS})
+add_dependencies(
+  rqt_rover_gui ${catkin_EXPORTED_TARGETS}
+  ${ublox_msgs_EXPORTED_TARGETS}
+)
 
 target_link_libraries(
   rqt_rover_gui

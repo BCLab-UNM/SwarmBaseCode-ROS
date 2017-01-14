@@ -699,8 +699,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/paris/wristAngle</wristTopic>
-			<fingerTopic>/paris/fingerAngle</fingerTopic>
+			<wristTopic>/paris/wristAngle/cmd</wristTopic>
+			<fingerTopic>/paris/fingerAngle/cmd</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
@@ -746,7 +746,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>paris/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/paris/velocity</commandTopic>
+			<commandTopic>/paris/skidsteer</commandTopic>
 			<odometryTopic>/paris/odom</odometryTopic>
 			<odometryFrame>paris/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>

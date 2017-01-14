@@ -699,8 +699,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/achilles/wristAngle</wristTopic>
-			<fingerTopic>/achilles/fingerAngle</fingerTopic>
+			<wristTopic>/achilles/wristAngle/cmd</wristTopic>
+			<fingerTopic>/achilles/fingerAngle/cmd</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
@@ -746,7 +746,7 @@
 			<wheelDiameter>0.12</wheelDiameter>
 			<robotBaseFrame>achilles/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/achilles/velocity</commandTopic>
+			<commandTopic>/achilles/skidsteer</commandTopic>
 			<odometryTopic>/achilles/odom</odometryTopic>
 			<odometryFrame>achilles/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>
