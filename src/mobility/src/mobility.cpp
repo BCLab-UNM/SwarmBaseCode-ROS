@@ -52,10 +52,10 @@ geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
 geometry_msgs::Pose2D currentLocationAverage;
 geometry_msgs::Pose2D goalLocation;
+ 
 geometry_msgs::Pose2D centerLocation;
 geometry_msgs::Pose2D centerLocationMap;
 geometry_msgs::Pose2D centerLocationOdom;
-geometry_msgs::Pose2D mapLocation[500];
 
 int currentMode = 0;
 float mobilityLoopTimeStep = 0.1; // time between the mobility loop calls
@@ -89,9 +89,15 @@ bool init = false;
 // used to remember place in mapAverage array
 int mapCount = 0;
 
+// How many points to use in calculating the map average position
+const unsigned int mapHistorySize = 500;
+
+// An array in which to store map positions
+geometry_msgs::Pose2D mapLocation[mapHistorySize];
+
 bool avoidingObstacle = false;
 
-float searchVelocity = 0.2;
+float searchVelocity = 0.2; // meters/second
 
 std_msgs::String msg;
 
@@ -225,6 +231,11 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
+
+// This is the top-most logic control block organised as a state machine.
+// This function calls the dropOff, pickUp, and search controllers.
+// This block passes the goal location to the proportional-integral-derivative
+// controllers in the abridge package.
 void mobilityStateMachine(const ros::TimerEvent&) {
 
     std_msgs::String stateMachineMsg;
@@ -238,24 +249,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
 
-        /* debugging print statements */
-        /*
-        stringstream ss;
-        ss << "map center " << centerLocationMap.x << " : "
-           << centerLocationMap.y << " centerLocation " << centerLocation.x
-           << " : " << centerLocation.y << " currentLlocation "
-           << currentLocation.x << " : " << currentLocation.y
-           << " currentLocationAverage " << currentLocationAverage.x
-           << " : " << currentLocationAverage.y << "curMap "
-           << currentLocationMap.x << " : " << currentLocationMap.y;
-        msg.data = ss.str();
-        infoLogPublisher.publish(msg);
-        */
-
+      
         // time since timerStartTime was set to current time
         timerTimeElapsed = time(0) - timerStartTime;
 
-        // initiliation code goes here. (code that runs only once at start of
+        // init code goes here. (code that runs only once at start of
         // auto mode but wont work in main goes here)
         if (!init) {
             if (timerTimeElapsed > 60) {
@@ -706,7 +704,7 @@ void mapAverage() {
     mapLocation[mapCount] = currentLocationMap;
     mapCount++;
 
-    if (mapCount >= 500) {
+    if (mapCount >= mapHistorySize) {
         mapCount = 0;
     }
 
@@ -715,15 +713,15 @@ void mapAverage() {
     double theta = 0;
 
     // add up all the positions in the array
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < mapHistorySize; i++) {
         x += mapLocation[i].x;
         y += mapLocation[i].y;
         theta += mapLocation[i].theta;
     }
 
     // find the average
-    x = x/500;
-    y = y/500;
+    x = x/mapHistorySize;
+    y = y/mapHistorySize;
     
     // Get theta rotation by converting quaternion orientation to pitch/roll/yaw
     theta = theta/100;
@@ -742,10 +740,6 @@ void mapAverage() {
 
         mapPose.header.frame_id = publishedName + "/map";
         mapPose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, centerLocationMap.theta);
-        //mapPose.pose.orientation.x = 0;
-        //mapPose.pose.orientation.y = 0;
-        //mapPose.pose.orientation.z = 0;
-        //mapPose.pose.orientation.w = 1;
         mapPose.pose.position.x = centerLocationMap.x;
         mapPose.pose.position.y = centerLocationMap.y;
         geometry_msgs::PoseStamped odomPose;
@@ -766,9 +760,10 @@ void mapAverage() {
             infoLogPublisher.publish(msg);
         }
 
+    // The custom transform allows us to ignore the orientation provided by the ros transform above.
+    // The orientation provided by the ros transform above is incorrect, but the x and y coordinates are good.
     bool useCustomTransform = true;
-    if (useCustomTransform)
-    {
+    if (useCustomTransform) {
         geometry_msgs::Pose2D offset;
         offset.x = currentLocation.x - currentLocationMap.x;
         offset.y = currentLocation.y - currentLocationMap.y;
@@ -776,63 +771,11 @@ void mapAverage() {
         centerLocation.x = offset.x - centerLocationMap.x;
         centerLocation.y = offset.y - centerLocationMap.y;
 
-    }
-    else
-    {
+    } else { // Use the position and orientation provided by the ros transform.
         centerLocation.x = odomPose.pose.position.x; //set centerLocation in odom frame
         centerLocation.y = odomPose.pose.position.y;
     }
 
     }
 }
-
-
-
-
-//below is some saved example code
-//************************************************************************************************************************************************
-
-//This is code for map link to odom link
-/*
-    geometry_msgs::PoseStamped mapOrigin;
-    mapOrigin.header.stamp = ros::Time::now();
-    mapOrigin.header.frame_id = publishedName + "/map";
-    mapOrigin.pose.orientation.w = 1;
-    geometry_msgs::PoseStamped odomPose;
-    string x = "";
-
-        try {
-            tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time::now(), ros::Duration(1.0));
-            tfListener->transformPose(publishedName + "/odom", mapOrigin, odomPose);
-        }
-
-        catch(tf::TransformException& ex) {
-            ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
-            x = "Exception thrown " + (string)ex.what();
-        }
-    x = odomPose.pose.position.x;
-
-*/
-
-
-//This is code for camera link to odom link
-/*
-        geometry_msgs::PoseStamped mapOrigin;
-        geometry_msgs::PoseStamped odomPose;
-        try {
-            tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time(0), ros::Duration(1.0));
-            tfListener->transformPose(publishedName + "/odom", mapOrigin, odomPose);
-        }
-        catch(tf::TransformException& ex) {
-            ROS_INFO("Received an exception trying to transform a point from \"map\" to \"odom\": %s", ex.what());
-        }
-        //x coord = odomPose.pose.position.x;
-*/
-
-/*
-   stringstream ss;
-   ss << "map center " << centerLocationMap.x << " : " << centerLocationMap.y << " centerLocation " << centerLocation.x << " : " << centerLocation.y << " currentLlocation " << currentLocation.x << " : " << currentLocation.y << " currentLocationAverage " << currentLocationAverage.x << " : " << currentLocationAverage.y << " curMap " << currentLocationMap.x << " : " << currentLocationMap.y;
-   msg.data = ss.str();
-   infoLogPublisher.publish(msg);
-   */
 
