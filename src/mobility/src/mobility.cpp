@@ -140,6 +140,9 @@ ros::Timer targetDetectedTimer;
 // records time for delays in sequanced actions, 1 second resolution.
 time_t timerStartTime;
 
+// An initial delay to allow the rover to gather enough position data to 
+// average its location.
+unsigned int startDelayInSeconds = 1;
 float timerTimeElapsed = 0;
 
 //Transforms
@@ -224,6 +227,11 @@ int main(int argc, char **argv) {
     msg.data = "Log Started";
     infoLogPublisher.publish(msg);
 
+    stringstream ss;
+    ss << "Rover start delay set to " << startDelayInSeconds << " seconds";
+    msg.data = ss.str();
+    infoLogPublisher.publish(msg);
+
     timerStartTime = time(0);
 
     ros::spin();
@@ -256,7 +264,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         // init code goes here. (code that runs only once at start of
         // auto mode but wont work in main goes here)
         if (!init) {
-            if (timerTimeElapsed > 60) {
+            if (timerTimeElapsed > startDelayInSeconds) {
                 // Set the location of the center circle location in the map
                 // frame based upon our current average location on the map.
                 centerLocationMap.x = currentLocationAverage.x;
