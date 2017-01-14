@@ -104,7 +104,7 @@ std_msgs::String msg;
 // state machine states
 #define STATE_MACHINE_TRANSFORM 0
 #define STATE_MACHINE_ROTATE 1
-#define STATE_MACHINE_DIFFERENTIAL_DRIVE 2
+#define STATE_MACHINE_SKID_STEER 2
 #define STATE_MACHINE_PICKUP 3
 #define STATE_MACHINE_DROPOFF 4
 
@@ -354,7 +354,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             //If goal has not yet been reached drive and maintane heading
             else if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
-                stateMachineState = STATE_MACHINE_DIFFERENTIAL_DRIVE;
+                stateMachineState = STATE_MACHINE_SKID_STEER;
             }
             //Otherwise, drop off target and select new random uniform heading
             //If no targets have been detected, assign a new goal
@@ -381,7 +381,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 break;
             } else {
                 // move to differential drive step
-                stateMachineState = STATE_MACHINE_DIFFERENTIAL_DRIVE;
+                stateMachineState = STATE_MACHINE_SKID_STEER;
                 //fall through on purpose.
             }
         }
@@ -389,8 +389,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         // Calculate angle between currentLocation.x/y and goalLocation.x/y
         // Drive forward
         // Stay in this state until angle is at least PI/2
-        case STATE_MACHINE_DIFFERENTIAL_DRIVE: {
-            stateMachineMsg.data = "DIFFERENTIAL_DRIVE";
+        case STATE_MACHINE_SKID_STEER: {
+            stateMachineMsg.data = "SKID_STEER";
 
             // calculate the distance between current and desired heading in radians
             float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
