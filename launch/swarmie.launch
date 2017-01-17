@@ -10,7 +10,7 @@
 
   <node pkg="robot_localization" type="navsat_transform_node" name="$(arg name)_NAVSAT" respawn="false">
 
-      <param name="magnetic_declination_radians" value="0.1530654"/>
+      <param name="magnetic_declination_radians" value="0.0"/>
       <param name="yaw_offset" value="1.57079632679"/>
       <param name="world_frame" value="map"/>
       <param name="frequency" value="10"/>
@@ -41,7 +41,7 @@
                                false, false, true, 
                                false, false, false, 
                                false, false, true, 
-                               true, false, false]</rosparam>
+                               false, false, false]</rosparam>
 
       <remap from="/odometry/filtered" to="/$(arg name)/odom/filtered" />
     
@@ -66,12 +66,12 @@
                                false, false, true,
                                false, false, false,
                                false, false, true,
-                               true, false, false]</rosparam>
+                               false, false, false]</rosparam>
 
-      <rosparam param="odom1_config">[true, true, false,
+      <rosparam param="odom1_config">[false, false, false,
                                 false, false, false,
                                 true, false, false,
-                                false, false, true,
+                                false, false, false,
                                 false, false, false]</rosparam>
 
 <rosparam param="initial_estimate_covariance">[1e-9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

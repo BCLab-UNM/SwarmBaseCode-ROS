@@ -72,7 +72,7 @@ else
     nohup rosrun ublox_gps ublox_gps __name:=$HOSTNAME\_UBLOX /$HOSTNAME\_UBLOX/fix:=/$HOSTNAME/fix /$HOSTNAME\_UBLOX/fix_velocity:=/$HOSTNAME/fix_velocity /$HOSTNAME\_UBLOX/navposllh:=/$HOSTNAME/navposllh /$HOSTNAME\_UBLOX/navsol:=/$HOSTNAME/navsol /$HOSTNAME\_UBLOX/navstatus:=/$HOSTNAME/navstatus /$HOSTNAME\_UBLOX/navvelned:=/$HOSTNAME/navvelned _device:=/dev/$gpsDevicePath _frame_id:=$HOSTNAME/base_link &
 fi
 
-nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _frequency:=10 _magnetic_declination_radians:=0.1530654 _yaw_offset:=0 _use_odometry_yaw:=true /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
+nohup rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _frequency:=10 _magnetic_declination_radians:=0.1530654 _yaw_offset:=0 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
 
 rosparam set /$HOSTNAME\_ODOM/odom0 /$HOSTNAME/odom
 rosparam set /$HOSTNAME\_ODOM/imu0 /$HOSTNAME/imu
@@ -82,8 +82,10 @@ nohup rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_f
 
 rosparam set /$HOSTNAME\_MAP/odom0 /$HOSTNAME/odom/navsat
 rosparam set /$HOSTNAME\_MAP/odom1 /$HOSTNAME/odom/filtered
+rosparam set /$HOSTNAME\_MAP/imu0 /$HOSTNAME/imu
 rosparam set /$HOSTNAME\_MAP/odom0_config [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false]
-rosparam set /$HOSTNAME\_MAP/odom1_config [false,false,false,false,false,true,true,false,false,false,false,true,true,false,false]
+rosparam set /$HOSTNAME\_MAP/odom1_config [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false]
+rosparam set /$HOSTNAME\_MAP/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,false,false,false]
 
 rosparam set /$HOSTNAME\_MAP/initial_estimate_covariance "[1e-9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /
                                                0, 1e-9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /
