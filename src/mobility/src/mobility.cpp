@@ -52,7 +52,7 @@ geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
 geometry_msgs::Pose2D currentLocationAverage;
 geometry_msgs::Pose2D goalLocation;
- 
+
 geometry_msgs::Pose2D centerLocation;
 geometry_msgs::Pose2D centerLocationMap;
 geometry_msgs::Pose2D centerLocationOdom;
@@ -257,7 +257,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
 
-      
+
         // time since timerStartTime was set to current time
         timerTimeElapsed = time(0) - timerStartTime;
 
@@ -768,21 +768,10 @@ void mapAverage() {
             infoLogPublisher.publish(msg);
         }
 
-    // The custom transform allows us to ignore the orientation provided by the ros transform above.
-    // The orientation provided by the ros transform above is incorrect, but the x and y coordinates are good.
-    bool useCustomTransform = true;
-    if (useCustomTransform) {
-        geometry_msgs::Pose2D offset;
-        offset.x = currentLocation.x - currentLocationMap.x;
-        offset.y = currentLocation.y - currentLocationMap.y;
-
-        centerLocation.x = offset.x - centerLocationMap.x;
-        centerLocation.y = offset.y - centerLocationMap.y;
-
-    } else { // Use the position and orientation provided by the ros transform.
+        // Use the position and orientation provided by the ros transform.
         centerLocation.x = odomPose.pose.position.x; //set centerLocation in odom frame
         centerLocation.y = odomPose.pose.position.y;
-    }
+
 
     }
 }
