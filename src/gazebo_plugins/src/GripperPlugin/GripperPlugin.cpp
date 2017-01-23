@@ -279,7 +279,8 @@ void GripperPlugin::setFingerAngleHandler(const std_msgs::Float32ConstPtr& msg) 
     // 1.39626 is approximately equal to 80 degrees
     double maxGrippingAngle = 1.39626;
 
-    if (desiredFingerAngle >= maxGrippingAngle) {
+    
+    if (attachedTargetModel->IsStatic() && desiredFingerAngle >= maxGrippingAngle) {
       sendInfoLogMessage("GripperPlugin: detach() trying to detach due to finger angle failsafe");
       try {
         detach(); 
