@@ -29,7 +29,7 @@ public:
     float getCentX() { return centerLocation.x;}
     float getCount() { return count;}
 
-    void setDataTargets(int ccount, bool lleft, bool rright) {count = ccount; right = rright; left = lleft;}
+    void setDataTargets(int ccount, double lleft, double rright);
     void setCenterDist(float dist) {distanceToCenter = dist;}
     void setDataLocations(geometry_msgs::Pose2D center, geometry_msgs::Pose2D current, float sync);
 
@@ -60,6 +60,9 @@ private:
     int seenEnoughCenterTagsCount;
     DropOffResult result;
     int count;
+    int prevCount;
+    double countLeft;
+    double countRight;
     float collectionPointVisualDistance;
     float distanceToCenter;
     geometry_msgs::Pose2D centerLocation;

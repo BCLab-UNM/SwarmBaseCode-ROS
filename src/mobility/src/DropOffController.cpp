@@ -29,6 +29,7 @@ DropOffController::DropOffController() {
     centerSeen = false;
     timeElapsedSinceTimeSinceSeeingEnoughCenterTags = time(0);
     circularCenterSearching = false;
+    prevCount = 0;
 
     searchVelocity = 0.15;
 }
@@ -104,29 +105,46 @@ void DropOffController::calculateDecision() {
     //reset timeWithoutSeeingEnoughCenterTags timout timer to current time
     if ((!centerApproach && !seenEnoughCenterTags) || (count > 0 && !seenEnoughCenterTags)) timeWithoutSeeingEnoughCenterTags = time(0);
 
-    if (count > 0) //if we have a target and the center is located drive towards it.
+    if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
     {
         centerSeen = true;
         result.goalDriving = false;
 
+        if (seenEnoughCenterTags) //if we have seen enough tags
+        {
+            if ((countLeft-5) > countRight) //and there are too many on the left
+            {
+                right = false; //then we say non on the right to cause us to turn right
+            }
+            else if ((countRight-5) > countLeft)
+            {
+                left = false; //or left in this case
+            }
+        }
+
         float turnDirection = 1;
-        //below commented out code is only usfull for the new center design as opposed to the current circle.
         //reverse tag rejection when we have seen enough tags that we are on a
         //trajectory in to the square we dont want to follow an edge.
-        //if (seenEnoughCenterTags) turnDirection = -1;
-        //otherwise turn till tags on both sides of image then drive straight
+        if (seenEnoughCenterTags) turnDirection = -1;
 
+
+        //otherwise turn till tags on both sides of image then drive straight
         if (left && right) {
             result.cmdVel = searchVelocity;
             result.angleError = 0.0;
         }
         else if (right) {
-            result.cmdVel = -0.1;
+            result.cmdVel = -0.1 * turnDirection;
             result.angleError = -centeringTurn*turnDirection;
         }
         else if (left){
-            result.cmdVel = -0.1;
+            result.cmdVel = -0.1 * turnDirection;
             result.angleError = centeringTurn*turnDirection;
+        }
+        else
+        {
+            result.cmdVel = searchVelocity;
+            result.angleError = 0.0;
         }
 
         //must see greater than this many tags before assuming we are driving into the center and not along an edge.
@@ -135,14 +153,19 @@ void DropOffController::calculateDecision() {
             seenEnoughCenterTags = true; //we have driven far enough forward to be in the circle.
             timeWithoutSeeingEnoughCenterTags = time(0);
         }
+        if (count > 0) //reset gaurd to prevent drop offs due to loosing tracking on tags for a frame or 2.
+        {
+            timeWithoutSeeingEnoughCenterTags = time(0);
+        }
         //time since we dropped below countGuard tags
         timeElapsedSinceTimeSinceSeeingEnoughCenterTags = time(0) - timeWithoutSeeingEnoughCenterTags;
 
         //we have driven far enough forward to have passed over the circle.
-        if (count < seenEnoughCenterTagsCount && seenEnoughCenterTags && timeElapsedSinceTimeSinceSeeingEnoughCenterTags > 0) {
+        if (count == 0 && seenEnoughCenterTags && timeElapsedSinceTimeSinceSeeingEnoughCenterTags > 1) {
             centerSeen = false;
         }
         centerApproach = true;
+        prevCount = count;
         count = 0;
     }
     //was on approach to center and did not seenEnoughCenterTags
@@ -206,6 +229,7 @@ void DropOffController::reset() {
     result.reset = false;
     spinner = 0;
     addSpinSize = 0;
+    prevCount = 0;
 
     left = false;
     right = false;
@@ -216,6 +240,30 @@ void DropOffController::reset() {
     seenEnoughCenterTags = false;
     circularCenterSearching = false;
 
+}
+
+void DropOffController::setDataTargets(int ccount, double lleft, double rright)
+{
+    count = ccount;
+    if (rright > 0)
+    {
+        right = true;
+    }
+    else
+    {
+        right = false;
+    }
+    if (lleft > 0)
+    {
+        left = true;
+    }
+    else
+    {
+        left = false;
+    }
+
+    countLeft = lleft;
+    countRight = rright;
 }
 
 DropOffController::~DropOffController() {

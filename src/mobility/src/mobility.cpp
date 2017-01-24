@@ -529,11 +529,11 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
     // if a target is detected and we are looking for center tags
     if (message->detections.size() > 0 && !reachedCollectionPoint) {
         float cameraOffsetCorrection = 0.020; //meters;
-        bool right = false;
-        bool left = false;
 
         centerSeen = false;
         double count = 0;
+        double countRight = 0;
+        double countLeft = 0;
 
         // this loop is to get the number of center tags
         for (int i = 0; i < message->detections.size(); i++) {
@@ -542,9 +542,10 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
                 // checks if tag is on the right or left side of the image
                 if (cenPose.pose.position.x + cameraOffsetCorrection > 0) {
-                    right = true;
+                    countRight++;
+
                 } else {
-                    left = true;
+                    countLeft++;
                 }
 
                 centerSeen = true;
@@ -557,7 +558,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
             goalLocation = currentLocation;
         }
 
-        dropOffController.setDataTargets(count,left,right);
+        dropOffController.setDataTargets(count,countLeft,countRight);
 
         // if we see the center and we dont have a target collected
         if (centerSeen && !targetCollected) {
