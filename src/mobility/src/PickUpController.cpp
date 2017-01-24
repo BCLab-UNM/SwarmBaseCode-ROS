@@ -63,6 +63,7 @@ PickUpResult PickUpController::pickUpSelectedTarget(bool blockBlock) {
         result.cmdVel = vel;
         result.angleError = -blockYawError/2;
         timeOut = false;
+        nTargetsSeen = 0;
         return result;
     }
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
