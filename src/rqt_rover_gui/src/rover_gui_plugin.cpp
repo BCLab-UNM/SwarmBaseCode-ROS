@@ -1806,6 +1806,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     timer_start_time_in_seconds = 0.0;
     timer_stop_time_in_seconds = 0.0;
     current_simulated_time_in_seconds = 0.0;
+    last_current_time_update_in_seconds = 0.0;
     is_timer_on = false;
 }
 
