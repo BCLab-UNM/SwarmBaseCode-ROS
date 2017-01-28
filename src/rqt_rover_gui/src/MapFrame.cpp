@@ -368,18 +368,18 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         painter.drawPoints(point_array, scaled_target_locations.size());
 
         // Draw a yellow circle at the current EKF estimated rover location
-        painter.setPen(Qt::yellow);
-        pair<float,float> current_coordinate; //check if EKFPath is empty before takeing coordinates off the back
         if(!map_data->getEKFPath(rover_to_display)->empty()) {
+          painter.setPen(Qt::yellow);
+          pair<float,float> current_coordinate;
           current_coordinate = map_data->getEKFPath(rover_to_display)->back();
+
+          float x = map_origin_x+((current_coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+          float y = map_origin_y+((current_coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+          float radius = 2.5;
+
+          painter.drawEllipse(QPointF(x,y), radius, radius);
+          painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display));
         }
-        QPoint point;
-        float x = map_origin_x+((current_coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
-        float y = map_origin_y+((current_coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
-        float radius = 2.5;
-        //painter.drawArc(x-radius,y-radius,2*radius,2*radius,0,16*360);
-        painter.drawEllipse(QPointF(x,y), radius, radius);
-        painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display));
 
         map_data->unlock();
 
