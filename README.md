@@ -8,6 +8,8 @@ This repository contains:
 2. 3D .STL models for the physical Swarmie build 
 3. Bash shell scripts for initializing simulated Swarmies in the Gazebo simulator, as well as physical Swarmies
 
+- For a step-by-step guide to using Swarmathon-ROS to control a physical Swarmie robot, please see the instructions in the physical robot [Quick Start Guide](https://github.com/BCLab-UNM/Swarmathon-Docs/edit/master/Quick%20Start%20Physical%20Guide.md).
+
 - Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
 - We recommend Jason M. O'Kane's [A Gentle Introduction to ROS](https://cse.sc.edu/~jokane/agitr/) for an in-depth walkthrough.
