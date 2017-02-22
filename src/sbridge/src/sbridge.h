@@ -27,9 +27,18 @@ class sbridge {
 
 		//Publishers
 		ros::Publisher skidsteerPublish;
+        ros::Publisher heartbeatPublisher;
 
 		//Subscribers
 		ros::Subscriber driveControlSubscriber;
+
+        //Callback handlers
+        void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
+
+        //Timers
+        ros::Timer publish_heartbeat_timer;
+
+        float heartbeat_publish_interval;
 
 		geometry_msgs::Twist velocity;
 };

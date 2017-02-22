@@ -45,6 +45,8 @@ const float deltaTime = 0.1; //abridge's update interval
 int currentMode = 0;
 string publishedName;
 
+float heartbeat_publish_interval = 2;
+
 
 //PID constants and arrays
 const int histArrayLength = 1000;
@@ -72,6 +74,7 @@ ros::Publisher sonarLeftPublish;
 ros::Publisher sonarCenterPublish;
 ros::Publisher sonarRightPublish;
 ros::Publisher infoLogPublisher;
+ros::Publisher heartbeatPublisher;
 
 //Subscribers
 ros::Subscriber driveControlSubscriber;
@@ -81,6 +84,10 @@ ros::Subscriber modeSubscriber;
 
 //Timers
 ros::Timer publishTimer;
+ros::Timer publish_heartbeat_timer;
+
+//Callback handlers
+void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 
 int main(int argc, char **argv) {
     
@@ -114,6 +121,7 @@ int main(int argc, char **argv) {
     sonarCenterPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarCenter"), 10);
     sonarRightPublish = aNH.advertise<sensor_msgs::Range>((publishedName + "/sonarRight"), 10);
     infoLogPublisher = aNH.advertise<std_msgs::String>("/infoLog", 1, true);
+    heartbeatPublisher = aNH.advertise<std_msgs::String>((publishedName + "/abridge/heartbeat"), 1, true);
     
     driveControlSubscriber = aNH.subscribe((publishedName + "/driveControl"), 10, driveCommandHandler);
     fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle/cmd"), 1, fingerAngleHandler);
@@ -122,6 +130,7 @@ int main(int argc, char **argv) {
 
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
+    publish_heartbeat_timer = aNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
     
     imu.header.frame_id = publishedName+"/base_link";
     
@@ -471,10 +480,10 @@ void parseData(string str) {
 
 		if (dataSet.size() >= 3 && dataSet.at(1) == "1") {
 
-			if (dataSet.at(0) == "GRF") {
-				fingerAngle.header.stamp = ros::Time::now();
-				fingerAngle.quaternion = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(2).c_str()), 0.0, 0.0);
-			}
+            if (dataSet.at(0) == "GRF") {
+                fingerAngle.header.stamp = ros::Time::now();
+                fingerAngle.quaternion = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(2).c_str()), 0.0, 0.0);
+            }
 			else if (dataSet.at(0) == "GRW") {
 				wristAngle.header.stamp = ros::Time::now();
 				wristAngle.quaternion = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(2).c_str()), 0.0, 0.0);
@@ -520,4 +529,10 @@ void parseData(string str) {
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 	currentMode = message->data;
+}
+
+void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
+    std_msgs::String msg;
+    msg.data = "";
+    heartbeatPublisher.publish(msg);
 }

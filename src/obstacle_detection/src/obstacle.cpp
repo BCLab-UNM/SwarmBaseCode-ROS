@@ -8,6 +8,7 @@
 //ROS messages
 #include <std_msgs/UInt8.h>
 #include <sensor_msgs/Range.h>
+#include <std_msgs/String.h>
 
 using namespace std;
 
@@ -16,11 +17,18 @@ double collisionDistance = 0.6; //meters the ultrasonic detectors will flag obst
 string publishedName;
 char host[128];
 
+float heartbeat_publish_interval = 2;
+
 //Publishers
 ros::Publisher obstaclePublish;
+ros::Publisher heartbeatPublisher;
+
+//Timers
+ros::Timer publish_heartbeat_timer;
 
 //Callback handlers
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);
+void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 
 int main(int argc, char** argv) {
     gethostname(host, sizeof (host));
@@ -38,6 +46,7 @@ int main(int argc, char** argv) {
     ros::NodeHandle oNH;
     
     obstaclePublish = oNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle"), 10);
+    heartbeatPublisher = oNH.advertise<std_msgs::String>((publishedName + "/obstacle/heartbeat"), 1, true);
     
     message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(oNH, (publishedName + "/sonarLeft"), 10);
     message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(oNH, (publishedName + "/sonarCenter"), 10);
@@ -47,6 +56,8 @@ int main(int argc, char** argv) {
 
     message_filters::Synchronizer<sonarSyncPolicy> sonarSync(sonarSyncPolicy(10), sonarLeftSubscriber, sonarCenterSubscriber, sonarRightSubscriber);
     sonarSync.registerCallback(boost::bind(&sonarHandler, _1, _2, _3));
+
+    publish_heartbeat_timer = oNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
 
     ros::spin();
 
@@ -73,3 +84,8 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
         obstaclePublish.publish(obstacleMode);
 }
 
+void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
+    std_msgs::String msg;
+    msg.data = "";
+    heartbeatPublisher.publish(msg);
+}

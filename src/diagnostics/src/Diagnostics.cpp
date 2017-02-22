@@ -21,6 +21,10 @@ Diagnostics::Diagnostics(std::string name) {
   sonarLeftSubscribe = nodeHandle.subscribe(publishedName + "/sonarLeft", 10, &Diagnostics::sonarLeftTimestampUpdate, this);
   sonarCenterSubscribe = nodeHandle.subscribe(publishedName + "/sonarCenter", 10, &Diagnostics::sonarCenterTimestampUpdate, this);
   sonarRightSubscribe = nodeHandle.subscribe(publishedName + "/sonarRight", 10, &Diagnostics::sonarRightTimestampUpdate, this);
+  abdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/abridge/heartbeat", 1, &Diagnostics::abridgeNode,this);
+  sbdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/sbridge/heartbeat", 1, &Diagnostics::sbridgeNode,this);
+  obstacleNodeSubscribe = nodeHandle.subscribe(publishedName + "/obstacle/heartbeat", 1, &Diagnostics::obstacleNode,this);
+  mobilityNodeSubscribe = nodeHandle.subscribe(publishedName + "/mobiltiy/heartbeat", 1, &Diagnostics::obstacleNode,this);
 
   // Initialize the variables we use to track the simulation update rate
   prevRealTime = common::Time(0.0);
@@ -29,8 +33,11 @@ Diagnostics::Diagnostics(std::string name) {
 
   // Setup sensor check timers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
+
+  // Setup Node check timer
+  nodeCheckTimer = nodeHandle.createTimer(ros::Duration(nodeCheckInterval), &Diagnostics::nodeCheckTimerEventHandler, this);
   
- simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
+  simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
 
   if ( checkIfSimulatedRover() ) {
     // For processing gazebo messages from the world stats topic.
@@ -131,7 +138,23 @@ void Diagnostics::sonarCenterTimestampUpdate(const sensor_msgs::Range::ConstPtr&
 }
 
 void Diagnostics::sonarRightTimestampUpdate(const sensor_msgs::Range::ConstPtr& message) {
-	sonarRightTimestamp = message->header.stamp;
+    sonarRightTimestamp = message->header.stamp;
+}
+
+void Diagnostics::abridgeNode(std_msgs::String msg) {
+    abridgeNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::sbridgeNode(std_msgs::String msg) {
+    sbridgeNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::obstacleNode(std_msgs::String msg) {
+    obstacleNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::mobilityNode(std_msgs::String msg) {
+    mobilityNodeTimestamp = ros::Time::now();
 }
 
 // Return the current time in this timezone in "WeekDay Month Day hr:mni:sec year" format.
@@ -161,6 +184,20 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
   
   publishDiagnosticData();
   }
+
+}
+
+void Diagnostics::nodeCheckTimerEventHandler(const ros::TimerEvent& event) {
+
+    if (!simulated) {
+        checkAbridge();
+    }
+    else {
+       checkSbridge();
+    }
+
+    checkObstacle();
+    checkMobility();
 
 }
 
@@ -308,6 +345,62 @@ void Diagnostics::checkOdometry() {
 		odometryConnected = false;
 		publishErrorLogMessage("Encoders are not connected");
 	}
+}
+
+void Diagnostics::checkAbridge() {
+
+    if (ros::Time::now() - abridgeNodeTimestamp <= ros::Duration(2.0)) {
+        if (!abridgeRunning) {
+            abridgeRunning = true;
+            publishInfoLogMessage("abridge running");
+        }
+    }
+    else if (abridgeRunning) {
+        abridgeRunning = false;
+        publishErrorLogMessage("abridge is not running");
+    }
+}
+
+void Diagnostics::checkSbridge() {
+
+    if (ros::Time::now() - sbridgeNodeTimestamp <= ros::Duration(5.0)) {
+        if (!sbridgeRunning) {
+            sbridgeRunning = true;
+            publishInfoLogMessage("sbridge running");
+        }
+    }
+    else if (sbridgeRunning) {
+        sbridgeRunning = false;
+        publishErrorLogMessage("sbridge is not running");
+    }
+}
+
+void Diagnostics::checkObstacle() {
+
+    if (ros::Time::now() - obstacleNodeTimestamp <= ros::Duration(5.0)) {
+        if (!obstacleRunning) {
+            obstacleRunning = true;
+            publishInfoLogMessage("obstacle running");
+        }
+    }
+    else if (obstacleRunning) {
+        obstacleRunning = false;
+        publishErrorLogMessage("obstacle is not running");
+    }
+}
+
+void Diagnostics::checkMobility() {
+
+    if (ros::Time::now() - mobilityNodeTimestamp <= ros::Duration(5.0)) {
+        if (!mobilityRunning) {
+            mobilityRunning = true;
+            publishInfoLogMessage("mobility node running");
+        }
+    }
+    else if (mobilityRunning) {
+        mobilityRunning = false;
+        publishErrorLogMessage("mobility node is not running");
+    }
 }
 
 // Check if the U-Blox GPS is connected
