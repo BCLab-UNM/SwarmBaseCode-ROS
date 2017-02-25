@@ -11,6 +11,12 @@ using namespace gazebo;
 
 Diagnostics::Diagnostics(std::string name) {
 
+  node_heartbeat_timeout = 5.0;
+  device_heartbeat_timeout = 2.0;
+  abridgeRunning = sbridgeRunning = obstacleRunning = mobilityRunning = true;
+  diagnostics_start_time = ros::Time::now();
+  node_start_delay = 20;
+
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
   diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
@@ -24,7 +30,7 @@ Diagnostics::Diagnostics(std::string name) {
   abdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/abridge/heartbeat", 1, &Diagnostics::abridgeNode,this);
   sbdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/sbridge/heartbeat", 1, &Diagnostics::sbridgeNode,this);
   obstacleNodeSubscribe = nodeHandle.subscribe(publishedName + "/obstacle/heartbeat", 1, &Diagnostics::obstacleNode,this);
-  mobilityNodeSubscribe = nodeHandle.subscribe(publishedName + "/mobiltiy/heartbeat", 1, &Diagnostics::obstacleNode,this);
+  mobilityNodeSubscribe = nodeHandle.subscribe(publishedName + "/mobility/heartbeat", 1, &Diagnostics::mobilityNode,this);
 
   // Initialize the variables we use to track the simulation update rate
   prevRealTime = common::Time(0.0);
@@ -189,6 +195,9 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
 
 void Diagnostics::nodeCheckTimerEventHandler(const ros::TimerEvent& event) {
 
+
+    if (node_start_delay > (ros::Time::now() - diagnostics_start_time).sec) return;
+
     if (!simulated) {
         checkAbridge();
     }
@@ -221,7 +230,7 @@ float Diagnostics::checkSimRate() {
 void Diagnostics::checkIMU() {
   // Example
   //publishWarningLogMessage("IMU Warning");
-	if (ros::Time::now() - imuTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - imuTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!imuConnected) {
 			imuConnected = true;
 			publishInfoLogMessage("IMU connected");
@@ -270,7 +279,7 @@ void Diagnostics::checkSonar() {
   //Example
   //publishErrorLogMessage("Sonar Error");
 
-	if (ros::Time::now() - sonarLeftTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - sonarLeftTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarLeftConnected) {
 			sonarLeftConnected = true;
 			publishInfoLogMessage("Left ultrasound connected");
@@ -281,7 +290,7 @@ void Diagnostics::checkSonar() {
 		publishErrorLogMessage("Left ultrasound is not connected");
 	}
 
-	if (ros::Time::now() - sonarCenterTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - sonarCenterTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarCenterConnected) {
 			sonarCenterConnected = true;
 			publishInfoLogMessage("Center ultrasound connected");
@@ -292,7 +301,7 @@ void Diagnostics::checkSonar() {
 		publishErrorLogMessage("Center ultrasound is not connected");
 	}
 
-	if (ros::Time::now() - sonarRightTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - sonarRightTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarRightConnected) {
 			sonarRightConnected = true;
 			publishInfoLogMessage("Right ultrasound connected");
@@ -308,7 +317,7 @@ void Diagnostics::checkGripper() {
 	// Example
 	//publishWarningLogMessage("Gripper Warning");
 
-	if (ros::Time::now() - fingersTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - fingersTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!fingersConnected) {
 			fingersConnected = true;
 			publishInfoLogMessage("Gripper fingers connected");
@@ -319,7 +328,7 @@ void Diagnostics::checkGripper() {
 		publishErrorLogMessage("Gripper fingers are not connected");
 	}
 
-	if (ros::Time::now() - wristTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - wristTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!wristConnected) {
 			wristConnected = true;
 			publishInfoLogMessage("Gripper wrist connected");
@@ -335,7 +344,7 @@ void Diagnostics::checkOdometry() {
 	// Example
 	//publishWarningLogMessage("Odometry Warning");
 
-	if (ros::Time::now() - odometryTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - odometryTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!odometryConnected) {
 			odometryConnected = true;
 			publishInfoLogMessage("Encoders connected");
@@ -349,57 +358,57 @@ void Diagnostics::checkOdometry() {
 
 void Diagnostics::checkAbridge() {
 
-    if (ros::Time::now() - abridgeNodeTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - abridgeNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
         if (!abridgeRunning) {
             abridgeRunning = true;
-            publishInfoLogMessage("abridge running");
+            publishInfoLogMessage("the abridge node is now running");
         }
     }
     else if (abridgeRunning) {
         abridgeRunning = false;
-        publishErrorLogMessage("abridge is not running");
+        publishErrorLogMessage("the abridge node is not running");
     }
 }
 
 void Diagnostics::checkSbridge() {
 
-    if (ros::Time::now() - sbridgeNodeTimestamp <= ros::Duration(5.0)) {
+    if (ros::Time::now() - sbridgeNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
         if (!sbridgeRunning) {
             sbridgeRunning = true;
-            publishInfoLogMessage("sbridge running");
+            publishInfoLogMessage("the sbridge node is now running");
         }
     }
     else if (sbridgeRunning) {
         sbridgeRunning = false;
-        publishErrorLogMessage("sbridge is not running");
+        publishErrorLogMessage("the sbridge node is not running");
     }
 }
 
 void Diagnostics::checkObstacle() {
 
-    if (ros::Time::now() - obstacleNodeTimestamp <= ros::Duration(5.0)) {
+    if (ros::Time::now() - obstacleNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
         if (!obstacleRunning) {
             obstacleRunning = true;
-            publishInfoLogMessage("obstacle running");
+            publishInfoLogMessage("the obstacle node is now running");
         }
     }
     else if (obstacleRunning) {
         obstacleRunning = false;
-        publishErrorLogMessage("obstacle is not running");
+        publishErrorLogMessage("the obstacle node is not running");
     }
 }
 
 void Diagnostics::checkMobility() {
 
-    if (ros::Time::now() - mobilityNodeTimestamp <= ros::Duration(5.0)) {
+    if (ros::Time::now() - mobilityNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
         if (!mobilityRunning) {
             mobilityRunning = true;
-            publishInfoLogMessage("mobility node running");
+            publishInfoLogMessage("the mobility node is now running");
         }
     }
     else if (mobilityRunning) {
         mobilityRunning = false;
-        publishErrorLogMessage("mobility node is not running");
+        publishErrorLogMessage("the mobility node is not running");
     }
 }
 

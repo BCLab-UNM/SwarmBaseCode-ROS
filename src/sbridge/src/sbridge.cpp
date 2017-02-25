@@ -6,12 +6,15 @@ sbridge::sbridge(std::string publishedName) {
 
     driveControlSubscriber = sNH.subscribe((publishedName + "/driveControl"), 10, &sbridge::cmdHandler, this);
 
-    heartbeatPublisher = sNH.advertise<std_msgs::String>((publishedName + "/sbridge/heartbeat"), 1, true);
+    heartbeatPublisher = sNH.advertise<std_msgs::String>((publishedName + "/sbridge/heartbeat"), 1, false);
     skidsteerPublish = sNH.advertise<geometry_msgs::Twist>((publishedName + "/skidsteer"), 10);
+    infoLogPublisher = sNH.advertise<std_msgs::String>("/infoLog", 1, true);
 
+    float heartbeat_publish_interval = 2;
     publish_heartbeat_timer = sNH.createTimer(ros::Duration(heartbeat_publish_interval), &sbridge::publishHeartBeatTimerEventHandler, this);
 
-    heartbeat_publish_interval = 2;
+
+     ROS_INFO("constructor");
 
 }
 
@@ -67,5 +70,9 @@ void sbridge::publishHeartBeatTimerEventHandler(const ros::TimerEvent& event) {
     std_msgs::String msg;
     msg.data = "";
     heartbeatPublisher.publish(msg);
+
+    ROS_INFO("%ds, %dnsec", event.last_real.sec, event.last_real.nsec);
 }
 
+sbridge::~sbridge() {
+}

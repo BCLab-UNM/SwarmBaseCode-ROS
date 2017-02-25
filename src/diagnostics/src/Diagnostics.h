@@ -113,6 +113,9 @@ private:
   ros::Timer simCheckTimer;
   ros::Timer nodeCheckTimer;
 
+  ros::Time diagnostics_start_time; // Time that this package started
+  float node_start_delay; // Time to wait for nodes to start
+
   // Store some state about the current health of the rover
   bool cameraConnected = true;
   bool GPSConnected = true;
@@ -141,6 +144,9 @@ private:
   ros::Time sbridgeNodeTimestamp;
   ros::Time obstacleNodeTimestamp;
   ros::Time mobilityNodeTimestamp;
+
+  // Max time since last heartbeat before notifying the user - in seconds
+  float node_heartbeat_timeout, device_heartbeat_timeout;
 
   // Simulation update rate as a fraction of real time
   float simRate;

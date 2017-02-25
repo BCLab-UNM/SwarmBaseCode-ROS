@@ -88,4 +88,5 @@ void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
     std_msgs::String msg;
     msg.data = "";
     heartbeatPublisher.publish(msg);
+     ROS_INFO("yes");
 }
