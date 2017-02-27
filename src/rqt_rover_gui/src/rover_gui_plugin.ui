@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -340,7 +340,7 @@ border: 1px solid white;
        <x>10</x>
        <y>60</y>
        <width>301</width>
-       <height>331</height>
+       <height>306</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -353,7 +353,7 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>10</y>
         <width>141</width>
         <height>161</height>
        </rect>
@@ -435,7 +435,7 @@ border-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>130</y>
+         <y>120</y>
          <width>117</width>
          <height>22</height>
         </rect>
@@ -461,9 +461,9 @@ border-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>150</y>
-        <width>71</width>
-        <height>27</height>
+        <y>130</y>
+        <width>70</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -483,7 +483,7 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>160</x>
-        <y>50</y>
+        <y>30</y>
         <width>121</width>
         <height>91</height>
        </rect>
@@ -541,7 +541,7 @@ border-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>200</y>
+        <y>190</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -560,7 +560,7 @@ border-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>200</y>
+        <y>190</y>
         <width>131</width>
         <height>27</height>
        </rect>
@@ -591,9 +591,9 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <widget class="QLabel" name="custom_world_path">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>180</y>
-        <width>241</width>
+        <x>68</x>
+        <y>162</y>
+        <width>200</width>
         <height>20</height>
        </rect>
       </property>
@@ -610,8 +610,8 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>240</y>
+        <x>20</x>
+        <y>230</y>
         <width>181</width>
         <height>22</height>
        </rect>
@@ -633,7 +633,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="geometry">
        <rect>
         <x>210</x>
-        <y>240</y>
+        <y>230</y>
         <width>71</width>
         <height>27</height>
        </rect>
@@ -683,7 +683,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>280</y>
+        <y>270</y>
         <width>131</width>
         <height>23</height>
        </rect>
@@ -738,7 +738,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>280</y>
+        <y>270</y>
         <width>130</width>
         <height>20</height>
        </rect>
@@ -787,7 +787,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>400</y>
+       <y>370</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -1049,7 +1049,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>430</y>
+       <y>400</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -1995,7 +1995,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>460</y>
+       <y>430</y>
        <width>161</width>
        <height>27</height>
       </rect>
@@ -2891,7 +2891,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="map_display_button_group"/>
   <buttongroup name="rover_control_button_group"/>
+  <buttongroup name="map_display_button_group"/>
  </buttongroups>
 </ui>
