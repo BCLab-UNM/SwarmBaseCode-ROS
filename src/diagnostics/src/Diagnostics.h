@@ -12,6 +12,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Range.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include "WirelessDiags.h"
 
@@ -43,6 +44,7 @@ public:
   void sbridgeNode(std_msgs::String msg);
   void obstacleNode(std_msgs::String msg);
   void mobilityNode(std_msgs::String msg);
+  void ubloxNode(const sensor_msgs::NavSatFixConstPtr& message);
   
   // This function sends an array of floats
   // corresponding to predefined diagnostic values 
@@ -76,6 +78,7 @@ private:
   void checkSbridge();
   void checkObstacle();
   void checkMobility();
+  void checkUblox();
     
   bool checkGPSExists();
   bool checkCameraExists();
@@ -106,6 +109,7 @@ private:
   ros::Subscriber sbdridgeNodeSubscribe;
   ros::Subscriber obstacleNodeSubscribe;
   ros::Subscriber mobilityNodeSubscribe;
+  ros::Subscriber ubloxNodeSubscribe;
   
   float sensorCheckInterval = 2; // Check sensors every 2 seconds
   float nodeCheckInterval = 5; //Check nodes every 5 seconds
@@ -131,6 +135,7 @@ private:
   bool sbridgeRunning;
   bool obstacleRunning;
   bool mobilityRunning;
+  bool ubloxRunning;
 
   //time last message was received
   ros::Time fingersTimestamp;
@@ -144,6 +149,7 @@ private:
   ros::Time sbridgeNodeTimestamp;
   ros::Time obstacleNodeTimestamp;
   ros::Time mobilityNodeTimestamp;
+  ros::Time ubloxNodeTimestamp;
 
   // Max time since last heartbeat before notifying the user - in seconds
   float node_heartbeat_timeout, device_heartbeat_timeout;

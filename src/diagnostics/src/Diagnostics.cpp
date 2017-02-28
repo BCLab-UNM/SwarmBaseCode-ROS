@@ -31,6 +31,7 @@ Diagnostics::Diagnostics(std::string name) {
   sbdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/sbridge/heartbeat", 1, &Diagnostics::sbridgeNode,this);
   obstacleNodeSubscribe = nodeHandle.subscribe(publishedName + "/obstacle/heartbeat", 1, &Diagnostics::obstacleNode,this);
   mobilityNodeSubscribe = nodeHandle.subscribe(publishedName + "/mobility/heartbeat", 1, &Diagnostics::mobilityNode,this);
+  ubloxNodeSubscribe = nodeHandle.subscribe(publishedName + "/fix" , 1, &Diagnostics::ubloxNode,this);
 
   // Initialize the variables we use to track the simulation update rate
   prevRealTime = common::Time(0.0);
@@ -163,6 +164,10 @@ void Diagnostics::mobilityNode(std_msgs::String msg) {
     mobilityNodeTimestamp = ros::Time::now();
 }
 
+void Diagnostics::ubloxNode(const sensor_msgs::NavSatFix::ConstPtr& message) {
+    ubloxNodeTimestamp = ros::Time::now();
+}
+
 // Return the current time in this timezone in "WeekDay Month Day hr:mni:sec year" format.
 // We use this instead of asctime or ctime because it is thread safe
 string Diagnostics::getHumanFriendlyTime() {
@@ -200,6 +205,7 @@ void Diagnostics::nodeCheckTimerEventHandler(const ros::TimerEvent& event) {
 
     if (!simulated) {
         checkAbridge();
+        checkUblox();
     }
     else {
        checkSbridge();
@@ -409,6 +415,20 @@ void Diagnostics::checkMobility() {
     else if (mobilityRunning) {
         mobilityRunning = false;
         publishErrorLogMessage("the mobility node is not running");
+    }
+}
+
+void Diagnostics::checkUblox() {
+
+    if (ros::Time::now() - ubloxNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
+        if (!ubloxRunning) {
+            ubloxRunning = true;
+            publishInfoLogMessage("the ublox node is now running");
+        }
+    }
+    else if (ubloxRunning) {
+        ubloxRunning = false;
+        publishErrorLogMessage("the ublox node is not running");
     }
 }
 
