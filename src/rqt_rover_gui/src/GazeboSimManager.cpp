@@ -191,7 +191,7 @@ QString GazeboSimManager::addGroundPlane( QString ground_name )
     return return_msg;
 }
 
-QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z)
+QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z, float roll, float pitch, float yaw)
 {
     float rover_clearance = 0.45; //meters
     model_locations.insert(make_tuple(x, y, rover_clearance));
@@ -201,7 +201,9 @@ QString GazeboSimManager::addRover(QString rover_name, float x, float y, float z
                + " -x " + QString::number(x)
                + " -y " + QString::number(y)
                + " -z " + QString::number(z)
-               + " -Y " + QString::number(M_PI);
+               + " -R " + QString::number(roll)
+               + " -P " + QString::number(pitch)
+               + " -Y " + QString::number(yaw);
 
     QProcess sh;
     sh.start("sh", QStringList() << "-c" << argument);
