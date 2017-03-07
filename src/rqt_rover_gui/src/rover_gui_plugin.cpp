@@ -1613,13 +1613,80 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     progress_dialog.show();
 
     QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
-    QPointF rover_positions[6] = {QPointF(0.0,1.0), QPointF(1.0,1.0), QPointF(1.0,0.0), QPointF(-1.0,0.0), QPointF(0.0,-1.0), QPointF(-1.0,-1.0)};
 
+    /**
+     * The distance to the rover from a corner position is calculated differently
+     * than the distance to a cardinal position.
+     *
+     * The cardinal direction rovers are a straightforward calculation where:
+     *     a = the distance to the edge of the collection zone
+     *         i.e., 1/2 of the collection zone square side length
+     *     b = the 50cm distance required by the rules for placing the rover
+     *     c = offset for the simulation for the center of the rover (30cm)
+     *         i.e., the rover position is at the center of its body
+     *
+     * The corner rovers use trigonometry to calculate the distance where each
+     * value of d, e, and f, are the legs to an isosceles right triangle. In
+     * other words, we are calculating and summing X and Y offsets to position
+     * the rover.
+     *     d = a
+     *     e = xy offset to move the rover 50cm from the corner of the collection zone
+     *     f = xy offset to move the rover 30cm to account for its position being
+     *         calculated at the center of its body
+     *
+     *                       *  *          d = 0.508m
+     *                     *      *        e = 0.354m
+     *                   *          *    + f = 0.212m
+     *                 *     /*     *    ------------
+     *                 *    / | f *            1.072m
+     *                   * /--| *
+     *                    /* *
+     *                   / | e
+     *                  /--|
+     *     *************
+     *     *          /|
+     *     *         / |
+     *     *        /  | d                 a = 0.508m
+     *     *       /   |     *********     b = 0.500m
+     *     *      /    |     *       *   + c = 0.300m
+     *     *     *-----|-----*---*   *   ------------
+     *     *        a  *  b  * c     *         1.308m
+     *     *           *     *********
+     *     *           *
+     *     *           *
+     *     *           *
+     *     *************
+     */
+    QPointF rover_positions[6] =
+    {
+      /* cardinal rovers: North, East, South, West */
+      QPointF(-1.308,  0.000), // 1.308 = distance_from_center_to_edge_of_collection_zone
+      QPointF( 0.000, -1.308), //             + 50 cm distance to rover
+      QPointF( 1.308,  0.000), //             + 30 cm distance_from_center_of_rover_to_edge_of_rover
+      QPointF( 0.000,  1.308), // 1.308m = 0.508m + 0.5m + 0.3m
+
+      /* corner rovers: Northeast, Southwest */
+      QPointF( 1.072,  1.072), // 1.072 = diagonal_distance_from_center_to_edge_of_collection_zone
+      QPointF(-1.072, -1.072)  //             + diagonal_distance_to_move_50cm
+    };                         //             + diagonal_distance_to_move_30cm
+                               // 1.072m = 0.508 + 0.354 + 0.212
+
+    /* In this case, the yaw is the value that turns rover "left" and "right" */
+    float rover_yaw[6] =
+    {
+       0.000, //  0.00 * PI
+       1.571, //  0.50 * PI
+      -3.142, // -1.00 * PI
+      -1.571, // -0.50 * PI
+      -2.356, // -0.75 * PI
+       0.785  //  0.25 * PI
+    };
+      
     // Add rovers to the simulation and start the associated ROS nodes
     for (int i = 0; i < n_rovers; i++)
     {
         emit sendInfoLogMessage("Adding rover "+rovers[i]+"...");
-        return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0);
+        return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0, 0, 0, rover_yaw[i]);
         emit sendInfoLogMessage(return_msg);
 
         emit sendInfoLogMessage("Starting rover node for "+rovers[i]+"...");

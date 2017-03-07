@@ -35,7 +35,7 @@ public:
 
     QString addGroundPlane( QString ground_name );
     QString removeGroundPlane( QString ground_name );
-    QString addRover(QString rover_name, float x, float y, float z);
+    QString addRover(QString rover_name, float x, float y, float z, float R, float P, float Y);
     QString removeRover(QString rover_name);
     QString startRoverNode(QString rover_name);
     QString stopRoverNode(QString rover_name);
