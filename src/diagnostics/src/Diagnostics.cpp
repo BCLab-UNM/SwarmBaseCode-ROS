@@ -13,7 +13,6 @@ Diagnostics::Diagnostics(std::string name) {
 
   node_heartbeat_timeout = 5.0;
   device_heartbeat_timeout = 2.0;
-  abridgeRunning = sbridgeRunning = obstacleRunning = mobilityRunning = true;
   diagnostics_start_time = ros::Time::now();
   node_start_delay = 20;
 
