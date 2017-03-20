@@ -120,22 +120,23 @@ private:
   ros::Time diagnostics_start_time; // Time that this package started
   float node_start_delay; // Time to wait for nodes to start
 
-  // Store some state about the current health of the rover
+  // Initialise values according to whether the rover will report the
+  // connection on startup or only after recovery from a failure.
   bool cameraConnected = true;
   bool GPSConnected = true;
   bool simulated = false;
-  bool fingersConnected;
-  bool wristConnected;
-  bool imuConnected;
-  bool odometryConnected;
-  bool sonarLeftConnected;
-  bool sonarCenterConnected;
-  bool sonarRightConnected;
-  bool abridgeRunning;
-  bool sbridgeRunning;
-  bool obstacleRunning;
-  bool mobilityRunning;
-  bool ubloxRunning;
+  bool fingersConnected = false;
+  bool wristConnected = false;
+  bool imuConnected = false;
+  bool odometryConnected = false;
+  bool sonarLeftConnected = false;
+  bool sonarCenterConnected = false;
+  bool sonarRightConnected = false;
+  bool abridgeRunning = true;
+  bool sbridgeRunning = true;
+  bool obstacleRunning = true;
+  bool mobilityRunning = true;
+  bool ubloxRunning = true;
 
   //time last message was received
   ros::Time fingersTimestamp;
