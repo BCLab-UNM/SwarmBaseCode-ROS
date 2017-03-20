@@ -7,10 +7,12 @@
 
 #include <ros/ros.h>
 
+#include <std_msgs/String.h>
 #include <geometry_msgs/QuaternionStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Range.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include "WirelessDiags.h"
 
@@ -38,6 +40,11 @@ public:
   void sonarLeftTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
   void sonarCenterTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
   void sonarRightTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
+  void abridgeNode(std_msgs::String msg);
+  void sbridgeNode(std_msgs::String msg);
+  void obstacleNode(std_msgs::String msg);
+  void mobilityNode(std_msgs::String msg);
+  void ubloxNode(const sensor_msgs::NavSatFixConstPtr& message);
   
   // This function sends an array of floats
   // corresponding to predefined diagnostic values 
@@ -54,6 +61,7 @@ private:
   // These functions are called on a timer and check for problems with the sensors
   void sensorCheckTimerEventHandler(const ros::TimerEvent&);
   void simCheckTimerEventHandler(const ros::TimerEvent&);
+  void nodeCheckTimerEventHandler(const ros::TimerEvent&);
   
 
   // Get the rate the simulation is running for simulated rovers
@@ -65,6 +73,12 @@ private:
   void checkCamera();
   void checkGripper();
   void checkOdometry();
+
+  void checkAbridge();
+  void checkSbridge();
+  void checkObstacle();
+  void checkMobility();
+  void checkUblox();
     
   bool checkGPSExists();
   bool checkCameraExists();
@@ -91,10 +105,20 @@ private:
   ros::Subscriber sonarLeftSubscribe;
   ros::Subscriber sonarCenterSubscribe;
   ros::Subscriber sonarRightSubscribe;
+  ros::Subscriber abdridgeNodeSubscribe;
+  ros::Subscriber sbdridgeNodeSubscribe;
+  ros::Subscriber obstacleNodeSubscribe;
+  ros::Subscriber mobilityNodeSubscribe;
+  ros::Subscriber ubloxNodeSubscribe;
   
   float sensorCheckInterval = 2; // Check sensors every 2 seconds
+  float nodeCheckInterval = 5; //Check nodes every 5 seconds
   ros::Timer sensorCheckTimer;
   ros::Timer simCheckTimer;
+  ros::Timer nodeCheckTimer;
+
+  ros::Time diagnostics_start_time; // Time that this package started
+  float node_start_delay; // Time to wait for nodes to start
 
   // Store some state about the current health of the rover
   bool cameraConnected = true;
@@ -107,6 +131,13 @@ private:
   bool sonarLeftConnected;
   bool sonarCenterConnected;
   bool sonarRightConnected;
+  bool abridgeRunning;
+  bool sbridgeRunning;
+  bool obstacleRunning;
+  bool mobilityRunning;
+  bool ubloxRunning;
+
+  //time last message was received
   ros::Time fingersTimestamp;
   ros::Time wristTimestamp;
   ros::Time imuTimestamp;
@@ -114,6 +145,14 @@ private:
   ros::Time sonarLeftTimestamp;
   ros::Time sonarCenterTimestamp;
   ros::Time sonarRightTimestamp;
+  ros::Time abridgeNodeTimestamp;
+  ros::Time sbridgeNodeTimestamp;
+  ros::Time obstacleNodeTimestamp;
+  ros::Time mobilityNodeTimestamp;
+  ros::Time ubloxNodeTimestamp;
+
+  // Max time since last heartbeat before notifying the user - in seconds
+  float node_heartbeat_timeout, device_heartbeat_timeout;
 
   // Simulation update rate as a fraction of real time
   float simRate;

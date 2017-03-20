@@ -11,6 +11,12 @@ using namespace gazebo;
 
 Diagnostics::Diagnostics(std::string name) {
 
+  node_heartbeat_timeout = 5.0;
+  device_heartbeat_timeout = 2.0;
+  abridgeRunning = sbridgeRunning = obstacleRunning = mobilityRunning = true;
+  diagnostics_start_time = ros::Time::now();
+  node_start_delay = 20;
+
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
   diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
@@ -21,6 +27,11 @@ Diagnostics::Diagnostics(std::string name) {
   sonarLeftSubscribe = nodeHandle.subscribe(publishedName + "/sonarLeft", 10, &Diagnostics::sonarLeftTimestampUpdate, this);
   sonarCenterSubscribe = nodeHandle.subscribe(publishedName + "/sonarCenter", 10, &Diagnostics::sonarCenterTimestampUpdate, this);
   sonarRightSubscribe = nodeHandle.subscribe(publishedName + "/sonarRight", 10, &Diagnostics::sonarRightTimestampUpdate, this);
+  abdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/abridge/heartbeat", 1, &Diagnostics::abridgeNode,this);
+  sbdridgeNodeSubscribe = nodeHandle.subscribe(publishedName + "/sbridge/heartbeat", 1, &Diagnostics::sbridgeNode,this);
+  obstacleNodeSubscribe = nodeHandle.subscribe(publishedName + "/obstacle/heartbeat", 1, &Diagnostics::obstacleNode,this);
+  mobilityNodeSubscribe = nodeHandle.subscribe(publishedName + "/mobility/heartbeat", 1, &Diagnostics::mobilityNode,this);
+  ubloxNodeSubscribe = nodeHandle.subscribe(publishedName + "/fix" , 1, &Diagnostics::ubloxNode,this);
 
   // Initialize the variables we use to track the simulation update rate
   prevRealTime = common::Time(0.0);
@@ -29,8 +40,11 @@ Diagnostics::Diagnostics(std::string name) {
 
   // Setup sensor check timers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
+
+  // Setup Node check timer
+  nodeCheckTimer = nodeHandle.createTimer(ros::Duration(nodeCheckInterval), &Diagnostics::nodeCheckTimerEventHandler, this);
   
- simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
+  simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
 
   if ( checkIfSimulatedRover() ) {
     // For processing gazebo messages from the world stats topic.
@@ -131,7 +145,27 @@ void Diagnostics::sonarCenterTimestampUpdate(const sensor_msgs::Range::ConstPtr&
 }
 
 void Diagnostics::sonarRightTimestampUpdate(const sensor_msgs::Range::ConstPtr& message) {
-	sonarRightTimestamp = message->header.stamp;
+    sonarRightTimestamp = message->header.stamp;
+}
+
+void Diagnostics::abridgeNode(std_msgs::String msg) {
+    abridgeNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::sbridgeNode(std_msgs::String msg) {
+    sbridgeNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::obstacleNode(std_msgs::String msg) {
+    obstacleNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::mobilityNode(std_msgs::String msg) {
+    mobilityNodeTimestamp = ros::Time::now();
+}
+
+void Diagnostics::ubloxNode(const sensor_msgs::NavSatFix::ConstPtr& message) {
+    ubloxNodeTimestamp = ros::Time::now();
 }
 
 // Return the current time in this timezone in "WeekDay Month Day hr:mni:sec year" format.
@@ -164,6 +198,24 @@ void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
 
 }
 
+void Diagnostics::nodeCheckTimerEventHandler(const ros::TimerEvent& event) {
+
+
+    if (node_start_delay > (ros::Time::now() - diagnostics_start_time).sec) return;
+
+    if (!simulated) {
+        checkAbridge();
+        checkUblox();
+    }
+    else {
+       checkSbridge();
+    }
+
+    checkObstacle();
+    checkMobility();
+
+}
+
 void Diagnostics::simCheckTimerEventHandler(const ros::TimerEvent& event) {
   
   if (simulated) {
@@ -184,7 +236,7 @@ float Diagnostics::checkSimRate() {
 void Diagnostics::checkIMU() {
   // Example
   //publishWarningLogMessage("IMU Warning");
-	if (ros::Time::now() - imuTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - imuTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!imuConnected) {
 			imuConnected = true;
 			publishInfoLogMessage("IMU connected");
@@ -233,7 +285,7 @@ void Diagnostics::checkSonar() {
   //Example
   //publishErrorLogMessage("Sonar Error");
 
-	if (ros::Time::now() - sonarLeftTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - sonarLeftTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarLeftConnected) {
 			sonarLeftConnected = true;
 			publishInfoLogMessage("Left ultrasound connected");
@@ -244,7 +296,7 @@ void Diagnostics::checkSonar() {
 		publishErrorLogMessage("Left ultrasound is not connected");
 	}
 
-	if (ros::Time::now() - sonarCenterTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - sonarCenterTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarCenterConnected) {
 			sonarCenterConnected = true;
 			publishInfoLogMessage("Center ultrasound connected");
@@ -255,7 +307,7 @@ void Diagnostics::checkSonar() {
 		publishErrorLogMessage("Center ultrasound is not connected");
 	}
 
-	if (ros::Time::now() - sonarRightTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - sonarRightTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarRightConnected) {
 			sonarRightConnected = true;
 			publishInfoLogMessage("Right ultrasound connected");
@@ -271,7 +323,7 @@ void Diagnostics::checkGripper() {
 	// Example
 	//publishWarningLogMessage("Gripper Warning");
 
-	if (ros::Time::now() - fingersTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - fingersTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!fingersConnected) {
 			fingersConnected = true;
 			publishInfoLogMessage("Gripper fingers connected");
@@ -282,7 +334,7 @@ void Diagnostics::checkGripper() {
 		publishErrorLogMessage("Gripper fingers are not connected");
 	}
 
-	if (ros::Time::now() - wristTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - wristTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!wristConnected) {
 			wristConnected = true;
 			publishInfoLogMessage("Gripper wrist connected");
@@ -298,7 +350,7 @@ void Diagnostics::checkOdometry() {
 	// Example
 	//publishWarningLogMessage("Odometry Warning");
 
-	if (ros::Time::now() - odometryTimestamp <= ros::Duration(2.0)) {
+    if (ros::Time::now() - odometryTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!odometryConnected) {
 			odometryConnected = true;
 			publishInfoLogMessage("Encoders connected");
@@ -308,6 +360,76 @@ void Diagnostics::checkOdometry() {
 		odometryConnected = false;
 		publishErrorLogMessage("Encoders are not connected");
 	}
+}
+
+void Diagnostics::checkAbridge() {
+
+    if (ros::Time::now() - abridgeNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
+        if (!abridgeRunning) {
+            abridgeRunning = true;
+            publishInfoLogMessage("the abridge node is now running");
+        }
+    }
+    else if (abridgeRunning) {
+        abridgeRunning = false;
+        publishErrorLogMessage("the abridge node is not running");
+    }
+}
+
+void Diagnostics::checkSbridge() {
+
+    if (ros::Time::now() - sbridgeNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
+        if (!sbridgeRunning) {
+            sbridgeRunning = true;
+            publishInfoLogMessage("the sbridge node is now running");
+        }
+    }
+    else if (sbridgeRunning) {
+        sbridgeRunning = false;
+        publishErrorLogMessage("the sbridge node is not running");
+    }
+}
+
+void Diagnostics::checkObstacle() {
+
+    if (ros::Time::now() - obstacleNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
+        if (!obstacleRunning) {
+            obstacleRunning = true;
+            publishInfoLogMessage("the obstacle node is now running");
+        }
+    }
+    else if (obstacleRunning) {
+        obstacleRunning = false;
+        publishErrorLogMessage("the obstacle node is not running");
+    }
+}
+
+void Diagnostics::checkMobility() {
+
+    if (ros::Time::now() - mobilityNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
+        if (!mobilityRunning) {
+            mobilityRunning = true;
+            publishInfoLogMessage("the mobility node is now running");
+        }
+    }
+    else if (mobilityRunning) {
+        mobilityRunning = false;
+        publishErrorLogMessage("the mobility node is not running");
+    }
+}
+
+void Diagnostics::checkUblox() {
+
+    if (ros::Time::now() - ubloxNodeTimestamp <= ros::Duration(node_heartbeat_timeout)) {
+        if (!ubloxRunning) {
+            ubloxRunning = true;
+            publishInfoLogMessage("the ublox node is now running");
+        }
+    }
+    else if (ubloxRunning) {
+        ubloxRunning = false;
+        publishErrorLogMessage("the ublox node is not running");
+    }
 }
 
 // Check if the U-Blox GPS is connected
