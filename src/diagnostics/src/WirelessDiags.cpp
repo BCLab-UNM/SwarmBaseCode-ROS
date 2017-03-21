@@ -43,7 +43,7 @@ bool WirelessDiags::isInterfaceUp(string name) {
     memset(&ifr, 0, sizeof(ifr));
     strcpy(ifr.ifr_name, name.c_str());
     if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
-      string errorMsg = "Unable to open ioctl socket: "+ string(strerror(errno));
+      string errorMsg = "WirelessDiags::isInterfaceUp(): error getting network interface flags. Unable to open ioctl socket for " + name + ": "+ string(strerror(errno));
       throw runtime_error(errorMsg);
     }
     close(sock);
@@ -194,7 +194,7 @@ WirelessInfo WirelessDiags::getInfo(){
 
   // Use IOCTL to request the wireless stats. If -1 there was an error.
   if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
-    string errorMsg = "Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
+    string errorMsg = "WirelessDiags::getInfo(): error getting wireless statistics. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
 
     // Throw an error
     throw runtime_error(errorMsg);
@@ -216,7 +216,7 @@ WirelessInfo WirelessDiags::getInfo(){
   //this will gather the SSID of the connected network
   if(ioctl(sockfd, SIOCGIWESSID, &req) == -1){
     // There was an error throw an exception
-    string errorMsg = "Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
+    string errorMsg = "WirelessDiags::getInfo(): error getting network ESSID. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
     throw runtime_error(errorMsg);
   }
   else {
@@ -231,7 +231,7 @@ WirelessInfo WirelessDiags::getInfo(){
   //this will get the claimed bitrate of the link
   if(ioctl(sockfd, SIOCGIWRATE, &req) == -1){
     // There was an error throw an exception
-    string errorMsg = "Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
+    string errorMsg = "WirelessDiags::getInfo(): error getting transmission rate. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
     throw runtime_error(errorMsg);
   } else {
     // Opened the socket so read the data
@@ -246,7 +246,7 @@ WirelessInfo WirelessDiags::getInfo(){
   //this will get the mac address of the interface
   if(ioctl(sockfd, SIOCGIFHWADDR, &req2) == -1){
     // There was an error throw an exception
-    string errorMsg = "Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
+    string errorMsg = "WirelessDiags::getInfo(): error getting MAC address. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
     throw runtime_error(errorMsg);
   } else{
     // Opened the socket so read the data
