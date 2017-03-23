@@ -166,6 +166,7 @@ namespace gazebo {
       std::mutex attaching_mutex;
 
       bool dropStaticTarget;
+      gazebo::math::Angle maxGrippingAngle;
 
       int  dropStaticTargetCounter;
   };

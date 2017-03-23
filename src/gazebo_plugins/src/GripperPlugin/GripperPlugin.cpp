@@ -35,6 +35,9 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   dropStaticTarget = false;
   dropStaticTargetCounter = 0;
   
+  // 1.39626 is approximately equal to 80 degrees
+  maxGrippingAngle = 1.39626;
+
   // Set values for the gripper attachment code
   isAttached = false;
   noContactTime = common::Time(0.0);
@@ -276,10 +279,7 @@ void GripperPlugin::setFingerAngleHandler(const std_msgs::Float32ConstPtr& msg) 
 
   // Force drop static models when the gripper is open
   if (isAttached) {
-    // 1.39626 is approximately equal to 80 degrees
-    double maxGrippingAngle = 1.39626;
 
-    
     if (attachedTargetModel->IsStatic() && desiredFingerAngle >= maxGrippingAngle) {
       sendInfoLogMessage("GripperPlugin: detach() trying to detach due to finger angle failsafe");
       try {
@@ -561,8 +561,7 @@ void GripperPlugin::handleGrasping() {
           }
       }
     }
-  
-
+ 
   // Check whether we should detach an existing gripper-target joint
   // Detach whenever the attach criteria above are not met for longer
   // than the noContactThreshold.
@@ -578,9 +577,20 @@ void GripperPlugin::handleGrasping() {
 	  sendInfoLogMessage("Attempting detach...");
           detach();
         } catch (exception &e) {
-          sendInfoLogMessage("GripperPlugin: detach() failed with: " + string(e.what()));
+          sendInfoLogMessage("GripperPlugin: handleGrasping() failed with: " + string(e.what()));
         }
     }
+  }
+  
+  // Fail safe - sometimes the cubes get stuck. Always detach if the finger angle is wide enough  
+  if (desiredFingerAngle >= maxGrippingAngle) {
+      if (isAttached)
+      try {
+	sendInfoLogMessage("GripperPlugin: handleGrasping() trying to detach due to finger angle failsafe. Finger angle is "+ to_string(desiredFingerAngle.Degree()) + ", max gripping angle is " + to_string(maxGrippingAngle.Degree()));
+        detach(); 
+      } catch (exception &e) {
+	  sendInfoLogMessage("GripperPlugin: handleGrasping() failed with: " + string(e.what()));
+      }
   }
 }
 
@@ -594,12 +604,9 @@ void GripperPlugin::attach() {
 
   if (isAttached) throw runtime_error("already attached");
 
-  // 1.39626 is approximately equal to 80 degrees
-  float maxGrippingAngle = 1.39626;
-
   // Do not attach in the edge case where the gripper fingers are fully open.
   // Gripping will occur once the rover begins to grasp and the desiredFingerAngle is lowered.
-  if (desiredFingerAngle >= 1.39626) return;
+  if (desiredFingerAngle >= maxGrippingAngle) return;
 
   // Get the target model
   physics::ModelPtr targetModel = rightFingerTargetLink->GetModel(); // It doesn't matter whether we use the left or right target link here.
