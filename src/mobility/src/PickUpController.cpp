@@ -142,13 +142,13 @@ PickUpResult PickUpController::selectTarget(const apriltags_ros::AprilTagDetecti
             target = i;
             closest = test;
             blockDist = hypot(tagPose.pose.position.z, tagPose.pose.position.y); //distance from bottom center of chassis ignoring height.
-            if (0 <= (blockDist*blockDist - 0.195*0.195))
+            if ( (blockDist*blockDist - 0.195*0.195) > 0 )
             {
                 blockDist = sqrt(blockDist*blockDist - 0.195*0.195);
             }
             else
             {
-	      float epsilon = 0.00001; // A small non-zero number
+	      float epsilon = 0.00001; // A small non-zero positive number
 	      blockDist = epsilon;
             }
             blockYawError = atan((tagPose.pose.position.x + 0.020)/blockDist)*1.05; //angle to block from bottom center of chassis on the horizontal.
