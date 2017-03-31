@@ -473,7 +473,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     goalLocation.theta = atan2(centerLocationOdom.y - currentLocation.y, centerLocationOdom.x - currentLocation.x);
 
                     // set center as goal position
-                    goalLocation.x = centerLocationOdom.x = 0;
+                    goalLocation.x = centerLocationOdom.x;
                     goalLocation.y = centerLocationOdom.y;
 
                     // lower wrist to avoid ultrasound sensors
