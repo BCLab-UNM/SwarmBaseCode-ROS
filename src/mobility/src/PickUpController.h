@@ -3,15 +3,7 @@
 #define HEADERFILE_H
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <ros/ros.h>
-
-struct PickUpResult {
-  float cmdVel;
-  float angleError;
-  float fingerAngle;
-  float wristAngle;
-  bool pickedUp;
-  bool giveUp;
-};
+#include "StandardVars.h"
 
 class PickUpController
 {
@@ -19,10 +11,10 @@ class PickUpController
   PickUpController();
   ~PickUpController();
   
-  PickUpResult Run();
+  Result Run();
 
-  PickUpResult selectTarget(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
-  PickUpResult pickUpSelectedTarget(bool blockBlock);
+  Result selectTarget(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+  Result pickUpSelectedTarget(bool blockBlock);
 
   float getDist() {return blockDist;}
   bool getLockTarget() {return lockTarget;}

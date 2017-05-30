@@ -205,36 +205,7 @@ mapAverage();
 
     
 
-    // Calculate angle between currentLocation.x/y and goalLocation.x/y
-    // Drive forward
-    // Stay in this state until angle is at least PI/2
-    case STATE_MACHINE_SKID_STEER: {
-        stateMachineMsg.data = "SKID_STEER";
-
-        // calculate the distance between current and desired heading in radians
-        float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
-
-        // goal not yet reached drive while maintaining proper heading.
-        if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
-            // drive and turn simultaniously
-            sendDriveCommand(searchVelocity, errorYaw/2);
-        }
-        // goal is reached but desired heading is still wrong turn only
-        else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) {
-             // rotate but dont drive
-            sendDriveCommand(0.0, errorYaw);
-        }
-        else {
-            // stop
-            sendDriveCommand(0.0, 0.0);
-            avoidingObstacle = false;
-
-            // move back to transform step
-            stateMachineState = STATE_MACHINE_TRANSFORM;
-        }
-
-        break;
-    }
+    
 
     case STATE_MACHINE_PICKUP: {
         stateMachineMsg.data = "PICKUP";

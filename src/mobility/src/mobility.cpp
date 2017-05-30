@@ -23,6 +23,8 @@
 #include "DropOffController.h"
 #include "SearchController.h"
 
+#include "StandardVars.h"
+
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
 #include <ros/ros.h>
@@ -71,6 +73,7 @@ std_msgs::String msg;
 #define STATE_MACHINE_SKID_STEER 2
 #define STATE_MACHINE_PICKUP 3
 #define STATE_MACHINE_DROPOFF 4
+#define STATE_MACHINE_MANAGE_WAYPOINTS 5
 
 #define PROCCESE_LOOP_SEARCHING 0
 #define PROCCESE_LOOP_TARGETCOLLECTED 1
@@ -219,7 +222,9 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             if (procceseLoopState == PROCCESE_LOOP_SEARCHING) {
                 if (targetsFound) {
-                    PickUpResult result = pickUpController.run();
+                    Result result = pickUpController.run();
+                    wristAnglePublish.publish(result.wristAngle);
+                    fingerAnglePublish.publish(result.fingerAngle);
                     
                     if (result.changeBehaviour != " ") {
                         if (result.changeBehaviour == "target pickedup") {
@@ -227,6 +232,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                         }
                         else if (result.changeBehaviour == "target lost") {
                             targetsFound = false;
+                        }
+                    }
+                    else if (result.waypointDriving) {
+                        for (int i = result.pointCount; i > 0; i--) {
+                            goalLocation.push_front(result.waypoint[i]);
                         }
                     }
                     else if (!result.waypoint) {
@@ -246,32 +256,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             if (obstacleDetected) {
                 
-                if (result.changeBehaviour) {
-                    
-                }
-                else if (result.waypoint) {
-                    for (int i = result.pointCount; i > 0; i--) {
-                        goalLocation.push_front(result.waypoint[i]);
-                    }
-                }
-                else if (!result.waypoint) {
-                    if (result.PID == FAST_PID){
-                        fastPID(result.cmdVel,result.cmdError); 
-                    }
-                    else if (result.PID == SLOW_PID) {
-                        slowPID(result.cmdVel,result.cmdError);
-                    }
-                    else if (result.PID == CONST_PID) {
-                        constPID(esult.cmdVel,result.cmdAngular);
-                    }
-                }
-                
             }
             
             if (procceseLoopState == PROCCESE_LOOP_TARGETCOLLECTED) {
                 
                 if (targetsCollected) {
-                    PickUpResult result = pickUpController.run();
+                    Result result = dropOffController.run();
                     
                     if (result.changeBehaviour != " ") {
                         if (result.changeBehaviour == "target dropped") {
@@ -306,6 +296,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
         }
             
+            //Handles route planning and navigation as well as makeing sure all waypoints are valid.
+        case STATE_MACHINE_MANAGE_WAYPOINTS: {
+             stateMachineMsg.data = "MANAGE_WAYPOINTS";
+             
+             
+             stateMachineState = STATE_MACHINE_ROTATE;
+        }            
+            
             // Calculate angle between currentLocation.theta and goalLocation.theta
             // Rotate left or right depending on sign of angle
             // Stay in this state until angle is minimized
@@ -326,23 +324,53 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 //fall through on purpose.
             }
         }
+            // Calculate angle between currentLocation.x/y and goalLocation.x/y
+            // Drive forward
+            // Stay in this state until angle is at least PI/2
+        case STATE_MACHINE_SKID_STEER: {
+            stateMachineMsg.data = "SKID_STEER";
+            
+            // calculate the distance between current and desired heading in radians
+            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
+            
+            // goal not yet reached drive while maintaining proper heading.
+            if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
+                // drive and turn simultaniously
+                sendDriveCommand(searchVelocity, errorYaw/2);
+            }
+            // goal is reached but desired heading is still wrong turn only
+            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) {
+                // rotate but dont drive
+                sendDriveCommand(0.0, errorYaw);
+            }
+            else {
+                // stop
+                sendDriveCommand(0.0, 0.0);
+                avoidingObstacle = false;
+                
+                // move back to transform step
+                stateMachineState = STATE_MACHINE_TRANSFORM;
+            }
+            
+            break;
+        }
             
             
             
             
         }
-        // mode is NOT auto
-        else {
-            // publish current state for the operator to see
-            stateMachineMsg.data = "WAITING";
-        }
-        
-        
-        // publish state machine string for user, only if it has changed, though
-        if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
-            stateMachinePublish.publish(stateMachineMsg);
-            sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
-        }
+    }
+    // mode is NOT auto
+    else {
+        // publish current state for the operator to see
+        stateMachineMsg.data = "WAITING";
+    }
+    
+    
+    // publish state machine string for user, only if it has changed, though
+    if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
+        stateMachinePublish.publish(stateMachineMsg);
+        sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
 }
 
@@ -362,6 +390,7 @@ void sendDriveCommand(double linearVel, double angularError)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
     targetsFound = pickUpController.sendData(message);
+    targetCollected = dropOffController.sendData(message);
     
 }
 
