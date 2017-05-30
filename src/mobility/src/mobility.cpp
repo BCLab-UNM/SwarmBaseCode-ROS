@@ -72,6 +72,14 @@ std_msgs::String msg;
 #define STATE_MACHINE_PICKUP 3
 #define STATE_MACHINE_DROPOFF 4
 
+#define PROCCESE_LOOP_SEARCHING 0
+#define PROCCESE_LOOP_TARGETCOLLECTED 1
+
+#define FAST_PID 0 //quickest turn reasponse time
+#define SLOW_PID 1 //slower turn reasponse time
+#define CONST_PID 2 //constant angular turn rate
+
+
 int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
@@ -202,37 +210,123 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         
         switch(stateMachineState) {
         
+        
+        //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
+        //This should be done as little as possible. I Suggest to Use timeouts to set control bools false.
+        //Then only call INTERUPT if bool switches to true.
         case STATE_MACHINE_INTERUPT: {
             stateMachineMsg.data = "INTERUPT";
             
-            if (targetsFound) {
-                PickUpResult result = pickUpController.run();
+            if (procceseLoopState == PROCCESE_LOOP_SEARCHING) {
+                if (targetsFound) {
+                    PickUpResult result = pickUpController.run();
+                    
+                    if (result.changeBehaviour != " ") {
+                        if (result.changeBehaviour == "target pickedup") {
+                            procceseLoopState = PROCCESE_LOOP_TARGETCOLLECTED;
+                        }
+                        else if (result.changeBehaviour == "target lost") {
+                            targetsFound = false;
+                        }
+                    }
+                    else if (!result.waypoint) {
+                        if (result.PID == FAST_PID){
+                            fastPID(result.cmdVel,result.cmdError); 
+                        }
+                        else if (result.PID == SLOW_PID) {
+                            slowPID(result.cmdVel,result.cmdError);
+                        }
+                        else if (result.PID == CONST_PID) {
+                            constPID(result.cmdVel,result.cmdAngular);
+                        }
+                    }
+                }
+            }
+            
+            
+            if (obstacleDetected) {
                 
                 if (result.changeBehaviour) {
                     
                 }
                 else if (result.waypoint) {
+                    for (int i = result.pointCount; i > 0; i--) {
+                        goalLocation.push_front(result.waypoint[i]);
+                    }
+                }
+                else if (!result.waypoint) {
+                    if (result.PID == FAST_PID){
+                        fastPID(result.cmdVel,result.cmdError); 
+                    }
+                    else if (result.PID == SLOW_PID) {
+                        slowPID(result.cmdVel,result.cmdError);
+                    }
+                    else if (result.PID == CONST_PID) {
+                        constPID(esult.cmdVel,result.cmdAngular);
+                    }
+                }
+                
+            }
+            
+            if (procceseLoopState == PROCCESE_LOOP_TARGETCOLLECTED) {
+                
+                if (targetsCollected) {
+                    PickUpResult result = pickUpController.run();
                     
+                    if (result.changeBehaviour != " ") {
+                        if (result.changeBehaviour == "target dropped") {
+                            
+                        }
+                        else if (result.changeBehaviour == "target returned") {
+                            
+                        }
+                    }
+                    else if (!result.waypoint) {
+                        if (result.PID == FAST_PID){
+                            fastPID(result.cmdVel,result.cmdError); 
+                        }
+                        else if (result.PID == SLOW_PID) {
+                            slowPID(result.cmdVel,result.cmdError);
+                        }
+                        else if (result.PID == CONST_PID) {
+                            constPID(result.cmdVel,result.cmdAngular);
+                        }
+                    }
                 }
-                else {
-                    slowPIDVelAngularVel(result.cmdVel,result.cmdAngular);
-                }
             }
-            else if (obstacleDetected) {
+            
+            if (waypointsAvalible) {
                 
             }
-            else if (targetCollected) {
-                
-            }
-            else if (waypointsAvalible) {
-                
-            }
-            else if (pathPlanningRequired) {
+            
+            if (pathPlanningRequired) {
                 
             }
             
             
         }
+            
+            // Calculate angle between currentLocation.theta and goalLocation.theta
+            // Rotate left or right depending on sign of angle
+            // Stay in this state until angle is minimized
+        case STATE_MACHINE_ROTATE: {
+            stateMachineMsg.data = "ROTATING";
+            
+            // Calculate the diffrence between current and desired heading in radians.
+            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
+            
+            // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
+            if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > rotateOnlyAngleTolerance) {
+                // rotate but dont drive.
+                sendDriveCommand(0.0, errorYaw);
+                break;
+            } else {
+                // move to differential drive step
+                stateMachineState = STATE_MACHINE_SKID_STEER;
+                //fall through on purpose.
+            }
+        }
+            
             
             
             
@@ -267,6 +361,7 @@ void sendDriveCommand(double linearVel, double angularError)
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
+    targetsFound = pickUpController.sendData(message);
     
 }
 

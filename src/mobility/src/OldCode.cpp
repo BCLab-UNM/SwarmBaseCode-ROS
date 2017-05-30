@@ -203,26 +203,7 @@ mapAverage();
         //Purposefully fall through to next case without breaking
     }
 
-    // Calculate angle between currentLocation.theta and goalLocation.theta
-    // Rotate left or right depending on sign of angle
-    // Stay in this state until angle is minimized
-    case STATE_MACHINE_ROTATE: {
-        stateMachineMsg.data = "ROTATING";
-        // Calculate the diffrence between current and desired
-        // heading in radians.
-        float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
-
-        // If angle > 0.4 radians rotate but dont drive forward.
-        if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > rotateOnlyAngleTolerance) {
-            // rotate but dont drive  0.05 is to prevent turning in reverse
-            sendDriveCommand(0.05, errorYaw);
-            break;
-        } else {
-            // move to differential drive step
-            stateMachineState = STATE_MACHINE_SKID_STEER;
-            //fall through on purpose.
-        }
-    }
+    
 
     // Calculate angle between currentLocation.x/y and goalLocation.x/y
     // Drive forward
