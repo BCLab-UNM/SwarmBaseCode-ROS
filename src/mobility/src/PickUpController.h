@@ -18,6 +18,8 @@ class PickUpController
  public:
   PickUpController();
   ~PickUpController();
+  
+  PickUpResult Run();
 
   PickUpResult selectTarget(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
   PickUpResult pickUpSelectedTarget(bool blockBlock);

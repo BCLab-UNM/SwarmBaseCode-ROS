@@ -17,6 +17,16 @@ PickUpController::PickUpController() {
 
 }
 
+PickUpResult PickUpController::Run() {
+    if (noTargetsCollected) {
+        
+    }
+    else {
+        
+    }
+    
+}
+
 PickUpResult PickUpController::pickUpSelectedTarget(bool blockBlock) {
     //threshold distance to be from the target block before attempting pickup
     float targetDist = 0.25; //meters
@@ -116,7 +126,7 @@ PickUpResult PickUpController::pickUpSelectedTarget(bool blockBlock) {
     return result;
 }
 
-PickUpResult PickUpController::selectTarget(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
+void PickUpController::selectTarget(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
 
     /*PickUpResult result;
   result.pickedUp = false;
@@ -177,7 +187,6 @@ PickUpResult PickUpController::selectTarget(const apriltags_ros::AprilTagDetecti
         result.wristAngle = 1.25;
     }
 
-    return result;
 }
 
 void PickUpController::reset() {
