@@ -47,12 +47,13 @@ void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
 void lowerWrist();  // Lower wrist to 50 degrees
+void resultHandler();
 
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
 geometry_msgs::Pose2D currentLocationAverage;
-geometry_msgs::Pose2D goalLocation;
+list<geometry_msgs::Pose2D> waypoints;
 
 geometry_msgs::Pose2D centerLocation;
 geometry_msgs::Pose2D centerLocationMap;
@@ -63,6 +64,7 @@ float mobilityLoopTimeStep = 0.1; // time between the mobility loop calls
 float status_publish_interval = 1;
 float heartbeat_publish_interval = 2;
 
+Result result;
 
 
 std_msgs::String msg;
@@ -222,10 +224,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             if (procceseLoopState == PROCCESE_LOOP_SEARCHING) {
                 if (targetsFound) {
-                    Result result = pickUpController.run();
-                    wristAnglePublish.publish(result.wristAngle);
-                    fingerAnglePublish.publish(result.fingerAngle);
-                    
+                    result = pickUpController.run();
                     if (result.changeBehaviour != " ") {
                         if (result.changeBehaviour == "target pickedup") {
                             procceseLoopState = PROCCESE_LOOP_TARGETCOLLECTED;
@@ -234,21 +233,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                             targetsFound = false;
                         }
                     }
-                    else if (result.waypointDriving) {
-                        for (int i = result.pointCount; i > 0; i--) {
-                            goalLocation.push_front(result.waypoint[i]);
-                        }
-                    }
-                    else if (!result.waypoint) {
-                        if (result.PID == FAST_PID){
-                            fastPID(result.cmdVel,result.cmdError); 
-                        }
-                        else if (result.PID == SLOW_PID) {
-                            slowPID(result.cmdVel,result.cmdError);
-                        }
-                        else if (result.PID == CONST_PID) {
-                            constPID(result.cmdVel,result.cmdAngular);
-                        }
+                    else {
+                        resultHandler();
                     }
                 }
             }
@@ -271,16 +257,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                             
                         }
                     }
-                    else if (!result.waypoint) {
-                        if (result.PID == FAST_PID){
-                            fastPID(result.cmdVel,result.cmdError); 
-                        }
-                        else if (result.PID == SLOW_PID) {
-                            slowPID(result.cmdVel,result.cmdError);
-                        }
-                        else if (result.PID == CONST_PID) {
-                            constPID(result.cmdVel,result.cmdAngular);
-                        }
+                    else {
+                        resultHandler();
                     }
                 }
             }
@@ -304,17 +282,17 @@ void mobilityStateMachine(const ros::TimerEvent&) {
              stateMachineState = STATE_MACHINE_ROTATE;
         }            
             
-            // Calculate angle between currentLocation.theta and goalLocation.theta
+            // Calculate angle between currentLocation.theta and waypoints.front().theta
             // Rotate left or right depending on sign of angle
             // Stay in this state until angle is minimized
         case STATE_MACHINE_ROTATE: {
             stateMachineMsg.data = "ROTATING";
             
             // Calculate the diffrence between current and desired heading in radians.
-            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
+            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta);
             
             // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > rotateOnlyAngleTolerance) {
+            if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta)) > rotateOnlyAngleTolerance) {
                 // rotate but dont drive.
                 sendDriveCommand(0.0, errorYaw);
                 break;
@@ -324,22 +302,22 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 //fall through on purpose.
             }
         }
-            // Calculate angle between currentLocation.x/y and goalLocation.x/y
+            // Calculate angle between currentLocation.x/y and waypoints.front().x/y
             // Drive forward
             // Stay in this state until angle is at least PI/2
         case STATE_MACHINE_SKID_STEER: {
             stateMachineMsg.data = "SKID_STEER";
             
             // calculate the distance between current and desired heading in radians
-            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta);
+            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta);
             
             // goal not yet reached drive while maintaining proper heading.
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
+            if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.front().y - currentLocation.y, waypoints.front().x - currentLocation.x))) < M_PI_2) {
                 // drive and turn simultaniously
                 sendDriveCommand(searchVelocity, errorYaw/2);
             }
             // goal is reached but desired heading is still wrong turn only
-            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) {
+            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta)) > 0.1) {
                 // rotate but dont drive
                 sendDriveCommand(0.0, errorYaw);
             }
@@ -389,7 +367,7 @@ void sendDriveCommand(double linearVel, double angularError)
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
-    targetsFound = pickUpController.sendData(message);
+    targetsFound = pickUpController.setData(message);
     targetCollected = dropOffController.sendData(message);
     
 }
@@ -462,6 +440,28 @@ void sigintEventHandler(int sig) {
 }
 
 
+void resultHandler()
+{
+    wristAnglePublish.publish(result.wristAngle);
+    fingerAnglePublish.publish(result.fingerAngle);
+  
+    if (result.waypointDriving) {
+        for (int i = result.pointCount; i > 0; i--) {
+            waypoints.push_front(result.waypoint[i]);
+        }
+    }
+    else if (!result.waypoint) {
+        if (result.PID == FAST_PID){
+            fastPID(result.cmdVel,result.cmdError); 
+        }
+        else if (result.PID == SLOW_PID) {
+            slowPID(result.cmdVel,result.cmdError);
+        }
+        else if (result.PID == CONST_PID) {
+            constPID(result.cmdVel,result.cmdAngular);
+        }
+    }      
+}
 
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
     std_msgs::String msg;
