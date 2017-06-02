@@ -49,6 +49,13 @@ void raiseWrist();  // Return wrist back to 0 degrees
 void lowerWrist();  // Lower wrist to 50 degrees
 void resultHandler();
 
+//update data functions
+//these are called at the end of mobilityStateMachine in order to update objects data sets
+//use specifically for data that is not the objects reasponsability such as location data
+//this data may be neccesary for some of the logic and math an object does but it should not be directly passed in, in raw format.
+
+void dropOffControllerUpdateData();
+
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
@@ -64,13 +71,27 @@ float mobilityLoopTimeStep = 0.1; // time between the mobility loop calls
 float status_publish_interval = 1;
 float heartbeat_publish_interval = 2;
 
+bool targetsFound = false;
+
+bool obstacleDetected = false;
+
+bool targetsCollected = false;
+
+bool waypointsAvalible = false;
+
+bool pathPlanningRequired = false;
+
+float searchVelocity = 0.2; // meters/second
+
+bool avoidingObstacle = false;
+
 Result result;
 
 
 std_msgs::String msg;
 
 // state machine states
-#define STATE_MACHINE_TRANSFORM 0
+#define STATE_MACHINE_INTERUPT 0
 #define STATE_MACHINE_ROTATE 1
 #define STATE_MACHINE_SKID_STEER 2
 #define STATE_MACHINE_PICKUP 3
@@ -80,12 +101,9 @@ std_msgs::String msg;
 #define PROCCESE_LOOP_SEARCHING 0
 #define PROCCESE_LOOP_TARGETCOLLECTED 1
 
-#define FAST_PID 0 //quickest turn reasponse time
-#define SLOW_PID 1 //slower turn reasponse time
-#define CONST_PID 2 //constant angular turn rate
 
-
-int stateMachineState = STATE_MACHINE_TRANSFORM;
+int stateMachineState = STATE_MACHINE_INTERUPT;
+int procceseLoopState = PROCCESE_LOOP_SEARCHING;
 
 geometry_msgs::Twist velocity;
 char host[128];
@@ -141,6 +159,7 @@ void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void targetDetectedReset(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
+
 
 int main(int argc, char **argv) {
     
@@ -207,8 +226,8 @@ int main(int argc, char **argv) {
 // This block passes the goal location to the proportional-integral-derivative
 // controllers in the abridge package.
 void mobilityStateMachine(const ros::TimerEvent&) {
-    
-    
+    std_msgs::String stateMachineMsg;
+    float rotateOnlyAngleTolerance = 0.4;
     
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
@@ -247,7 +266,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             if (procceseLoopState == PROCCESE_LOOP_TARGETCOLLECTED) {
                 
                 if (targetsCollected) {
-                    Result result = dropOffController.run();
+                    //Result result = dropOffController.run();
                     
                     if (result.changeBehaviour != " ") {
                         if (result.changeBehaviour == "target dropped") {
@@ -327,7 +346,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 avoidingObstacle = false;
                 
                 // move back to transform step
-                stateMachineState = STATE_MACHINE_TRANSFORM;
+                stateMachineState = STATE_MACHINE_INTERUPT;
             }
             
             break;
@@ -350,6 +369,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         stateMachinePublish.publish(stateMachineMsg);
         sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
+    
+    dropOffControllerUpdateData();
 }
 
 void sendDriveCommand(double linearVel, double angularError)
@@ -368,7 +389,7 @@ void sendDriveCommand(double linearVel, double angularError)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
     targetsFound = pickUpController.setData(message);
-    targetCollected = dropOffController.sendData(message);
+    //targetCollected = dropOffController.sendData(message);
     
 }
 
@@ -422,7 +443,7 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&) {
 
 
 void targetDetectedReset(const ros::TimerEvent& event) {
-    targetDetected = false;
+    /*targetDetected = false;
     
     std_msgs::Float32 angle;
     angle.data = 0;
@@ -431,7 +452,7 @@ void targetDetectedReset(const ros::TimerEvent& event) {
     fingerAnglePublish.publish(angle);
     
     // raise wrist
-    wristAnglePublish.publish(angle);
+    wristAnglePublish.publish(angle);*/
 }
 
 void sigintEventHandler(int sig) {
@@ -442,25 +463,32 @@ void sigintEventHandler(int sig) {
 
 void resultHandler()
 {
-    wristAnglePublish.publish(result.wristAngle);
-    fingerAnglePublish.publish(result.fingerAngle);
+    std_msgs::Float32 angle;
+    angle.data = result.wristAngle;
+    wristAnglePublish.publish(angle);
+    angle.data = result.fingerAngle;
+    fingerAnglePublish.publish(angle);
   
     if (result.waypointDriving) {
-        for (int i = result.pointCount; i > 0; i--) {
+        for (int i = result.waypointCount; i > 0; i--) {
             waypoints.push_front(result.waypoint[i]);
         }
     }
     else if (!result.waypoint) {
         if (result.PID == FAST_PID){
-            fastPID(result.cmdVel,result.cmdError); 
+            //fastPID(result.cmdVel,result.cmdError); needs declaration
         }
         else if (result.PID == SLOW_PID) {
-            slowPID(result.cmdVel,result.cmdError);
+            //slowPID(result.cmdVel,result.cmdError); needs declaration
         }
         else if (result.PID == CONST_PID) {
-            constPID(result.cmdVel,result.cmdAngular);
+            //constPID(result.cmdVel,result.cmdAngular); needs declaration
         }
     }      
+}
+
+void dropOffControllerUpdateData() {
+    
 }
 
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {

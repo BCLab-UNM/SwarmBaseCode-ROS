@@ -38,9 +38,8 @@ const unsigned int mapHistorySize = 500;
 // An array in which to store map positions
 geometry_msgs::Pose2D mapLocation[mapHistorySize];
 
-bool avoidingObstacle = false;
 
-float searchVelocity = 0.2; // meters/second
+
 
 
 
@@ -77,8 +76,8 @@ for (int i = 0; i < 100; i++) {
 
 
 
-std_msgs::String stateMachineMsg;
-float rotateOnlyAngleTolerance = 0.4;
+
+
 int returnToSearchDelay = 5;
 
 // calls the averaging function, also responsible for

@@ -16,9 +16,9 @@ PickUpController::PickUpController() {
     
 }
 
-Result PickUpController::Run() {
+Result PickUpController::run() {
     if (!targetCollected) {
-                
+        //pickUpSelectedTarget();
     }
     else {
         
@@ -180,21 +180,6 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
         result.cmdVel = 0.0;
         result.cmdAngular = 0.0;
     }
-}
-
-void PickUpController::selectTarget(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
-    
-    /*PickUpResult result;
-  result.pickedUp = false;
-  result.cmdVel = 0;
-  result.cmdAngular = 0;
-  result.fingerAngle = -1;
-  result.wristAngle = -1;
-                        */
-    
-    
-    
-    
 }
 
 void PickUpController::reset() {
