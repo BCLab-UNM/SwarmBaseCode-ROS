@@ -91,19 +91,23 @@ Result result;
 std_msgs::String msg;
 
 // state machine states
-#define STATE_MACHINE_INTERUPT 0
-#define STATE_MACHINE_ROTATE 1
-#define STATE_MACHINE_SKID_STEER 2
-#define STATE_MACHINE_PICKUP 3
-#define STATE_MACHINE_DROPOFF 4
-#define STATE_MACHINE_MANAGE_WAYPOINTS 5
+enum StateMachineStates {
+    STATE_MACHINE_INTERRUPT,
+    STATE_MACHINE_ROTATE,
+    STATE_MACHINE_SKID_STEER,
+    STATE_MACHINE_PICKUP,
+    STATE_MACHINE_DROPOFF,
+    STATE_MACHINE_WAYPOINTS
+};
 
-#define PROCCESE_LOOP_SEARCHING 0
-#define PROCCESE_LOOP_TARGETCOLLECTED 1
+enum ProcessLoopStates {
+    PROCCESS_LOOP_SEARCHING,
+    PROCCESS_LOOP_TARGETCOLLECTED
+};
 
 
-int stateMachineState = STATE_MACHINE_INTERUPT;
-int procceseLoopState = PROCCESE_LOOP_SEARCHING;
+int stateMachineState = STATE_MACHINE_INTERRUPT;
+int procceseLoopState = PROCCESS_LOOP_SEARCHING;
 
 geometry_msgs::Twist velocity;
 char host[128];
@@ -238,17 +242,17 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
         //This should be done as little as possible. I Suggest to Use timeouts to set control bools false.
         //Then only call INTERUPT if bool switches to true.
-        case STATE_MACHINE_INTERUPT: {
-            stateMachineMsg.data = "INTERUPT";
+        case STATE_MACHINE_INTERRUPT: {
+            stateMachineMsg.data = "INTERRUPT";
             
-            if (procceseLoopState == PROCCESE_LOOP_SEARCHING) {
+            if (procceseLoopState == PROCCESS_LOOP_SEARCHING) {
                 if (targetsFound) {
                     result = pickUpController.run();
-                    if (result.changeBehaviour != " ") {
-                        if (result.changeBehaviour == "target pickedup") {
-                            procceseLoopState = PROCCESE_LOOP_TARGETCOLLECTED;
+                    if (result.type == behavior) {
+                        if (result.b == targetPickedUp) {
+                            procceseLoopState = PROCCESS_LOOP_TARGETCOLLECTED;
                         }
-                        else if (result.changeBehaviour == "target lost") {
+                        else if (result.b == targetLost) {
                             targetsFound = false;
                         }
                     }
@@ -263,16 +267,16 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 
             }
             
-            if (procceseLoopState == PROCCESE_LOOP_TARGETCOLLECTED) {
+            if (procceseLoopState == PROCCESS_LOOP_TARGETCOLLECTED) {
                 
                 if (targetsCollected) {
                     //Result result = dropOffController.run();
                     
-                    if (result.changeBehaviour != " ") {
-                        if (result.changeBehaviour == "target dropped") {
+                    if (result.type == behavior) {
+                        if (result.b == targetDropped) {
                             
                         }
-                        else if (result.changeBehaviour == "target returned") {
+                        else if (result.b == targetReturned) {
                             
                         }
                     }
@@ -294,7 +298,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         }
             
             //Handles route planning and navigation as well as makeing sure all waypoints are valid.
-        case STATE_MACHINE_MANAGE_WAYPOINTS: {
+        case STATE_MACHINE_WAYPOINTS: {
              stateMachineMsg.data = "MANAGE_WAYPOINTS";
              
              
@@ -346,7 +350,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 avoidingObstacle = false;
                 
                 // move back to transform step
-                stateMachineState = STATE_MACHINE_INTERUPT;
+                stateMachineState = STATE_MACHINE_WAYPOINTS;
             }
             
             break;
@@ -469,19 +473,19 @@ void resultHandler()
     angle.data = result.fingerAngle;
     fingerAnglePublish.publish(angle);
   
-    if (result.waypointDriving) {
-        for (int i = result.waypointCount; i > 0; i--) {
-            waypoints.push_front(result.waypoint[i]);
+    if (result.type == waypoint) {
+        for (int i = result.wpts.waypointCount; i > 0; i--) {
+            waypoints.push_front(result.wpts.waypoint[i]);
         }
     }
-    else if (!result.waypoint) {
-        if (result.PID == FAST_PID){
+    else if (!result.type == waypoint) {
+        if (result.PIDMode == FAST_PID){
             //fastPID(result.cmdVel,result.cmdError); needs declaration
         }
-        else if (result.PID == SLOW_PID) {
+        else if (result.PIDMode == SLOW_PID) {
             //slowPID(result.cmdVel,result.cmdError); needs declaration
         }
-        else if (result.PID == CONST_PID) {
+        else if (result.PIDMode == CONST_PID) {
             //constPID(result.cmdVel,result.cmdAngular); needs declaration
         }
     }      

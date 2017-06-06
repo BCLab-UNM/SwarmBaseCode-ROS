@@ -8,9 +8,9 @@ PickUpController::PickUpController() {
     blockDist = 0;
     td = 0;
     
-    result.changeBehaviour = " ";
-    result.cmdVel = 0;
-    result.cmdAngular = 0;
+    result.type;
+    result.pd.cmdVel = 0;
+    result.pd.cmdAngular = 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
     
@@ -18,6 +18,8 @@ PickUpController::PickUpController() {
 
 Result PickUpController::run() {
     if (!targetCollected) {
+        result.type = precisionDriving;
+        
         //pickUpSelectedTarget();
     }
     else {
@@ -81,7 +83,8 @@ bool PickUpController::setData(const apriltags_ros::AprilTagDetectionArray::Cons
         float Td = Tdiff.sec + Tdiff.nsec/1000000000;
         
         if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.13 && Td < 3.8) {
-            result.changeBehaviour = "target pickedup";
+            result.type = behavior;
+            result.b = targetPickedUp;
         }
         
         //Lower wrist and open fingures if no locked targt
@@ -111,16 +114,16 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
     {
         if(!timeOut) //if not in a counting state
         {
-            result.cmdVel = 0.0;
-            result.cmdAngular = 0.0;
+            result.pd.cmdVel = 0.0;
+            result.pd.cmdAngular = 0.0;
             
             timeOut = true;
         }
         //if in a counting state and has been counting for 1 second
         else if (Td > 1 && Td < 2.5)
         {
-            result.cmdVel = -0.2;
-            result.cmdAngular = 0.0;
+            result.pd.cmdVel = -0.2;
+            result.pd.cmdAngular = 0.0;
         }
     }
     else if (blockDist > targetDist && !lockTarget) //if a target is detected but not locked, and not too close.
@@ -128,8 +131,8 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
         float vel = blockDist * 0.20;
         if (vel < 0.1) vel = 0.1;
         if (vel > 0.2) vel = 0.2;
-        result.cmdVel = vel;
-        result.cmdAngular = -blockYawError/2;
+        result.pd.cmdVel = vel;
+        result.pd.cmdAngular = -blockYawError/2;
         timeOut = false;
         nTargetsSeen = 0;
         return;
@@ -137,20 +140,20 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
     {
         lockTarget = true;
-        result.cmdVel = 0.18;
-        result.cmdAngular = 0.0;
+        result.pd.cmdVel = 0.18;
+        result.pd.cmdAngular = 0.0;
         timeOut = true;
     }
     else if (Td > 2.4) //raise the wrist
     {
-        result.cmdVel = -0.25;
-        result.cmdAngular = 0.0;
+        result.pd.cmdVel = -0.25;
+        result.pd.cmdAngular = 0.0;
         result.wristAngle = 0;
     }
     else if (Td > 1.7) //close the fingers and stop driving
     {
-        result.cmdVel = -0.1;
-        result.cmdAngular = 0.0;
+        result.pd.cmdVel = -0.1;
+        result.pd.cmdAngular = 0.0;
         result.fingerAngle = 0;
         return;
     }
@@ -159,13 +162,14 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
     {
         if (blockBlock) //if the ultrasound is blocked at less than .12 meters a block has been picked up no new pickup required
         {
-            result.changeBehaviour = "target pickedup";
+            result.type = behavior;
+            result.b = targetPickedUp;
         }
         else //recover begin looking for targets again
         {
             lockTarget = false;
-            result.cmdVel = -0.15;
-            result.cmdAngular = 0.0;
+            result.pd.cmdVel = -0.15;
+            result.pd.cmdAngular = 0.0;
             //set gripper
             result.fingerAngle = M_PI_2;
             result.wristAngle = 0;
@@ -174,17 +178,19 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
     
     if (Td > 5 && timeOut) //if no targets are found after too long a period go back to search pattern
     {
-        result.changeBehaviour = "target lost";
+        result.type = behavior;
+        result.b = targetLost;
         lockTarget = false;
         timeOut = false;
-        result.cmdVel = 0.0;
-        result.cmdAngular = 0.0;
+        result.pd.cmdVel = 0.0;
+        result.pd.cmdAngular = 0.0;
     }
 }
 
 void PickUpController::reset() {
     
-    result.changeBehaviour = " ";
+    result.type = behavior;
+    result.b = init;
     lockTarget = false;
     timeOut = false;
     nTargetsSeen = 0;
@@ -192,8 +198,8 @@ void PickUpController::reset() {
     blockDist = 0;
     td = 0;
     
-    result.cmdVel = 0;
-    result.cmdAngular = 0;
+    result.pd.cmdVel = 0;
+    result.pd.cmdAngular = 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
 }
