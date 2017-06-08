@@ -29,7 +29,7 @@ enum BehaviorTrigger {
 
 struct PrecisionDriving {
     float cmdVel;
-    float cmdError;
+    float cmdAngularError;
     float cmdAngular;
     float setPointVel;
     float setPointYaw;
@@ -53,8 +53,10 @@ public:
             this->b = init;
         } else if(this->type == precisionDriving) {
             this->pd.cmdVel = 0.0f;
-            this->pd.cmdError = 0.0f;
+            this->pd.cmdAngularError = 0.0f;
             this->pd.cmdAngular = 0.0f;
+            this->pd.setPointVel = 0.0f;
+            this->pd.setPointYaw = 0.0f;
         }
         
     }
@@ -69,7 +71,15 @@ public:
         }
     }
     
-    inline Result(Result&& r) : Result(r.type, r.fingerAngle, r.wristAngle, r.PIDMode) {
+    
+    ~Result() {}
+    
+    Result& operator=(const Result& r) {
+        this->type = r.type;
+        this->fingerAngle = r.fingerAngle;
+        this->wristAngle = r.wristAngle;
+        this->PIDMode = r.PIDMode;
+        
         if(r.type == behavior) {
             this->b = r.b;
         } else if(r.type == waypoint) {
@@ -79,8 +89,6 @@ public:
         }
     }
     
-    ~Result() {}
-
     ResultType type;
     union {
         BehaviorTrigger b;

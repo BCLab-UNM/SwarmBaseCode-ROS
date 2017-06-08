@@ -5,6 +5,9 @@
 #include <random_numbers/random_numbers.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 
 // ROS messages
 #include <std_msgs/Float32.h>
@@ -22,6 +25,7 @@
 #include "PickUpController.h"
 #include "DropOffController.h"
 #include "SearchController.h"
+#include "obstaclecontoller.h"
 
 #include "StandardVars.h"
 #include "PID.h"
@@ -42,6 +46,7 @@ random_numbers::RandomNumberGenerator* rng;
 PickUpController pickUpController;
 DropOffController dropOffController;
 SearchController searchController;
+ObstacleController obstacleController;
 
 // Mobility Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
@@ -51,12 +56,6 @@ void raiseWrist();  // Return wrist back to 0 degrees
 void lowerWrist();  // Lower wrist to 50 degrees
 void resultHandler();
 
-//update data functions
-//these are called at the end of mobilityStateMachine in order to update objects data sets
-//use specifically for data that is not the objects reasponsability such as location data
-//this data may be neccesary for some of the logic and math an object does but it should not be directly passed in, in raw format.
-
-void dropOffControllerUpdateData();
 
 //PID configs************************
 PIDConfig fastVelConfig();
@@ -78,9 +77,13 @@ geometry_msgs::Pose2D centerLocationMap;
 geometry_msgs::Pose2D centerLocationOdom;
 
 int currentMode = 0;
-float mobilityLoopTimeStep = 0.1; // time between the mobility loop calls
-float status_publish_interval = 1;
-float heartbeat_publish_interval = 2;
+const float mobilityLoopTimeStep = 0.1; // time between the mobility loop calls
+const float status_publish_interval = 1;
+const float heartbeat_publish_interval = 2;
+const float waypointTolerance = 0.1; //10 cm tolerance.
+
+// used for calling code once but not in main
+bool initilized = false;
 
 bool targetsFound = false;
 
@@ -95,6 +98,9 @@ bool pathPlanningRequired = false;
 float searchVelocity = 0.2; // meters/second
 
 bool avoidingObstacle = false;
+
+bool dropOffWayPoints = false;
+bool dropOffPrecision = false;
 
 Result result;
 
@@ -113,7 +119,7 @@ enum StateMachineStates {
 
 enum ProcessLoopStates {
     PROCCESS_LOOP_SEARCHING,
-    PROCCESS_LOOP_TARGETCOLLECTED
+    PROCCESS_LOOP_TARGET_PICKEDUP
 };
 
 
@@ -139,7 +145,6 @@ ros::Publisher heartbeatPublisher;
 ros::Subscriber joySubscriber;
 ros::Subscriber modeSubscriber;
 ros::Subscriber targetSubscriber;
-ros::Subscriber obstacleSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
 
@@ -168,13 +173,14 @@ void sigintEventHandler(int signal);
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
-void obstacleHandler(const std_msgs::UInt8::ConstPtr& message);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void targetDetectedReset(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
+void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);
+
 
 
 int main(int argc, char **argv) {
@@ -201,9 +207,11 @@ int main(int argc, char **argv) {
     joySubscriber = mNH.subscribe((publishedName + "/joystick"), 10, joyCmdHandler);
     modeSubscriber = mNH.subscribe((publishedName + "/mode"), 1, modeHandler);
     targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
-    obstacleSubscriber = mNH.subscribe((publishedName + "/obstacle"), 10, obstacleHandler);
     odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
     mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
+    message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
+    message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
+    message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
     
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
@@ -219,9 +227,10 @@ int main(int argc, char **argv) {
     
     publish_heartbeat_timer = mNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
        
-   
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Range, sensor_msgs::Range, sensor_msgs::Range> sonarSyncPolicy;
     
-    
+    message_filters::Synchronizer<sonarSyncPolicy> sonarSync(sonarSyncPolicy(10), sonarLeftSubscriber, sonarCenterSubscriber, sonarRightSubscriber);
+    sonarSync.registerCallback(boost::bind(&sonarHandler, _1, _2, _3));
     
     tfListener = new tf::TransformListener();
     std_msgs::String msg;
@@ -249,6 +258,22 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
     float rotateOnlyAngleTolerance = 0.4;
     
+    // time since timerStartTime was set to current time
+    timerTimeElapsed = time(0) - timerStartTime;
+    
+    // init code goes here. (code that runs only once at start of
+    // auto mode but wont work in main goes here)
+    if (!initilized) {
+        if (timerTimeElapsed > startDelayInSeconds) {
+            // initialization has run
+            initilized = true;
+        } else {
+            return;
+        }
+
+    }
+    
+    
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
         
@@ -261,12 +286,13 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         case STATE_MACHINE_INTERRUPT: {
             stateMachineMsg.data = "INTERRUPT";
             
-            if (procceseLoopState == PROCCESS_LOOP_SEARCHING) {
+            if (procceseLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
                 if (targetsFound) {
-                    //result = pickUpController.makeDecision();
+                    result = pickUpController.CalculateResult();
                     if (result.type == behavior) {
                         if (result.b == targetPickedUp) {
-                            procceseLoopState = PROCCESS_LOOP_TARGETCOLLECTED;
+                            procceseLoopState = PROCCESS_LOOP_TARGET_PICKEDUP;
+                            dropOffController.SetTargetPickedUp();
                         }
                         else if (result.b == targetLost) {
                             targetsFound = false;
@@ -280,27 +306,31 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             
             if (obstacleDetected) {
-               /* result = obstacleController.makeDecision();
+               result = obstacleController.CalculateResult();
                 if (result.type == behavior) {
                     
                 }
                 else {
                     resultHandler();
-                }
-                */
+                }                
             }
             
-            if (procceseLoopState == PROCCESS_LOOP_TARGETCOLLECTED) {
+            if (procceseLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
                 
                 if (targetsCollected) {
-                    //Result result = dropOffController.run();
+                    Result result = dropOffController.CalculateResult();
                     
                     if (result.type == behavior) {
                         if (result.b == targetDropped) {
-                            
+                            procceseLoopState = PROCCESS_LOOP_SEARCHING;
+                            targetsCollected = false;
+                            dropOffWayPoints = false;
+                             dropOffPrecision = false;
                         }
                         else if (result.b == targetReturned) {
-                            
+                            procceseLoopState = PROCCESS_LOOP_SEARCHING;
+                            targetsCollected = false;
+                            dropOffWayPoints = false;
                         }
                     }
                     else {
@@ -330,8 +360,28 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             //Handles route planning and navigation as well as makeing sure all waypoints are valid.
         case STATE_MACHINE_WAYPOINTS: {
              stateMachineMsg.data = "MANAGE_WAYPOINTS";
+                          
+             bool toClose = true;
+             while (!waypoints.empty() && toClose) {
+                 if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
+                     waypoints.pop_back();   
+                 }
+                 else {
+                     toClose = false;
+                 }
+             }
+             if (waypoints.empty()) {
+                 stateMachineState = STATE_MACHINE_INTERRUPT;
+                 waypointsAvalible = false;
+                 break;
+             }
+             else {
+                 waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
+                 stateMachineState = STATE_MACHINE_ROTATE;
+                 //fall through on purpose
+             }
              
-             stateMachineState = STATE_MACHINE_ROTATE;
+             
         }            
             
             // Calculate angle between currentLocation.theta and waypoints.front().theta
@@ -403,7 +453,15 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
     
-    dropOffControllerUpdateData();
+    dropOffController.SetLocationData(currentLocation, centerLocation); //send location data to dropOffController
+    
+    if (!dropOffWayPoints) { //check if we have triggered this interupt already if so ignore it
+        dropOffWayPoints = dropOffController.ShouldInterrupt(); //trigger waypoints interupt for drop off flag is true
+        stateMachineState = STATE_MACHINE_INTERRUPT;
+        dropOffPrecision = false; //we cannot precision drive if we want to waypoint drive.
+    }
+    
+    searchController.UpdateData(currentLocation, centerLocation);
 }
 
 void sendDriveCommand(double left, double right)
@@ -421,8 +479,22 @@ void sendDriveCommand(double left, double right)
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
-    targetsFound = pickUpController.setData(message);
-    //targetCollected = dropOffController.sendData(message);
+    if (procceseLoopState == PROCCESS_LOOP_SEARCHING) {
+        pickUpController.UpdateData(message); //send april tag data to pickUpController
+        if (!targetsFound) {
+            targetsFound = pickUpController.ShouldInterrupt(); //set this flag to indicate we found a target and thus handle the interupt
+            stateMachineState = STATE_MACHINE_INTERRUPT;
+        }
+    }
+    
+    dropOffController.UpdateData(message); //send april tag data to dropOffController
+    if (!dropOffPrecision) { //if we have called this interupt ignore it
+        if (dropOffController.IsChangingMode()) {
+            stateMachineState = STATE_MACHINE_INTERRUPT;
+            dropOffWayPoints = false; //set this repeat hold flag false to allow a new interupt in the future
+            dropOffPrecision = true; //set is repeat hold flag true to prevent multiple calls
+        }
+    }
     
 }
 
@@ -431,7 +503,22 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
     sendDriveCommand(0.0, 0.0);
 }
 
-void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
+void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
+
+    obstacleController.UpdateData(sonarLeft->range, sonarCenter->range, sonarRight->range, currentLocation);
+    if (!obstacleDetected) {
+    obstacleDetected = obstacleController.ShouldInterrupt();
+    stateMachineState = STATE_MACHINE_INTERRUPT;
+    }
+    
+    if (sonarCenter->range < 0.1) {
+        pickUpController.SetUltraSoundData(true);
+        dropOffController.SetBlockBlockingUltrasound(true);
+    }
+    else {
+        pickUpController.SetUltraSoundData(false);
+        dropOffController.SetBlockBlockingUltrasound(false);
+    }
     
 }
 
@@ -474,20 +561,6 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&) {
     status_publisher.publish(msg);
 }
 
-
-void targetDetectedReset(const ros::TimerEvent& event) {
-    /*targetDetected = false;
-    
-    std_msgs::Float32 angle;
-    angle.data = 0;
-    
-    // close fingers
-    fingerAnglePublish.publish(angle);
-    
-    // raise wrist
-    wristAnglePublish.publish(angle);*/
-}
-
 void sigintEventHandler(int sig) {
     // All the default sigint handler does is call shutdown()
     ros::shutdown();
@@ -496,23 +569,28 @@ void sigintEventHandler(int sig) {
 
 void resultHandler()
 {
-    std_msgs::Float32 angle;
-    angle.data = result.wristAngle;
-    wristAnglePublish.publish(angle);
-    angle.data = result.fingerAngle;
-    fingerAnglePublish.publish(angle);
+        std_msgs::Float32 angle;
+    if (result.wristAngle != -1) {
+        angle.data = result.wristAngle;
+        wristAnglePublish.publish(angle);
+    }
+    if (result.fingerAngle != -1) {
+        angle.data = result.fingerAngle;
+        fingerAnglePublish.publish(angle); 
+    }
   
     if (result.type == waypoint) {
         if (!result.wpts.waypoints.empty()) {
             waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
+            waypointsAvalible = true;
         }
     }
     else if (!result.type == waypoint) {
         if (result.PIDMode == FAST_PID){
-            fastPID(result.pd.cmdVel,result.pd.cmdError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+            fastPID(result.pd.cmdVel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
         }
         else if (result.PIDMode == SLOW_PID) {
-            //slowPID(result.cmdVel,result.cmdError); needs declaration
+            //slowPID(result.cmdVel,result.cmdAngularError); needs declaration
         }
         else if (result.PIDMode == CONST_PID) {
             //constPID(result.cmdVel,result.cmdAngular); needs declaration
@@ -520,9 +598,6 @@ void resultHandler()
     }      
 }
 
-void dropOffControllerUpdateData() {
-    
-}
 
 void fastPID(float vel, float yaw , float setPointVel, float setPointYaw) {
     float velOut = fastVelPID.PIDOut(vel, setPointVel);

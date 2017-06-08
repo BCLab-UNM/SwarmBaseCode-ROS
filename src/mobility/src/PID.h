@@ -7,7 +7,9 @@
 using namespace std;
 
 struct PIDConfig {
-    float Kp,Ki,Kd = 0;
+    float Kp = 0;
+    float Ki = 0;
+    float Kd = 0;
     float satUpper = 255; 
     float satLower = -255; 
     float antiWindup = satUpper/2; 

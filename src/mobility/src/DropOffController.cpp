@@ -49,7 +49,7 @@ Result DropOffController::CalculateResult() {
             result.wristAngle = angle; //raise wrist
 
             result.pd.cmdVel = -0.3;
-            result.pd.cmdError = 0.0;
+            result.pd.cmdAngularError = 0.0;
         }
 
         return result;
@@ -129,20 +129,20 @@ Result DropOffController::CalculateResult() {
         //otherwise turn till tags on both sides of image then drive straight
         if (left && right) {
             result.pd.cmdVel = searchVelocity;
-            result.pd.cmdError = 0.0;
+            result.pd.cmdAngularError = 0.0;
         }
         else if (right) {
             result.pd.cmdVel = -0.1 * turnDirection;
-            result.pd.cmdError = -centeringTurn*turnDirection;
+            result.pd.cmdAngularError = -centeringTurn*turnDirection;
         }
         else if (left){
             result.pd.cmdVel = -0.1 * turnDirection;
-            result.pd.cmdError = centeringTurn*turnDirection;
+            result.pd.cmdAngularError = centeringTurn*turnDirection;
         }
         else
         {
             result.pd.cmdVel = searchVelocity;
-            result.pd.cmdError = 0.0;
+            result.pd.cmdAngularError = 0.0;
         }
 
         //must see greater than this many tags before assuming we are driving into the center and not along an edge.
@@ -186,7 +186,7 @@ Result DropOffController::CalculateResult() {
         else
         {
             result.pd.cmdVel = searchVelocity;
-            result.pd.cmdError = 0.0;
+            result.pd.cmdAngularError = 0.0;
         }
 
         return result;
@@ -205,7 +205,7 @@ Result DropOffController::CalculateResult() {
 
 void DropOffController::Reset() {
     result.pd.cmdVel = 0;
-    result.pd.cmdError = 0;
+    result.pd.cmdAngularError = 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
     spinner = 0;

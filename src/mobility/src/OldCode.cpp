@@ -26,9 +26,6 @@ bool centerSeen = false;
 // back out, and reset the boolean cascade.
 bool reachedCollectionPoint = false;
 
-// used for calling code once but not in main
-bool init = false;
-
 // used to remember place in mapAverage array
 int mapCount = 0;
 
@@ -87,26 +84,8 @@ mapAverage();
 
 
 
-    // time since timerStartTime was set to current time
-    timerTimeElapsed = time(0) - timerStartTime;
 
-    // init code goes here. (code that runs only once at start of
-    // auto mode but wont work in main goes here)
-    if (!init) {
-        if (timerTimeElapsed > startDelayInSeconds) {
-            // Set the location of the center circle location in the map
-            // frame based upon our current average location on the map.
-            centerLocationMap.x = currentLocationAverage.x;
-            centerLocationMap.y = currentLocationAverage.y;
-            centerLocationMap.theta = currentLocationAverage.theta;
 
-            // initialization has run
-            init = true;
-        } else {
-            return;
-        }
-
-    }
 
     // If no collected or detected blocks set fingers
     // to open wide and raised position.
