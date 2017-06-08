@@ -5,8 +5,8 @@ PickUpController::PickUpController() {
     timeOut = false;
     nTargetsSeen = 0;
     blockYawError = 0;
-    blockDist = 0;
-    td = 0;
+    blockDistance = 0;
+    timeDifference = 0;
     
     result.type;
     result.pd.cmdVel = 0;
@@ -30,13 +30,12 @@ Result PickUpController::run() {
     
 }
 
-bool PickUpController::setData(const apriltags_ros::AprilTagDetectionArray::ConstPtr &message) {
+void PickUpController::updateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr &message) {
     
     if (message->detections.size() > 0) {
         
         float cameraOffsetCorrection = 0.020; //meters;
         
-        nTargetsSeen = 0;
         nTargetsSeen = message->detections.size();
         
         double closest = std::numeric_limits<double>::max();
@@ -47,11 +46,11 @@ bool PickUpController::setData(const apriltags_ros::AprilTagDetectionArray::Cons
                 
                 geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
                 double test = hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z); //absolute distance to block from camera lense
-                
                 if (closest > test)
                 {
                     target = i;
                     closest = test;
+                    targetFound = true;
                 }
             }
             else {
@@ -61,19 +60,22 @@ bool PickUpController::setData(const apriltags_ros::AprilTagDetectionArray::Cons
         
         geometry_msgs::PoseStamped tagPose = message->detections[target].pose;
                 
-        blockDist = hypot(tagPose.pose.position.z, tagPose.pose.position.y); //distance from bottom center of chassis ignoring height.
-        if ( (blockDist*blockDist - 0.195*0.195) > 0 )
+        blockDistance = hypot(tagPose.pose.position.z, tagPose.pose.position.y); //distance from bottom center of chassis ignoring height.
+        if ( (blockDistance*blockDistance - 0.195*0.195) > 0 )
         {
-            blockDist = sqrt(blockDist*blockDist - 0.195*0.195);
+            blockDistance = sqrt(blockDistance*blockDistance - 0.195*0.195);
         }
         else
         {
             float epsilon = 0.00001; // A small non-zero positive number
-            blockDist = epsilon;
+            blockDistance = epsilon;
         }
-        blockYawError = atan((tagPose.pose.position.x + cameraOffsetCorrection)/blockDist)*1.05; //angle to block from bottom center of chassis on the horizontal.
-        if ( blockYawError > 10) blockYawError = 10; //limits block angle error to prevent overspeed from PID.
-        if ( blockYawError < - 10) blockYawError = -10; //due to detcetion dropping out when moveing quickly
+        blockYawError = atan((tagPose.pose.position.x + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
+
+        if(blockYawError > 10) blockYawError =10;
+        if(blockYawError < -10) blockYawError = -10;
+
+
         
 
         
@@ -81,7 +83,7 @@ bool PickUpController::setData(const apriltags_ros::AprilTagDetectionArray::Cons
         //diffrence between current time and millisecond time
         ros::Duration Tdiff = ros::Time::now() - millTimer;
         float Td = Tdiff.sec + Tdiff.nsec/1000000000;
-        
+     
         if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.13 && Td < 3.8) {
             result.type = behavior;
             result.b = targetPickedUp;
@@ -97,18 +99,23 @@ bool PickUpController::setData(const apriltags_ros::AprilTagDetectionArray::Cons
     }
 }
 
+
+bool PickUpController::getData(){
+    return targetFound;
+}
+
 void PickUpController::pickUpSelectedTarget(bool blockBlock) {
     //threshold distance to be from the target block before attempting pickup
-    float targetDist = 0.25; //meters
+    float targetDistance = 0.25; //meters
     
     
     // millisecond time = current time if not in a counting state
     if (!timeOut) millTimer = ros::Time::now();
     
     //diffrence between current time and millisecond time
-    ros::Duration Tdiff = ros::Time::now() - millTimer;
-    float Td = Tdiff.sec + Tdiff.nsec/1000000000.0;
-    td = Td;
+    ros::Duration Tdifference = ros::Time::now() - millTimer;
+    float Td = Tdifference.sec + Tdifference.nsec/1000000000.0;
+    timeDifference = Td;
     
     if (nTargetsSeen == 0 && !lockTarget) //if not targets detected and a target has not been locked in
     {
@@ -126,9 +133,9 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
             result.pd.cmdAngular = 0.0;
         }
     }
-    else if (blockDist > targetDist && !lockTarget) //if a target is detected but not locked, and not too close.
+    else if (blockDistance > targetDistance && !lockTarget) //if a target is detected but not locked, and not too close.
     {
-        float vel = blockDist * 0.20;
+        float vel = blockDistance * 0.20;
         if (vel < 0.1) vel = 0.1;
         if (vel > 0.2) vel = 0.2;
         result.pd.cmdVel = vel;
@@ -195,8 +202,8 @@ void PickUpController::reset() {
     timeOut = false;
     nTargetsSeen = 0;
     blockYawError = 0;
-    blockDist = 0;
-    td = 0;
+    blockDistance = 0;
+    timeDifference = 0;
     
     result.pd.cmdVel = 0;
     result.pd.cmdAngular = 0;

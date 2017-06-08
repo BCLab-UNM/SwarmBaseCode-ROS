@@ -1,5 +1,5 @@
 #include "SearchController.h"
-
+#include "StandardVars.h"
 SearchController::SearchController() {
   rng = new random_numbers::RandomNumberGenerator();
 }
@@ -7,33 +7,45 @@ SearchController::SearchController() {
 /**
  * This code implements a basic random walk search.
  */
-geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLocation) {
-  geometry_msgs::Pose2D goalLocation;
-
+Result SearchController::search() {
+   res.type = waypoint;
+   geometry_msgs::Pose2D  searchLocation;
+      
   //select new heading from Gaussian distribution around current heading
-  goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+  searchLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+  
+  //selec.t new position 50 cm from current location
+  searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+  searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+  res.wpts.waypoints[0] = searchLocation;
+         
+  return res;
+  
+}
 
-  //select new position 50 cm from current location
-  goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-  goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
-
-  return goalLocation;
+void SearchController::setCurrentLocation(geometry_msgs::Pose2D currentLocation){
+    
+   this->currentLocation = currentLocation;
 }
 
 /**
  * Continues search pattern after interruption. For example, avoiding the
  * center or collisions.
  */
-geometry_msgs::Pose2D SearchController::continueInterruptedSearch(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D oldGoalLocation) {
-  geometry_msgs::Pose2D newGoalLocation;
+Result SearchController::continueInterruptedSearch(geometry_msgs::Pose2D oldSearchLocation){
+    res.type = waypoint;
+    
+    geometry_msgs::Pose2D newSearchLocation;
 
   //remainingGoalDist avoids magic numbers by calculating the dist
-  double remainingGoalDist = hypot(oldGoalLocation.x - currentLocation.x, oldGoalLocation.y - currentLocation.y);
+
+  double remainingGoalDist = hypot(oldSearchLocation.x - currentLocation.x, oldSearchLocation.y - currentLocation.y);
 
   //this of course assumes random walk continuation. Change for diffrent search methods.
-  newGoalLocation.theta = oldGoalLocation.theta;
-  newGoalLocation.x = currentLocation.x + (0.50 * cos(oldGoalLocation.theta)); //(remainingGoalDist * cos(oldGoalLocation.theta));
-  newGoalLocation.y = currentLocation.y + (0.50 * sin(oldGoalLocation.theta)); //(remainingGoalDist * sin(oldGoalLocation.theta));
+  newSearchLocation.theta = oldSearchLocation.theta;
+  newSearchLocation.x = currentLocation.x + (0.50 * cos(oldSearchLocation.theta)); //(remainingGoalDist * cos(oldGoalLocation.theta));
+  newSearchLocation.y = currentLocation.y + (0.50 * sin(oldSearchLocation.theta)); //(remainingGoalDist * sin(oldGoalLocation.theta));
+  res.wpts.waypoints[0] = newSearchLocation;
 
-  return newGoalLocation;
+  return res;
 }

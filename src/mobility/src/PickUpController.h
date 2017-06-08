@@ -15,11 +15,12 @@ class PickUpController
 
   void pickUpSelectedTarget(bool blockBlock);
   
-  bool setData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+  void updateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+  bool getData();
 
-  float getDist() {return blockDist;}
+  float getDistance() {return blockDistance;}
   bool getLockTarget() {return lockTarget;}
-  float getTD() {return td;}
+  float getTD() {return timeDifference;}
 
   void reset();
 
@@ -27,7 +28,7 @@ private:
   //set true when the target block is less than targetDist so we continue attempting to pick it up rather than
   //switching to another block that is in view
   bool lockTarget; 
-  
+
   bool targetFound;
   bool targetCollected;
 
@@ -40,11 +41,11 @@ private:
   double blockYawError;
   
   //distance to target block from front of robot
-  double blockDist;
+  double blockDistance;
 
   //struct for returning data to mobility
   Result result;
 
-  float td;
+  float timeDifference;
 };
 #endif // end header define
