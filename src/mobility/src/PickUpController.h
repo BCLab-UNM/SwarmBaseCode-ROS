@@ -13,15 +13,15 @@ class PickUpController
   
   Result run();
 
-  void pickUpSelectedTarget(bool blockBlock);
+  Result CalculateResult();
   
-  void updateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
-  bool getData();
+  void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+  bool ShouldInterrupt();
 
   float getDistance() {return blockDistance;}
-  bool getLockTarget() {return lockTarget;}
-  float getTD() {return timeDifference;}
-
+  bool GetLockTarget() {return lockTarget;}
+  float GetTD() {return timeDifference;}
+  void SetUltraSoundData(bool blockBlock);
   void reset();
 
 private:
@@ -46,6 +46,10 @@ private:
   //struct for returning data to mobility
   Result result;
 
+  bool blockBlock;
+
   float timeDifference;
+
+
 };
 #endif // end header define

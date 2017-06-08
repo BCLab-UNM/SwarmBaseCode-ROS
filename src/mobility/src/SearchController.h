@@ -15,18 +15,19 @@ class SearchController {
     SearchController();
 
     // performs search pattern
-    Result search();
+    Result CalculateResult();
 
-    // continues search pattern after interruption
-   Result continueInterruptedSearch(geometry_msgs::Pose2D oldGoalLocation);
+    bool ShouldInterrept();
+    void UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation);
+
    // sets the value of the current location 
 
 
   private:
 
-    void setCurrentLocation(geometry_msgs::Pose2D setLocation);
     random_numbers::RandomNumberGenerator* rng;
     geometry_msgs::Pose2D currentLocation;
+    geometry_msgs::Pose2D centerLocation;
     //struct for returning data to mobility
     Result res;
 };

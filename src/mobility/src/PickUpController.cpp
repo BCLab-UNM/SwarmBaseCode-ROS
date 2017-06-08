@@ -30,7 +30,7 @@ Result PickUpController::run() {
     
 }
 
-void PickUpController::updateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr &message) {
+void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr &message) {
     
     if (message->detections.size() > 0) {
         
@@ -97,14 +97,19 @@ void PickUpController::updateData(const apriltags_ros::AprilTagDetectionArray::C
             result.wristAngle = 1.25;
         }
     }
+
+
 }
 
 
-bool PickUpController::getData(){
+bool PickUpController::ShouldInterrupt(){
     return targetFound;
 }
 
-void PickUpController::pickUpSelectedTarget(bool blockBlock) {
+
+
+Result PickUpController::CalculateResult() {      //****not named correctly and needs to return a properly formated result and be called CalculateResult that takes in no parameters
+                                                                    //instead blockBlock will be passaed in through a new method such as setUltraSoundData
     //threshold distance to be from the target block before attempting pickup
     float targetDistance = 0.25; //meters
     
@@ -142,7 +147,7 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
         result.pd.cmdAngular = -blockYawError/2;
         timeOut = false;
         nTargetsSeen = 0;
-        return;
+        return result;
     }
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
     {
@@ -162,7 +167,7 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
         result.pd.cmdVel = -0.1;
         result.pd.cmdAngular = 0.0;
         result.fingerAngle = 0;
-        return;
+        return result;
     }
     
     if (Td > 3.8 && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
@@ -192,6 +197,8 @@ void PickUpController::pickUpSelectedTarget(bool blockBlock) {
         result.pd.cmdVel = 0.0;
         result.pd.cmdAngular = 0.0;
     }
+
+        return result;
 }
 
 void PickUpController::reset() {
@@ -209,7 +216,13 @@ void PickUpController::reset() {
     result.pd.cmdAngular = 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
+};
+
+void PickUpController::SetUltraSoundData(bool blockBlock){
+    this->blockBlock = blockBlock;
 }
+
+
 
 PickUpController::~PickUpController() {
 }
