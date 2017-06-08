@@ -26,6 +26,7 @@ add_executable(
   src/DropOffController.cpp
   src/SearchController.cpp
   src/mobility.cpp
+  src/PID.cpp
 )
 
 add_dependencies(mobility ${catkin_EXPORTED_TARGETS})

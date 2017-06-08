@@ -24,6 +24,8 @@
 #include "SearchController.h"
 
 #include "StandardVars.h"
+#include "PID.h"
+#include <vector>
 
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
@@ -56,11 +58,20 @@ void resultHandler();
 
 void dropOffControllerUpdateData();
 
+//PID configs************************
+PIDConfig fastVelConfig();
+PIDConfig fastYawConfig();
+
+void fastPID(float vel,float yaw, float setPointVel, float setPointYaw);
+PID fastVelPID(fastVelConfig());
+PID fastYawPID(fastYawConfig());
+
+
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
 geometry_msgs::Pose2D currentLocationAverage;
-list<geometry_msgs::Pose2D> waypoints;
+vector<geometry_msgs::Pose2D> waypoints;
 
 geometry_msgs::Pose2D centerLocation;
 geometry_msgs::Pose2D centerLocationMap;
@@ -108,6 +119,7 @@ enum ProcessLoopStates {
 
 int stateMachineState = STATE_MACHINE_INTERRUPT;
 int procceseLoopState = PROCCESS_LOOP_SEARCHING;
+
 
 geometry_msgs::Twist velocity;
 char host[128];
@@ -206,6 +218,10 @@ int main(int argc, char **argv) {
     targetDetectedTimer = mNH.createTimer(ros::Duration(0), targetDetectedReset, true);
     
     publish_heartbeat_timer = mNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
+       
+   
+    
+    
     
     tfListener = new tf::TransformListener();
     std_msgs::String msg;
@@ -240,14 +256,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         
         
         //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
-        //This should be done as little as possible. I Suggest to Use timeouts to set control bools false.
+        //This should be d one as little as possible. I Suggest to Use timeouts to set control bools false.
         //Then only call INTERUPT if bool switches to true.
         case STATE_MACHINE_INTERRUPT: {
             stateMachineMsg.data = "INTERRUPT";
             
             if (procceseLoopState == PROCCESS_LOOP_SEARCHING) {
                 if (targetsFound) {
-                    result = pickUpController.run();
+                    //result = pickUpController.makeDecision();
                     if (result.type == behavior) {
                         if (result.b == targetPickedUp) {
                             procceseLoopState = PROCCESS_LOOP_TARGETCOLLECTED;
@@ -264,7 +280,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             
             if (obstacleDetected) {
-                
+               /* result = obstacleController.makeDecision();
+                if (result.type == behavior) {
+                    
+                }
+                else {
+                    resultHandler();
+                }
+                */
             }
             
             if (procceseLoopState == PROCCESS_LOOP_TARGETCOLLECTED) {
@@ -287,11 +310,18 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             
             if (waypointsAvalible) {
+                stateMachineState = STATE_MACHINE_WAYPOINTS;
                 
             }
             
             if (pathPlanningRequired) {
-                
+                //result = searchController.makeDecision();
+                if (result.type == behavior) {
+
+                }
+                else {
+                    resultHandler();
+                }
             }
             
             
@@ -300,7 +330,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             //Handles route planning and navigation as well as makeing sure all waypoints are valid.
         case STATE_MACHINE_WAYPOINTS: {
              stateMachineMsg.data = "MANAGE_WAYPOINTS";
-             
              
              stateMachineState = STATE_MACHINE_ROTATE;
         }            
@@ -312,10 +341,10 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             stateMachineMsg.data = "ROTATING";
             
             // Calculate the diffrence between current and desired heading in radians.
-            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta);
+            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
             
             // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta)) > rotateOnlyAngleTolerance) {
+            if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
                 // rotate but dont drive.
                 sendDriveCommand(0.0, errorYaw);
                 break;
@@ -325,22 +354,22 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 //fall through on purpose.
             }
         }
-            // Calculate angle between currentLocation.x/y and waypoints.front().x/y
+            // Calculate angle between currentLocation.x/y and waypoints.back().x/y
             // Drive forward
             // Stay in this state until angle is at least PI/2
         case STATE_MACHINE_SKID_STEER: {
             stateMachineMsg.data = "SKID_STEER";
             
             // calculate the distance between current and desired heading in radians
-            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta);
+            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
             
             // goal not yet reached drive while maintaining proper heading.
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.front().y - currentLocation.y, waypoints.front().x - currentLocation.x))) < M_PI_2) {
+            if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
                 // drive and turn simultaniously
                 sendDriveCommand(searchVelocity, errorYaw/2);
             }
             // goal is reached but desired heading is still wrong turn only
-            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.front().theta)) > 0.1) {
+            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > 0.1) {
                 // rotate but dont drive
                 sendDriveCommand(0.0, errorYaw);
             }
@@ -377,10 +406,10 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     dropOffControllerUpdateData();
 }
 
-void sendDriveCommand(double linearVel, double angularError)
+void sendDriveCommand(double left, double right)
 {
-    velocity.linear.x = linearVel,
-            velocity.angular.z = angularError;
+    velocity.linear.x = left,
+            velocity.angular.z = right;
     
     // publish the drive commands
     driveControlPublish.publish(velocity);
@@ -474,13 +503,13 @@ void resultHandler()
     fingerAnglePublish.publish(angle);
   
     if (result.type == waypoint) {
-        for (int i = result.wpts.waypointCount; i > 0; i--) {
-            waypoints.push_front(result.wpts.waypoint[i]);
+        if (!result.wpts.waypoints.empty()) {
+            waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
         }
     }
     else if (!result.type == waypoint) {
         if (result.PIDMode == FAST_PID){
-            //fastPID(result.cmdVel,result.cmdError); needs declaration
+            fastPID(result.pd.cmdVel,result.pd.cmdError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
         }
         else if (result.PIDMode == SLOW_PID) {
             //slowPID(result.cmdVel,result.cmdError); needs declaration
@@ -494,6 +523,65 @@ void resultHandler()
 void dropOffControllerUpdateData() {
     
 }
+
+void fastPID(float vel, float yaw , float setPointVel, float setPointYaw) {
+    float velOut = fastVelPID.PIDOut(vel, setPointVel);
+    float yawOut = fastYawPID.PIDOut(yaw, setPointYaw);
+    
+    int left = velOut - yawOut;
+    int right = velOut + yawOut;
+    
+    int sat = 255;
+    if (left  >  sat) {left  =  sat;}
+    if (left  < -sat) {left  = -sat;}
+    if (right >  sat) {right =  sat;}
+    if (right < -sat) {right = -sat;}
+    
+    sendDriveCommand(left,right);
+}
+
+PIDConfig fastVelConfig() {
+    PIDConfig config;
+    
+    config.Kp = 140;
+    config.Ki = 20;
+    config.Kd = 15;
+    config.satUpper = 255; 
+    config.satLower = -255; 
+    config.antiWindup = config.satUpper/2; 
+    config.errorHistLength = 4;
+    config.alwaysIntegral = false; 
+    config.resetOnSetpoint = true;
+    config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
+    config.integralDeadZone = 0.01;
+    config.integralErrorHistoryLength = 10000;
+    config.integralMax = config.satUpper/2;
+    
+    return config;
+    
+}
+
+PIDConfig fastYawConfig() {
+    PIDConfig config;
+    
+    config.Kp = 200;
+    config.Ki = 15;
+    config.Kd = 15;
+    config.satUpper = 255; 
+    config.satLower = -255; 
+    config.antiWindup = config.satUpper/2; 
+    config.errorHistLength = 4;
+    config.alwaysIntegral = false; 
+    config.resetOnSetpoint = true;
+    config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
+    config.integralDeadZone = 0.01;
+    config.integralErrorHistoryLength = 10000;
+    config.integralMax = config.satUpper/2;
+    
+    return config;
+    
+}
+
 
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
     std_msgs::String msg;

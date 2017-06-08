@@ -2,6 +2,7 @@
 #define STANDARDVARS_H
 
 #include <geometry_msgs/Pose2D.h>
+#include <vector>
 
 //this file contains variable declarations that are used throught multiple classes such as the Results struct.
 using namespace std;
@@ -30,11 +31,12 @@ struct PrecisionDriving {
     float cmdVel;
     float cmdError;
     float cmdAngular;
+    float setPointVel;
+    float setPointYaw;
 };
 
 struct Waypoints {
-    int waypointCount;
-    geometry_msgs::Pose2D waypoint[50];
+    vector<geometry_msgs::Pose2D> waypoints;
 };
 
 
@@ -49,14 +51,35 @@ public:
                                                                      PIDMode(PID) {
         if(this->type == behavior) {
             this->b = init;
-        } else if(this->type == waypoint) {
-            this->wpts.waypointCount = 0;
         } else if(this->type == precisionDriving) {
             this->pd.cmdVel = 0.0f;
             this->pd.cmdError = 0.0f;
             this->pd.cmdAngular = 0.0f;
         }
+        
     }
+    
+    inline Result(const Result& r) : Result(r.type, r.fingerAngle, r.wristAngle, r.PIDMode) {
+        if(r.type == behavior) {
+            this->b = r.b;
+        } else if(r.type == waypoint) {
+            this->wpts.waypoints = r.wpts.waypoints;
+        } else if(r.type == precisionDriving) {
+            this->pd = r.pd;
+        }
+    }
+    
+    inline Result(Result&& r) : Result(r.type, r.fingerAngle, r.wristAngle, r.PIDMode) {
+        if(r.type == behavior) {
+            this->b = r.b;
+        } else if(r.type == waypoint) {
+            this->wpts.waypoints = r.wpts.waypoints;
+        } else if(r.type == precisionDriving) {
+            this->pd = r.pd;
+        }
+    }
+    
+    ~Result() {}
 
     ResultType type;
     union {
