@@ -109,22 +109,23 @@ std_msgs::String msg;
 
 // state machine states
 enum StateMachineStates {
-    STATE_MACHINE_INTERRUPT,
+    STATE_MACHINE_INTERRUPT = 0,
+    STATE_MACHINE_WAYPOINTS,
     STATE_MACHINE_ROTATE,
     STATE_MACHINE_SKID_STEER,
     STATE_MACHINE_PICKUP,
-    STATE_MACHINE_DROPOFF,
-    STATE_MACHINE_WAYPOINTS
+    STATE_MACHINE_DROPOFF
+
 };
 
 enum ProcessLoopStates {
-    PROCCESS_LOOP_SEARCHING,
+    PROCCESS_LOOP_SEARCHING = 0,
     PROCCESS_LOOP_TARGET_PICKEDUP
 };
 
 
-int stateMachineState = STATE_MACHINE_INTERRUPT;
-int proccessLoopState = PROCCESS_LOOP_SEARCHING;
+StateMachineStates stateMachineState = STATE_MACHINE_INTERRUPT;
+ProcessLoopStates proccessLoopState = PROCCESS_LOOP_SEARCHING;
 
 
 geometry_msgs::Twist velocity;
@@ -349,20 +350,16 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             
             if (waypointsAvalible) {
-                msg.data = "Waypoints";
-                infoLogPublisher.publish(msg);
                 stateMachineState = STATE_MACHINE_WAYPOINTS;
-                
+                stringstream ss;
+                ss << "state is now waypoints : " << stateMachineState;
+                msg.data = ss.str();
+                infoLogPublisher.publish(msg);
+                break;
             }
             
             if (pathPlanningRequired) {
-                msg.data = "Search";
-                infoLogPublisher.publish(msg);
                 result = searchController.CalculateResult();
-                stringstream ss;
-                ss << "results type search : " << result.type;
-                msg.data = ss.str();
-                infoLogPublisher.publish(msg);
                 if (result.type == behavior) {
 
                 }
@@ -373,37 +370,40 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
             msg.data = "End of Interupt";
             infoLogPublisher.publish(msg);
-            
-           break;
+            break;
         }
-            
+
             //Handles route planning and navigation as well as makeing sure all waypoints are valid.
         case STATE_MACHINE_WAYPOINTS: {
-             stateMachineMsg.data = "MANAGE_WAYPOINTS";
-                          
-             bool toClose = true;
-             while (!waypoints.empty() && toClose) {
-                 if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
-                     waypoints.pop_back();   
-                 }
-                 else {
-                     toClose = false;
-                 }
-             }
-             if (waypoints.empty()) {
-                 stateMachineState = STATE_MACHINE_INTERRUPT;
-                 waypointsAvalible = false;
-                 break;
-             }
-             else {
-                 waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
-                 stateMachineState = STATE_MACHINE_ROTATE;
-                 //fall through on purpose
-             }
-             
-             
-        }            
-            
+            stateMachineMsg.data = "MANAGE_WAYPOINTS";
+
+            msg.data = "In waypoint state";
+            infoLogPublisher.publish(msg);
+
+            bool toClose = true;
+            while (!waypoints.empty() && toClose) {
+                if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
+                    waypoints.pop_back();
+                    msg.data = "Clear vector";
+                    infoLogPublisher.publish(msg);
+                }
+                else {
+                    toClose = false;
+                }
+            }
+            if (waypoints.empty()) {
+                stateMachineState = STATE_MACHINE_INTERRUPT;
+                waypointsAvalible = false;
+                break;
+            }
+            else {
+                waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
+                stateMachineState = STATE_MACHINE_ROTATE;
+                //fall through on purpose
+            }
+
+
+        }
             // Calculate angle between currentLocation.theta and waypoints.front().theta
             // Rotate left or right depending on sign of angle
             // Stay in this state until angle is minimized
@@ -412,11 +412,17 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             // Calculate the diffrence between current and desired heading in radians.
             float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
+
+            result.pd.setPointVel = 0.0;
+            result.pd.setPointYaw = waypoints.back().theta;
             
             // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
             if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
                 // rotate but dont drive.
-                sendDriveCommand(0.0, errorYaw);
+
+                if (result.PIDMode == FAST_PID){
+                    fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+                }
                 break;
             } else {
                 // move to differential drive step
@@ -432,16 +438,24 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             // calculate the distance between current and desired heading in radians
             float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
+
+            result.pd.setPointYaw = waypoints.back().theta;
             
             // goal not yet reached drive while maintaining proper heading.
             if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
                 // drive and turn simultaniously
-                sendDriveCommand(searchVelocity, errorYaw/2);
+                result.pd.setPointVel = searchVelocity;
+                if (result.PIDMode == FAST_PID){
+                    fastPID(searchVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+                }
             }
             // goal is reached but desired heading is still wrong turn only
             else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > 0.1) {
                 // rotate but dont drive
-                sendDriveCommand(0.0, errorYaw);
+                result.pd.setPointVel = 0.0;
+                if (result.PIDMode == FAST_PID){
+                    fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+                }
             }
             else {
                 // stop
@@ -455,7 +469,9 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             break;
         }
             
-            
+        default: {
+            break;
+        }
             
             
         }
@@ -477,8 +493,10 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     
     if (!dropOffWayPoints) { //check if we have triggered this interupt already if so ignore it
         dropOffWayPoints = dropOffController.ShouldInterrupt(); //trigger waypoints interupt for drop off flag is true
-        stateMachineState = STATE_MACHINE_INTERRUPT;
-        dropOffPrecision = false; //we cannot precision drive if we want to waypoint drive.
+        if(dropOffWayPoints) {
+            stateMachineState = STATE_MACHINE_INTERRUPT;
+            dropOffPrecision = false; //we cannot precision drive if we want to waypoint drive.
+        }
     }
 
     searchController.UpdateData(currentLocation, centerLocation);
@@ -535,8 +553,10 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
 
     obstacleController.UpdateData(sonarLeft->range, sonarCenter->range, sonarRight->range, currentLocation);
     if (!obstacleDetected) {
-    obstacleDetected = obstacleController.ShouldInterrupt();
-    stateMachineState = STATE_MACHINE_INTERRUPT;
+        obstacleDetected = obstacleController.ShouldInterrupt();
+        if (obstacleDetected) {
+            stateMachineState = STATE_MACHINE_INTERRUPT;
+        }
     }
     
     if (sonarCenter->range < 0.1) {
@@ -610,10 +630,12 @@ void resultHandler()
     if (result.type == waypoint) {
         if (!result.wpts.waypoints.empty()) {
             waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
+            msg.data = "not empty";
+            infoLogPublisher.publish(msg);
             waypointsAvalible = true;
         }
     }
-    else if (!result.type == waypoint) {
+    else if (result.type == precisionDriving) {
         if (result.PIDMode == FAST_PID){
             fastPID(result.pd.cmdVel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
         }
@@ -630,6 +652,11 @@ void resultHandler()
 void fastPID(float vel, float yaw , float setPointVel, float setPointYaw) {
     float velOut = fastVelPID.PIDOut(vel, setPointVel);
     float yawOut = fastYawPID.PIDOut(yaw, setPointYaw);
+
+    stringstream ss;
+    ss << "velOut : " << velOut << " yawOut : " << yawOut;
+    msg.data = ss.str();
+    infoLogPublisher.publish(msg);
     
     int left = velOut - yawOut;
     int right = velOut + yawOut;
