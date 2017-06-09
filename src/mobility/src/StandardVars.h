@@ -42,59 +42,11 @@ struct Waypoints {
 
 struct Result {
     
-public:
-    inline Result() : Result(precisionDriving, -1.0f, -1.0f, FAST_PID) {}
-    
-    inline Result(ResultType t, float fingerAng, float wristAng, PIDType PID) : type(t), 
-                                                                     fingerAngle(fingerAng), 
-                                                                     wristAngle(wristAng), 
-                                                                     PIDMode(PID) {
-        if(this->type == behavior) {
-            this->b = init;
-        } else if(this->type == precisionDriving) {
-            this->pd.cmdVel = 0.0f;
-            this->pd.cmdAngularError = 0.0f;
-            this->pd.cmdAngular = 0.0f;
-            this->pd.setPointVel = 0.0f;
-            this->pd.setPointYaw = 0.0f;
-        }
-        
-    }
-    
-    inline Result(const Result& r) : Result(r.type, r.fingerAngle, r.wristAngle, r.PIDMode) {
-        if(r.type == behavior) {
-            this->b = r.b;
-        } else if(r.type == waypoint) {
-            this->wpts.waypoints = r.wpts.waypoints;
-        } else if(r.type == precisionDriving) {
-            this->pd = r.pd;
-        }
-    }
-    
-    
-    ~Result() {}
-    
-    Result& operator=(const Result& r) {
-        this->type = r.type;
-        this->fingerAngle = r.fingerAngle;
-        this->wristAngle = r.wristAngle;
-        this->PIDMode = r.PIDMode;
-        
-        if(r.type == behavior) {
-            this->b = r.b;
-        } else if(r.type == waypoint) {
-            this->wpts.waypoints = r.wpts.waypoints;
-        } else if(r.type == precisionDriving) {
-            this->pd = r.pd;
-        }
-    }
-    
     ResultType type;
-    union {
-        BehaviorTrigger b;
-        Waypoints wpts;
-        PrecisionDriving pd;
-    };
+
+    BehaviorTrigger b;
+    Waypoints wpts;
+    PrecisionDriving pd;
     
     float fingerAngle;
     float wristAngle;
