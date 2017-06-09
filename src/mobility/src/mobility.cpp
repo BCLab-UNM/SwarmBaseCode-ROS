@@ -25,7 +25,7 @@
 #include "PickUpController.h"
 #include "DropOffController.h"
 #include "SearchController.h"
-#include "obstaclecontoller.h"
+#include "ObstacleController.h"
 
 #include "StandardVars.h"
 #include "PID.h"
@@ -152,7 +152,6 @@ ros::Subscriber mapSubscriber;
 // Timers
 ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
-ros::Timer targetDetectedTimer;
 ros::Timer publish_heartbeat_timer;
 
 // records time for delays in sequanced actions, 1 second resolution.
@@ -177,7 +176,6 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
-void targetDetectedReset(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);
 
@@ -223,7 +221,6 @@ int main(int argc, char **argv) {
     
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
     stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
-    targetDetectedTimer = mNH.createTimer(ros::Duration(0), targetDetectedReset, true);
     
     publish_heartbeat_timer = mNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
        

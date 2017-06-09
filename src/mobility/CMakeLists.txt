@@ -21,7 +21,8 @@ include_directories(
 )
 
 add_executable(
-  mobility 
+  mobility
+  src/ObstacleController.cpp 
   src/PickUpController.cpp
   src/DropOffController.cpp
   src/SearchController.cpp
