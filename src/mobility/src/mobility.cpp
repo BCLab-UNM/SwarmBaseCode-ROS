@@ -124,7 +124,7 @@ enum ProcessLoopStates {
 
 
 int stateMachineState = STATE_MACHINE_INTERRUPT;
-int procceseLoopState = PROCCESS_LOOP_SEARCHING;
+int proccessLoopState = PROCCESS_LOOP_SEARCHING;
 
 
 geometry_msgs::Twist velocity;
@@ -286,7 +286,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             msg.data = "Interrupt";
             infoLogPublisher.publish(msg);
 
-            if (procceseLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
+            if (proccessLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
                 if (targetsFound) {
                     msg.data = "Targets";
                     infoLogPublisher.publish(msg);
@@ -294,7 +294,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     result = pickUpController.CalculateResult();
                     if (result.type == behavior) {
                         if (result.b == targetPickedUp) {
-                            procceseLoopState = PROCCESS_LOOP_TARGET_PICKEDUP;
+                            proccessLoopState = PROCCESS_LOOP_TARGET_PICKEDUP;
                             dropOffController.SetTargetPickedUp();
                         }
                         else if (result.b == targetLost) {
@@ -321,7 +321,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 }                
             }
             
-            if (procceseLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
+            if (proccessLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
                 
                 if (targetsCollected) {
                     msg.data = "DroppOff";
@@ -331,13 +331,13 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     
                     if (result.type == behavior) {
                         if (result.b == targetDropped) {
-                            procceseLoopState = PROCCESS_LOOP_SEARCHING;
+                            proccessLoopState = PROCCESS_LOOP_SEARCHING;
                             targetsCollected = false;
                             dropOffWayPoints = false;
                              dropOffPrecision = false;
                         }
                         else if (result.b == targetReturned) {
-                            procceseLoopState = PROCCESS_LOOP_SEARCHING;
+                            proccessLoopState = PROCCESS_LOOP_SEARCHING;
                             targetsCollected = false;
                             dropOffWayPoints = false;
                         }
@@ -356,9 +356,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             
             if (pathPlanningRequired) {
-                //result = searchController.CalculateResult();
+                msg.data = "Search";
+                infoLogPublisher.publish(msg);
+                result = searchController.CalculateResult();
                 stringstream ss;
-                ss << "results type search " << result.type;
+                ss << "results type search : " << result.type;
                 msg.data = ss.str();
                 infoLogPublisher.publish(msg);
                 if (result.type == behavior) {
@@ -368,8 +370,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     resultHandler();
                 }
             }
+
+            msg.data = "End of Interupt";
+            infoLogPublisher.publish(msg);
             
-            
+           break;
         }
             
             //Handles route planning and navigation as well as makeing sure all waypoints are valid.
@@ -493,8 +498,8 @@ void sendDriveCommand(double left, double right)
  *************************/
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
-
-    if (procceseLoopState == PROCCESS_LOOP_SEARCHING) {
+    
+    if (proccessLoopState == PROCCESS_LOOP_SEARCHING) {
         pickUpController.UpdateData(message); //send april tag data to pickUpController
         if (!targetsFound) {
             targetsFound = pickUpController.ShouldInterrupt(); //set this flag to indicate we found a target and thus handle the interupt

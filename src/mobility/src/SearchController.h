@@ -29,7 +29,7 @@ class SearchController {
     geometry_msgs::Pose2D currentLocation;
     geometry_msgs::Pose2D centerLocation;
     //struct for returning data to mobility
-    Result res;
+    Result result;
 };
 
 #endif /* SEARCH_CONTROLLER */
