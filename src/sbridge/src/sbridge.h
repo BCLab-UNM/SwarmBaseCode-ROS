@@ -22,6 +22,7 @@ class sbridge {
 
 		sbridge(std::string publishedName);
 		void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
+        void modeHandler(const std_msgs::UInt8::ConstPtr& message);
         ~sbridge();
 
 	private:
@@ -33,6 +34,7 @@ class sbridge {
 
 		//Subscribers
 		ros::Subscriber driveControlSubscriber;
+        ros::Subscriber modeSubscriber;
 
         //Timer callback handler
         void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
@@ -40,6 +42,8 @@ class sbridge {
         ros::Timer publish_heartbeat_timer;
 
 		geometry_msgs::Twist velocity;
+
+        int currentMode;
 };
 
 #endif /* SBRIDGE */

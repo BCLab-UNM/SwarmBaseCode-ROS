@@ -88,6 +88,7 @@ ros::Timer publish_heartbeat_timer;
 
 //Callback handlers
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
+void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 
 int main(int argc, char **argv) {
     
@@ -99,7 +100,7 @@ int main(int argc, char **argv) {
     string devicePath;
     param.param("device", devicePath, string("/dev/ttyUSB0"));
     usb.openUSBPort(devicePath, baud);
-    void modeHandler(const std_msgs::UInt8::ConstPtr& message);
+
     
     sleep(5);
     

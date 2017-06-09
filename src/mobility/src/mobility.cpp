@@ -93,7 +93,7 @@ bool targetsCollected = false;
 
 bool waypointsAvalible = false;
 
-bool pathPlanningRequired = false;
+bool pathPlanningRequired = true;
 
 float searchVelocity = 0.2; // meters/second
 
@@ -269,7 +269,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         }
 
     }
-    
+
     
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
@@ -282,9 +282,15 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         //Then only call INTERUPT if bool switches to true.
         case STATE_MACHINE_INTERRUPT: {
             stateMachineMsg.data = "INTERRUPT";
-            
+
+            msg.data = "Interupt";
+            infoLogPublisher.publish(msg);
+
             if (procceseLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
                 if (targetsFound) {
+                    msg.data = "Targets";
+                    infoLogPublisher.publish(msg);
+
                     result = pickUpController.CalculateResult();
                     if (result.type == behavior) {
                         if (result.b == targetPickedUp) {
@@ -303,6 +309,9 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             
             if (obstacleDetected) {
+                msg.data = "Obstacle";
+                infoLogPublisher.publish(msg);
+
                result = obstacleController.CalculateResult();
                 if (result.type == behavior) {
                     
@@ -315,6 +324,9 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             if (procceseLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
                 
                 if (targetsCollected) {
+                    msg.data = "DroppOff";
+                    infoLogPublisher.publish(msg);
+
                     Result result = dropOffController.CalculateResult();
                     
                     if (result.type == behavior) {
@@ -337,12 +349,18 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             
             if (waypointsAvalible) {
+                msg.data = "Waypoints";
+                infoLogPublisher.publish(msg);
                 stateMachineState = STATE_MACHINE_WAYPOINTS;
                 
             }
             
             if (pathPlanningRequired) {
-                //result = searchController.makeDecision();
+                result = searchController.CalculateResult();
+                stringstream ss;
+                ss << "results type search " << result.type;
+                msg.data = ss.str();
+                infoLogPublisher.publish(msg);
                 if (result.type == behavior) {
 
                 }
@@ -457,7 +475,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         stateMachineState = STATE_MACHINE_INTERRUPT;
         dropOffPrecision = false; //we cannot precision drive if we want to waypoint drive.
     }
-    
+
     searchController.UpdateData(currentLocation, centerLocation);
 }
 
