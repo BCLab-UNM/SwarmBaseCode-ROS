@@ -283,7 +283,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         case STATE_MACHINE_INTERRUPT: {
             stateMachineMsg.data = "INTERRUPT";
 
-            msg.data = "Interupt";
+            msg.data = "Interrupt";
             infoLogPublisher.publish(msg);
 
             if (procceseLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
@@ -356,7 +356,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             }
             
             if (pathPlanningRequired) {
-                result = searchController.CalculateResult();
+                //result = searchController.CalculateResult();
                 stringstream ss;
                 ss << "results type search " << result.type;
                 msg.data = ss.str();
@@ -493,12 +493,20 @@ void sendDriveCommand(double left, double right)
  *************************/
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
-    
+
     if (procceseLoopState == PROCCESS_LOOP_SEARCHING) {
         pickUpController.UpdateData(message); //send april tag data to pickUpController
         if (!targetsFound) {
             targetsFound = pickUpController.ShouldInterrupt(); //set this flag to indicate we found a target and thus handle the interupt
-            stateMachineState = STATE_MACHINE_INTERRUPT;
+
+            if(targetsFound) {
+                msg.data = "A target has been found by " + publishedName;
+                infoLogPublisher.publish(msg);
+
+                stateMachineState = STATE_MACHINE_INTERRUPT;
+            } else {
+                msg.data = "A target was not found by " + publishedName;
+            }
         }
     }
     

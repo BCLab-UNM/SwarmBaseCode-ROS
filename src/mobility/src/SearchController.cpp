@@ -17,7 +17,7 @@ Result SearchController::CalculateResult() {
   //selec.t new position 50 cm from current location
   searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
   searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
-  res.wpts.waypoints[0] = searchLocation;
+  res.wpts.waypoints.insert(res.wpts.waypoints.begin(), searchLocation);
          
   return res;
   
