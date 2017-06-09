@@ -11,8 +11,6 @@ class PickUpController
   PickUpController();
   ~PickUpController();
   
-  Result run();
-
   Result CalculateResult();
   
   void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
@@ -30,7 +28,6 @@ private:
   bool lockTarget; 
 
   bool targetFound;
-  bool targetCollected;
 
   // Failsafe state. No legitimate behavior state. If in this state for too long return to searching as default behavior.
   bool timeOut;

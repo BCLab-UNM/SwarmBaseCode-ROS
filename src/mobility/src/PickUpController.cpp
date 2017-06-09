@@ -7,26 +7,14 @@ PickUpController::PickUpController() {
     blockYawError = 0;
     blockDistance = 0;
     timeDifference = 0;
+
+    targetFound = false;
     
     result.type;
     result.pd.cmdVel = 0;
     result.pd.cmdAngular = 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
-    
-}
-
-Result PickUpController::run() {
-    if (!targetCollected) {
-        result.type = precisionDriving;
-        
-        //pickUpSelectedTarget();
-    }
-    else {
-        
-    }
-    
-    return result;
     
 }
 
@@ -43,6 +31,8 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
         for (int i = 0; i < message->detections.size(); i++) { //this loop selects the closest visible block to makes goals for it
         
             if (message->detections[i].id == 0) {
+
+                targetFound = true;
                 
                 geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
                 double test = hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z); //absolute distance to block from camera lense
@@ -50,7 +40,6 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
                 {
                     target = i;
                     closest = test;
-                    targetFound = true;
                 }
             }
             else {
@@ -59,7 +48,9 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
         }
         
         geometry_msgs::PoseStamped tagPose = message->detections[target].pose;
-                
+
+
+        ///TODO: Explain the trig going on here- blockDistance is c, 0.195 is b; find a
         blockDistance = hypot(tagPose.pose.position.z, tagPose.pose.position.y); //distance from bottom center of chassis ignoring height.
         if ( (blockDistance*blockDistance - 0.195*0.195) > 0 )
         {
@@ -74,10 +65,6 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
 
         if(blockYawError > 10) blockYawError =10;
         if(blockYawError < -10) blockYawError = -10;
-
-
-        
-
         
         //if target is close enough
         //diffrence between current time and millisecond time
@@ -88,7 +75,7 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
             result.type = behavior;
             result.b = targetPickedUp;
         }
-        
+
         //Lower wrist and open fingures if no locked targt
         else if (!lockTarget)
         {
@@ -103,7 +90,9 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
 
 
 bool PickUpController::ShouldInterrupt(){
-    return targetFound;
+    bool tmp = targetFound;
+    targetFound = false;
+    return tmp;
 }
 
 
