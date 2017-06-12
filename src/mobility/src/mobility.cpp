@@ -541,6 +541,17 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
             dropOffPrecision = true; //set is repeat hold flag true to prevent multiple calls
         }
     }
+
+    obstacleController.UpdateData(message); //send april tag data to dropOffContoller
+    if(!targetsCollected){
+        if(!obstacleDetected) {
+            obstacleDetected = obstacleController.ShouldInterrupt();
+
+            if(obstacleDetected) {
+                stateMachineState = STATE_MACHINE_INTERRUPT;
+            }
+        }
+    }
     
 }
 
