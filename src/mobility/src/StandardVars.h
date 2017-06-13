@@ -24,7 +24,8 @@ enum BehaviorTrigger {
     targetDropped,
     targetReturned,
     targetLost,
-    targetPickedUp
+    targetPickedUp,
+    obstacleAvoided
 };
 
 struct PrecisionDriving {
