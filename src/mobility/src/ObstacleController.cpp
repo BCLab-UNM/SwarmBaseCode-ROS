@@ -46,11 +46,23 @@ Result ObstacleController::CalculateResult() {
 }
 
 
-void ObstacleController::UpdateData(float left, float center, float right ,geometry_msgs::Pose2D currentLocation) {
+void ObstacleController::UpdateData(float sonarleft, float sonarcenter, float sonarright ,geometry_msgs::Pose2D currentLocation) {
     
-    this->left = left;
-    this->right = right;
-    this->center = center;
+    this->left = sonarleft;
+    this->right = sonarright;
+    this->center = sonarcenter;
+
+    if(ignoreCenter){
+        if(this-> center >reactivateCenterThreshold){
+            ignoreCenter = false;
+
+        }
+        else{
+            this->center = 3;
+
+
+        }
+    }
     
     if (left < triggerDistance || right < triggerDistance || center < triggerDistance) {
         obstacleInterrupt = true;
@@ -89,6 +101,12 @@ void ObstacleController::UpdateData(const apriltags_ros::AprilTagDetectionArray:
 
 bool ObstacleController::ShouldInterrupt() {
     return obstacleInterrupt;
+}
+
+void ObstacleController::SetIgnoreCenter(){
+     ignoreCenter = true;
+
+
 }
 
 

@@ -589,6 +589,12 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
 
+   if(pickUpController.NewUpdateData(sonarCenter->range)){
+       obstacleController.SetIgnoreCenter();
+   }
+
+
+
     obstacleController.UpdateData(sonarLeft->range, sonarCenter->range, sonarRight->range, currentLocation);
     if (!obstacleDetected) {
         obstacleDetected = obstacleController.ShouldInterrupt();

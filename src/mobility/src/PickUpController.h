@@ -14,6 +14,7 @@ class PickUpController
   Result CalculateResult();
   
   void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+  bool NewUpdateData(float rangeCenter);
   bool ShouldInterrupt();
 
   float getDistance() {return blockDistance;}

@@ -47,6 +47,11 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
                 nTargetsSeen--;
             }
         }
+
+        if(!targetFound){
+            // Do nothing
+
+        }
         
         geometry_msgs::PoseStamped tagPose = message->detections[target].pose;
 
@@ -71,12 +76,12 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
         //diffrence between current time and millisecond time
         ros::Duration Tdiff = ros::Time::now() - millTimer;
         float Td = Tdiff.sec + Tdiff.nsec/1000000000;
-     
+
         if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.15 && Td < 3.8) {
+
             result.type = behavior;
             result.b = targetPickedUp;
         }
-
         //Lower wrist and open fingures if no locked targt
         else if (!lockTarget)
         {
@@ -85,6 +90,21 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
             result.wristAngle = 1.25;
         }
     }
+
+
+}
+
+
+bool PickUpController::NewUpdateData(float rangeCenter){
+
+    if (rangeCenter < 0.12 && targetFound) {
+        result.type = behavior;
+        result.b = targetPickedUp;
+        return true;
+    }
+
+    return false;
+
 
 
 }

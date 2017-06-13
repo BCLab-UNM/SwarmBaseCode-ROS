@@ -18,12 +18,13 @@ public:
     void UpdateData(float left, float center, float right, geometry_msgs::Pose2D currentLocation);
     bool ShouldInterrupt();
     void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+    void SetIgnoreCenter();
 
     
 private:
 
     const float K_angular = 0.01500f;
-
+    const int reactivateCenterThreshold = 0.8;
     const int targetCountPivot = 6;
     const float obstacleDistancePivot = 0.2526;
     const float triggerDistance = 0.8;
@@ -42,6 +43,8 @@ private:
     int countLeft;
     int countRight;
     bool centerSeen;
+
+    bool ignoreCenter;
 
 
     geometry_msgs::Pose2D currentLocation;
