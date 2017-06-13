@@ -3,51 +3,44 @@
 PID::PID(PIDConfig config)
 {
     this->config = config; 
-    integralErrorHistArray.resize(config.integralErrorHistoryLength);
+    integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
 }
 
 float PID::PIDOut(float calculatedError, float setPoint) {
     
-    Error.pop_back();
+    if (Error.size() >= config.errorHistLength) {
+        Error.pop_back();
+    }
     Error.insert(Error.begin(), calculatedError); //insert new error into vector for history purposes.
-    
+
     float P = 0; //proportional yaw output 
     float I = 0; //Integral yaw output
     float D = 0; //Derivative yaw output
     
     if (setPoint != prevSetPoint && config.resetOnSetpoint) {
-        for (int i = 0; i < config.errorHistLength; i++) {
-            Error.at(i) = 0;
-        }
-        for (int i = 0; i < config.integralErrorHistoryLength; i++) {
-            integralErrorHistArray.at(i) = 0;
-        }
+        Error.clear();
+        integralErrorHistArray.clear();
         prevSetPoint = setPoint;
-        
+        step = 0;
+        integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
     }
-    
     
     //feed forward
     float FF = config.feedForwardMultiplier * setPoint;
     
     //error averager
-    float avgError;
-    bool checkExists = true;
-    for (int i = 0; i < (config.errorHistLength); i++) {
-        avgError += Error.at(i);
-        if (Error.at(i) == 0) {
-            checkExists = false;
-            break;
+    float avgError = 0;
+    if (Error.size() >= config.errorHistLength) {
+        for (int i = 0; i < config.errorHistLength; i++) {
+            avgError += Error[i];
         }
-    }
-    if (!checkExists) {
-        avgError = calculatedError;
+        avgError /= config.errorHistLength;//config.errorHistLength;
     }
     else {
-        avgError /= config.errorHistLength;
+        avgError = calculatedError;
     }
     
-    
+
     // ----- BEGIN PID CONTROLLER CODE -----
     
     
@@ -60,16 +53,15 @@ float PID::PIDOut(float calculatedError, float setPoint) {
         P = config.satUpper;
     if (P < config.satLower)
         P = config.satLower; 
-    
     //Integral
     bool integralOn = false;
     
     //only use integral when error is larger than presumed noise.
-    if (Error.front() > config.integralDeadZone || Error.front() < -config.integralDeadZone)
+    if (fabs(Error.front()) > config.integralDeadZone)
     {
-        integralErrorHistArray.at(step) = Error.front(); //add error into the error Array.
+        integralErrorHistArray[step] = Error.front(); //add error into the error Array.
         step++;
-        
+
         if (step >= config.integralErrorHistoryLength) step = 0;
         
         if (!config.alwaysIntegral) {
@@ -78,9 +70,9 @@ float PID::PIDOut(float calculatedError, float setPoint) {
     }
     
     float sum = 0;
-    for (int i= 0; i < config.integralErrorHistoryLength; i++) //sum the array to get the error over time from t = 0 to present.
+    for (int i= 0; i < integralErrorHistArray.size(); i++) //sum the array to get the error over time from t = 0 to present.
     {
-        sum += integralErrorHistArray.at(i);
+        sum += integralErrorHistArray[i];
     }
     
     if (config.alwaysIntegral || integralOn){
@@ -94,21 +86,29 @@ float PID::PIDOut(float calculatedError, float setPoint) {
     //if P is already commanding greater than half max PWM dont use the integral       
     if (fabs(I) > config.integralMax || fabs(P) > config.antiWindup) //reset the integral to 0 if it hits its cap of half max PWM
     {
-        for (int i = 0; i < config.integralErrorHistoryLength; i++) {
-            integralErrorHistArray.at(i) = 0;
-        }         
+        integralErrorHistArray.clear();
+        integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
         I = 0;
+        step = 0;
     }
     
     //Derivative
     if (fabs(P) < config.antiWindup) 
     {
-        //10 being the frequency of the system giving us a one second prediction base.
-        //calculates the derivative of the error using average of last 2 error values for current error
-        //and average of error 2 and 3 steps in the past as previouse error
-        D = config.Kd * (avgError) * hz; 
+        float avgPrevError = 0;
+        for (int i = 1; i < Error.size(); i++) {
+            avgPrevError += Error[i];
+        }
+        if (Error.size() > 1) {
+        avgPrevError /= Error.size()-1;
+        }
+        else {
+            avgPrevError = Error[0];
+        }
+
+        D = config.Kd * (((1-config.derivativeAlpha)*Error[0]) - (config.derivativeAlpha * avgPrevError));
     }
-    
+
     float PIDOut = P + I + D + FF;
     if (PIDOut > config.satUpper) //cap vel command
     {

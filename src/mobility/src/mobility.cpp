@@ -60,10 +60,17 @@ void resultHandler();
 //PID configs************************
 PIDConfig fastVelConfig();
 PIDConfig fastYawConfig();
+PIDConfig constVelConfig();
+PIDConfig constYawConfig();
 
 void fastPID(float vel,float yaw, float setPointVel, float setPointYaw);
+void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
+
 PID fastVelPID(fastVelConfig());
 PID fastYawPID(fastYawConfig());
+
+PID constVelPID(constVelConfig());
+PID constYawPID(constYawConfig());
 
 
 // Numeric Variables for rover positioning
@@ -101,6 +108,9 @@ bool avoidingObstacle = false;
 
 bool dropOffWayPoints = false;
 bool dropOffPrecision = false;
+
+float linearVelocity = 0;
+float angularVelocity = 0;
 
 Result result;
 
@@ -254,7 +264,8 @@ int main(int argc, char **argv) {
 // controllers in the abridge package.
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
-    float rotateOnlyAngleTolerance = 0.4;
+    float rotateOnlyAngleTolerance = 0.2;
+    float finalRotationTolerance = 0.1;
     
     // time since timerStartTime was set to current time
     timerTimeElapsed = time(0) - timerStartTime;
@@ -303,9 +314,14 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                         }
                     }
                     else {
+                        stringstream ss;
+                        ss << "cmdVel : " << result.pd.cmdVel << " cmdAngular : " << result.pd.cmdAngular;
+                        msg.data = ss.str();
+                        infoLogPublisher.publish(msg);
                         resultHandler();
                     }
-                }
+                    break;
+                }               
             }
             
             
@@ -315,11 +331,16 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
                result = obstacleController.CalculateResult();
                 if (result.type == behavior) {
-                    
+                    if (result.b == obstacleAvoided) {
+                        obstacleDetected = false;
+                        stateMachineState = STATE_MACHINE_INTERRUPT;
+                        waypoints.clear();
+                    }
                 }
                 else {
                     resultHandler();
-                }                
+                }
+                break;
             }
             
             if (proccessLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
@@ -380,15 +401,15 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             msg.data = "In waypoint state";
             infoLogPublisher.publish(msg);
 
-            bool toClose = true;
-            while (!waypoints.empty() && toClose) {
+            bool tooClose = true;
+            while (!waypoints.empty() && tooClose) {
                 if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
                     waypoints.pop_back();
-                    msg.data = "Clear vector";
+                    msg.data = "Removed waypoints";
                     infoLogPublisher.publish(msg);
                 }
                 else {
-                    toClose = false;
+                    tooClose = false;
                 }
             }
             if (waypoints.empty()) {
@@ -397,7 +418,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 break;
             }
             else {
-                waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
                 stateMachineState = STATE_MACHINE_ROTATE;
                 //fall through on purpose
             }
@@ -410,6 +430,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         case STATE_MACHINE_ROTATE: {
             stateMachineMsg.data = "ROTATING";
             
+            waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
             // Calculate the diffrence between current and desired heading in radians.
             float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
@@ -419,9 +440,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
             if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
                 // rotate but dont drive.
-
-                if (result.PIDMode == FAST_PID){
-                    fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+                if (result.PIDMode == FAST_PID) {
+                    fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
                 }
                 break;
             } else {
@@ -446,21 +466,22 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 // drive and turn simultaniously
                 result.pd.setPointVel = searchVelocity;
                 if (result.PIDMode == FAST_PID){
-                    fastPID(searchVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+                    fastPID(searchVelocity - linearVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
                 }
             }
             // goal is reached but desired heading is still wrong turn only
-            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > 0.1) {
+            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance) {
                 // rotate but dont drive
                 result.pd.setPointVel = 0.0;
                 if (result.PIDMode == FAST_PID){
                     fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
                 }
+                msg.data = "Final Alignment";
+                infoLogPublisher.publish(msg);
             }
             else {
                 // stop
                 sendDriveCommand(0.0, 0.0);
-                avoidingObstacle = false;
                 
                 // move back to transform step
                 stateMachineState = STATE_MACHINE_WAYPOINTS;
@@ -475,13 +496,18 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
             
         }
+
+        stringstream ss;
+        ss << angularVelocity;
+        msg.data = ss.str();
+        infoLogPublisher.publish(msg);
     }
     // mode is NOT auto
     else {
         // publish current state for the operator to see
         stateMachineMsg.data = "WAITING";
     }
-    
+
     
     // publish state machine string for user, only if it has changed, though
     if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
@@ -523,12 +549,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
             targetsFound = pickUpController.ShouldInterrupt(); //set this flag to indicate we found a target and thus handle the interupt
 
             if(targetsFound) {
-                msg.data = "A target has been found by " + publishedName;
-                infoLogPublisher.publish(msg);
-
                 stateMachineState = STATE_MACHINE_INTERRUPT;
-            } else {
-                msg.data = "A target was not found by " + publishedName;
             }
         }
     }
@@ -592,6 +613,9 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
     currentLocation.theta = yaw;
+
+    linearVelocity = message->twist.twist.linear.x;
+    angularVelocity = message->twist.twist.angular.z;
 }
 
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
@@ -648,26 +672,26 @@ void resultHandler()
     }
     else if (result.type == precisionDriving) {
         if (result.PIDMode == FAST_PID){
-            fastPID(result.pd.cmdVel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+            float vel = result.pd.cmdVel -linearVelocity;
+            fastPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
         }
         else if (result.PIDMode == SLOW_PID) {
             //slowPID(result.cmdVel,result.cmdAngularError); needs declaration
         }
         else if (result.PIDMode == CONST_PID) {
-            //constPID(result.cmdVel,result.cmdAngular); needs declaration
+            float vel = result.pd.cmdVel - linearVelocity;
+            float angular = result.pd.cmdAngular - angularVelocity;
+
+            constPID(vel, angular ,result.pd.setPointVel, result.pd.setPointYaw);
         }
     }      
 }
 
 
-void fastPID(float vel, float yaw , float setPointVel, float setPointYaw) {
-    float velOut = fastVelPID.PIDOut(vel, setPointVel);
-    float yawOut = fastYawPID.PIDOut(yaw, setPointYaw);
+void fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw) {
 
-    stringstream ss;
-    ss << "velOut : " << velOut << " yawOut : " << yawOut;
-    msg.data = ss.str();
-    infoLogPublisher.publish(msg);
+    float velOut = fastVelPID.PIDOut(errorVel, setPointVel);
+    float yawOut = fastYawPID.PIDOut(errorYaw, setPointYaw);
     
     int left = velOut - yawOut;
     int right = velOut + yawOut;
@@ -681,22 +705,40 @@ void fastPID(float vel, float yaw , float setPointVel, float setPointYaw) {
     sendDriveCommand(left,right);
 }
 
+void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw) {
+
+    float velOut = fastVelPID.PIDOut(erroVel, setPointVel);
+    float yawOut = fastYawPID.PIDOut(constAngularError, setPointYaw);
+
+    int left = velOut - yawOut;
+    int right = velOut + yawOut;
+
+    int sat = 255;
+    if (left  >  sat) {left  =  sat;}
+    if (left  < -sat) {left  = -sat;}
+    if (right >  sat) {right =  sat;}
+    if (right < -sat) {right = -sat;}
+
+    sendDriveCommand(left,right);
+}
+
 PIDConfig fastVelConfig() {
     PIDConfig config;
     
     config.Kp = 140;
-    config.Ki = 20;
-    config.Kd = 15;
+    config.Ki = 10;
+    config.Kd = 0.8;
     config.satUpper = 255; 
     config.satLower = -255; 
     config.antiWindup = config.satUpper/2; 
     config.errorHistLength = 4;
-    config.alwaysIntegral = false; 
+    config.alwaysIntegral = true;
     config.resetOnSetpoint = true;
     config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
     config.integralDeadZone = 0.01;
     config.integralErrorHistoryLength = 10000;
     config.integralMax = config.satUpper/2;
+    config.derivativeAlpha = 0.7;
     
     return config;
     
@@ -706,21 +748,66 @@ PIDConfig fastYawConfig() {
     PIDConfig config;
     
     config.Kp = 200;
-    config.Ki = 15;
-    config.Kd = 15;
+    config.Ki = 25;
+    config.Kd = 0.5;
     config.satUpper = 255; 
     config.satLower = -255; 
     config.antiWindup = config.satUpper/2; 
     config.errorHistLength = 4;
     config.alwaysIntegral = false; 
     config.resetOnSetpoint = true;
+    config.feedForwardMultiplier = 0; //gives 127 pwm at 0.4 commandedspeed
+    config.integralDeadZone = 0.01;
+    config.integralErrorHistoryLength = 10000;
+    config.integralMax = config.satUpper/2;
+     config.derivativeAlpha = 0.7;
+    
+    return config;
+    
+}
+
+PIDConfig constVelConfig() {
+    PIDConfig config;
+
+    config.Kp = 140;
+    config.Ki = 10;
+    config.Kd = 0.8;
+    config.satUpper = 255;
+    config.satLower = -255;
+    config.antiWindup = config.satUpper/2;
+    config.errorHistLength = 4;
+    config.alwaysIntegral = true;
+    config.resetOnSetpoint = true;
     config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
     config.integralDeadZone = 0.01;
     config.integralErrorHistoryLength = 10000;
     config.integralMax = config.satUpper/2;
-    
+    config.derivativeAlpha = 0.7;
+
     return config;
-    
+
+}
+
+PIDConfig constYawConfig() {
+    PIDConfig config;
+
+    config.Kp = 100;
+    config.Ki = 5;
+    config.Kd = 1.2;
+    config.satUpper = 255;
+    config.satLower = -255;
+    config.antiWindup = config.satUpper/4;
+    config.errorHistLength = 4;
+    config.alwaysIntegral = true;
+    config.resetOnSetpoint = true;
+    config.feedForwardMultiplier = 120; //gives 127 pwm at 0.4 commandedspeed
+    config.integralDeadZone = 0.01;
+    config.integralErrorHistoryLength = 10000;
+    config.integralMax = config.satUpper/2;
+    config.derivativeAlpha = 0.6;
+
+    return config;
+
 }
 
 

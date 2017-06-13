@@ -12,9 +12,10 @@ PickUpController::PickUpController() {
     
     result.type;
     result.pd.cmdVel = 0;
-    result.pd.cmdAngular = 0;
+    result.pd.cmdAngularError= 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
+    result.PIDMode = FAST_PID;
     
 }
 
@@ -100,7 +101,9 @@ bool PickUpController::ShouldInterrupt(){
 Result PickUpController::CalculateResult() {      //****not named correctly and needs to return a properly formated result and be called CalculateResult that takes in no parameters
                                                                     //instead blockBlock will be passaed in through a new method such as setUltraSoundData
     //threshold distance to be from the target block before attempting pickup
-    float targetDistance = 0.25; //meters
+    float targetDistance = 0.2; //meters
+
+    result.type = precisionDriving;
     
     
     // millisecond time = current time if not in a counting state
@@ -116,15 +119,16 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
         if(!timeOut) //if not in a counting state
         {
             result.pd.cmdVel = 0.0;
-            result.pd.cmdAngular = 0.0;
+            result.pd.cmdAngularError= 0.0;
             
             timeOut = true;
+            result.pd.cmdAngularError= -blockYawError;
         }
         //if in a counting state and has been counting for 1 second
         else if (Td > 1 && Td < 2.5)
         {
             result.pd.cmdVel = -0.2;
-            result.pd.cmdAngular = 0.0;
+            result.pd.cmdAngularError= 0.0;
         }
     }
     else if (blockDistance > targetDistance && !lockTarget) //if a target is detected but not locked, and not too close.
@@ -133,7 +137,7 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
         if (vel < 0.1) vel = 0.1;
         if (vel > 0.2) vel = 0.2;
         result.pd.cmdVel = vel;
-        result.pd.cmdAngular = -blockYawError/2;
+        result.pd.cmdAngularError = -blockYawError;
         timeOut = false;
         nTargetsSeen = 0;
         return result;
@@ -141,20 +145,20 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
     {
         lockTarget = true;
-        result.pd.cmdVel = 0.18;
-        result.pd.cmdAngular = 0.0;
+        result.pd.cmdVel = 0.22;
+        result.pd.cmdAngularError= 0.0;
         timeOut = true;
     }
     else if (Td > 2.4) //raise the wrist
     {
         result.pd.cmdVel = -0.25;
-        result.pd.cmdAngular = 0.0;
+        result.pd.cmdAngularError= 0.0;
         result.wristAngle = 0;
     }
     else if (Td > 1.7) //close the fingers and stop driving
     {
         result.pd.cmdVel = -0.1;
-        result.pd.cmdAngular = 0.0;
+        result.pd.cmdAngularError= 0.0;
         result.fingerAngle = 0;
         return result;
     }
@@ -170,7 +174,7 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
         {
             lockTarget = false;
             result.pd.cmdVel = -0.15;
-            result.pd.cmdAngular = 0.0;
+            result.pd.cmdAngularError= 0.0;
             //set gripper
             result.fingerAngle = M_PI_2;
             result.wristAngle = 0;
@@ -184,7 +188,7 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
         lockTarget = false;
         timeOut = false;
         result.pd.cmdVel = 0.0;
-        result.pd.cmdAngular = 0.0;
+        result.pd.cmdAngularError= 0.0;
     }
 
         return result;
@@ -202,7 +206,7 @@ void PickUpController::reset() {
     timeDifference = 0;
     
     result.pd.cmdVel = 0;
-    result.pd.cmdAngular = 0;
+    result.pd.cmdAngularError= 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
 };

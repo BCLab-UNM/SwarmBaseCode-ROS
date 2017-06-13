@@ -20,6 +20,7 @@ struct PIDConfig {
     float integralDeadZone = 0.01;
     float integralErrorHistoryLength = 10000;
     float integralMax = 255/2;
+    float derivativeAlpha = 0.7;
 };
 
 class PID

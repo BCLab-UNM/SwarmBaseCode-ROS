@@ -21,37 +21,46 @@ sbridge::sbridge(std::string publishedName) {
 }
 
 void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
-    double linearVel = (message->linear.x);
-    double angularVel = (message->angular.z);
+    double left = (message->linear.x);
+    double right = (message->angular.z);
 
-
-    float turn = angularVel/60;
-    float forward = linearVel/355;
-
-    if (forward >= 150){
-
-        forward -= (abs(turn)/5);
-    }
-
-    if (linearVel >= 0 && forward <= 0)
-    {
-        forward = 0;
-    }
-    if (linearVel <= 0 && forward >= 0)
-    {
-        forward = 0;
-    }
-
+    float turn = 0;
+    float forward = 0;
 
     if (currentMode == 1) {
-        forward = linearVel*0.8;
-        turn = angularVel*1.4;
+        forward = left*0.6;
+        turn = right*1.4;
         if (forward >= 0.4){
 
             forward -= (abs(turn)/5);
         }
 
     }
+    else
+    {
+
+        float linearVel = (left + right)/2;
+        float angularVel = (right-left)/2;
+
+        turn = angularVel/180;
+        forward = linearVel/400;
+        if (forward >= 150){
+
+            forward -= (abs(turn)/5);
+        }
+
+        if (linearVel >= 0 && forward <= 0)
+        {
+            forward = 0;
+        }
+        if (linearVel <= 0 && forward >= 0)
+        {
+            forward = 0;
+        }
+    }
+
+
+
 
     velocity.linear.x = forward,
             velocity.angular.z = turn;

@@ -9,6 +9,7 @@ SearchController::SearchController() {
   centerLocation.x = 0;
   centerLocation.y = 0;
   centerLocation.theta = 0;
+  result.PIDMode = FAST_PID;
 }
 
 /**
