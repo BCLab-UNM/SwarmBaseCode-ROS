@@ -60,14 +60,20 @@ void resultHandler();
 //PID configs************************
 PIDConfig fastVelConfig();
 PIDConfig fastYawConfig();
+PIDConfig slowVelConfig();
+PIDConfig slowYawConfig();
 PIDConfig constVelConfig();
 PIDConfig constYawConfig();
 
-void fastPID(float vel,float yaw, float setPointVel, float setPointYaw);
+void fastPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
+void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
 void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
 
 PID fastVelPID(fastVelConfig());
 PID fastYawPID(fastYawConfig());
+
+PID slowVelPID(slowVelConfig());
+PID slowYawPID(slowYawConfig());
 
 PID constVelPID(constVelConfig());
 PID constYawPID(constYawConfig());
@@ -676,7 +682,9 @@ void resultHandler()
             fastPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
         }
         else if (result.PIDMode == SLOW_PID) {
-            //slowPID(result.cmdVel,result.cmdAngularError); needs declaration
+            //will take longer to reach the setPoint but has les chanse of an overshoot
+            float vel = result.pd.cmdVel -linearVelocity;
+            slowPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw);
         }
         else if (result.PIDMode == CONST_PID) {
             float vel = result.pd.cmdVel - linearVelocity;
@@ -702,6 +710,23 @@ void fastPID(float errorVel, float errorYaw , float setPointVel, float setPointY
     if (right >  sat) {right =  sat;}
     if (right < -sat) {right = -sat;}
     
+    sendDriveCommand(left,right);
+}
+
+void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw) {
+
+    float velOut = slowVelPID.PIDOut(errorVel, setPointVel);
+    float yawOut = slowYawPID.PIDOut(errorYaw, setPointYaw);
+
+    int left = velOut - yawOut;
+    int right = velOut + yawOut;
+
+    int sat = 255;
+    if (left  >  sat) {left  =  sat;}
+    if (left  < -sat) {left  = -sat;}
+    if (right >  sat) {right =  sat;}
+    if (right < -sat) {right = -sat;}
+
     sendDriveCommand(left,right);
 }
 
@@ -760,10 +785,54 @@ PIDConfig fastYawConfig() {
     config.integralDeadZone = 0.01;
     config.integralErrorHistoryLength = 10000;
     config.integralMax = config.satUpper/2;
-     config.derivativeAlpha = 0.7;
+    config.derivativeAlpha = 0.7;
     
     return config;
     
+}
+
+PIDConfig slowVelConfig() {
+    PIDConfig config;
+
+    config.Kp = 100;
+    config.Ki = 8;
+    config.Kd = 1.1;
+    config.satUpper = 255;
+    config.satLower = -255;
+    config.antiWindup = config.satUpper/2;
+    config.errorHistLength = 4;
+    config.alwaysIntegral = true;
+    config.resetOnSetpoint = true;
+    config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
+    config.integralDeadZone = 0.01;
+    config.integralErrorHistoryLength = 10000;
+    config.integralMax = config.satUpper/2;
+    config.derivativeAlpha = 0.7;
+
+    return config;
+
+}
+
+PIDConfig slowYawConfig() {
+    PIDConfig config;
+
+    config.Kp = 100;
+    config.Ki = 15;
+    config.Kd = 1.5;
+    config.satUpper = 255;
+    config.satLower = -255;
+    config.antiWindup = config.satUpper/4;
+    config.errorHistLength = 4;
+    config.alwaysIntegral = false;
+    config.resetOnSetpoint = true;
+    config.feedForwardMultiplier = 0; //gives 127 pwm at 0.4 commandedspeed
+    config.integralDeadZone = 0.01;
+    config.integralErrorHistoryLength = 10000;
+    config.integralMax = config.satUpper/6;
+    config.derivativeAlpha = 0.7;
+
+    return config;
+
 }
 
 PIDConfig constVelConfig() {

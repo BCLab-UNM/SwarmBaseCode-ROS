@@ -15,7 +15,7 @@ PickUpController::PickUpController() {
     result.pd.cmdAngularError= 0;
     result.fingerAngle = -1;
     result.wristAngle = -1;
-    result.PIDMode = FAST_PID;
+    result.PIDMode = SLOW_PID;
     
 }
 
@@ -72,7 +72,7 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
         ros::Duration Tdiff = ros::Time::now() - millTimer;
         float Td = Tdiff.sec + Tdiff.nsec/1000000000;
      
-        if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.13 && Td < 3.8) {
+        if (hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z) < 0.15 && Td < 3.8) {
             result.type = behavior;
             result.b = targetPickedUp;
         }
@@ -101,7 +101,7 @@ bool PickUpController::ShouldInterrupt(){
 Result PickUpController::CalculateResult() {      //****not named correctly and needs to return a properly formated result and be called CalculateResult that takes in no parameters
                                                                     //instead blockBlock will be passaed in through a new method such as setUltraSoundData
     //threshold distance to be from the target block before attempting pickup
-    float targetDistance = 0.2; //meters
+    float targetDistance = 0.15; //meters
 
     result.type = precisionDriving;
     
@@ -145,7 +145,7 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
     {
         lockTarget = true;
-        result.pd.cmdVel = 0.22;
+        result.pd.cmdVel = 0.28;
         result.pd.cmdAngularError= 0.0;
         timeOut = true;
     }
