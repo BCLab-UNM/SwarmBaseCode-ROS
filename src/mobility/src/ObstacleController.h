@@ -24,7 +24,7 @@ public:
 private:
 
     const float K_angular = 0.01500f;
-    const int reactivateCenterThreshold = 0.8;
+    const float reactivateCenterThreshold = 0.8;
     const int targetCountPivot = 6;
     const float obstacleDistancePivot = 0.2526;
     const float triggerDistance = 0.8;
@@ -44,7 +44,7 @@ private:
     int countRight;
     bool centerSeen;
 
-    bool ignoreCenter;
+    bool ignoreCenter = false;
 
 
     geometry_msgs::Pose2D currentLocation;

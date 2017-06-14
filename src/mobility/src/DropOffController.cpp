@@ -6,6 +6,7 @@ DropOffController::DropOffController() {
 
     result.type = behavior;
     result.b = init;
+    result.wristAngle = 0.8;
 
     circularCenterSearching = false;
     spinner = 0;
@@ -207,10 +208,11 @@ void DropOffController::Reset() {
     result.pd.cmdVel = 0;
     result.pd.cmdAngularError = 0;
     result.fingerAngle = -1;
-    result.wristAngle = -1;
+    result.wristAngle = 0.8;
     spinner = 0;
     spinSizeIncrease = 0;
     prevCount = 0;
+
 
     //reset flags
     reachedCollectionPoint = false;

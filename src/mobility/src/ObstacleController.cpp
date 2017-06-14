@@ -48,17 +48,17 @@ Result ObstacleController::CalculateResult() {
 
 void ObstacleController::UpdateData(float sonarleft, float sonarcenter, float sonarright ,geometry_msgs::Pose2D currentLocation) {
     
-    this->left = sonarleft;
-    this->right = sonarright;
-    this->center = sonarcenter;
+    left = sonarleft;
+    right = sonarright;
+    center = sonarcenter;
 
     if(ignoreCenter){
-        if(this-> center >reactivateCenterThreshold){
+        if(center > reactivateCenterThreshold){
             ignoreCenter = false;
 
         }
         else{
-            this->center = 3;
+            center = 3;
 
 
         }

@@ -312,18 +312,17 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     result = pickUpController.CalculateResult();
                     if (result.type == behavior) {
                         if (result.b == targetPickedUp) {
+                            msg.data = "Made it to targetPickedup";
+                            infoLogPublisher.publish(msg);
                             proccessLoopState = PROCCESS_LOOP_TARGET_PICKEDUP;
                             dropOffController.SetTargetPickedUp();
+                            targetsCollected = true;
                         }
                         else if (result.b == targetLost) {
                             targetsFound = false;
                         }
                     }
                     else {
-                        stringstream ss;
-                        ss << "cmdVel : " << result.pd.cmdVel << " cmdAngular : " << result.pd.cmdAngular;
-                        msg.data = ss.str();
-                        infoLogPublisher.publish(msg);
                         resultHandler();
                     }
                     break;
@@ -334,7 +333,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             if (obstacleDetected) {
                 msg.data = "Obstacle";
                 infoLogPublisher.publish(msg);
-
                result = obstacleController.CalculateResult();
                 if (result.type == behavior) {
                     if (result.b == obstacleAvoided) {
@@ -503,10 +501,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             
         }
 
-        stringstream ss;
-        ss << angularVelocity;
-        msg.data = ss.str();
-        infoLogPublisher.publish(msg);
+
     }
     // mode is NOT auto
     else {
@@ -591,6 +586,7 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
 
    if(pickUpController.NewUpdateData(sonarCenter->range)){
        obstacleController.SetIgnoreCenter();
+
    }
 
 
@@ -602,7 +598,7 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
             stateMachineState = STATE_MACHINE_INTERRUPT;
         }
     }
-    
+
     if (sonarCenter->range < 0.1) {
         pickUpController.SetUltraSoundData(true);
         dropOffController.SetBlockBlockingUltrasound(true);
@@ -611,7 +607,7 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
         pickUpController.SetUltraSoundData(false);
         dropOffController.SetBlockBlockingUltrasound(false);
     }
-    
+
 }
 
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
@@ -677,8 +673,6 @@ void resultHandler()
     if (result.type == waypoint) {
         if (!result.wpts.waypoints.empty()) {
             waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
-            msg.data = "not empty";
-            infoLogPublisher.publish(msg);
             waypointsAvalible = true;
         }
     }

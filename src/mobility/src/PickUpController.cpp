@@ -10,7 +10,7 @@ PickUpController::PickUpController() {
 
     targetFound = false;
     
-    result.type;
+    result.type = precisionDriving;
     result.pd.cmdVel = 0;
     result.pd.cmdAngularError= 0;
     result.fingerAngle = -1;
@@ -122,9 +122,6 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
                                                                     //instead blockBlock will be passaed in through a new method such as setUltraSoundData
     //threshold distance to be from the target block before attempting pickup
     float targetDistance = 0.15; //meters
-
-    result.type = precisionDriving;
-    
     
     // millisecond time = current time if not in a counting state
     if (!timeOut) millTimer = ros::Time::now();
@@ -185,20 +182,14 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
     
     if (Td > 3.8 && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
     {
-        if (blockBlock) //if the ultrasound is blocked at less than .12 meters a block has been picked up no new pickup required
-        {
-            result.type = behavior;
-            result.b = targetPickedUp;
-        }
-        else //recover begin looking for targets again
-        {
-            lockTarget = false;
-            result.pd.cmdVel = -0.15;
-            result.pd.cmdAngularError= 0.0;
-            //set gripper
-            result.fingerAngle = M_PI_2;
-            result.wristAngle = 0;
-        }
+
+        lockTarget = false;
+        result.pd.cmdVel = -0.15;
+        result.pd.cmdAngularError= 0.0;
+        //set gripper
+        result.fingerAngle = M_PI_2;
+        result.wristAngle = 0;
+
     }
     
     if (Td > 5 && timeOut) //if no targets are found after too long a period go back to search pattern
@@ -211,12 +202,12 @@ Result PickUpController::CalculateResult() {      //****not named correctly and 
         result.pd.cmdAngularError= 0.0;
     }
 
-        return result;
+    return result;
 }
 
 void PickUpController::reset() {
     
-    result.type = behavior;
+    result.type = precisionDriving;
     result.b = init;
     lockTarget = false;
     timeOut = false;
