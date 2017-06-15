@@ -20,12 +20,10 @@ enum ResultType {
 };
 
 enum BehaviorTrigger {
-    init,
-    targetDropped,
-    targetReturned,
-    targetLost,
-    targetPickedUp,
-    obstacleAvoided
+    wait,
+    prevProcess,
+    noChange,
+    nextProcess
 };
 
 struct PrecisionDriving {
@@ -51,6 +49,8 @@ struct Result {
     float fingerAngle;
     float wristAngle;
     PIDType PIDMode;
+
+    bool reset;
 };
 
 

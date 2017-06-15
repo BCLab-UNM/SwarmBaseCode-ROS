@@ -182,7 +182,108 @@ mapAverage();
     }
 
     
+    stateMachineMsg.data = "INTERRUPT";
 
+    msg.data = "Interrupt";
+    infoLogPublisher.publish(msg);
+
+    if (proccessLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
+        if (targetsFound) {
+            msg.data = "Targets";
+            infoLogPublisher.publish(msg);
+
+            result = pickUpController.CalculateResult();
+            if (result.type == behavior) {
+                if (result.b == targetPickedUp) {
+                    msg.data = "Made it to targetPickedup";
+                    infoLogPublisher.publish(msg);
+                    proccessLoopState = PROCCESS_LOOP_TARGET_PICKEDUP;
+                    dropOffController.SetTargetPickedUp();
+                    targetsCollected = true;
+                }
+                else if (result.b == targetLost) {
+                    targetsFound = false;
+                }
+
+                pickUpController.Reset();
+            }
+            else {
+                resultHandler();
+            }
+            break;
+        }
+    }
+
+
+    if (obstacleDetected) {
+        msg.data = "Obstacle";
+        infoLogPublisher.publish(msg);
+       result = obstacleController.CalculateResult();
+        if (result.type == behavior) {
+            if (result.b == obstacleAvoided) {
+                obstacleDetected = false;
+                stateMachineState = STATE_MACHINE_INTERRUPT;
+                waypoints.clear();
+            }
+        }
+        else {
+            resultHandler();
+        }
+        break;
+    }
+
+    if (proccessLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
+
+        if (targetsCollected) {
+            msg.data = "DroppOff";
+            infoLogPublisher.publish(msg);
+
+            result = dropOffController.CalculateResult();
+
+            if (result.type == behavior) {
+                if (result.b == targetDropped) {
+                    proccessLoopState = PROCCESS_LOOP_SEARCHING;
+                    targetsCollected = false;
+                    dropOffWayPoints = false;
+                     dropOffPrecision = false;
+                }
+                else if (result.b == targetReturned) {
+                    proccessLoopState = PROCCESS_LOOP_SEARCHING;
+                    targetsCollected = false;
+                    dropOffWayPoints = false;
+                }
+
+                dropOffController.Reset();
+            }
+            else {
+                resultHandler();
+            }
+            break;
+        }
+    }
+
+    if (waypointsAvalible) {
+        stateMachineState = STATE_MACHINE_WAYPOINTS;
+        stringstream ss;
+        ss << "state is now waypoints : " << stateMachineState;
+        msg.data = ss.str();
+        infoLogPublisher.publish(msg);
+        break;
+    }
+
+    if (pathPlanningRequired) {
+        result = searchController.CalculateResult();
+        if (result.type == behavior) {
+
+        }
+        else {
+            resultHandler();
+        }
+    }
+
+    msg.data = "End of Interupt";
+    infoLogPublisher.publish(msg);
+    break;
     
 
     case STATE_MACHINE_PICKUP: {

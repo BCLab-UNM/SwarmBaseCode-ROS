@@ -12,10 +12,14 @@ SearchController::SearchController() {
   result.PIDMode = FAST_PID;
 }
 
+void SearchController::Reset() {
+    result.reset = false;
+}
+
 /**
  * This code implements a basic random walk search.
  */
-Result SearchController::CalculateResult() {
+Result SearchController::DoWork() {
    result.type = waypoint;
    geometry_msgs::Pose2D  searchLocation;
       
@@ -32,15 +36,25 @@ Result SearchController::CalculateResult() {
   return result;
   
 }
- void SearchController::UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation){
+
+void SearchController::UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation){
      this->currentLocation = currentLocation;
      this->centerLocation = centerLocation;
 }
 
-bool SearchController::ShouldInterrept(){
+void SearchController::ProcessData() {
+
+}
+
+bool SearchController::ShouldInterrupt(){
+    ProcessData();
+
     return nullptr;
 }
 
+bool SearchController::HasWork() {
+    return true;
+}
 
 
 

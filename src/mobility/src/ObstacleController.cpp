@@ -2,10 +2,18 @@
 
 ObstacleController::ObstacleController()
 {
-    
+    obstacleAvoided = true;
+    obstacleDetected = false;
+    obstacleInterrupt = false;
 }
 
-Result ObstacleController::CalculateResult() {
+void ObstacleController::Reset() {
+    obstacleAvoided = true;
+    obstacleDetected = false;
+    obstacleInterrupt = false;
+}
+
+Result ObstacleController::DoWork() {
 
     if(centerSeen){
 
@@ -36,10 +44,6 @@ Result ObstacleController::CalculateResult() {
             result.pd.cmdVel = 0.0;
             result.pd.cmdAngularError = (currentLocation.theta + result.pd.setPointYaw);
         }
-        else {
-            result.type = behavior;
-            result.b = obstacleAvoided;
-        }
     }
 
     return result;
@@ -52,6 +56,13 @@ void ObstacleController::UpdateData(float sonarleft, float sonarcenter, float so
     right = sonarright;
     center = sonarcenter;
 
+    this->currentLocation = currentLocation;
+
+}
+
+void ObstacleController::ProcessData() {
+
+    //Process sonar info
     if(ignoreCenter){
         if(center > reactivateCenterThreshold){
             ignoreCenter = false;
@@ -63,16 +74,13 @@ void ObstacleController::UpdateData(float sonarleft, float sonarcenter, float so
 
         }
     }
-    
-    if (left < triggerDistance || right < triggerDistance || center < triggerDistance) {
+
+    if ((left < triggerDistance || right < triggerDistance || center < triggerDistance || centerSeen) && !obstacleInterrupt) {
         obstacleInterrupt = true;
+        obstacleAvoided = false;
+    } else {
+        obstacleAvoided = true;
     }
-    else {
-        obstacleInterrupt = false;
-    }
-
-    this->currentLocation = currentLocation;
-
 }
 
 void ObstacleController::UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message){
@@ -94,22 +102,28 @@ void ObstacleController::UpdateData(const apriltags_ros::AprilTagDetectionArray:
         }
     }
 
-    if(centerSeen) {
-        obstacleInterrupt = true;
-    }
 }
 
 bool ObstacleController::ShouldInterrupt() {
-    return obstacleInterrupt;
+    ProcessData();
+
+    if(obstacleInterrupt && !obstacleDetected) {
+        obstacleDetected = true;
+        return true;
+    } else {
+        if(obstacleAvoided) {
+            Reset();
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+bool ObstacleController::HasWork() {
+    return !obstacleAvoided;
 }
 
 void ObstacleController::SetIgnoreCenter(){
-     ignoreCenter = true;
-
-
+    ignoreCenter = true;
 }
-
-
-
-
-

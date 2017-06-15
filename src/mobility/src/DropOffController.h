@@ -5,18 +5,22 @@
 #include <geometry_msgs/Pose2D.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32.h>
+#include <ros/ros.h>
+
+#include "Controller.h"
 #include "StandardVars.h"
 
-class DropOffController
+class DropOffController : virtual Controller
 {
 public:
     DropOffController();
     ~DropOffController();
 
-    void Reset();
-    Result CalculateResult();
+    void Reset() override;
+    Result DoWork() override;
     void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
-    bool ShouldInterrupt();
+    bool ShouldInterrupt() override;
+    bool HasWork() override;
 
     bool IsChangingMode();
     void SetLocationData(geometry_msgs::Pose2D center, geometry_msgs::Pose2D current);
@@ -24,6 +28,9 @@ public:
     void SetBlockBlockingUltrasound(bool blockBlock);
 
     float GetSpinner() {return spinner;}
+
+protected:
+    void ProcessData();
 
 private:
 
@@ -33,7 +40,7 @@ private:
     const float centeringTurn = 0.15; //radians
     const int centerTagThreshold = 10;
     const int centerTagSearchCutoff = 6; //seconds
-    const float collectionPointVisualDistance = 0.5; //in meters
+    const float collectionPointVisualDistance = 0.3; //in meters
     const float initialSpinSize = 0.10; //in meters aka 10cm
     const float spinSizeIncrement = 0.10; //in meters
     const float searchVelocity = 0.15; //in meters per second
@@ -50,10 +57,10 @@ private:
     float spinner;
 
     //Timer for return code (dropping the cube in the center)- used for timerTimeElapsed
-    time_t returnTimer;
+    ros::Time returnTimer;
 
     //Time since last exceeding the tag threshold
-    time_t lastCenterTagThresholdTime;
+    ros::Time lastCenterTagThresholdTime;
 
     //Previous tag count
     int prevCount;
@@ -72,7 +79,7 @@ private:
     geometry_msgs::Pose2D currentLocation;
 
     //Time since modeTimer was started, in seconds
-    int timerTimeElapsed;
+    float timerTimeElapsed;
 
     //The amount over initialSpinSize we've gotten to
     float spinSizeIncrease;

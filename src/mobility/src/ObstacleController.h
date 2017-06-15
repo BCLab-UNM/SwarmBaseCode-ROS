@@ -2,25 +2,30 @@
 #define OBSTACLECONTOLLER_H
 
 #include "StandardVars.h"
+#include "Controller.h"
 #include <geometry_msgs/Pose2D.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
 
 
-class ObstacleController
+class ObstacleController : virtual Controller
 {
 public:
     ObstacleController();
     
     Result result;
     
-    Result CalculateResult();
-    
+    void Reset() override;
+    Result DoWork() override;
     void UpdateData(float left, float center, float right, geometry_msgs::Pose2D currentLocation);
-    bool ShouldInterrupt();
     void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+    bool ShouldInterrupt() override;
+    bool HasWork() override;
     void SetIgnoreCenter();
 
-    
+protected:
+
+    void ProcessData();
+
 private:
 
     const float K_angular = 0.01500f;
@@ -35,6 +40,8 @@ private:
 
 
     bool obstacleInterrupt;
+    bool obstacleDetected;
+    bool obstacleAvoided;
     
     float left = 0;
     float center = 0;

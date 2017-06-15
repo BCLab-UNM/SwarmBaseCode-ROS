@@ -22,10 +22,7 @@
 #include <apriltags_ros/AprilTagDetectionArray.h>
 
 // Include Controllers
-#include "PickUpController.h"
-#include "DropOffController.h"
-#include "SearchController.h"
-#include "ObstacleController.h"
+#include "LogicController.h"
 
 #include "StandardVars.h"
 #include "PID.h"
@@ -42,11 +39,8 @@ using namespace std;
 // Random number generator
 random_numbers::RandomNumberGenerator* rng;
 
-// Create controllers
-PickUpController pickUpController;
-DropOffController dropOffController;
-SearchController searchController;
-ObstacleController obstacleController;
+// Create logic controller
+LogicController logicController;
 
 // Mobility Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
@@ -125,23 +119,17 @@ std_msgs::String msg;
 
 // state machine states
 enum StateMachineStates {
-    STATE_MACHINE_INTERRUPT = 0,
+
+    //WAITING should not be handled- goes to default (it's a placeholder name)
+    STATE_MACHINE_WAITING = 0,
+    STATE_MACHINE_PRECISION_DRIVING,
     STATE_MACHINE_WAYPOINTS,
     STATE_MACHINE_ROTATE,
     STATE_MACHINE_SKID_STEER,
-    STATE_MACHINE_PICKUP,
-    STATE_MACHINE_DROPOFF
-
-};
-
-enum ProcessLoopStates {
-    PROCCESS_LOOP_SEARCHING = 0,
-    PROCCESS_LOOP_TARGET_PICKEDUP
 };
 
 
-StateMachineStates stateMachineState = STATE_MACHINE_INTERRUPT;
-ProcessLoopStates proccessLoopState = PROCCESS_LOOP_SEARCHING;
+StateMachineStates stateMachineState = STATE_MACHINE_WAITING;
 
 
 geometry_msgs::Twist velocity;
@@ -227,7 +215,7 @@ int main(int argc, char **argv) {
     message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
     message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
     message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
-    
+
     status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
     stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
     fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);
@@ -291,6 +279,28 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
+
+        result = logicController.DoWork();
+
+        if(result.type == behavior) {
+            if(result.b == noChange) {
+
+            } else if(result.b == wait) {
+
+                sendDriveCommand(0.0, 0.0);
+
+                stateMachineState = STATE_MACHINE_WAITING;
+
+            }
+        } else if(result.type == precisionDriving) {
+
+            stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
+
+        } else if(result.type == waypoint) {
+
+            resultHandler();
+
+        }
         
         switch(stateMachineState) {
         
@@ -298,103 +308,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
         //This should be d one as little as possible. I Suggest to Use timeouts to set control bools false.
         //Then only call INTERUPT if bool switches to true.
-        case STATE_MACHINE_INTERRUPT: {
-            stateMachineMsg.data = "INTERRUPT";
+        case STATE_MACHINE_PRECISION_DRIVING: {
 
-            msg.data = "Interrupt";
-            infoLogPublisher.publish(msg);
+            stateMachineMsg.data = "PRECISION_DRIVING";
 
-            if (proccessLoopState == PROCCESS_LOOP_SEARCHING) { //we will listen to this interupt section only when searching
-                if (targetsFound) {
-                    msg.data = "Targets";
-                    infoLogPublisher.publish(msg);
+            resultHandler();
 
-                    result = pickUpController.CalculateResult();
-                    if (result.type == behavior) {
-                        if (result.b == targetPickedUp) {
-                            msg.data = "Made it to targetPickedup";
-                            infoLogPublisher.publish(msg);
-                            proccessLoopState = PROCCESS_LOOP_TARGET_PICKEDUP;
-                            dropOffController.SetTargetPickedUp();
-                            targetsCollected = true;
-                        }
-                        else if (result.b == targetLost) {
-                            targetsFound = false;
-                        }
-                    }
-                    else {
-                        resultHandler();
-                    }
-                    break;
-                }               
-            }
-            
-            
-            if (obstacleDetected) {
-                msg.data = "Obstacle";
-                infoLogPublisher.publish(msg);
-               result = obstacleController.CalculateResult();
-                if (result.type == behavior) {
-                    if (result.b == obstacleAvoided) {
-                        obstacleDetected = false;
-                        stateMachineState = STATE_MACHINE_INTERRUPT;
-                        waypoints.clear();
-                    }
-                }
-                else {
-                    resultHandler();
-                }
-                break;
-            }
-            
-            if (proccessLoopState == PROCCESS_LOOP_TARGET_PICKEDUP) { //we will listen to this interupt section only when target collected
-                
-                if (targetsCollected) {
-                    msg.data = "DroppOff";
-                    infoLogPublisher.publish(msg);
-
-                    Result result = dropOffController.CalculateResult();
-                    
-                    if (result.type == behavior) {
-                        if (result.b == targetDropped) {
-                            proccessLoopState = PROCCESS_LOOP_SEARCHING;
-                            targetsCollected = false;
-                            dropOffWayPoints = false;
-                             dropOffPrecision = false;
-                        }
-                        else if (result.b == targetReturned) {
-                            proccessLoopState = PROCCESS_LOOP_SEARCHING;
-                            targetsCollected = false;
-                            dropOffWayPoints = false;
-                        }
-                    }
-                    else {
-                        resultHandler();
-                    }
-                }
-            }
-            
-            if (waypointsAvalible) {
-                stateMachineState = STATE_MACHINE_WAYPOINTS;
-                stringstream ss;
-                ss << "state is now waypoints : " << stateMachineState;
-                msg.data = ss.str();
-                infoLogPublisher.publish(msg);
-                break;
-            }
-            
-            if (pathPlanningRequired) {
-                result = searchController.CalculateResult();
-                if (result.type == behavior) {
-
-                }
-                else {
-                    resultHandler();
-                }
-            }
-
-            msg.data = "End of Interupt";
-            infoLogPublisher.publish(msg);
             break;
         }
 
@@ -516,7 +435,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
     
-    dropOffController.SetLocationData(currentLocation, centerLocation); //send location data to dropOffController
+    dropOffController.SetLocationData(centerLocation, currentLocation); //send location data to dropOffController
     
     if (!dropOffWayPoints) { //check if we have triggered this interupt already if so ignore it
         dropOffWayPoints = dropOffController.ShouldInterrupt(); //trigger waypoints interupt for drop off flag is true
@@ -671,9 +590,15 @@ void resultHandler()
     }
   
     if (result.type == waypoint) {
+
+        if(result.reset) {
+            waypoints.clear();
+        }
+
         if (!result.wpts.waypoints.empty()) {
             waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
             waypointsAvalible = true;
+            stateMachineState = STATE_MACHINE_WAYPOINTS;
         }
     }
     else if (result.type == precisionDriving) {

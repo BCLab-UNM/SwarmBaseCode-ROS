@@ -5,18 +5,22 @@ DropOffController::DropOffController() {
     reachedCollectionPoint = false;
 
     result.type = behavior;
-    result.b = init;
+    result.b = wait;
     result.wristAngle = 0.8;
+    result.reset = false;
 
     circularCenterSearching = false;
     spinner = 0;
     centerApproach = false;
-    lastCenterTagThresholdTime = time(0);
     seenEnoughCenterTags = false;
     prevCount = 0;
 
+    countLeft = 0;
+    countRight = 0;
+
     isPrecisionDriving = false;
     startWaypoint = false;
+    timerTimeElapsed = -1;
 
 }
 
@@ -24,30 +28,31 @@ DropOffController::~DropOffController() {
 
 }
 
-Result DropOffController::CalculateResult() {
+Result DropOffController::DoWork() {
 
-    //if we are in the routine for exciting the circle once we have dropped a block off and reseting all our flags
+    if(timerTimeElapsed > -1) {
+        ros::Duration elapsed = ros::Time::now() - returnTimer;
+        timerTimeElapsed = elapsed.sec + elapsed.nsec/1000000000.0;
+    }
+
+    //if we are in the routine for exiting the circle once we have dropped a block off and reseting all our flags
     //to resart our search.
     if(reachedCollectionPoint)
     {
         if (timerTimeElapsed >= 4)
         {
             result.type = behavior;
-            result.b = targetReturned;
-            Reset();
+            result.b = nextProcess;
+            result.reset = true;
             return result;
         }
-        else if (timerTimeElapsed >= 1)
+        else if (timerTimeElapsed >= 0.5)
         {
             isPrecisionDriving = true;
             result.type = precisionDriving;
 
-            //open fingers
-            float angle;
-            angle = M_PI_2;
-            result.fingerAngle = angle;
-            angle= 0;
-            result.wristAngle = angle; //raise wrist
+            result.fingerAngle = M_PI_2; //open fingers
+            result.wristAngle = 0; //raise wrist
 
             result.pd.cmdVel = -0.3;
             result.pd.cmdAngularError = 0.0;
@@ -60,15 +65,19 @@ Result DropOffController::CalculateResult() {
     int count = countLeft + countRight;
 
     //check to see if we are driving to the center location or if we need to drive in a circle and look.
-    if (distanceToCenter > collectionPointVisualDistance && !circularCenterSearching && count == 0) {
+    if (distanceToCenter > collectionPointVisualDistance && !circularCenterSearching && (count == 0)) {
 
         result.type = waypoint;
-        result.wpts.waypoints.push_back(centerLocation);
+        result.wpts.waypoints.push_back(this->centerLocation);
         startWaypoint = false;
         isPrecisionDriving = false;
 
+        timerTimeElapsed = 0;
+
+        return result;
+
     }
-    else if (timerTimeElapsed >=5)//spin search for center
+    else if (timerTimeElapsed >= 5)//spin search for center
     {
         geometry_msgs::Pose2D nextSpinPoint;
 
@@ -92,6 +101,11 @@ Result DropOffController::CalculateResult() {
         //safety flag to prevent us trying to drive back to the
         //center since we have a block with us and the above point is
         //greater than collectionPointVisualDistance from the center.
+
+        returnTimer = ros::Time::now();
+        timerTimeElapsed = 0;
+
+        return result;
     }
 
     bool left = (countLeft > 0);
@@ -101,7 +115,7 @@ Result DropOffController::CalculateResult() {
     //reset lastCenterTagThresholdTime timout timer to current time
     if ((!centerApproach && !seenEnoughCenterTags) || (count > 0 && !seenEnoughCenterTags)) {
 
-        lastCenterTagThresholdTime = time(0);
+        lastCenterTagThresholdTime = ros::Time::now();
 
     }
 
@@ -126,6 +140,7 @@ Result DropOffController::CalculateResult() {
         //trajectory in to the square we dont want to follow an edge.
         if (seenEnoughCenterTags) turnDirection = -1;
 
+        result.type = precisionDriving;
 
         //otherwise turn till tags on both sides of image then drive straight
         if (left && right) {
@@ -150,14 +165,15 @@ Result DropOffController::CalculateResult() {
         if (count > centerTagThreshold)
         {
             seenEnoughCenterTags = true; //we have driven far enough forward to be in the circle.
-            lastCenterTagThresholdTime = time(0);
+            lastCenterTagThresholdTime = ros::Time::now();
         }
         if (count > 0) //reset gaurd to prevent drop offs due to loosing tracking on tags for a frame or 2.
         {
-            lastCenterTagThresholdTime = time(0);
+            lastCenterTagThresholdTime = ros::Time::now();
         }
         //time since we dropped below countGuard tags
-        time_t timeSinceSeeingEnoughCenterTags = time(0) - lastCenterTagThresholdTime;
+        ros::Duration elapsed = ros::Time::now() - lastCenterTagThresholdTime;
+        float timeSinceSeeingEnoughCenterTags = elapsed.sec + elapsed.nsec/1000000000.0;
 
         //we have driven far enough forward to have passed over the circle.
         if (count == 0 && seenEnoughCenterTags && timeSinceSeeingEnoughCenterTags > 1) {
@@ -172,7 +188,8 @@ Result DropOffController::CalculateResult() {
     //for centerTagSearchCutoff seconds so reset.
     else if (centerApproach) {
 
-        time_t timeSinceSeeingEnoughCenterTags = time(0) - lastCenterTagThresholdTime;
+        ros::Duration elapsed = ros::Time::now() - lastCenterTagThresholdTime;
+        float timeSinceSeeingEnoughCenterTags = elapsed.sec + elapsed.nsec/1000000000.0;
         if (timeSinceSeeingEnoughCenterTags > centerTagSearchCutoff)
         {
             //go back to drive to center base location instead of drop off attempt
@@ -181,7 +198,7 @@ Result DropOffController::CalculateResult() {
             centerApproach = false;
 
             result.type = waypoint;
-            result.wpts.waypoints.push_back(centerLocation);
+            result.wpts.waypoints.push_back(this->centerLocation);
             isPrecisionDriving = false;
         }
         else
@@ -198,7 +215,7 @@ Result DropOffController::CalculateResult() {
     {
         reachedCollectionPoint = true;
         centerApproach = false;
-        returnTimer = time(0);
+        returnTimer = ros::Time::now();
     }
 
     return result;
@@ -209,9 +226,14 @@ void DropOffController::Reset() {
     result.pd.cmdAngularError = 0;
     result.fingerAngle = -1;
     result.wristAngle = 0.8;
+    result.reset = false;
     spinner = 0;
     spinSizeIncrease = 0;
     prevCount = 0;
+    timerTimeElapsed = -1;
+
+    countLeft = 0;
+    countRight = 0;
 
 
     //reset flags
@@ -244,18 +266,26 @@ void DropOffController::UpdateData(const apriltags_ros::AprilTagDetectionArray::
                 }
             }
         }
-
-        if((countLeft + countRight) > 0) {
-            isPrecisionDriving = true;
-        } else {
-            startWaypoint = true;
-        }
     }
 
 }
 
+void DropOffController::ProcessData() {
+    if((countLeft + countRight) > 0) {
+        isPrecisionDriving = true;
+    } else {
+        startWaypoint = true;
+    }
+}
+
 bool DropOffController::ShouldInterrupt() {
+    ProcessData();
+
     return startWaypoint;
+}
+
+bool DropOffController::HasWork() {
+    return ((startWaypoint || isPrecisionDriving) && !circularCenterSearching);
 }
 
 bool DropOffController::IsChangingMode() {
