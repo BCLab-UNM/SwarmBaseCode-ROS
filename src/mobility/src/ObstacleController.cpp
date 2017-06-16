@@ -76,7 +76,7 @@ void ObstacleController::ProcessData() {
     }
 
     if ((left < triggerDistance || right < triggerDistance || center < triggerDistance || centerSeen) && !obstacleInterrupt) {
-        obstacleInterrupt = true;
+        obstacleDetected = true;
         obstacleAvoided = false;
     } else {
         obstacleAvoided = true;
@@ -107,8 +107,8 @@ void ObstacleController::UpdateData(const apriltags_ros::AprilTagDetectionArray:
 bool ObstacleController::ShouldInterrupt() {
     ProcessData();
 
-    if(obstacleInterrupt && !obstacleDetected) {
-        obstacleDetected = true;
+    if(obstacleDetected && !obstacleInterrupt) {
+        obstacleInterrupt = true;
         return true;
     } else {
         if(obstacleAvoided) {
