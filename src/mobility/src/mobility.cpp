@@ -25,7 +25,6 @@
 #include "LogicController.h"
 
 #include "StandardVars.h"
-#include "PID.h"
 #include <vector>
 
 // To handle shutdown signals so the node quits
@@ -51,28 +50,6 @@ void lowerWrist();  // Lower wrist to 50 degrees
 void resultHandler();
 
 
-//PID configs************************
-PIDConfig fastVelConfig();
-PIDConfig fastYawConfig();
-PIDConfig slowVelConfig();
-PIDConfig slowYawConfig();
-PIDConfig constVelConfig();
-PIDConfig constYawConfig();
-
-void fastPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
-void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
-void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
-
-PID fastVelPID(fastVelConfig());
-PID fastYawPID(fastYawConfig());
-
-PID slowVelPID(slowVelConfig());
-PID slowYawPID(slowYawConfig());
-
-PID constVelPID(constVelConfig());
-PID constYawPID(constYawConfig());
-
-
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
@@ -92,22 +69,7 @@ const float waypointTolerance = 0.1; //10 cm tolerance.
 // used for calling code once but not in main
 bool initilized = false;
 
-bool targetsFound = false;
-
-bool obstacleDetected = false;
-
-bool targetsCollected = false;
-
-bool waypointsAvalible = false;
-
-bool pathPlanningRequired = true;
-
 float searchVelocity = 0.2; // meters/second
-
-bool avoidingObstacle = false;
-
-bool dropOffWayPoints = false;
-bool dropOffPrecision = false;
 
 float linearVelocity = 0;
 float angularVelocity = 0;
@@ -463,35 +425,12 @@ void sendDriveCommand(double left, double right)
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
-    if (proccessLoopState == PROCCESS_LOOP_SEARCHING) {
-        pickUpController.UpdateData(message); //send april tag data to pickUpController
-        if (!targetsFound) {
-            targetsFound = pickUpController.ShouldInterrupt(); //set this flag to indicate we found a target and thus handle the interupt
+    if (message->detections.size() > 0) {
 
-            if(targetsFound) {
-                stateMachineState = STATE_MACHINE_INTERRUPT;
-            }
-        }
-    }
-    
-    dropOffController.UpdateData(message); //send april tag data to dropOffController
-    if (!dropOffPrecision) { //if we have called this interupt ignore it
-        if (dropOffController.IsChangingMode()) {
-            stateMachineState = STATE_MACHINE_INTERRUPT;
-            dropOffWayPoints = false; //set this repeat hold flag false to allow a new interupt in the future
-            dropOffPrecision = true; //set is repeat hold flag true to prevent multiple calls
-        }
-    }
+        //Crate vector of tag ids with pos data
 
-    obstacleController.UpdateData(message); //send april tag data to dropOffContoller
-    if(!targetsCollected){
-        if(!obstacleDetected) {
-            obstacleDetected = obstacleController.ShouldInterrupt();
 
-            if(obstacleDetected) {
-                stateMachineState = STATE_MACHINE_INTERRUPT;
-            }
-        }
+        logicController.setAprilTags();
     }
     
 }
@@ -503,29 +442,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
 
-   if(pickUpController.NewUpdateData(sonarCenter->range)){
-       obstacleController.SetIgnoreCenter();
-
-   }
-
-
-
-    obstacleController.UpdateData(sonarLeft->range, sonarCenter->range, sonarRight->range, currentLocation);
-    if (!obstacleDetected) {
-        obstacleDetected = obstacleController.ShouldInterrupt();
-        if (obstacleDetected) {
-            stateMachineState = STATE_MACHINE_INTERRUPT;
-        }
-    }
-
-    if (sonarCenter->range < 0.1) {
-        pickUpController.SetUltraSoundData(true);
-        dropOffController.SetBlockBlockingUltrasound(true);
-    }
-    else {
-        pickUpController.SetUltraSoundData(false);
-        dropOffController.SetBlockBlockingUltrasound(false);
-    }
+    logicController.setSonarData(sonarLeft->range, sonarCenter->range, sonarRight->range);
 
 }
 
@@ -543,6 +460,9 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 
     linearVelocity = message->twist.twist.linear.x;
     angularVelocity = message->twist.twist.angular.z;
+
+    logicController.setPositionData(); //TODO create non ros
+    logicController.setVelocityData(linearVelocity, angularVelocity);
 }
 
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
@@ -577,232 +497,7 @@ void sigintEventHandler(int sig) {
 }
 
 
-void resultHandler()
-{
-        std_msgs::Float32 angle;
-    if (result.wristAngle != -1) {
-        angle.data = result.wristAngle;
-        wristAnglePublish.publish(angle);
-    }
-    if (result.fingerAngle != -1) {
-        angle.data = result.fingerAngle;
-        fingerAnglePublish.publish(angle); 
-    }
-  
-    if (result.type == waypoint) {
 
-        if(result.reset) {
-            waypoints.clear();
-        }
-
-        if (!result.wpts.waypoints.empty()) {
-            waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
-            waypointsAvalible = true;
-            stateMachineState = STATE_MACHINE_WAYPOINTS;
-        }
-    }
-    else if (result.type == precisionDriving) {
-        if (result.PIDMode == FAST_PID){
-            float vel = result.pd.cmdVel -linearVelocity;
-            fastPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
-        }
-        else if (result.PIDMode == SLOW_PID) {
-            //will take longer to reach the setPoint but has les chanse of an overshoot
-            float vel = result.pd.cmdVel -linearVelocity;
-            slowPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw);
-        }
-        else if (result.PIDMode == CONST_PID) {
-            float vel = result.pd.cmdVel - linearVelocity;
-            float angular = result.pd.cmdAngular - angularVelocity;
-
-            constPID(vel, angular ,result.pd.setPointVel, result.pd.setPointYaw);
-        }
-    }      
-}
-
-
-void fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw) {
-
-    float velOut = fastVelPID.PIDOut(errorVel, setPointVel);
-    float yawOut = fastYawPID.PIDOut(errorYaw, setPointYaw);
-    
-    int left = velOut - yawOut;
-    int right = velOut + yawOut;
-    
-    int sat = 255;
-    if (left  >  sat) {left  =  sat;}
-    if (left  < -sat) {left  = -sat;}
-    if (right >  sat) {right =  sat;}
-    if (right < -sat) {right = -sat;}
-    
-    sendDriveCommand(left,right);
-}
-
-void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw) {
-
-    float velOut = slowVelPID.PIDOut(errorVel, setPointVel);
-    float yawOut = slowYawPID.PIDOut(errorYaw, setPointYaw);
-
-    int left = velOut - yawOut;
-    int right = velOut + yawOut;
-
-    int sat = 255;
-    if (left  >  sat) {left  =  sat;}
-    if (left  < -sat) {left  = -sat;}
-    if (right >  sat) {right =  sat;}
-    if (right < -sat) {right = -sat;}
-
-    sendDriveCommand(left,right);
-}
-
-void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw) {
-
-    float velOut = fastVelPID.PIDOut(erroVel, setPointVel);
-    float yawOut = fastYawPID.PIDOut(constAngularError, setPointYaw);
-
-    int left = velOut - yawOut;
-    int right = velOut + yawOut;
-
-    int sat = 255;
-    if (left  >  sat) {left  =  sat;}
-    if (left  < -sat) {left  = -sat;}
-    if (right >  sat) {right =  sat;}
-    if (right < -sat) {right = -sat;}
-
-    sendDriveCommand(left,right);
-}
-
-PIDConfig fastVelConfig() {
-    PIDConfig config;
-    
-    config.Kp = 140;
-    config.Ki = 10;
-    config.Kd = 0.8;
-    config.satUpper = 255; 
-    config.satLower = -255; 
-    config.antiWindup = config.satUpper/2; 
-    config.errorHistLength = 4;
-    config.alwaysIntegral = true;
-    config.resetOnSetpoint = true;
-    config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
-    config.integralDeadZone = 0.01;
-    config.integralErrorHistoryLength = 10000;
-    config.integralMax = config.satUpper/2;
-    config.derivativeAlpha = 0.7;
-    
-    return config;
-    
-}
-
-PIDConfig fastYawConfig() {
-    PIDConfig config;
-    
-    config.Kp = 200;
-    config.Ki = 25;
-    config.Kd = 0.5;
-    config.satUpper = 255; 
-    config.satLower = -255; 
-    config.antiWindup = config.satUpper/2; 
-    config.errorHistLength = 4;
-    config.alwaysIntegral = false; 
-    config.resetOnSetpoint = true;
-    config.feedForwardMultiplier = 0; //gives 127 pwm at 0.4 commandedspeed
-    config.integralDeadZone = 0.01;
-    config.integralErrorHistoryLength = 10000;
-    config.integralMax = config.satUpper/2;
-    config.derivativeAlpha = 0.7;
-    
-    return config;
-    
-}
-
-PIDConfig slowVelConfig() {
-    PIDConfig config;
-
-    config.Kp = 100;
-    config.Ki = 8;
-    config.Kd = 1.1;
-    config.satUpper = 255;
-    config.satLower = -255;
-    config.antiWindup = config.satUpper/2;
-    config.errorHistLength = 4;
-    config.alwaysIntegral = true;
-    config.resetOnSetpoint = true;
-    config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
-    config.integralDeadZone = 0.01;
-    config.integralErrorHistoryLength = 10000;
-    config.integralMax = config.satUpper/2;
-    config.derivativeAlpha = 0.7;
-
-    return config;
-
-}
-
-PIDConfig slowYawConfig() {
-    PIDConfig config;
-
-    config.Kp = 100;
-    config.Ki = 15;
-    config.Kd = 1.5;
-    config.satUpper = 255;
-    config.satLower = -255;
-    config.antiWindup = config.satUpper/4;
-    config.errorHistLength = 4;
-    config.alwaysIntegral = false;
-    config.resetOnSetpoint = true;
-    config.feedForwardMultiplier = 0; //gives 127 pwm at 0.4 commandedspeed
-    config.integralDeadZone = 0.01;
-    config.integralErrorHistoryLength = 10000;
-    config.integralMax = config.satUpper/6;
-    config.derivativeAlpha = 0.7;
-
-    return config;
-
-}
-
-PIDConfig constVelConfig() {
-    PIDConfig config;
-
-    config.Kp = 140;
-    config.Ki = 10;
-    config.Kd = 0.8;
-    config.satUpper = 255;
-    config.satLower = -255;
-    config.antiWindup = config.satUpper/2;
-    config.errorHistLength = 4;
-    config.alwaysIntegral = true;
-    config.resetOnSetpoint = true;
-    config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
-    config.integralDeadZone = 0.01;
-    config.integralErrorHistoryLength = 10000;
-    config.integralMax = config.satUpper/2;
-    config.derivativeAlpha = 0.7;
-
-    return config;
-
-}
-
-PIDConfig constYawConfig() {
-    PIDConfig config;
-
-    config.Kp = 100;
-    config.Ki = 5;
-    config.Kd = 1.2;
-    config.satUpper = 255;
-    config.satLower = -255;
-    config.antiWindup = config.satUpper/4;
-    config.errorHistLength = 4;
-    config.alwaysIntegral = true;
-    config.resetOnSetpoint = true;
-    config.feedForwardMultiplier = 120; //gives 127 pwm at 0.4 commandedspeed
-    config.integralDeadZone = 0.01;
-    config.integralErrorHistoryLength = 10000;
-    config.integralMax = config.satUpper/2;
-    config.derivativeAlpha = 0.6;
-
-    return config;
-
-}
 
 
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {

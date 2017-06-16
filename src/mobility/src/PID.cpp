@@ -1,7 +1,10 @@
 #include "PID.h"
 
-PID::PID(PIDConfig config)
-{
+PID::PID() {
+
+}
+
+PID::PID(PIDConfig config){
     this->config = config; 
     integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
 }

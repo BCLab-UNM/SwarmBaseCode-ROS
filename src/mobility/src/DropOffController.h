@@ -18,7 +18,6 @@ public:
 
     void Reset() override;
     Result DoWork() override;
-    void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
     bool ShouldInterrupt() override;
     bool HasWork() override;
 
@@ -26,13 +25,14 @@ public:
     void SetLocationData(geometry_msgs::Pose2D center, geometry_msgs::Pose2D current);
     void SetTargetPickedUp();
     void SetBlockBlockingUltrasound(bool blockBlock);
+    void setTargetData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
 
     float GetSpinner() {return spinner;}
 
-protected:
-    void ProcessData();
 
 private:
+
+    void ProcessData();
 
     //Constants
 

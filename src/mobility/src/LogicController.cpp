@@ -54,9 +54,19 @@ Result LogicController::DoWork() {
 
         if(result.type == behavior) {
             if(result.b == nextProcess) {
-
+                if (processState == _LAST) {
+                    processState = _FIRST;
+                }
+                else {
+                processState += 1;
+                }
             } else if(result.b == prevProcess) {
-
+                if (processState == _FIRST) {
+                    processState = _LAST-1;
+                }
+                else {
+                processState -= 1;
+                }
             }
         } else if(result.type == precisionDriving) {
 

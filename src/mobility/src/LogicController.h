@@ -6,6 +6,7 @@
 #include "DropOffController.h"
 #include "SearchController.h"
 #include "ObstacleController.h"
+#include "DriveController.h"
 
 #include <vector>
 #include <queue>
@@ -45,8 +46,11 @@ private:
     };
 
     enum ProcessState {
+        _FIRST = 0,
         PROCCESS_STATE_SEARCHING = 0,
-        PROCCESS_STATE_TARGET_PICKEDUP
+        PROCCESS_COLLECTING_TARGET,
+        PROCCESS_STATE_TARGET_PICKEDUP,
+        _LAST
     };
 
     LogicState logicState;
@@ -56,6 +60,7 @@ private:
     DropOffController dropOffController;
     SearchController searchController;
     ObstacleController obstacleController;
+    DriveController driveController;
 
     std::vector<PrioritizedController> prioritizedControllers;
     priority_queue<PrioritizedController> control_queue;

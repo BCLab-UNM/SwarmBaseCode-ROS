@@ -30,10 +30,13 @@ public:
 
 
     PIDConfig config;
-    
+
+    PID();
     PID(PIDConfig config);
     
     float PIDOut(float calculatedError, float setPoint);
+
+    void setConfiguration(PIDConfig config) {this->config = config;}
     
 private:
     
