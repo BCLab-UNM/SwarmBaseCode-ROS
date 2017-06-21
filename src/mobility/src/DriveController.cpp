@@ -1,19 +1,20 @@
 #include "DriveController.h"
 
-DriveController::DriveController()
-{
+DriveController::DriveController() {
 
 fastVelPID.setConfiguration(fastVelConfig());
-fastyawPID.setConfiguration(fastYawConfig());
+fastYawPID.setConfiguration(fastYawConfig());
 
 slowVelPID.setConfiguration(slowVelConfig());
 slowYawPID.setConfiguration(slowYawConfig());
 
-constVelPID.setConfiguration(constVelConfig();
+constVelPID.setConfiguration(constVelConfig());
 constYawPID.setConfiguration(constYawConfig());
 
 
 }
+
+DriveController::~DriveController() {}
 
 void DriveController::Reset() {
 
@@ -21,16 +22,154 @@ void DriveController::Reset() {
 
 Result DriveController::DoWork() {
 
-    resultHandler();
+    if(result.type == behavior) {
+        if(result.b == noChange) {
+
+        } else if(result.b == wait) {
+
+            left = 0.0;
+            right = 0.0;
+            stateMachineState = STATE_MACHINE_WAITING;
+
+        }
+    } else if(result.type == precisionDriving) {
+
+        stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
+
+    } else if(result.type == waypoint) {
+
+        ProcessData();
+
+    }
+
+    switch(stateMachineState) {
+
+
+    //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
+    //This should be d one as little as possible. I Suggest to Use timeouts to set control bools false.
+    //Then only call INTERUPT if bool switches to true.
+    case STATE_MACHINE_PRECISION_DRIVING: {
+
+        ProcessData();
+
+        break;
+    }
+
+        //Handles route planning and navigation as well as makeing sure all waypoints are valid.
+    case STATE_MACHINE_WAYPOINTS: {
+
+
+        bool tooClose = true;
+        while (!waypoints.empty() && tooClose) {
+            if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
+                waypoints.pop_back();
+            }
+            else {
+                tooClose = false;
+            }
+        }
+        if (waypoints.empty()) {
+            stateMachineState = STATE_MACHINE_WAITING;
+            result.type = behavior;
+            interupt = true;
+            return result;
+        }
+        else {
+            stateMachineState = STATE_MACHINE_ROTATE;
+            //fall through on purpose
+        }
+
+
+    }
+        // Calculate angle between currentLocation.theta and waypoints.front().theta
+        // Rotate left or right depending on sign of angle
+        // Stay in this state until angle is minimized
+    case STATE_MACHINE_ROTATE: {
+
+        waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
+        // Calculate the diffrence between current and desired heading in radians.
+        float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
+
+        result.pd.setPointVel = 0.0;
+        result.pd.setPointYaw = waypoints.back().theta;
+
+        // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
+        if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
+            // rotate but dont drive.
+            if (result.PIDMode == FAST_PID) {
+                fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
+            }
+            break;
+        } else {
+            // move to differential drive step
+            stateMachineState = STATE_MACHINE_SKID_STEER;
+            //fall through on purpose.
+        }
+    }
+        // Calculate angle between currentLocation.x/y and waypoints.back().x/y
+        // Drive forward
+        // Stay in this state until angle is at least PI/2
+    case STATE_MACHINE_SKID_STEER: {
+
+        // calculate the distance between current and desired heading in radians
+        float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
+
+        result.pd.setPointYaw = waypoints.back().theta;
+
+        // goal not yet reached drive while maintaining proper heading.
+        if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
+            // drive and turn simultaniously
+            result.pd.setPointVel = searchVelocity;
+            if (result.PIDMode == FAST_PID){
+                fastPID(searchVelocity - linearVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+            }
+        }
+        // goal is reached but desired heading is still wrong turn only
+        else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance) {
+            // rotate but dont drive
+            result.pd.setPointVel = 0.0;
+            if (result.PIDMode == FAST_PID){
+                fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+            }
+        }
+        else {
+            // stop
+            left = 0.0;
+            right = 0.0;
+
+            // move back to transform step
+            stateMachineState = STATE_MACHINE_WAYPOINTS;
+        }
+
+        break;
+    }
+
+    default: {
+        break;
+    }
+
+
+    }
+
+
+
 
     result.type = precisionDriving;
-    result.pd.cmdAngular = right;
-    result.pd.cmdVel = left;
+    result.pd.right = right;
+    result.pd.left = left;
+
+    return result;
 
 }
 
 bool DriveController::ShouldInterrupt() {
-
+    if (interupt) {
+        interupt = false;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 bool DriveController::HasWork() {
@@ -38,9 +177,10 @@ bool DriveController::HasWork() {
 }
 
 
-void DriveController::resultHandler()
+
+void DriveController::ProcessData()
 {
-        std_msgs::Float32 angle;
+        /*std_msgs::Float32 angle;
     if (result.wristAngle != -1) {
         angle.data = result.wristAngle;
         wristAnglePublish.publish(angle);
@@ -48,7 +188,7 @@ void DriveController::resultHandler()
     if (result.fingerAngle != -1) {
         angle.data = result.fingerAngle;
         fingerAnglePublish.publish(angle);
-    }
+    }*/
 
     if (result.type == waypoint) {
 
@@ -58,7 +198,6 @@ void DriveController::resultHandler()
 
         if (!result.wpts.waypoints.empty()) {
             waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
-            waypointsAvalible = true;
             stateMachineState = STATE_MACHINE_WAYPOINTS;
         }
     }

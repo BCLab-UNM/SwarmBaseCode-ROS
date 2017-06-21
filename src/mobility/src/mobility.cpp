@@ -54,7 +54,6 @@ void resultHandler();
 geometry_msgs::Pose2D currentLocation;
 geometry_msgs::Pose2D currentLocationMap;
 geometry_msgs::Pose2D currentLocationAverage;
-vector<geometry_msgs::Pose2D> waypoints;
 
 geometry_msgs::Pose2D centerLocation;
 geometry_msgs::Pose2D centerLocationMap;
@@ -69,29 +68,12 @@ const float waypointTolerance = 0.1; //10 cm tolerance.
 // used for calling code once but not in main
 bool initilized = false;
 
-float searchVelocity = 0.2; // meters/second
-
 float linearVelocity = 0;
 float angularVelocity = 0;
 
 Result result;
 
-
 std_msgs::String msg;
-
-// state machine states
-enum StateMachineStates {
-
-    //WAITING should not be handled- goes to default (it's a placeholder name)
-    STATE_MACHINE_WAITING = 0,
-    STATE_MACHINE_PRECISION_DRIVING,
-    STATE_MACHINE_WAYPOINTS,
-    STATE_MACHINE_ROTATE,
-    STATE_MACHINE_SKID_STEER,
-};
-
-
-StateMachineStates stateMachineState = STATE_MACHINE_WAITING;
 
 
 geometry_msgs::Twist velocity;
@@ -220,8 +202,6 @@ int main(int argc, char **argv) {
 // controllers in the abridge package.
 void mobilityStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
-    float rotateOnlyAngleTolerance = 0.2;
-    float finalRotationTolerance = 0.1;
     
     // time since timerStartTime was set to current time
     timerTimeElapsed = time(0) - timerStartTime;
@@ -243,145 +223,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     if (currentMode == 2 || currentMode == 3) {
 
         result = logicController.DoWork();
-
-        if(result.type == behavior) {
-            if(result.b == noChange) {
-
-            } else if(result.b == wait) {
-
-                sendDriveCommand(0.0, 0.0);
-
-                stateMachineState = STATE_MACHINE_WAITING;
-
-            }
-        } else if(result.type == precisionDriving) {
-
-            stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
-
-        } else if(result.type == waypoint) {
-
-            resultHandler();
-
-        }
-        
-        switch(stateMachineState) {
-        
-        
-        //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
-        //This should be d one as little as possible. I Suggest to Use timeouts to set control bools false.
-        //Then only call INTERUPT if bool switches to true.
-        case STATE_MACHINE_PRECISION_DRIVING: {
-
-            stateMachineMsg.data = "PRECISION_DRIVING";
-
-            resultHandler();
-
-            break;
+        if (result.type == precisionDriving) {
+            sendDriveCommand(result.pd.left,result.pd.right);
         }
 
-            //Handles route planning and navigation as well as makeing sure all waypoints are valid.
-        case STATE_MACHINE_WAYPOINTS: {
-            stateMachineMsg.data = "MANAGE_WAYPOINTS";
-
-            msg.data = "In waypoint state";
-            infoLogPublisher.publish(msg);
-
-            bool tooClose = true;
-            while (!waypoints.empty() && tooClose) {
-                if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
-                    waypoints.pop_back();
-                    msg.data = "Removed waypoints";
-                    infoLogPublisher.publish(msg);
-                }
-                else {
-                    tooClose = false;
-                }
-            }
-            if (waypoints.empty()) {
-                stateMachineState = STATE_MACHINE_INTERRUPT;
-                waypointsAvalible = false;
-                break;
-            }
-            else {
-                stateMachineState = STATE_MACHINE_ROTATE;
-                //fall through on purpose
-            }
-
-
-        }
-            // Calculate angle between currentLocation.theta and waypoints.front().theta
-            // Rotate left or right depending on sign of angle
-            // Stay in this state until angle is minimized
-        case STATE_MACHINE_ROTATE: {
-            stateMachineMsg.data = "ROTATING";
-            
-            waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
-            // Calculate the diffrence between current and desired heading in radians.
-            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
-
-            result.pd.setPointVel = 0.0;
-            result.pd.setPointYaw = waypoints.back().theta;
-            
-            // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
-                // rotate but dont drive.
-                if (result.PIDMode == FAST_PID) {
-                    fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
-                }
-                break;
-            } else {
-                // move to differential drive step
-                stateMachineState = STATE_MACHINE_SKID_STEER;
-                //fall through on purpose.
-            }
-        }
-            // Calculate angle between currentLocation.x/y and waypoints.back().x/y
-            // Drive forward
-            // Stay in this state until angle is at least PI/2
-        case STATE_MACHINE_SKID_STEER: {
-            stateMachineMsg.data = "SKID_STEER";
-            
-            // calculate the distance between current and desired heading in radians
-            float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
-
-            result.pd.setPointYaw = waypoints.back().theta;
-            
-            // goal not yet reached drive while maintaining proper heading.
-            if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
-                // drive and turn simultaniously
-                result.pd.setPointVel = searchVelocity;
-                if (result.PIDMode == FAST_PID){
-                    fastPID(searchVelocity - linearVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
-                }
-            }
-            // goal is reached but desired heading is still wrong turn only
-            else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance) {
-                // rotate but dont drive
-                result.pd.setPointVel = 0.0;
-                if (result.PIDMode == FAST_PID){
-                    fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
-                }
-                msg.data = "Final Alignment";
-                infoLogPublisher.publish(msg);
-            }
-            else {
-                // stop
-                sendDriveCommand(0.0, 0.0);
-                
-                // move back to transform step
-                stateMachineState = STATE_MACHINE_WAYPOINTS;
-            }
-            
-            break;
-        }
-            
-        default: {
-            break;
-        }
-            
-            
-        }
-
+        //publishHandeling here
+        //logicController.getPublishData() suggested;
 
     }
     // mode is NOT auto
@@ -396,18 +243,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         stateMachinePublish.publish(stateMachineMsg);
         sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
-    
-    dropOffController.SetLocationData(centerLocation, currentLocation); //send location data to dropOffController
-    
-    if (!dropOffWayPoints) { //check if we have triggered this interupt already if so ignore it
-        dropOffWayPoints = dropOffController.ShouldInterrupt(); //trigger waypoints interupt for drop off flag is true
-        if(dropOffWayPoints) {
-            stateMachineState = STATE_MACHINE_INTERRUPT;
-            dropOffPrecision = false; //we cannot precision drive if we want to waypoint drive.
-        }
-    }
-
-    searchController.UpdateData(currentLocation, centerLocation);
+    //send pointer to connect centerLocation of searchController and droppOffController
 }
 
 void sendDriveCommand(double left, double right)
@@ -426,11 +262,20 @@ void sendDriveCommand(double left, double right)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
     
     if (message->detections.size() > 0) {
+        vector<TagPoint> tags;
 
-        //Crate vector of tag ids with pos data
+        for (int i = 0; i < message->detections.size(); i++) {
 
-
-        logicController.setAprilTags();
+                TagPoint loc;
+                loc.id = message->detections[i].id;
+                geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
+                loc.x = tagPose.pose.position.x;
+                loc.y = tagPose.pose.position.y;
+                loc.z = tagPose.pose.position.z;
+                //loc.theta =
+                tags.push_back(loc);
+        }
+        logicController.setAprilTags(tags);
     }
     
 }
@@ -461,7 +306,12 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
     linearVelocity = message->twist.twist.linear.x;
     angularVelocity = message->twist.twist.angular.z;
 
-    logicController.setPositionData(); //TODO create non ros
+
+    Point currentLoc;
+    currentLoc.x = currentLocation.x;
+    currentLoc.y = currentLocation.y;
+    currentLoc.theta = currentLocation.theta;
+    logicController.setPositionData(currentLoc);
     logicController.setVelocityData(linearVelocity, angularVelocity);
 }
 
@@ -476,6 +326,16 @@ void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
     currentLocationMap.theta = yaw;
+
+    linearVelocity = message->twist.twist.linear.x;
+    angularVelocity = message->twist.twist.angular.z;
+
+    Point currentLoc;
+    currentLoc.x = currentLocation.x;
+    currentLoc.y = currentLocation.y;
+    currentLoc.theta = currentLocation.theta;
+    logicController.setPositionData(currentLoc);
+    logicController.setMapVelocityData(linearVelocity, angularVelocity);
 }
 
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
@@ -495,10 +355,6 @@ void sigintEventHandler(int sig) {
     // All the default sigint handler does is call shutdown()
     ros::shutdown();
 }
-
-
-
-
 
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
     std_msgs::String msg;

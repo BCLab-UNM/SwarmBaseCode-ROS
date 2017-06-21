@@ -17,7 +17,9 @@ struct PrioritizedController {
     int priority = -1;
     Controller* controller = nullptr;
 
-    inline bool operator <(const PrioritizedController& other) {
+    PrioritizedController(int pri, Controller* cntrl) : priority(pri), controller(cntrl) {}
+
+    inline bool operator <(const PrioritizedController& other) const {
         return priority < other.priority;
     }
 };
@@ -33,6 +35,13 @@ public:
     void UpdateData();
     bool ShouldInterrupt() override;
     bool HasWork() override;
+
+    void setAprilTags(vector<TagPoint> tags);
+    void setSonarData(float left, float center, float right);
+    void setPositionData(Point currentLocation);
+    void setMapPositionData(Point currentLocationMap);
+    void setVelocityData(float linearVelocity, float angularVelocity);
+    void setMapVelocityData(float linearVelocity, float angularVelocity);
 
 protected:
     void ProcessData();

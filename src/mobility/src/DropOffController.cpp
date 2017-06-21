@@ -243,21 +243,20 @@ void DropOffController::Reset() {
 
 }
 
-void DropOffController::UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
+void DropOffController::UpdateData(vector<TagPoint> tags) {
     countRight = 0;
     countLeft = 0;
 
     if(targetHeld) {
         // if a target is detected and we are looking for center tags
-        if (message->detections.size() > 0 && !reachedCollectionPoint) {
+        if (tags.size() > 0 && !reachedCollectionPoint) {
 
             // this loop is to get the number of center tags
-            for (int i = 0; i < message->detections.size(); i++) {
-                if (message->detections[i].id == 256) {
-                    geometry_msgs::PoseStamped cenPose = message->detections[i].pose;
+            for (int i = 0; i < tags.size(); i++) {
+                if (tags[i].id == 256) {
 
                     // checks if tag is on the right or left side of the image
-                    if (cenPose.pose.position.x + cameraOffsetCorrection > 0) {
+                    if (tags[i].x + cameraOffsetCorrection > 0) {
                         countRight++;
 
                     } else {

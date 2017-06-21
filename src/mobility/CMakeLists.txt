@@ -28,6 +28,8 @@ add_executable(
   src/SearchController.cpp
   src/mobility.cpp
   src/PID.cpp
+  src/DriveController.cpp
+  src/LogicController.cpp
 )
 
 add_dependencies(mobility ${catkin_EXPORTED_TARGETS})

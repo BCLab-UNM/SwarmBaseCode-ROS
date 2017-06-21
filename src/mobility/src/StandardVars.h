@@ -32,6 +32,9 @@ struct PrecisionDriving {
     float cmdAngular;
     float setPointVel;
     float setPointYaw;
+
+    float left;
+    float right;
 };
 
 struct Waypoints {
@@ -78,5 +81,19 @@ struct Result {
  * 
  */
 
+
+struct Point {
+    float x;
+    float y;
+    float theta;
+};
+
+struct TagPoint {
+    int id;
+    float x;
+    float y;
+    float z;
+    float theta;
+};
 
 #endif // STANDARDVARS_H

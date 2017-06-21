@@ -14,6 +14,8 @@ LogicController::LogicController() {
 
 }
 
+LogicController::~LogicController() {}
+
 void LogicController::Reset() {
 
     logicState = LOGIC_STATE_INTERRUPT;
@@ -31,6 +33,18 @@ void LogicController::Reset() {
 Result LogicController::DoWork() {
     Result result;
 
+
+    if (processState == PROCCESS_STATE_SEARCHING) {
+
+    }
+    else if (processState == PROCCESS_COLLECTING_TARGET) {
+
+    }
+    else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
+
+    }
+
+
     switch(logicState) {
     case LOGIC_STATE_INTERRUPT: {
 
@@ -38,7 +52,7 @@ Result LogicController::DoWork() {
         control_queue = priority_queue<PrioritizedController>();
 
         for(PrioritizedController cntrlr : prioritizedControllers) {
-            if(cntrlr.controller->ShouldBePolled()) {
+            if(cntrlr.controller->ShouldInterrupt()) {
                 control_queue.push(cntrlr);
             }
         }
@@ -50,7 +64,7 @@ Result LogicController::DoWork() {
             return result;
         }
 
-        result = control_queue.top().controller->CalculateResult();
+        result = control_queue.top().controller->DoWork();
 
         if(result.type == behavior) {
             if(result.b == nextProcess) {
@@ -58,14 +72,14 @@ Result LogicController::DoWork() {
                     processState = _FIRST;
                 }
                 else {
-                processState += 1;
+                processState = (ProcessState)((int)processState + 1);
                 }
             } else if(result.b == prevProcess) {
                 if (processState == _FIRST) {
-                    processState = _LAST-1;
+                    processState = (ProcessState)((int)_LAST - 1);
                 }
                 else {
-                processState -= 1;
+                processState = (ProcessState)((int)processState - 1);
                 }
             }
         } else if(result.type == precisionDriving) {
@@ -75,7 +89,7 @@ Result LogicController::DoWork() {
         } else if(result.type == waypoint) {
 
             logicState = LOGIC_STATE_WAITING;
-
+            result = control_queue.top().controller->DoWork();
 
         }
 
@@ -84,18 +98,32 @@ Result LogicController::DoWork() {
 
     case LOGIC_STATE_WAITING: {
 
-
+        result = driveController.DoWork();
+        if (result.type = behavior) {
+            if(driveController.ShouldInterrupt()) {
+                logicState = LOGIC_STATE_INTERRUPT;
+            }
+            else {
+                return result;
+            }
+        }
+        else {
+            return result;
+        }
 
         break;
     }
 
     case LOGIC_STATE_PRECISION_COMMAND: {
 
-        result = control_queue.top().controller->CalculateResult();
-
+        result = control_queue.top().controller->DoWork();
+        driveController.setResultData(result);
+        result = driveController.DoWork();
         break;
     }
     }
+
+    return result;
 }
 
 void LogicController::UpdateData() {
@@ -115,4 +143,28 @@ bool LogicController::ShouldInterrupt() {
 
 bool LogicController::HasWork() {
     return false;
+}
+
+void LogicController::setPositionData(Point currentLocation) {
+
+}
+
+void LogicController::setMapPositionData(Point currentLocationMap) {
+
+}
+
+void LogicController::setVelocityData(float linearVelocity, float angularVelocity) {
+
+}
+
+void LogicController::setMapVelocityData(float linearVelocity, float angularVelocity) {
+
+}
+
+void LogicController::setAprilTags(vector<TagPoint> tags) {
+
+}
+
+void LogicController::setSonarData(float left, float center, float right) {
+
 }

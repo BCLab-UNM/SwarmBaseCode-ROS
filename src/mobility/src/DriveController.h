@@ -3,6 +3,8 @@
 
 #include "StandardVars.h"
 #include "PID.h"
+#include "Controller.h"
+#include <angles/angles.h>
 
 class DriveController : virtual Controller
 {
@@ -24,7 +26,27 @@ private:
     float left;
     float right;
 
-    void ProcessData();
+    bool interupt = false;
+
+    float rotateOnlyAngleTolerance = 0.2;
+    float finalRotationTolerance = 0.1;
+    const float waypointTolerance = 0.1; //10 cm tolerance.
+
+    float searchVelocity = 0.2; // meters/second
+
+    float linearVelocity = 0;
+    float angularVelocity = 0;
+
+    // Numeric Variables for rover positioning
+    Point currentLocation;
+    Point currentLocationMap;
+    Point currentLocationAverage;
+
+    Point centerLocation;
+    Point centerLocationMap;
+    Point centerLocationOdom;
+
+    vector<geometry_msgs::Pose2D> waypoints;
 
     //PID configs************************
     PIDConfig fastVelConfig();
@@ -38,15 +60,30 @@ private:
     void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
     void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
 
-    PID fastVelPID(fastVelConfig());
-    PID fastYawPID(fastYawConfig());
+    PID fastVelPID;
+    PID fastYawPID;
 
-    PID slowVelPID(slowVelConfig());
-    PID slowYawPID(slowYawConfig());
+    PID slowVelPID;
+    PID slowYawPID;
 
-    PID constVelPID(constVelConfig());
-    PID constYawPID(constYawConfig());
+    PID constVelPID;
+    PID constYawPID;
 
+    // state machine states
+    enum StateMachineStates {
+
+        //WAITING should not be handled- goes to default (it's a placeholder name)
+        STATE_MACHINE_WAITING = 0,
+        STATE_MACHINE_PRECISION_DRIVING,
+        STATE_MACHINE_WAYPOINTS,
+        STATE_MACHINE_ROTATE,
+        STATE_MACHINE_SKID_STEER,
+    };
+
+
+    StateMachineStates stateMachineState = STATE_MACHINE_WAITING;
+
+    void ProcessData();
 
 };
 

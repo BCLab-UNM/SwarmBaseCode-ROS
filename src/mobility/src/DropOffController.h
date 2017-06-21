@@ -29,6 +29,8 @@ public:
 
     float GetSpinner() {return spinner;}
 
+    void UpdateData(vector<TagPoint> tags);
+
 
 private:
 
