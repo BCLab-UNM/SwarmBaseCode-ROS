@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(mobility)
+project(behaviours)
 
 SET(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -21,21 +21,21 @@ include_directories(
 )
 
 add_executable(
-  mobility
+  behaviours
   src/ObstacleController.cpp 
   src/PickUpController.cpp
   src/DropOffController.cpp
   src/SearchController.cpp
-  src/mobility.cpp
+  src/ROSAdapter.cpp
   src/PID.cpp
   src/DriveController.cpp
   src/LogicController.cpp
 )
 
-add_dependencies(mobility ${catkin_EXPORTED_TARGETS})
+add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(
-  mobility
+  behaviours
   ${catkin_LIBRARIES}
 )
 

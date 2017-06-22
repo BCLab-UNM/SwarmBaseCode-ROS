@@ -41,7 +41,7 @@ random_numbers::RandomNumberGenerator* rng;
 // Create logic controller
 LogicController logicController;
 
-// Mobility Logic Functions
+// Behaviours Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
 void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
@@ -60,7 +60,7 @@ geometry_msgs::Pose2D centerLocationMap;
 geometry_msgs::Pose2D centerLocationOdom;
 
 int currentMode = 0;
-const float mobilityLoopTimeStep = 0.1; // time between the mobility loop calls
+const float behaviourLoopTimeStep = 0.1; // time between the behaviour loop calls
 const float status_publish_interval = 1;
 const float heartbeat_publish_interval = 2;
 const float waypointTolerance = 0.1; //10 cm tolerance.
@@ -123,7 +123,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
-void mobilityStateMachine(const ros::TimerEvent&);
+void behaviourStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);
@@ -138,14 +138,14 @@ int main(int argc, char **argv) {
     if (argc >= 2) {
         publishedName = argv[1];
         cout << "Welcome to the world of tomorrow " << publishedName
-             << "!  Mobility turnDirectionule started." << endl;
+             << "!  Behaviour turnDirectionule started." << endl;
     } else {
         publishedName = hostname;
         cout << "No Name Selected. Default is: " << publishedName << endl;
     }
     
     // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
-    ros::init(argc, argv, (publishedName + "_MOBILITY"), ros::init_options::NoSigintHandler);
+    ros::init(argc, argv, (publishedName + "_BEHAVIOUR"), ros::init_options::NoSigintHandler);
     ros::NodeHandle mNH;
     
     // Register the SIGINT event handler so the node can shutdown properly
@@ -166,10 +166,10 @@ int main(int argc, char **argv) {
     wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);
     infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
     driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);
-    heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/mobility/heartbeat"), 1, true);
+    heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);
     
     publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
-    stateMachineTimer = mNH.createTimer(ros::Duration(mobilityLoopTimeStep), mobilityStateMachine);
+    stateMachineTimer = mNH.createTimer(ros::Duration(behaviourLoopTimeStep), behaviourStateMachine);
     
     publish_heartbeat_timer = mNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
        
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
 // This function calls the dropOff, pickUp, and search controllers.
 // This block passes the goal location to the proportional-integral-derivative
 // controllers in the abridge package.
-void mobilityStateMachine(const ros::TimerEvent&) {
+void behaviourStateMachine(const ros::TimerEvent&) {
     std_msgs::String stateMachineMsg;
     
     // time since timerStartTime was set to current time

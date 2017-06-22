@@ -35,7 +35,7 @@ private:
     random_numbers::RandomNumberGenerator* rng;
     Point currentLocation;
     Point centerLocation;
-    //struct for returning data to mobility
+    //struct for returning data to ROS adapter
     Result result;
 };
 

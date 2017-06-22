@@ -43,7 +43,7 @@ public:
   void abridgeNode(std_msgs::String msg);
   void sbridgeNode(std_msgs::String msg);
   void obstacleNode(std_msgs::String msg);
-  void mobilityNode(std_msgs::String msg);
+  void behaviourNode(std_msgs::String msg);
   void ubloxNode(const sensor_msgs::NavSatFixConstPtr& message);
   
   // This function sends an array of floats
@@ -77,7 +77,7 @@ private:
   void checkAbridge();
   void checkSbridge();
   void checkObstacle();
-  void checkMobility();
+  void checkBehaviour();
   void checkUblox();
     
   bool checkGPSExists();
@@ -108,7 +108,7 @@ private:
   ros::Subscriber abdridgeNodeSubscribe;
   ros::Subscriber sbdridgeNodeSubscribe;
   ros::Subscriber obstacleNodeSubscribe;
-  ros::Subscriber mobilityNodeSubscribe;
+  ros::Subscriber behaviourNodeSubscribe;
   ros::Subscriber ubloxNodeSubscribe;
   
   float sensorCheckInterval = 2; // Check sensors every 2 seconds
@@ -135,7 +135,7 @@ private:
   bool abridgeRunning = true;
   bool sbridgeRunning = true;
   bool obstacleRunning = true;
-  bool mobilityRunning = true;
+  bool behaviourRunning = true;
   bool ubloxRunning = true;
 
   //time last message was received
@@ -149,7 +149,7 @@ private:
   ros::Time abridgeNodeTimestamp;
   ros::Time sbridgeNodeTimestamp;
   ros::Time obstacleNodeTimestamp;
-  ros::Time mobilityNodeTimestamp;
+  ros::Time behaviourNodeTimestamp;
   ros::Time ubloxNodeTimestamp;
 
   // Max time since last heartbeat before notifying the user - in seconds

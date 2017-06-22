@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>mobility</name>
+  <name>behaviours</name>
   <version>0.2.0</version>
   <description>Algorithmic implementation of random search as a finite state machine</description>
 

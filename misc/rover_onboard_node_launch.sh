@@ -1,6 +1,6 @@
 #!/bin/bash
 pkill usb_cam_node
-pkill mobility
+pkill behaviour
 pkill obstacle
 pkill apriltag_detector_node
 pkill abridge
@@ -47,7 +47,7 @@ findDevicePath() {
 #Startup ROS packages/processes
 nohup rosrun tf static_transform_publisher __name:=$HOSTNAME\_BASE2CAM 0.12 -0.03 0.195 -1.57 0 -2.22 /$HOSTNAME/base_link /$HOSTNAME/camera_link 100 &
 nohup rosrun usb_cam usb_cam_node __name:=$HOSTNAME\_CAMERA /$HOSTNAME\_CAMERA/image_raw:=/$HOSTNAME/camera/image _camera_info_url:=file://${HOME}/rover_workspace/camera_info/head_camera.yaml _image_width:=320 _image_height:=240 &
-nohup rosrun mobility mobility &
+nohup rosrun behaviour behaviour &
 nohup rosrun obstacle_detection obstacle &
 nohup rosrun diagnostics diagnostics &
 
@@ -129,7 +129,7 @@ while true; do
     read choice;
 
     if [ "$choice" == "q" ];then
-	rosnode kill $HOSTNAME\_MOBILITY
+	rosnode kill $HOSTNAME\_BEHAVIOUR
 	rostopic pub -1 /$HOSTNAME\/velocity geometry_msgs/Twist '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
 	rosnode kill $HOSTNAME\_ABRIDGE
 	rosnode kill $HOSTNAME\_NAVSAT

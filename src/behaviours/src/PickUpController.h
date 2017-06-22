@@ -53,7 +53,7 @@ private:
     //distance to target block from camera
     double blockCameraDistance;
 
-    //struct for returning data to mobility
+    //struct for returning data to the ROS adapter
     Result result;
 
     bool blockBlock;
