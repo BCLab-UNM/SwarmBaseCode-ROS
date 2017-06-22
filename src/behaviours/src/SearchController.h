@@ -3,7 +3,7 @@
 
 #include <random_numbers/random_numbers.h>
 #include "Controller.h"
-#include "StandardVars.h"
+
 /**
  * This class implements the search control algorithm for the rovers. The code
  * here should be modified and enhanced to improve search performance.

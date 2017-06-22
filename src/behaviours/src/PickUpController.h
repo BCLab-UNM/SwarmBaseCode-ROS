@@ -1,11 +1,9 @@
 #ifndef PICKUPCONTROLLER_H
 #define PICKUPCONTROLLER_H
-#define HEADERFILE_H
 
 #include <ros/ros.h>
 #include "Controller.h"
-#include "StandardVars.h"
-
+#include "TagPoint.h"
 
 class PickUpController : virtual Controller
 {

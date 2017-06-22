@@ -1,9 +1,8 @@
 #ifndef OBSTACLECONTOLLER_H
 #define OBSTACLECONTOLLER_H
 
-#include "StandardVars.h"
 #include "Controller.h"
-
+#include "TagPoint.h"
 
 class ObstacleController : virtual Controller
 {

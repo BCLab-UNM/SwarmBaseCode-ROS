@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "StandardVars.h"
+#include "Result.h"
 
 /*
  * This class is meant to serve as a template for all Controllers,

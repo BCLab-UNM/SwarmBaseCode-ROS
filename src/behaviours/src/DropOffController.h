@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 
 #include "Controller.h"
-#include "StandardVars.h"
+#include "TagPoint.h"
 
 class DropOffController : virtual Controller
 {

@@ -23,8 +23,6 @@
 
 // Include Controllers
 #include "LogicController.h"
-
-#include "StandardVars.h"
 #include <vector>
 
 // To handle shutdown signals so the node quits
