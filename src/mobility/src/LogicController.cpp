@@ -145,8 +145,16 @@ bool LogicController::HasWork() {
     return false;
 }
 
-void LogicController::setPositionData(Point currentLocation) {
 
+void LogicController::controllerInterconnect() {
+
+}
+
+
+void LogicController::setPositionData(Point currentLocation) {
+    searchController.setCurrentLocation(currentLocation);
+    dropOffController.SetCurrentLocation(currentLocation);
+    obstacleController.SetCurrentLocation(currentLocation);
 }
 
 void LogicController::setMapPositionData(Point currentLocationMap) {
@@ -154,7 +162,7 @@ void LogicController::setMapPositionData(Point currentLocationMap) {
 }
 
 void LogicController::setVelocityData(float linearVelocity, float angularVelocity) {
-
+    driveController.SetVelocityData(linearVelocity,angularVelocity);
 }
 
 void LogicController::setMapVelocityData(float linearVelocity, float angularVelocity) {
@@ -162,9 +170,21 @@ void LogicController::setMapVelocityData(float linearVelocity, float angularVelo
 }
 
 void LogicController::setAprilTags(vector<TagPoint> tags) {
-
+    pickUpController.SetTagData(tags);
+    obstacleController.SetTagData(tags);
+    dropOffController.setTargetData(tags);
 }
 
 void LogicController::setSonarData(float left, float center, float right) {
+    pickUpController.SetSonarData(center);
+    obstacleController.SetSonarData(left,center,right);
+}
+
+void LogicController::setCenterLocationOdom(Point centerLocationOdom) {
+    searchController.setCenterLocation(centerLocationOdom);
+    dropOffController.SetCenterLocation(centerLocationOdom);
+}
+
+void LogicController::setCenterLocationMap(Point centerLocationMap) {
 
 }

@@ -18,6 +18,7 @@ public:
     bool HasWork() override;
 
     void setResultData(Result result) {this->result = result;}
+    void SetVelocityData(float linearVelocity,float angularVelocity);
 
 private:
 
@@ -46,7 +47,7 @@ private:
     Point centerLocationMap;
     Point centerLocationOdom;
 
-    vector<geometry_msgs::Pose2D> waypoints;
+    vector<Point> waypoints;
 
     //PID configs************************
     PIDConfig fastVelConfig();

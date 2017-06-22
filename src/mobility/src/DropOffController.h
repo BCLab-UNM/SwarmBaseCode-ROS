@@ -2,8 +2,6 @@
 #define DROPOFCONTROLLER_H
 #define HEADERFILE_H
 
-#include <geometry_msgs/Pose2D.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32.h>
 #include <ros/ros.h>
 
@@ -22,10 +20,11 @@ public:
     bool HasWork() override;
 
     bool IsChangingMode();
-    void SetLocationData(geometry_msgs::Pose2D center, geometry_msgs::Pose2D current);
+    void SetCenterLocation(Point center);
+    void SetCurrentLocation(Point current);
     void SetTargetPickedUp();
     void SetBlockBlockingUltrasound(bool blockBlock);
-    void setTargetData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+    void setTargetData(vector<TagPoint> tags);
 
     float GetSpinner() {return spinner;}
 
@@ -77,8 +76,8 @@ private:
     int countRight;
 
     //Center and current locations as of the last call to setLocationData
-    geometry_msgs::Pose2D centerLocation;
-    geometry_msgs::Pose2D currentLocation;
+    Point centerLocation;
+    Point currentLocation;
 
     //Time since modeTimer was started, in seconds
     float timerTimeElapsed;

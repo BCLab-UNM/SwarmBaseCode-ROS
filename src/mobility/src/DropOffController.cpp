@@ -79,7 +79,7 @@ Result DropOffController::DoWork() {
     }
     else if (timerTimeElapsed >= 5)//spin search for center
     {
-        geometry_msgs::Pose2D nextSpinPoint;
+        Point nextSpinPoint;
 
         //sets a goal that is 60cm from the centerLocation and spinner
         //radians counterclockwise from being purly along the x-axis.
@@ -243,7 +243,7 @@ void DropOffController::Reset() {
 
 }
 
-void DropOffController::UpdateData(vector<TagPoint> tags) {
+void DropOffController::setTargetData(vector<TagPoint> tags) {
     countRight = 0;
     countLeft = 0;
 
@@ -291,8 +291,11 @@ bool DropOffController::IsChangingMode() {
     return isPrecisionDriving;
 }
 
-void DropOffController::SetLocationData(geometry_msgs::Pose2D center, geometry_msgs::Pose2D current) {
+void DropOffController::SetCenterLocation(Point center) {
     centerLocation = center;
+}
+
+void DropOffController::SetCurrentLocation(Point current) {
     currentLocation = current;
 }
 

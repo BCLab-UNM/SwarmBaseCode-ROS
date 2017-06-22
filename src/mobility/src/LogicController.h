@@ -42,6 +42,8 @@ public:
     void setMapPositionData(Point currentLocationMap);
     void setVelocityData(float linearVelocity, float angularVelocity);
     void setMapVelocityData(float linearVelocity, float angularVelocity);
+    void setCenterLocationOdom(Point centerLocationOdom);
+    void setCenterLocationMap(Point centerLocationMap);
 
 protected:
     void ProcessData();
@@ -73,6 +75,8 @@ private:
 
     std::vector<PrioritizedController> prioritizedControllers;
     priority_queue<PrioritizedController> control_queue;
+
+    void controllerInterconnect();
 };
 
 #endif // LOGICCONTROLLER_H

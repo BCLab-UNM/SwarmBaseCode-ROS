@@ -21,7 +21,7 @@ void SearchController::Reset() {
  */
 Result SearchController::DoWork() {
    result.type = waypoint;
-   geometry_msgs::Pose2D  searchLocation;
+   Point  searchLocation;
       
   //select new heading from Gaussian distribution around current heading
   searchLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
@@ -37,9 +37,12 @@ Result SearchController::DoWork() {
   
 }
 
-void SearchController::UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation){
-     this->currentLocation = currentLocation;
-     this->centerLocation = centerLocation;
+void SearchController::setCenterLocation(Point centerLocation) {
+    this->centerLocation = centerLocation;
+}
+
+void SearchController::setCurrentLocation(Point currentLocation) {
+    this->currentLocation = currentLocation;
 }
 
 void SearchController::ProcessData() {

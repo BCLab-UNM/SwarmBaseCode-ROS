@@ -1,7 +1,6 @@
 #ifndef SEARCH_CONTROLLER
 #define SEARCH_CONTROLLER
 
-#include <geometry_msgs/Pose2D.h>
 #include <random_numbers/random_numbers.h>
 #include "Controller.h"
 #include "StandardVars.h"
@@ -23,7 +22,9 @@ public:
     bool HasWork() override;
 
     // sets the value of the current location
-    void UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation);
+    //void UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation);
+    void setCurrentLocation(Point currentLocation);
+    void setCenterLocation(Point centerLocation);
 
 protected:
 
@@ -32,8 +33,8 @@ protected:
 private:
 
     random_numbers::RandomNumberGenerator* rng;
-    geometry_msgs::Pose2D currentLocation;
-    geometry_msgs::Pose2D centerLocation;
+    Point currentLocation;
+    Point centerLocation;
     //struct for returning data to mobility
     Result result;
 };

@@ -2,7 +2,6 @@
 #define PICKUPCONTROLLER_H
 #define HEADERFILE_H
 
-#include <apriltags_ros/AprilTagDetectionArray.h>
 #include <ros/ros.h>
 #include "Controller.h"
 #include "StandardVars.h"
@@ -16,11 +15,11 @@ public:
 
     void Reset() override;
     Result DoWork() override;
-    void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+    void SetTagData(vector<TagPoint> tags);
     bool ShouldInterrupt() override;
     bool HasWork() override;
 
-    bool NewUpdateData(float rangeCenter);
+    bool SetSonarData(float rangeCenter);
 
     float getDistance() {return blockDistance;}
     bool GetLockTarget() {return lockTarget;}

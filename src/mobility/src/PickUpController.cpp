@@ -22,22 +22,21 @@ PickUpController::PickUpController() {
 PickUpController::~PickUpController() {
 }
 
-void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr &message) {
+void PickUpController::SetTagData(vector<TagPoint> tags) {
     
-    if (message->detections.size() > 0) {
+    if (tags.size() > 0) {
         
-        nTargetsSeen = message->detections.size();
+        nTargetsSeen = tags.size();
         
         double closest = std::numeric_limits<double>::max();
         int target  = 0;
-        for (int i = 0; i < message->detections.size(); i++) { //this loop selects the closest visible block to makes goals for it
+        for (int i = 0; i < tags.size(); i++) { //this loop selects the closest visible block to makes goals for it
 
-            if (message->detections[i].id == 0) {
+            if (tags[i].id == 0) {
 
                 targetFound = true;
                 
-                geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
-                double test = hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z); //absolute distance to block from camera lense
+                double test = hypot(hypot(tags[i].x, tags[i].y), tags[i].z); //absolute distance to block from camera lense
                 if (closest > test)
                 {
                     target = i;
@@ -47,7 +46,7 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
             else {
                 nTargetsSeen--;
 
-                if(message->detections[i].id == 256) {
+                if(tags[i].id == 256) {
                     Reset();
                     return;
                 }
@@ -56,19 +55,18 @@ void PickUpController::UpdateData(const apriltags_ros::AprilTagDetectionArray::C
 
         float cameraOffsetCorrection = 0.020; //meters;
 
-        geometry_msgs::PoseStamped tagPose = message->detections[target].pose;
-        blockYawError = atan((tagPose.pose.position.x + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
+        blockYawError = atan((tags[target].x + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
 
         ///TODO: Explain the trig going on here- blockDistance is c, 0.195 is b; find a
-        blockDistance = hypot(tagPose.pose.position.z, tagPose.pose.position.y); //distance from bottom center of chassis ignoring height.
+        blockDistance = hypot(tags[target].z, tags[target].y); //distance from bottom center of chassis ignoring height.
 
-        blockCameraDistance = hypot(hypot(tagPose.pose.position.x, tagPose.pose.position.y), tagPose.pose.position.z);
+        blockCameraDistance = hypot(hypot(tags[target].x, tags[target].y), tags[target].z);
     }
 
 }
 
 
-bool PickUpController::NewUpdateData(float rangeCenter){
+bool PickUpController::SetSonarData(float rangeCenter){
 
     if (rangeCenter < 0.12 && targetFound) {
         result.type = behavior;

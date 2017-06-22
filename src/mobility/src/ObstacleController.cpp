@@ -50,14 +50,14 @@ Result ObstacleController::DoWork() {
 }
 
 
-void ObstacleController::UpdateData(float sonarleft, float sonarcenter, float sonarright ,geometry_msgs::Pose2D currentLocation) {
-    
+void ObstacleController::SetSonarData(float sonarleft, float sonarcenter, float sonarright) {
     left = sonarleft;
     right = sonarright;
     center = sonarcenter;
+}
 
-    this->currentLocation = currentLocation;
-
+void ObstacleController::SetCurrentLocation(Point currentLocation) {
+        this->currentLocation = currentLocation;
 }
 
 void ObstacleController::ProcessData() {
@@ -83,16 +83,15 @@ void ObstacleController::ProcessData() {
     }
 }
 
-void ObstacleController::UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message){
+void ObstacleController::SetTagData(vector<TagPoint> tags){
     float cameraOffsetCorrection = 0.020; //meters;
     centerSeen = false;
     // this loop is to get the number of center tags
-    for (int i = 0; i < message->detections.size(); i++) {
-        if (message->detections[i].id == 256) {
-            geometry_msgs::PoseStamped cenPose = message->detections[i].pose;
+    for (int i = 0; i < tags.size(); i++) {
+        if (tags[i].id == 256) {
 
             // checks if tag is on the right or left side of the image
-            if (cenPose.pose.position.x + cameraOffsetCorrection > 0) {
+            if (tags[i].x + cameraOffsetCorrection > 0) {
                 countRight++;
 
             } else {

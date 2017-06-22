@@ -1,7 +1,6 @@
 #ifndef STANDARDVARS_H
 #define STANDARDVARS_H
 
-#include <geometry_msgs/Pose2D.h>
 #include <vector>
 
 //this file contains variable declarations that are used throught multiple classes such as the Results struct.
@@ -25,6 +24,19 @@ enum BehaviorTrigger {
     noChange,
     nextProcess
 };
+struct Point {
+    float x;
+    float y;
+    float theta;
+};
+
+struct TagPoint {
+    int id;
+    float x;
+    float y;
+    float z;
+    float theta;
+};
 
 struct PrecisionDriving {
     float cmdVel;
@@ -38,7 +50,7 @@ struct PrecisionDriving {
 };
 
 struct Waypoints {
-    vector<geometry_msgs::Pose2D> waypoints;
+    vector<Point> waypoints;
 };
 
 
@@ -80,20 +92,5 @@ struct Result {
  * 
  * 
  */
-
-
-struct Point {
-    float x;
-    float y;
-    float theta;
-};
-
-struct TagPoint {
-    int id;
-    float x;
-    float y;
-    float z;
-    float theta;
-};
 
 #endif // STANDARDVARS_H

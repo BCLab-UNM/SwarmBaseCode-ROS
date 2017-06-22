@@ -222,6 +222,18 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     // Robot is in automode
     if (currentMode == 2 || currentMode == 3) {
 
+        Point centerOdom;
+        centerOdom.x = centerLocation.x;
+        centerOdom.y = centerLocation.y;
+        centerOdom.theta = centerLocation.theta;
+        logicController.setCenterLocationOdom(centerOdom);
+
+        Point centerMap;
+        centerMap.x = centerLocationMap.x;
+        centerMap.y = centerLocationMap.y;
+        centerMap.theta = centerLocationMap.theta;
+        logicController.setCenterLocationMap(centerMap);
+
         result = logicController.DoWork();
         if (result.type == precisionDriving) {
             sendDriveCommand(result.pd.left,result.pd.right);

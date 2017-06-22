@@ -3,8 +3,6 @@
 
 #include "StandardVars.h"
 #include "Controller.h"
-#include <geometry_msgs/Pose2D.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
 
 
 class ObstacleController : virtual Controller
@@ -16,8 +14,9 @@ public:
     
     void Reset() override;
     Result DoWork() override;
-    void UpdateData(float left, float center, float right, geometry_msgs::Pose2D currentLocation);
-    void UpdateData(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+    void SetSonarData(float left, float center, float right);
+    void SetCurrentLocation(Point currentLocation);
+    void SetTagData(vector<TagPoint> tags);
     bool ShouldInterrupt() override;
     bool HasWork() override;
     void SetIgnoreCenter();
@@ -54,7 +53,7 @@ private:
     bool ignoreCenter = false;
 
 
-    geometry_msgs::Pose2D currentLocation;
+    Point currentLocation;
     
 };
 

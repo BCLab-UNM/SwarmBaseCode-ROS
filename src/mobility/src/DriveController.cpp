@@ -276,6 +276,13 @@ void DriveController::constPID(float erroVel,float constAngularError, float setP
 }
 
 
+void DriveController::SetVelocityData(float linearVelocity,float angularVelocity) {
+    this->linearVelocity = linearVelocity;
+    this->angularVelocity = angularVelocity;
+}
+
+
+
 
 PIDConfig DriveController::fastVelConfig() {
     PIDConfig config;
