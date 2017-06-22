@@ -148,6 +148,10 @@ bool LogicController::HasWork() {
 
 void LogicController::controllerInterconnect() {
 
+
+    if(pickUpController.GetIgnoreCenter()) {
+        obstacleController.SetIgnoreCenter();
+    }
 }
 
 

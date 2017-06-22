@@ -175,6 +175,7 @@ Result PickUpController::DoWork() {      //****not named correctly and needs to 
         result.pd.cmdVel = 0.28;
         result.pd.cmdAngularError= 0.0;
         timeOut = true;
+        ignoreCenterSonar = true;
     }
     else if (Td > 2.4) //raise the wrist
     {
@@ -236,6 +237,8 @@ void PickUpController::Reset() {
     result.fingerAngle = -1;
     result.wristAngle = -1;
     result.reset = false;
+
+    ignoreCenterSonar = false;
 };
 
 void PickUpController::SetUltraSoundData(bool blockBlock){

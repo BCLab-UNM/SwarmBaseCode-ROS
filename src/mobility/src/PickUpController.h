@@ -26,6 +26,8 @@ public:
     float GetTD() {return timeDifference;}
     void SetUltraSoundData(bool blockBlock);
 
+    bool GetIgnoreCenter() {return ignoreCenterSonar;}
+
 protected:
 
     void ProcessData();
@@ -55,6 +57,8 @@ private:
     Result result;
 
     bool blockBlock;
+
+    bool ignoreCenterSonar = false;
 
     float timeDifference;
 

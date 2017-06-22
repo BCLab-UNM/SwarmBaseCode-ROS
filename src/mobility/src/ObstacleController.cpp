@@ -54,6 +54,8 @@ void ObstacleController::SetSonarData(float sonarleft, float sonarcenter, float 
     left = sonarleft;
     right = sonarright;
     center = sonarcenter;
+
+    ProcessData();
 }
 
 void ObstacleController::SetCurrentLocation(Point currentLocation) {
