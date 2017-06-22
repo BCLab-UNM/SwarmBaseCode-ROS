@@ -1,7 +1,6 @@
 #ifndef PICKUPCONTROLLER_H
 #define PICKUPCONTROLLER_H
 
-#include <ros/ros.h>
 #include "Controller.h"
 #include "TagPoint.h"
 
@@ -26,6 +25,8 @@ public:
 
     bool GetIgnoreCenter() {return ignoreCenterSonar;}
 
+    void setCurrentTimeInMilliSecs( long int time );
+
 protected:
 
     void ProcessData();
@@ -40,7 +41,7 @@ private:
     // Failsafe state. No legitimate behavior state. If in this state for too long return to searching as default behavior.
     bool timeOut;
     int nTargetsSeen;
-    ros::Time millTimer;
+    long int millTimer;
 
     //yaw error to target block
     double blockYawError;
@@ -60,6 +61,6 @@ private:
 
     float timeDifference;
 
-
+    long int current_time;
 };
 #endif // end header define

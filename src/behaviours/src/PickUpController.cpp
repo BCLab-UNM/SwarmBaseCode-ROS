@@ -1,4 +1,6 @@
 #include "PickUpController.h"
+#include <limits> // For numeric limits
+#include <cmath> // For hypot
 
 PickUpController::PickUpController() {
     lockTarget = false;
@@ -100,8 +102,8 @@ void PickUpController::ProcessData() {
 
     //if target is close enough
     //diffrence between current time and millisecond time
-    ros::Duration Tdiff = ros::Time::now() - millTimer;
-    float Td = Tdiff.sec + Tdiff.nsec/1000000000;
+    long int Tdiff = current_time - millTimer;
+    float Td = Tdiff/1e3;
 
     if (blockCameraDistance < 0.15 && Td < 3.8) {
 
@@ -134,11 +136,11 @@ Result PickUpController::DoWork() {      //****not named correctly and needs to 
     float targetDistance = 0.15; //meters
     
     // millisecond time = current time if not in a counting state
-    if (!timeOut) millTimer = ros::Time::now();
+    if (!timeOut) millTimer = current_time;
     
     //diffrence between current time and millisecond time
-    ros::Duration Tdifference = ros::Time::now() - millTimer;
-    float Td = Tdifference.sec + Tdifference.nsec/1000000000.0;
+    long int Tdifference = current_time - millTimer;
+    float Td = Tdifference/1e3;
     timeDifference = Td;
     
     if (nTargetsSeen == 0 && !lockTarget) //if not targets detected and a target has not been locked in
@@ -243,4 +245,9 @@ void PickUpController::Reset() {
 
 void PickUpController::SetUltraSoundData(bool blockBlock){
     this->blockBlock = blockBlock;
+}
+
+void PickUpController::setCurrentTimeInMilliSecs( long int time )
+{
+  current_time = time;
 }

@@ -126,10 +126,11 @@ void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);
 
-
+// Converts the time passed as reported by ROS (which takes Gazebo simulation rate into account) into milliseconds as an integer.
+long int getROSTimeInMilliSecs();
 
 int main(int argc, char **argv) {
-    
+  
     gethostname(host, sizeof (host));
     string hostname(host);
     
@@ -231,7 +232,9 @@ void behaviourStateMachine(const ros::TimerEvent&) {
         centerMap.y = centerLocationMap.y;
         centerMap.theta = centerLocationMap.theta;
         logicController.setCenterLocationMap(centerMap);
-
+	
+	logicController.setCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
+	
         result = logicController.DoWork();
         if (result.type == precisionDriving) {
             sendDriveCommand(result.pd.left,result.pd.right);
@@ -372,3 +375,12 @@ void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
     heartbeatPublisher.publish(msg);
 }
 
+long int getROSTimeInMilliSecs()
+{
+  // Get the current time according to ROS (will be zero for simulated clock until the first time message is recieved).
+  ros::Time t = ros::Time::now();
+
+  // Convert from seconds and nanoseconds to milliseconds.
+  return t.sec*1e3 + t.nsec/1e6;
+  
+}

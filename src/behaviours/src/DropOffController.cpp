@@ -31,8 +31,9 @@ DropOffController::~DropOffController() {
 Result DropOffController::DoWork() {
 
     if(timerTimeElapsed > -1) {
-        ros::Duration elapsed = ros::Time::now() - returnTimer;
-        timerTimeElapsed = elapsed.sec + elapsed.nsec/1000000000.0;
+       
+	long int elapsed = current_time - returnTimer;
+        float timeTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
     }
 
     //if we are in the routine for exiting the circle once we have dropped a block off and reseting all our flags
@@ -102,7 +103,7 @@ Result DropOffController::DoWork() {
         //center since we have a block with us and the above point is
         //greater than collectionPointVisualDistance from the center.
 
-        returnTimer = ros::Time::now();
+        returnTimer = current_time;
         timerTimeElapsed = 0;
 
         return result;
@@ -115,7 +116,7 @@ Result DropOffController::DoWork() {
     //reset lastCenterTagThresholdTime timout timer to current time
     if ((!centerApproach && !seenEnoughCenterTags) || (count > 0 && !seenEnoughCenterTags)) {
 
-        lastCenterTagThresholdTime = ros::Time::now();
+        lastCenterTagThresholdTime = current_time;
 
     }
 
@@ -165,15 +166,15 @@ Result DropOffController::DoWork() {
         if (count > centerTagThreshold)
         {
             seenEnoughCenterTags = true; //we have driven far enough forward to be in the circle.
-            lastCenterTagThresholdTime = ros::Time::now();
+            lastCenterTagThresholdTime = current_time;
         }
         if (count > 0) //reset gaurd to prevent drop offs due to loosing tracking on tags for a frame or 2.
         {
-            lastCenterTagThresholdTime = ros::Time::now();
+            lastCenterTagThresholdTime = current_time;
         }
         //time since we dropped below countGuard tags
-        ros::Duration elapsed = ros::Time::now() - lastCenterTagThresholdTime;
-        float timeSinceSeeingEnoughCenterTags = elapsed.sec + elapsed.nsec/1000000000.0;
+        long int elapsed = current_time - lastCenterTagThresholdTime;
+        float timeSinceSeeingEnoughCenterTags = elapsed/1e3; // Convert from milliseconds to seconds
 
         //we have driven far enough forward to have passed over the circle.
         if (count == 0 && seenEnoughCenterTags && timeSinceSeeingEnoughCenterTags > 1) {
@@ -188,8 +189,8 @@ Result DropOffController::DoWork() {
     //for centerTagSearchCutoff seconds so reset.
     else if (centerApproach) {
 
-        ros::Duration elapsed = ros::Time::now() - lastCenterTagThresholdTime;
-        float timeSinceSeeingEnoughCenterTags = elapsed.sec + elapsed.nsec/1000000000.0;
+        long int elapsed = current_time - lastCenterTagThresholdTime;
+        float timeSinceSeeingEnoughCenterTags = elapsed/1e3; // Convert from milliseconds to seconds
         if (timeSinceSeeingEnoughCenterTags > centerTagSearchCutoff)
         {
             //go back to drive to center base location instead of drop off attempt
@@ -215,7 +216,7 @@ Result DropOffController::DoWork() {
     {
         reachedCollectionPoint = true;
         centerApproach = false;
-        returnTimer = ros::Time::now();
+        returnTimer = current_time;
     }
 
     return result;
@@ -305,4 +306,9 @@ void DropOffController::SetTargetPickedUp() {
 
 void DropOffController::SetBlockBlockingUltrasound(bool blockBlock) {
     targetHeld = targetHeld || blockBlock;
+}
+
+void DropOffController::setCurrentTimeInMilliSecs( long int time )
+{
+  current_time = time;
 }

@@ -3,7 +3,6 @@
 #define HEADERFILE_H
 
 #include <std_msgs/Float32.h>
-#include <ros/ros.h>
 
 #include "Controller.h"
 #include "TagPoint.h"
@@ -30,7 +29,8 @@ public:
 
     void UpdateData(vector<TagPoint> tags);
 
-
+    void setCurrentTimeInMilliSecs( long int time );
+    
 private:
 
     void ProcessData();
@@ -45,7 +45,7 @@ private:
     const float initialSpinSize = 0.10; //in meters aka 10cm
     const float spinSizeIncrement = 0.10; //in meters
     const float searchVelocity = 0.15; //in meters per second
-
+    
 
 
     //Instance Variables
@@ -58,10 +58,10 @@ private:
     float spinner;
 
     //Timer for return code (dropping the cube in the center)- used for timerTimeElapsed
-    ros::Time returnTimer;
+    long int returnTimer;
 
     //Time since last exceeding the tag threshold
-    ros::Time lastCenterTagThresholdTime;
+    long int lastCenterTagThresholdTime;
 
     //Previous tag count
     int prevCount;
@@ -112,6 +112,7 @@ private:
 
     Result result;
 
+    long int current_time;
 
 };
 #endif // end header define

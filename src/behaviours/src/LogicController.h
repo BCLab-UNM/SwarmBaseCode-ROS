@@ -45,6 +45,8 @@ public:
     void setCenterLocationOdom(Point centerLocationOdom);
     void setCenterLocationMap(Point centerLocationMap);
 
+    void setCurrentTimeInMilliSecs( long int time );
+    
 protected:
     void ProcessData();
 
@@ -77,6 +79,8 @@ private:
     priority_queue<PrioritizedController> control_queue;
 
     void controllerInterconnect();
+
+    long int current_time = 0; 
 };
 
 #endif // LOGICCONTROLLER_H

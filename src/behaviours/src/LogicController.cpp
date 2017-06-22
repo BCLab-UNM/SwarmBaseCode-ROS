@@ -213,3 +213,10 @@ void LogicController::setCenterLocationOdom(Point centerLocationOdom) {
 void LogicController::setCenterLocationMap(Point centerLocationMap) {
 
 }
+
+void LogicController::setCurrentTimeInMilliSecs( long int time )
+{
+  current_time = time;
+  dropOffController.setCurrentTimeInMilliSecs( time );
+  pickUpController.setCurrentTimeInMilliSecs( time );
+}
