@@ -7,7 +7,8 @@ LogicController::LogicController() {
     prioritizedControllers = {
         PrioritizedController{0, (Controller*)(&searchController)},
         PrioritizedController{1, (Controller*)(&obstacleController)},
-        PrioritizedController{2, (Controller*)(&pickUpController)}
+        PrioritizedController{2, (Controller*)(&pickUpController)},
+        PrioritizedController{-1, (Controller*)(&dropOffController)}
     };
 
     control_queue = priority_queue<PrioritizedController>();
@@ -35,13 +36,28 @@ Result LogicController::DoWork() {
 
 
     if (processState == PROCCESS_STATE_SEARCHING) {
-
+        prioritizedControllers = {
+            PrioritizedController{0, (Controller*)(&searchController)},
+            PrioritizedController{1, (Controller*)(&obstacleController)},
+            PrioritizedController{2, (Controller*)(&pickUpController)},
+            PrioritizedController{-1, (Controller*)(&dropOffController)}
+        };
     }
     else if (processState == PROCCESS_COLLECTING_TARGET) {
-
+        prioritizedControllers = {
+            PrioritizedController{-1, (Controller*)(&searchController)},
+            PrioritizedController{1, (Controller*)(&obstacleController)},
+            PrioritizedController{2, (Controller*)(&pickUpController)},
+            PrioritizedController{-1, (Controller*)(&dropOffController)}
+        };
     }
     else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
-
+        prioritizedControllers = {
+            PrioritizedController{-1, (Controller*)(&searchController)},
+            PrioritizedController{2, (Controller*)(&obstacleController)},
+            PrioritizedController{-1, (Controller*)(&pickUpController)},
+            PrioritizedController{1, (Controller*)(&dropOffController)}
+        };
     }
 
 
@@ -53,7 +69,12 @@ Result LogicController::DoWork() {
 
         for(PrioritizedController cntrlr : prioritizedControllers) {
             if(cntrlr.controller->ShouldInterrupt()) {
-                control_queue.push(cntrlr);
+                if (cntrlr.priority < 0) {
+                    continue;
+                }
+                else {
+                    control_queue.push(cntrlr);
+                }
             }
         }
 
@@ -72,14 +93,14 @@ Result LogicController::DoWork() {
                     processState = _FIRST;
                 }
                 else {
-                processState = (ProcessState)((int)processState + 1);
+                    processState = (ProcessState)((int)processState + 1);
                 }
             } else if(result.b == prevProcess) {
                 if (processState == _FIRST) {
                     processState = (ProcessState)((int)_LAST - 1);
                 }
                 else {
-                processState = (ProcessState)((int)processState - 1);
+                    processState = (ProcessState)((int)processState - 1);
                 }
             }
         } else if(result.type == precisionDriving) {
