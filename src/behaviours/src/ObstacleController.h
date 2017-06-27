@@ -19,6 +19,7 @@ public:
     bool ShouldInterrupt() override;
     bool HasWork() override;
     void SetIgnoreCenter();
+    void setCurrentTimeInMilliSecs( long int time );
 
 protected:
 
@@ -51,8 +52,10 @@ private:
 
     bool ignoreCenter = false;
 
-
     Point currentLocation;
+
+    long int current_time;
+    long int timeSinceTags;
     
 };
 

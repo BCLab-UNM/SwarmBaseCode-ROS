@@ -240,4 +240,5 @@ void LogicController::setCurrentTimeInMilliSecs( long int time )
   current_time = time;
   dropOffController.setCurrentTimeInMilliSecs( time );
   pickUpController.setCurrentTimeInMilliSecs( time );
+  obstacleController.setCurrentTimeInMilliSecs( time );
 }

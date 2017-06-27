@@ -65,6 +65,13 @@ void ObstacleController::SetCurrentLocation(Point currentLocation) {
 
 void ObstacleController::ProcessData() {
 
+    //timeout timer for no tag messages
+    long int Tdifference = current_time - timeSinceTags;
+    float Td = Tdifference/1e3;
+    if (Td >= 0.5) {
+        centerSeen = false;
+    }
+
     //Process sonar info
     if(ignoreCenter){
         if(center > reactivateCenterThreshold){
@@ -99,6 +106,7 @@ void ObstacleController::SetTagData(vector<TagPoint> tags){
                 countLeft++;
             }
             centerSeen = true;
+            timeSinceTags = current_time;
         }
     }
 
@@ -126,4 +134,9 @@ bool ObstacleController::HasWork() {
 
 void ObstacleController::SetIgnoreCenter(){
     ignoreCenter = true; //ignore center ultrasound
+}
+
+void ObstacleController::setCurrentTimeInMilliSecs( long int time )
+{
+  current_time = time;
 }

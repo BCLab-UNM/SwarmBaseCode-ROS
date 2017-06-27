@@ -32,10 +32,11 @@ Result SearchController::DoWork() {
 
     if (attemptCount > 0 && attemptCount < 5) {
         attemptCount++;
-        cout <<"attempt again" << endl;
+        cout <<"attempt again**********************************" << endl;
         return result;
     }
     else if (attemptCount >= 5 || attemptCount == 0) {
+        cout << "new search point*****************************" << endl;
         attemptCount = 1;
 
 
