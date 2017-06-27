@@ -29,6 +29,7 @@ DropOffController::~DropOffController() {
 }
 
 Result DropOffController::DoWork() {
+    cout << "in obstacle controller" << endl;
 
     if(timerTimeElapsed > -1) {
        

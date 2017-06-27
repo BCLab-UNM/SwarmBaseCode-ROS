@@ -18,6 +18,7 @@ public:
 
     void setResultData(Result result) {this->result = result;}
     void SetVelocityData(float linearVelocity,float angularVelocity);
+    void SetCurrentLocation(Point currentLocation) {this->currentLocation = currentLocation;}
 
 private:
 

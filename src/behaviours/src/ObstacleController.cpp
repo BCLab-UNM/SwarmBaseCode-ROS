@@ -14,6 +14,7 @@ void ObstacleController::Reset() {
 }
 
 Result ObstacleController::DoWork() {
+    cout << "in obstacle controller" << endl;
 
     if(centerSeen){
 
@@ -72,12 +73,10 @@ void ObstacleController::ProcessData() {
         }
         else{
             center = 3;
-
-
         }
     }
 
-    if ((left < triggerDistance || right < triggerDistance || center < triggerDistance || centerSeen) && !obstacleInterrupt) {
+    if (left < triggerDistance || right < triggerDistance || center < triggerDistance || centerSeen) {
         obstacleDetected = true;
         obstacleAvoided = false;
     } else {
@@ -112,7 +111,7 @@ bool ObstacleController::ShouldInterrupt() {
         obstacleInterrupt = true;
         return true;
     } else {
-        if(obstacleAvoided) {
+        if(obstacleAvoided && obstacleDetected) {
             Reset();
             return true;
         } else {
@@ -126,5 +125,5 @@ bool ObstacleController::HasWork() {
 }
 
 void ObstacleController::SetIgnoreCenter(){
-    ignoreCenter = true;
+    ignoreCenter = true; //ignore center ultrasound
 }

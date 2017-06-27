@@ -236,13 +236,21 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 	logicController.setCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
 	
         result = logicController.DoWork();
-        if (result.type == precisionDriving) {
-            sendDriveCommand(result.pd.left,result.pd.right);
+        sendDriveCommand(result.pd.left,result.pd.right);
+
+        std_msgs::Float32 angle;
+        if (result.fingerAngle != -1) {
+            angle.data = result.fingerAngle;
+            fingerAnglePublish.publish(angle);
+        }
+        if (result.wristAngle != -1) {
+            angle.data = result.wristAngle;
+            wristAnglePublish.publish(angle);
         }
 
         //publishHandeling here
         //logicController.getPublishData() suggested;
-
+        cout << endl;
     }
     // mode is NOT auto
     else {

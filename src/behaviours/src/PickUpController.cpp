@@ -134,6 +134,8 @@ Result PickUpController::DoWork() {      //****not named correctly and needs to 
     //instead blockBlock will be passaed in through a new method such as setUltraSoundData
     //threshold distance to be from the target block before attempting pickup
     float targetDistance = 0.15; //meters
+
+    cout << "in pickup controller" << endl;
     
     // millisecond time = current time if not in a counting state
     if (!timeOut) millTimer = current_time;

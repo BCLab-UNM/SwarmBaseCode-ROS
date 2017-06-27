@@ -25,7 +25,8 @@ void LogicController::Reset() {
     prioritizedControllers = {
         PrioritizedController{0, (Controller*)(&searchController)},
         PrioritizedController{1, (Controller*)(&obstacleController)},
-        PrioritizedController{2, (Controller*)(&pickUpController)}
+        PrioritizedController{2, (Controller*)(&pickUpController)},
+        PrioritizedController{-1, (Controller*)(&dropOffController)}
     };
 
     control_queue = priority_queue<PrioritizedController>();
@@ -60,6 +61,15 @@ Result LogicController::DoWork() {
         };
     }
 
+    for(PrioritizedController cntrlr : prioritizedControllers) {
+        if(cntrlr.controller->ShouldInterrupt() && cntrlr.priority > 0) {
+                logicState = LOGIC_STATE_INTERRUPT;
+                cout << "shouldInterupt " << cntrlr.priority <<endl;
+                //do not break all shouldInterupts may need calling in order to properly pre-proccess data.
+        }
+    }
+
+    cout << "state " << processState << " logicState " << logicState << endl;
 
     switch(logicState) {
     case LOGIC_STATE_INTERRUPT: {
@@ -68,12 +78,13 @@ Result LogicController::DoWork() {
         control_queue = priority_queue<PrioritizedController>();
 
         for(PrioritizedController cntrlr : prioritizedControllers) {
-            if(cntrlr.controller->ShouldInterrupt()) {
+            if(cntrlr.controller->HasWork()) {
                 if (cntrlr.priority < 0) {
                     continue;
                 }
                 else {
                     control_queue.push(cntrlr);
+                    cout << "hasWork" << endl;
                 }
             }
         }
@@ -86,6 +97,8 @@ Result LogicController::DoWork() {
         }
 
         result = control_queue.top().controller->DoWork();
+
+        cout << "result type " << result.type << endl;
 
         if(result.type == behavior) {
             if(result.b == nextProcess) {
@@ -103,26 +116,33 @@ Result LogicController::DoWork() {
                     processState = (ProcessState)((int)processState - 1);
                 }
             }
+            break;
         } else if(result.type == precisionDriving) {
 
             logicState = LOGIC_STATE_PRECISION_COMMAND;
 
         } else if(result.type == waypoint) {
 
-            logicState = LOGIC_STATE_WAITING;
-            result = control_queue.top().controller->DoWork();
+            cout << "waypoint" << endl;
 
+            logicState = LOGIC_STATE_WAITING;
+            driveController.setResultData(result);
         }
 
-        break;
     }
 
     case LOGIC_STATE_WAITING: {
 
+        cout << "waiting doing driving" << endl;
+
         result = driveController.DoWork();
-        if (result.type = behavior) {
+
+        cout << "result type : " << result.type << endl;
+
+        if (result.type == behavior) {
             if(driveController.ShouldInterrupt()) {
                 logicState = LOGIC_STATE_INTERRUPT;
+                break;
             }
             else {
                 return result;
@@ -180,6 +200,7 @@ void LogicController::setPositionData(Point currentLocation) {
     searchController.setCurrentLocation(currentLocation);
     dropOffController.SetCurrentLocation(currentLocation);
     obstacleController.SetCurrentLocation(currentLocation);
+    driveController.SetCurrentLocation(currentLocation);
 }
 
 void LogicController::setMapPositionData(Point currentLocationMap) {
