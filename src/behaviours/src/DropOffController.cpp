@@ -8,6 +8,7 @@ DropOffController::DropOffController() {
     result.b = wait;
     result.wristAngle = 0.8;
     result.reset = false;
+    interrupt = false;
 
     circularCenterSearching = false;
     spinner = 0;
@@ -34,7 +35,7 @@ Result DropOffController::DoWork() {
     if(timerTimeElapsed > -1) {
        
 	long int elapsed = current_time - returnTimer;
-        float timeTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
+    timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
     }
 
     //if we are in the routine for exiting the circle once we have dropped a block off and reseting all our flags
@@ -281,12 +282,23 @@ void DropOffController::ProcessData() {
 
 bool DropOffController::ShouldInterrupt() {
     ProcessData();
-
-    return startWaypoint;
+    if (startWaypoint && !interrupt) {
+        interrupt = true;
+        precisionInterrupt = true;
+        return true;
+    }
+    else if (isPrecisionDriving && !precisionInterrupt) {
+        precisionInterrupt = true;
+        return true;
+    }
 }
 
 bool DropOffController::HasWork() {
-    return ((startWaypoint || isPrecisionDriving) && !circularCenterSearching);
+    if (circularCenterSearching && timerTimeElapsed < 5) {
+        return false;
+    }
+
+    return ((startWaypoint || isPrecisionDriving));
 }
 
 bool DropOffController::IsChangingMode() {

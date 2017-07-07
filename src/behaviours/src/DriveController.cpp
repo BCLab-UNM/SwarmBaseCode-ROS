@@ -170,11 +170,9 @@ Result DriveController::DoWork() {
 }
 
 bool DriveController::ShouldInterrupt() {
-    cout << "check interupt" << endl;
 
     if (interupt) {
         interupt = false;
-        cout << "interupt true" << endl;
         return true;
     }
     else {
@@ -190,16 +188,6 @@ bool DriveController::HasWork() {
 
 void DriveController::ProcessData()
 {
-        /*std_msgs::Float32 angle;
-    if (result.wristAngle != -1) {
-        angle.data = result.wristAngle;
-        wristAnglePublish.publish(angle);
-    }
-    if (result.fingerAngle != -1) {
-        angle.data = result.fingerAngle;
-        fingerAnglePublish.publish(angle);
-    }*/
-
     if (result.type == waypoint) {
         result.type = behavior;
         result.b = noChange;
@@ -211,18 +199,19 @@ void DriveController::ProcessData()
         if (!result.wpts.waypoints.empty()) {
             waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
             stateMachineState = STATE_MACHINE_WAYPOINTS;
-            cout << "state is now waypoints" << endl;
         }
     }
     else if (result.type == precisionDriving) {
         if (result.PIDMode == FAST_PID){
             float vel = result.pd.cmdVel -linearVelocity;
-            fastPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw); //needs declaration
+            float setVel = result.pd.cmdVel;
+            fastPID(vel,result.pd.cmdAngularError, setVel, result.pd.setPointYaw);
         }
         else if (result.PIDMode == SLOW_PID) {
-            //will take longer to reach the setPoint but has les chanse of an overshoot
+            //will take longer to reach the setPoint but has less chanse of an overshoot
             float vel = result.pd.cmdVel -linearVelocity;
-            slowPID(vel,result.pd.cmdAngularError, result.pd.setPointVel, result.pd.setPointYaw);
+            float setVel = result.pd.cmdVel;
+            slowPID(vel,result.pd.cmdAngularError, setVel, result.pd.setPointYaw);
         }
         else if (result.PIDMode == CONST_PID) {
             float vel = result.pd.cmdVel - linearVelocity;

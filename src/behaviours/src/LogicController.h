@@ -61,7 +61,6 @@ private:
     enum ProcessState {
         _FIRST = 0,
         PROCCESS_STATE_SEARCHING = 0,
-        PROCCESS_COLLECTING_TARGET,
         PROCCESS_STATE_TARGET_PICKEDUP,
         _LAST
     };

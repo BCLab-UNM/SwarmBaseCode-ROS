@@ -236,6 +236,12 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 	logicController.setCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
 	
         result = logicController.DoWork();
+
+        if (result.type == behavior) {
+            if (result.b = wait) {
+                sendDriveCommand(0.0,0.0);
+            }
+        }
         sendDriveCommand(result.pd.left,result.pd.right);
 
         std_msgs::Float32 angle;

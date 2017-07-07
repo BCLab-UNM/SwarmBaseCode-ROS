@@ -114,5 +114,8 @@ private:
 
     long int current_time;
 
+    bool interrupt = false;
+    bool precisionInterrupt = false;
+
 };
 #endif // end header define

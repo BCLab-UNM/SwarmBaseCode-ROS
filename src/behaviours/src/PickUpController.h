@@ -24,6 +24,7 @@ public:
     void SetUltraSoundData(bool blockBlock);
 
     bool GetIgnoreCenter() {return ignoreCenterSonar;}
+    bool GetTargetHeld() {return targetHeld;}
 
     void setCurrentTimeInMilliSecs( long int time );
 
@@ -37,6 +38,7 @@ private:
     bool lockTarget;
 
     bool targetFound;
+    bool targetHeld;
 
     // Failsafe state. No legitimate behavior state. If in this state for too long return to searching as default behavior.
     bool timeOut;
@@ -50,7 +52,7 @@ private:
     double blockDistance;
 
     //distance to target block from camera
-    double blockCameraDistance;
+    double blockDistanceFromCamera;
 
     //struct for returning data to the ROS adapter
     Result result;
@@ -62,5 +64,7 @@ private:
     float timeDifference;
 
     long int current_time;
+
+    bool interupted = false;
 };
 #endif // end header define

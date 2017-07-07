@@ -33,33 +33,7 @@ void LogicController::Reset() {
 }
 
 Result LogicController::DoWork() {
-    Result result;
-
-
-    if (processState == PROCCESS_STATE_SEARCHING) {
-        prioritizedControllers = {
-            PrioritizedController{0, (Controller*)(&searchController)},
-            PrioritizedController{1, (Controller*)(&obstacleController)},
-            PrioritizedController{2, (Controller*)(&pickUpController)},
-            PrioritizedController{-1, (Controller*)(&dropOffController)}
-        };
-    }
-    else if (processState == PROCCESS_COLLECTING_TARGET) {
-        prioritizedControllers = {
-            PrioritizedController{-1, (Controller*)(&searchController)},
-            PrioritizedController{1, (Controller*)(&obstacleController)},
-            PrioritizedController{2, (Controller*)(&pickUpController)},
-            PrioritizedController{-1, (Controller*)(&dropOffController)}
-        };
-    }
-    else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
-        prioritizedControllers = {
-            PrioritizedController{-1, (Controller*)(&searchController)},
-            PrioritizedController{2, (Controller*)(&obstacleController)},
-            PrioritizedController{-1, (Controller*)(&pickUpController)},
-            PrioritizedController{1, (Controller*)(&dropOffController)}
-        };
-    }
+    Result result;    
 
     for(PrioritizedController cntrlr : prioritizedControllers) {
         if(cntrlr.controller->ShouldInterrupt() && cntrlr.priority > 0) {
@@ -92,8 +66,10 @@ Result LogicController::DoWork() {
         if(control_queue.empty()) {
             result.type = behavior;
             result.b = wait;
-
-            return result;
+            break;
+        }
+        else {
+            result.b = noChange;
         }
 
         result = control_queue.top().controller->DoWork();
@@ -101,6 +77,9 @@ Result LogicController::DoWork() {
         cout << "result type " << result.type << endl;
 
         if(result.type == behavior) {
+            if (result.reset) {
+                control_queue.top().controller->Reset();
+            }
             if(result.b == nextProcess) {
                 if (processState == _LAST) {
                     processState = _FIRST;
@@ -116,10 +95,15 @@ Result LogicController::DoWork() {
                     processState = (ProcessState)((int)processState - 1);
                 }
             }
+
+            if (result.b == nextProcess || result.b == prevProcess) {
+                ProcessData();
+            }
             break;
         } else if(result.type == precisionDriving) {
 
             logicState = LOGIC_STATE_PRECISION_COMMAND;
+            break;
 
         } else if(result.type == waypoint) {
 
@@ -142,20 +126,14 @@ Result LogicController::DoWork() {
         if (result.type == behavior) {
             if(driveController.ShouldInterrupt()) {
                 logicState = LOGIC_STATE_INTERRUPT;
-                break;
-            }
-            else {
-                return result;
             }
         }
-        else {
-            return result;
-        }
-
         break;
     }
 
     case LOGIC_STATE_PRECISION_COMMAND: {
+
+        cout << "precision command"<< endl;
 
         result = control_queue.top().controller->DoWork();
         driveController.setResultData(result);
@@ -164,6 +142,7 @@ Result LogicController::DoWork() {
     }
     }
 
+    controllerInterconnect();
     return result;
 }
 
@@ -174,6 +153,22 @@ void LogicController::UpdateData() {
 
 void LogicController::ProcessData() {
 
+    if (processState == PROCCESS_STATE_SEARCHING) {
+        prioritizedControllers = {
+            PrioritizedController{0, (Controller*)(&searchController)},
+            PrioritizedController{1, (Controller*)(&obstacleController)},
+            PrioritizedController{2, (Controller*)(&pickUpController)},
+            PrioritizedController{-1, (Controller*)(&dropOffController)}
+        };
+    }
+    else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
+        prioritizedControllers = {
+            PrioritizedController{-1, (Controller*)(&searchController)},
+            PrioritizedController{2, (Controller*)(&obstacleController)},
+            PrioritizedController{-1, (Controller*)(&pickUpController)},
+            PrioritizedController{1, (Controller*)(&dropOffController)}
+        };
+    }
 }
 
 bool LogicController::ShouldInterrupt() {
@@ -192,6 +187,9 @@ void LogicController::controllerInterconnect() {
 
     if(pickUpController.GetIgnoreCenter()) {
         obstacleController.SetIgnoreCenter();
+    }
+    if(pickUpController.GetTargetHeld()) {
+        dropOffController.SetTargetPickedUp();
     }
 }
 

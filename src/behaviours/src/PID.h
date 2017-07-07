@@ -41,7 +41,7 @@ public:
 private:
     
     vector<float> Error;
-    float prevSetPoint;
+    float prevSetPoint = std::numeric_limits<float>::min();
     vector<float> integralErrorHistArray;
     int step = 0;
     float hz = 10;

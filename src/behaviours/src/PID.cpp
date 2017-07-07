@@ -27,7 +27,6 @@ float PID::PIDOut(float calculatedError, float setPoint) {
         step = 0;
         integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
     }
-    
     //feed forward
     float FF = config.feedForwardMultiplier * setPoint;
     
@@ -58,6 +57,7 @@ float PID::PIDOut(float calculatedError, float setPoint) {
         P = config.satLower; 
     //Integral
     bool integralOn = false;
+
     
     //only use integral when error is larger than presumed noise.
     if (fabs(Error.front()) > config.integralDeadZone)
@@ -66,11 +66,11 @@ float PID::PIDOut(float calculatedError, float setPoint) {
         step++;
 
         if (step >= config.integralErrorHistoryLength) step = 0;
-        
         if (!config.alwaysIntegral) {
             integralOn = true;
         }
     }
+
     
     float sum = 0;
     for (int i= 0; i < integralErrorHistArray.size(); i++) //sum the array to get the error over time from t = 0 to present.
