@@ -59,6 +59,14 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
         }
     }
 
+    if (fabs(forward) >= 0.8) {
+        forward = forward/fabs(forward) * 0.8;
+    }
+
+    if (fabs(turn) >= 1.0) { //max value needs tuning
+        turn = turn/fabs(turn) * 1.0;
+    }
+
 
 
 

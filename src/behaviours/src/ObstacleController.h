@@ -20,6 +20,8 @@ public:
     bool HasWork() override;
     void SetIgnoreCenter();
     void setCurrentTimeInMilliSecs( long int time );
+    void SetTargetHeld () {targetHeld = true;}
+    void SetTargetHeldClear() {targetHeld = false;}
 
 protected:
 
@@ -56,6 +58,8 @@ private:
 
     long int current_time;
     long int timeSinceTags;
+
+    bool targetHeld = false;
     
 };
 

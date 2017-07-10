@@ -69,6 +69,9 @@ bool initilized = false;
 float linearVelocity = 0;
 float angularVelocity = 0;
 
+float prevWrist = 0;
+float prevFinger = 0;
+
 Result result;
 
 std_msgs::String msg;
@@ -237,21 +240,36 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 	
         result = logicController.DoWork();
 
+        bool skip = false;
         if (result.type == behavior) {
             if (result.b = wait) {
-                sendDriveCommand(0.0,0.0);
+                skip = true;
             }
         }
-        sendDriveCommand(result.pd.left,result.pd.right);
+        if (skip) {
+            sendDriveCommand(0.0,0.0);
+            std_msgs::Float32 angle;
 
-        std_msgs::Float32 angle;
-        if (result.fingerAngle != -1) {
-            angle.data = result.fingerAngle;
+            angle.data = prevFinger;
             fingerAnglePublish.publish(angle);
-        }
-        if (result.wristAngle != -1) {
-            angle.data = result.wristAngle;
+            angle.data = prevWrist;
             wristAnglePublish.publish(angle);
+        }
+        else {
+
+            sendDriveCommand(result.pd.left,result.pd.right);
+
+            std_msgs::Float32 angle;
+            if (result.fingerAngle != -1) {
+                angle.data = result.fingerAngle;
+                fingerAnglePublish.publish(angle);
+                prevFinger = result.fingerAngle;
+            }
+            if (result.wristAngle != -1) {
+                angle.data = result.wristAngle;
+                wristAnglePublish.publish(angle);
+                prevWrist = result.wristAngle;
+            }
         }
 
         //publishHandeling here

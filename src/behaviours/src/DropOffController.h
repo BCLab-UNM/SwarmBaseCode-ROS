@@ -24,6 +24,7 @@ public:
     void SetTargetPickedUp();
     void SetBlockBlockingUltrasound(bool blockBlock);
     void setTargetData(vector<TagPoint> tags);
+    bool HasTarget() {return targetHeld;}
 
     float GetSpinner() {return spinner;}
 

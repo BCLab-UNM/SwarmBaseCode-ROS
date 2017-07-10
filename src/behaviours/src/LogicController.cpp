@@ -66,6 +66,7 @@ Result LogicController::DoWork() {
         if(control_queue.empty()) {
             result.type = behavior;
             result.b = wait;
+            cout << "empty" << endl;
             break;
         }
         else {
@@ -190,6 +191,10 @@ void LogicController::controllerInterconnect() {
     }
     if(pickUpController.GetTargetHeld()) {
         dropOffController.SetTargetPickedUp();
+        obstacleController.SetTargetHeld();
+    }
+    if (!dropOffController.HasTarget()) {
+        obstacleController.SetTargetHeldClear();
     }
 }
 

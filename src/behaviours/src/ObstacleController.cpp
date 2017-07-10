@@ -95,18 +95,20 @@ void ObstacleController::SetTagData(vector<TagPoint> tags){
     float cameraOffsetCorrection = 0.020; //meters;
     centerSeen = false;
     // this loop is to get the number of center tags
-    for (int i = 0; i < tags.size(); i++) {
-        if (tags[i].id == 256) {
+    if (!targetHeld) {
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags[i].id == 256) {
 
-            // checks if tag is on the right or left side of the image
-            if (tags[i].x + cameraOffsetCorrection > 0) {
-                countRight++;
+                // checks if tag is on the right or left side of the image
+                if (tags[i].x + cameraOffsetCorrection > 0) {
+                    countRight++;
 
-            } else {
-                countLeft++;
+                } else {
+                    countLeft++;
+                }
+                centerSeen = true;
+                timeSinceTags = current_time;
             }
-            centerSeen = true;
-            timeSinceTags = current_time;
         }
     }
 

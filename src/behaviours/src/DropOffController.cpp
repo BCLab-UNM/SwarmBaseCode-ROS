@@ -33,8 +33,8 @@ Result DropOffController::DoWork() {
     cout << "in obstacle controller" << endl;
 
     if(timerTimeElapsed > -1) {
-       
-	long int elapsed = current_time - returnTimer;
+
+    long int elapsed = current_time - returnTimer;
     timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
     }
 
@@ -203,6 +203,8 @@ Result DropOffController::DoWork() {
             result.type = waypoint;
             result.wpts.waypoints.push_back(this->centerLocation);
             isPrecisionDriving = false;
+            interrupt = false;
+            precisionInterrupt = false;
         }
         else
         {
@@ -294,6 +296,12 @@ bool DropOffController::ShouldInterrupt() {
 }
 
 bool DropOffController::HasWork() {
+
+    if(timerTimeElapsed > -1) {
+        long int elapsed = current_time - returnTimer;
+        timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
+    }
+
     if (circularCenterSearching && timerTimeElapsed < 5) {
         return false;
     }
