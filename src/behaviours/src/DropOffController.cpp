@@ -114,7 +114,6 @@ Result DropOffController::DoWork() {
         returnTimer = current_time;
         timerTimeElapsed = 0;
 
-        return result;
     }
 
     bool left = (countLeft > 0);
@@ -293,7 +292,7 @@ bool DropOffController::ShouldInterrupt() {
     ProcessData();
     if (startWaypoint && !interrupt) {
         interrupt = true;
-        precisionInterrupt = true;
+        precisionInterrupt = false;
         return true;
     }
     else if (isPrecisionDriving && !precisionInterrupt) {

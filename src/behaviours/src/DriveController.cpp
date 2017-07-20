@@ -18,6 +18,9 @@ DriveController::~DriveController() {}
 
 void DriveController::Reset() {
   waypoints.clear();
+  if (stateMachineState == STATE_MACHINE_ROTATE || stateMachineState == STATE_MACHINE_SKID_STEER) {
+    stateMachineState = STATE_MACHINE_WAYPOINTS;
+  }
 }
 
 Result DriveController::DoWork() {
