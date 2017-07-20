@@ -22,6 +22,7 @@ public:
     void setCurrentTimeInMilliSecs( long int time );
     void SetTargetHeld () {targetHeld = true;}
     void SetTargetHeldClear() {targetHeld = false;}
+    bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
 
@@ -43,6 +44,7 @@ private:
     bool obstacleInterrupt;
     bool obstacleDetected;
     bool obstacleAvoided;
+    bool clearWaypoints = false;
     
     float left = 0;
     float center = 0;

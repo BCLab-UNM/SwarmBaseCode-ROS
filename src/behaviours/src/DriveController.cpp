@@ -17,7 +17,7 @@ constYawPID.setConfiguration(constYawConfig());
 DriveController::~DriveController() {}
 
 void DriveController::Reset() {
-
+  waypoints.clear();
 }
 
 Result DriveController::DoWork() {

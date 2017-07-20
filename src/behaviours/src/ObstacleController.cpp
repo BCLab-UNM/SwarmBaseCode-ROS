@@ -16,6 +16,8 @@ void ObstacleController::Reset() {
 Result ObstacleController::DoWork() {
     cout << "in obstacle controller" << endl;
 
+    clearWaypoints = true;
+
     if(centerSeen){
 
         result.type = precisionDriving;

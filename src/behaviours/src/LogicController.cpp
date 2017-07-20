@@ -196,6 +196,10 @@ void LogicController::controllerInterconnect() {
     if (!dropOffController.HasTarget()) {
         obstacleController.SetTargetHeldClear();
     }
+
+    if(obstacleController.GetShouldClearWaypoints()) {
+      driveController.Reset();
+    }
 }
 
 
