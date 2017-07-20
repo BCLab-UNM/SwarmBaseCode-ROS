@@ -32,6 +32,9 @@ DropOffController::~DropOffController() {
 Result DropOffController::DoWork() {
     cout << "in obstacle controller" << endl;
 
+    int count = countLeft + countRight;
+    cout << "drop: tagsize>0: " << count << endl;
+
     if(timerTimeElapsed > -1) {
 
     long int elapsed = current_time - returnTimer;
@@ -65,10 +68,11 @@ Result DropOffController::DoWork() {
     }
 
     double distanceToCenter = hypot(this->centerLocation.x - this->currentLocation.x, this->centerLocation.y - this->currentLocation.y);
-    int count = countLeft + countRight;
 
     //check to see if we are driving to the center location or if we need to drive in a circle and look.
     if (distanceToCenter > collectionPointVisualDistance && !circularCenterSearching && (count == 0)) {
+
+      cout << "drop: approaching center" << endl;
 
         result.type = waypoint;
         result.wpts.waypoints.push_back(this->centerLocation);
@@ -83,6 +87,8 @@ Result DropOffController::DoWork() {
     else if (timerTimeElapsed >= 5)//spin search for center
     {
         Point nextSpinPoint;
+
+        cout << "drop: circular search" << endl;
 
         //sets a goal that is 60cm from the centerLocation and spinner
         //radians counterclockwise from being purly along the x-axis.
@@ -124,6 +130,7 @@ Result DropOffController::DoWork() {
 
     if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
     {
+      cout << "drop: centerSeen" << endl;
         centerSeen = true;
 
         if (seenEnoughCenterTags) //if we have seen enough tags

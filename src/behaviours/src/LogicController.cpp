@@ -192,6 +192,8 @@ void LogicController::controllerInterconnect() {
     if(pickUpController.GetTargetHeld()) {
         dropOffController.SetTargetPickedUp();
         obstacleController.SetTargetHeld();
+        driveController.Reset();
+        cout << "drop: target held" << endl;
     }
     if (!dropOffController.HasTarget()) {
         obstacleController.SetTargetHeldClear();
