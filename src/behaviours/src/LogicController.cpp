@@ -138,14 +138,10 @@ Result LogicController::DoWork() {
         cout << "precision command"<< endl;
 
         result = control_queue.top().controller->DoWork();
-        if (result.type == behavior) {
-          logicState = LOGIC_STATE_INTERRUPT;
-        }
-        else {
-          driveController.setResultData(result);
-          result = driveController.DoWork();
-          break;
-        }
+
+        driveController.setResultData(result);
+        result = driveController.DoWork();
+        break;
     }
     }
 

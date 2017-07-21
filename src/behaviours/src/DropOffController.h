@@ -117,6 +117,7 @@ private:
 
     bool interrupt = false;
     bool precisionInterrupt = false;
+    bool finalInterrupt = false;
 
 };
 #endif // end header define
