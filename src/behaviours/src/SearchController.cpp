@@ -43,17 +43,26 @@ Result SearchController::DoWork() {
         result.type = waypoint;
         Point  searchLocation;
 
-        //select new heading from Gaussian distribution around current heading
-        searchLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+        //select new position 50 cm from current location
+        if (first_waypoint) 
+	  {
+	    first_waypoint = false;
+	    searchLocation.theta = currentLocation.theta + M_PI;
+	    searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+	    searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+	  }
+	else
+	  {
+	    //select new heading from Gaussian distribution around current heading
+	    searchLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+	    searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+	    searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+	  }
 
-        //selec.t new position 50 cm from current location
-        searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
-        searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
-
-        result.wpts.waypoints.clear();
-        result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
-
-        return result;
+	result.wpts.waypoints.clear();
+	result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+ 
+       return result;
     }
 
 }

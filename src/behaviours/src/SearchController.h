@@ -39,6 +39,10 @@ private:
     int attemptCount = 0;
     //struct for returning data to ROS adapter
     Result result;
+
+    // Search state
+    // Flag to allow special behaviour for the first waypoint
+    bool first_waypoint = true;
 };
 
 #endif /* SEARCH_CONTROLLER */
