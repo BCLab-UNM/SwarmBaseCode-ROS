@@ -52,14 +52,14 @@ enum BehaviorTrigger {
 };
 
 struct PrecisionDriving {
-    float cmdVel;
-    float cmdAngularError;
-    float cmdAngular;
-    float setPointVel;
-    float setPointYaw;
+  float cmdVel = 0.0;
+  float cmdAngularError = 0.0;
+  float cmdAngular = 0.0;
+  float setPointVel = 0.0;
+  float setPointYaw = 0.0;
 
-    float left;
-    float right;
+  float left = 0.0;
+  float right = 0.0;
 };
 
 struct Waypoints {
@@ -73,8 +73,8 @@ struct Result {
     Waypoints wpts;
     PrecisionDriving pd;
     
-    float fingerAngle;
-    float wristAngle;
+    float fingerAngle = -1;
+    float wristAngle = -1;
     PIDType PIDMode;
 
     bool reset;
