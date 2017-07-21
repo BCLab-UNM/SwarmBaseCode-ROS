@@ -50,6 +50,7 @@ Result DropOffController::DoWork() {
             result.type = behavior;
             result.b = nextProcess;
             result.reset = true;
+            cout << "drop: behavior change" << endl;
             return result;
         }
         else if (timerTimeElapsed >= 0.5)
@@ -62,6 +63,7 @@ Result DropOffController::DoWork() {
 
             result.pd.cmdVel = -0.3;
             result.pd.cmdAngularError = 0.0;
+            cout << "drop: released" << endl;
         }
 
         return result;
@@ -191,6 +193,8 @@ Result DropOffController::DoWork() {
         centerApproach = true;
         prevCount = count;
         count = 0;
+        countLeft = 0;
+        countRight = 0;
     }
 
     //was on approach to center and did not seenEnoughCenterTags
