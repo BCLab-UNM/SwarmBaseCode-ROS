@@ -50,6 +50,7 @@ Result DropOffController::DoWork() {
             result.type = behavior;
             result.b = nextProcess;
             result.reset = true;
+            finalInterrupt = true;
             cout << "drop: behavior change" << endl;
             return result;
         }
@@ -255,6 +256,11 @@ void DropOffController::Reset() {
     reachedCollectionPoint = false;
     seenEnoughCenterTags = false;
     circularCenterSearching = false;
+    isPrecisionDriving = false;
+    finalInterrupt = false;
+    precisionInterrupt = false;
+    targetHeld = false;
+    startWaypoint = false;
 
 }
 
@@ -302,6 +308,9 @@ bool DropOffController::ShouldInterrupt() {
     else if (isPrecisionDriving && !precisionInterrupt) {
         precisionInterrupt = true;
         return true;
+    }
+    if (finalInterrupt) {
+      return true;
     }
 }
 
