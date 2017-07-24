@@ -24,11 +24,9 @@ void DriveController::Reset() {
 }
 
 Result DriveController::DoWork() {
-  cout << "in drive controller" << endl;
 
   if(result.type == behavior) {
     if(result.b == noChange) {
-      cout << "no change" << endl;
 
     } else if(result.b == wait) {
 
@@ -42,7 +40,6 @@ Result DriveController::DoWork() {
     stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
 
   } else if(result.type == waypoint) {
-    cout << "proccese waypoints" << endl;
     ProcessData();
 
   }
@@ -74,7 +71,6 @@ Result DriveController::DoWork() {
     }
     if (waypoints.empty()) {
       stateMachineState = STATE_MACHINE_WAITING;
-      cout << "out of waypoints " << endl;
       result.type = behavior;
       interupt = true;
       return result;
@@ -96,9 +92,6 @@ Result DriveController::DoWork() {
     // Calculate the diffrence between current and desired heading in radians.
     float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
-    cout << "state is rotate yaw error is : " << errorYaw << endl;
-    cout << "current heading is : " << currentLocation.theta << endl;
-
     result.pd.setPointVel = 0.0;
     result.pd.setPointYaw = waypoints.back().theta;
 
@@ -107,7 +100,6 @@ Result DriveController::DoWork() {
       // rotate but dont drive.
       if (result.PIDMode == FAST_PID) {
         fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
-        cout << "pid values are L:R  " << result.pd.left << " : " << result.pd.right << endl;
       }
       break;
     } else {
@@ -121,7 +113,6 @@ Result DriveController::DoWork() {
     // Stay in this state until angle is at least PI/2
   case STATE_MACHINE_SKID_STEER: {
 
-    cout << "state is skidsteer" << endl;
     // calculate the distance between current and desired heading in radians
     float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
@@ -133,7 +124,6 @@ Result DriveController::DoWork() {
       result.pd.setPointVel = searchVelocity;
       if (result.PIDMode == FAST_PID){
         fastPID(searchVelocity - linearVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
-        cout << "driving pid values are L:R  " << result.pd.left << " : " << result.pd.right << endl;
       }
     }
     // goal is reached but desired heading is still wrong turn only
@@ -142,7 +132,6 @@ Result DriveController::DoWork() {
       result.pd.setPointVel = 0.0;
       if (result.PIDMode == FAST_PID){
         fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
-        cout << "final turn pid values are L:R  " << result.pd.left << " : " << result.pd.right << endl;
       }
     }
     else {
@@ -152,7 +141,6 @@ Result DriveController::DoWork() {
 
       // move back to transform step
       stateMachineState = STATE_MACHINE_WAYPOINTS;
-      cout << "back to waypoints" << endl;
     }
 
     break;

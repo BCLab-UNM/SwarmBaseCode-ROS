@@ -38,12 +38,9 @@ Result LogicController::DoWork() {
   for(PrioritizedController cntrlr : prioritizedControllers) {
     if(cntrlr.controller->ShouldInterrupt() && cntrlr.priority > 0) {
       logicState = LOGIC_STATE_INTERRUPT;
-      cout << "shouldInterupt " << cntrlr.priority <<endl;
       //do not break all shouldInterupts may need calling in order to properly pre-proccess data.
     }
   }
-
-  cout << "state " << processState << " logicState " << logicState << endl;
 
   switch(logicState) {
   case LOGIC_STATE_INTERRUPT: {
@@ -58,7 +55,6 @@ Result LogicController::DoWork() {
         }
         else {
           control_queue.push(cntrlr);
-          cout << "hasWork" << endl;
         }
       }
     }
@@ -66,7 +62,6 @@ Result LogicController::DoWork() {
     if(control_queue.empty()) {
       result.type = behavior;
       result.b = wait;
-      cout << "empty" << endl;
       break;
     }
     else {
@@ -75,15 +70,12 @@ Result LogicController::DoWork() {
 
     result = control_queue.top().controller->DoWork();
 
-    cout << "result type " << result.type << endl;
-
     if(result.type == behavior) {
       if (result.reset) {
         controllerInterconnect(); //allow controller to communicate state data before it is reset
         control_queue.top().controller->Reset();
       }
       if(result.b == nextProcess) {
-        cout << "*** next procces " << endl;
         if (processState == _LAST - 1) {
           processState = _FIRST;
         }
@@ -112,8 +104,6 @@ Result LogicController::DoWork() {
 
     } else if(result.type == waypoint) {
 
-      cout << "waypoint" << endl;
-
       logicState = LOGIC_STATE_WAITING;
       driveController.SetResultData(result);
     }
@@ -122,11 +112,7 @@ Result LogicController::DoWork() {
 
   case LOGIC_STATE_WAITING: {
 
-    cout << "waiting doing driving" << endl;
-
     result = driveController.DoWork();
-
-    cout << "result type : " << result.type << endl;
 
     if (result.type == behavior) {
       if(driveController.ShouldInterrupt()) {
@@ -137,8 +123,6 @@ Result LogicController::DoWork() {
   }
 
   case LOGIC_STATE_PRECISION_COMMAND: {
-
-    cout << "precision command"<< endl;
 
     result = control_queue.top().controller->DoWork();
 
@@ -193,13 +177,11 @@ void LogicController::controllerInterconnect() {
 
   if(pickUpController.GetIgnoreCenter()) {
     obstacleController.SetIgnoreCenter();
-     cout << "ignore center" << endl;
   }
   if(pickUpController.GetTargetHeld()) {
     dropOffController.SetTargetPickedUp();
     obstacleController.SetTargetHeld();
     searchController.SetSuccesfullPickup();
-    cout << "****** targetHeld" << endl;
   }
   if (!dropOffController.HasTarget()) {
     obstacleController.SetTargetHeldClear();

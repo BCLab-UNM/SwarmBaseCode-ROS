@@ -49,7 +49,6 @@ Result DropOffController::DoWork() {
       result.b = nextProcess;
       result.reset = true;
       finalInterrupt = true;
-      cout << "drop: behavior change" << endl;
       return result;
     }
     else if (timerTimeElapsed >= 0.1)
@@ -62,7 +61,6 @@ Result DropOffController::DoWork() {
 
       result.pd.cmdVel = -0.3;
       result.pd.cmdAngularError = 0.0;
-      cout << "drop: released" << endl;
     }
 
     return result;
@@ -72,8 +70,6 @@ Result DropOffController::DoWork() {
 
   //check to see if we are driving to the center location or if we need to drive in a circle and look.
   if (distanceToCenter > collectionPointVisualDistance && !circularCenterSearching && (count == 0)) {
-
-    cout << "drop: approaching center" << endl;
 
     result.type = waypoint;
     result.wpts.waypoints.clear();
@@ -89,8 +85,6 @@ Result DropOffController::DoWork() {
   else if (timerTimeElapsed >= 2)//spin search for center
   {
     Point nextSpinPoint;
-
-    cout << "drop: circular search" << endl;
 
     //sets a goal that is 60cm from the centerLocation and spinner
     //radians counterclockwise from being purly along the x-axis.
@@ -130,7 +124,6 @@ Result DropOffController::DoWork() {
 
   if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
   {
-    cout << "drop: centerSeen" << endl;
     centerSeen = true;
 
     if (seenEnoughCenterTags) //if we have seen enough tags

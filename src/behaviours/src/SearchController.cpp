@@ -21,12 +21,9 @@ void SearchController::Reset() {
  */
 Result SearchController::DoWork() {
 
-  cout << "in search controller" << endl;
-
   if (!result.wpts.waypoints.empty()) {
     if (hypot(result.wpts.waypoints[0].x-currentLocation.x, result.wpts.waypoints[0].y-currentLocation.y) < 0.10) {
       attemptCount = 0;
-      cout << "distance was less than tolerance new search" << endl;
     }
   }
 
@@ -36,11 +33,9 @@ Result SearchController::DoWork() {
       succesfullPickup = false;
       attemptCount = 1;
     }
-    cout <<"attempt again**********************************" << endl;
     return result;
   }
   else if (attemptCount >= 5 || attemptCount == 0) {
-    cout << "new search point*****************************" << endl;
     attemptCount = 1;
 
 

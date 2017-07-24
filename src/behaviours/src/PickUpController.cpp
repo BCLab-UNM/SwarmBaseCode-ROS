@@ -75,7 +75,6 @@ bool PickUpController::SetSonarData(float rangeCenter){
     result.b = nextProcess;
     result.reset = true;
     targetHeld = true;
-    cout << "*** target held due to sonar " << endl;
     return true;
   }
 
@@ -110,7 +109,6 @@ void PickUpController::ProcessData() {
     result.b = nextProcess;
     result.reset = true;
     targetHeld = true;
-    cout << "***** target held due to camera distance" << endl;
   }
   //Lower wrist and open fingures if no locked targt
   else if (!lockTarget)
@@ -128,7 +126,6 @@ bool PickUpController::ShouldInterrupt(){
 
   if ((targetFound && !interupted) || targetHeld) {
     interupted = true;
-    cout << "interupt pcikup" << endl;
     return true;
   }
   else if (!targetFound && interupted) {
@@ -145,8 +142,6 @@ Result PickUpController::DoWork() {
   if (!targetHeld) {
     //threshold distance to be from the target block before attempting pickup
     float targetDistance = 0.15; //meters
-
-    cout << "in pickup controller" << endl;
 
     // millisecond time = current time if not in a counting state
     if (!timeOut) millTimer = current_time;
