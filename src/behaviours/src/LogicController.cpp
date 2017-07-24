@@ -79,9 +79,11 @@ Result LogicController::DoWork() {
 
     if(result.type == behavior) {
       if (result.reset) {
+        controllerInterconnect(); //allow controller to communicate state data before it is reset
         control_queue.top().controller->Reset();
       }
       if(result.b == nextProcess) {
+        cout << "*** next procces " << endl;
         if (processState == _LAST - 1) {
           processState = _FIRST;
         }
@@ -191,10 +193,13 @@ void LogicController::controllerInterconnect() {
 
   if(pickUpController.GetIgnoreCenter()) {
     obstacleController.SetIgnoreCenter();
+     cout << "ignore center" << endl;
   }
   if(pickUpController.GetTargetHeld()) {
     dropOffController.SetTargetPickedUp();
     obstacleController.SetTargetHeld();
+    searchController.SetSuccesfullPickup();
+    cout << "****** targetHeld" << endl;
   }
   if (!dropOffController.HasTarget()) {
     obstacleController.SetTargetHeldClear();

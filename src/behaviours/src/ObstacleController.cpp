@@ -78,7 +78,6 @@ void ObstacleController::ProcessData() {
   if(ignoreCenter){
     if(center > reactivateCenterThreshold){
       ignoreCenter = false;
-
     }
     else{
       center = 3;
@@ -143,4 +142,14 @@ void ObstacleController::SetIgnoreCenter(){
 void ObstacleController::SetCurrentTimeInMilliSecs( long int time )
 {
   current_time = time;
+}
+
+void ObstacleController::SetTargetHeld() {
+  targetHeld = true;
+  if (previousTargetState == false) {
+    obstacleAvoided = true;
+    obstacleInterrupt = false;
+    obstacleDetected = false;
+    previousTargetState = true;
+  }
 }

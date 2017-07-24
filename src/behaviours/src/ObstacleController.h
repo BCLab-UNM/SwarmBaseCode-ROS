@@ -20,8 +20,8 @@ public:
   bool HasWork() override;
   void SetIgnoreCenter();
   void SetCurrentTimeInMilliSecs( long int time );
-  void SetTargetHeld () {targetHeld = true;}
-  void SetTargetHeldClear() {targetHeld = false;}
+  void SetTargetHeld ();
+  void SetTargetHeldClear() {targetHeld = false; previousTargetState = false;}
   bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
@@ -62,6 +62,7 @@ private:
   long int timeSinceTags;
 
   bool targetHeld = false;
+  bool previousTargetState = false;
 
 };
 

@@ -55,7 +55,7 @@ void PickUpController::SetTagData(vector<TagPoint> tags) {
       }
     }
 
-    float cameraOffsetCorrection = 0.020; //meters;
+    float cameraOffsetCorrection = 0.023; //meters;
 
     blockYawError = atan((tags[target].x + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
 
@@ -75,6 +75,7 @@ bool PickUpController::SetSonarData(float rangeCenter){
     result.b = nextProcess;
     result.reset = true;
     targetHeld = true;
+    cout << "*** target held due to sonar " << endl;
     return true;
   }
 
@@ -98,20 +99,18 @@ void PickUpController::ProcessData() {
     blockDistance = epsilon;
   }
 
-  if(blockYawError > 10) blockYawError =10;
-  if(blockYawError < -10) blockYawError = -10;
-
   //if target is close enough
   //diffrence between current time and millisecond time
   long int Tdiff = current_time - millTimer;
   float Td = Tdiff/1e3;
 
-  if (blockDistanceFromCamera < 0.15 && Td < 3.8) {
+  if (blockDistanceFromCamera < 0.12 && Td < 2.7) {
 
     result.type = behavior;
     result.b = nextProcess;
     result.reset = true;
     targetHeld = true;
+    cout << "***** target held due to camera distance" << endl;
   }
   //Lower wrist and open fingures if no locked targt
   else if (!lockTarget)
@@ -129,6 +128,7 @@ bool PickUpController::ShouldInterrupt(){
 
   if ((targetFound && !interupted) || targetHeld) {
     interupted = true;
+    cout << "interupt pcikup" << endl;
     return true;
   }
   else if (!targetFound && interupted) {
@@ -187,14 +187,14 @@ Result PickUpController::DoWork() {
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
     {
       lockTarget = true;
-      result.pd.cmdVel = 0.20;
+      result.pd.cmdVel = 0.15;
       result.pd.cmdAngularError= 0.0;
       timeOut = true;
       ignoreCenterSonar = true;
     }
-    else if (Td > 2.4) //raise the wrist
+    else if (Td > 2.2) //raise the wrist
     {
-      result.pd.cmdVel = -0.20;
+      result.pd.cmdVel = -0.15;
       result.pd.cmdAngularError= 0.0;
       result.wristAngle = 0;
     }
@@ -208,6 +208,7 @@ Result PickUpController::DoWork() {
 
     if (Td > 3.4 && timeOut) {
       lockTarget = false;
+      ignoreCenterSonar = true;
     }
     else if (Td > 2.8 && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
     {
@@ -215,18 +216,19 @@ Result PickUpController::DoWork() {
 
       result.pd.cmdVel = -0.15;
       result.pd.cmdAngularError= 0.0;
-      //set gripper
+      //set gripper to open and down
       result.fingerAngle = M_PI_2;
       result.wristAngle = 0;
 
     }
 
-    if (Td > 5 && timeOut) //if no targets are found after too long a period go back to search pattern
+    if (Td > 4.0 && timeOut) //if no targets are found after too long a period go back to search pattern
     {
       Reset();
       interupted = true;
       result.pd.cmdVel = 0.0;
       result.pd.cmdAngularError= 0.0;
+      ignoreCenterSonar = true;
     }
   }
 
@@ -258,7 +260,7 @@ void PickUpController::Reset() {
   result.reset = false;
 
   ignoreCenterSonar = false;
-};
+}
 
 void PickUpController::SetUltraSoundData(bool blockBlock){
   this->blockBlock = blockBlock;

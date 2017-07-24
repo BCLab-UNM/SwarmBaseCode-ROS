@@ -81,6 +81,12 @@ float PID::PIDOut(float calculatedError, float setPoint) {
   if (config.alwaysIntegral || integralOn){
     I = config.Ki * sum; //this is integrated output
   }
+  else {
+    integralErrorHistArray.clear();
+    integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
+    I = 0;
+    step = 0;
+  }
 
   //anti windup
   //anti windup reduces overshoot by limiting the acting time of the integral to areas where the
