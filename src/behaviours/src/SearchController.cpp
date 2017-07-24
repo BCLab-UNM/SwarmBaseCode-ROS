@@ -32,6 +32,10 @@ Result SearchController::DoWork() {
 
   if (attemptCount > 0 && attemptCount < 5) {
     attemptCount++;
+    if (succesfullPickup) {
+      succesfullPickup = false;
+      attemptCount = 0;
+    }
     cout <<"attempt again**********************************" << endl;
     return result;
   }
@@ -89,7 +93,7 @@ bool SearchController::HasWork() {
 }
 
 void SearchController::SetSuccesfullPickup() {
-
+  succesfullPickup = true;
 }
 
 
