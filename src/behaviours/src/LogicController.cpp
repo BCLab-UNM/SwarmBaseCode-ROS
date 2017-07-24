@@ -62,16 +62,7 @@ Result LogicController::DoWork() {
     //if no controlers have work report this to ROS Adapter and do nothing.
     if(control_queue.empty()) {
       result.type = behavior;
-      result.b = wait;if (processState == PROCCESS_STATE_SEARCHING) {
-        if(pickUpController.GetIgnoreCenter()) {
-          obstacleController.SetIgnoreCenter();
-        }
-          if(pickUpController.GetTargetHeld()) {
-            dropOffController.SetTargetPickedUp();
-            obstacleController.SetTargetHeld();
-            searchController.SetSuccesfullPickup();
-          }
-        }
+      result.b = wait;
       break;
     }
     else {
@@ -136,6 +127,7 @@ Result LogicController::DoWork() {
 
       logicState = LOGIC_STATE_WAITING;
       driveController.SetResultData(result);
+      //fall through on purpose
     }
 
   } //end of interupt case***************************************************************************************

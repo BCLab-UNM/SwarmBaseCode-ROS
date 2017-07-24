@@ -25,6 +25,10 @@
 #include "LogicController.h"
 #include <vector>
 
+#include <Point.h>
+#include <Result.h>
+#include <TagPoint.h>
+
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
 #include <ros/ros.h>
@@ -244,17 +248,17 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     //ask logic controller for the next set of actuator commands
     result = logicController.DoWork();
 
-    bool skip = false;
+    bool wait = false;
 
     //if a wait behaviour is thrown sit and do nothing untill logicController is ready
     if (result.type == behavior) {
       if (result.b = wait) {
-        skip = true;
+        wait = true;
       }
     }
 
     //do this when wait behaviour happens
-    if (skip) {
+    if (wait) {
       sendDriveCommand(0.0,0.0);
       std_msgs::Float32 angle;
 
