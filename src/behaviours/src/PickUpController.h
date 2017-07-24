@@ -26,7 +26,7 @@ public:
   bool GetIgnoreCenter() {return ignoreCenterSonar;}
   bool GetTargetHeld() {return targetHeld;}
 
-  void setCurrentTimeInMilliSecs( long int time );
+  void SetCurrentTimeInMilliSecs( long int time );
 
 protected:
 

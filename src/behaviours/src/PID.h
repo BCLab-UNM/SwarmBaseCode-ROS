@@ -36,7 +36,7 @@ public:
 
   float PIDOut(float calculatedError, float setPoint);
 
-  void setConfiguration(PIDConfig config) {this->config = config;}
+  void SetConfiguration(PIDConfig config) {this->config = config;}
 
 private:
 

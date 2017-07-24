@@ -2,14 +2,14 @@
 
 DriveController::DriveController() {
 
-  fastVelPID.setConfiguration(fastVelConfig());
-  fastYawPID.setConfiguration(fastYawConfig());
+  fastVelPID.SetConfiguration(fastVelConfig());
+  fastYawPID.SetConfiguration(fastYawConfig());
 
-  slowVelPID.setConfiguration(slowVelConfig());
-  slowYawPID.setConfiguration(slowYawConfig());
+  slowVelPID.SetConfiguration(slowVelConfig());
+  slowYawPID.SetConfiguration(slowYawConfig());
 
-  constVelPID.setConfiguration(constVelConfig());
-  constYawPID.setConfiguration(constYawConfig());
+  constVelPID.SetConfiguration(constVelConfig());
+  constYawPID.SetConfiguration(constYawConfig());
 
 
 }

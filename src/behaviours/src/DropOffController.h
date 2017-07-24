@@ -23,14 +23,14 @@ public:
   void SetCurrentLocation(Point current);
   void SetTargetPickedUp();
   void SetBlockBlockingUltrasound(bool blockBlock);
-  void setTargetData(vector<TagPoint> tags);
+  void SetTargetData(vector<TagPoint> tags);
   bool HasTarget() {return targetHeld;}
 
   float GetSpinner() {return spinner;}
 
   void UpdateData(vector<TagPoint> tags);
 
-  void setCurrentTimeInMilliSecs( long int time );
+  void SetCurrentTimeInMilliSecs( long int time );
 
 private:
 

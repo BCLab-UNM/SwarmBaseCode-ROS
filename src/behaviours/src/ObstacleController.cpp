@@ -140,7 +140,7 @@ void ObstacleController::SetIgnoreCenter(){
   ignoreCenter = true; //ignore center ultrasound
 }
 
-void ObstacleController::setCurrentTimeInMilliSecs( long int time )
+void ObstacleController::SetCurrentTimeInMilliSecs( long int time )
 {
   current_time = time;
 }

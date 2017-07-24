@@ -264,7 +264,7 @@ void PickUpController::SetUltraSoundData(bool blockBlock){
   this->blockBlock = blockBlock;
 }
 
-void PickUpController::setCurrentTimeInMilliSecs( long int time )
+void PickUpController::SetCurrentTimeInMilliSecs( long int time )
 {
   current_time = time;
 }

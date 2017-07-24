@@ -23,8 +23,9 @@ public:
 
   // sets the value of the current location
   //void UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation);
-  void setCurrentLocation(Point currentLocation);
-  void setCenterLocation(Point centerLocation);
+  void SetCurrentLocation(Point currentLocation);
+  void SetCenterLocation(Point centerLocation);
+  void SetSuccesfullPickup();
 
 protected:
 

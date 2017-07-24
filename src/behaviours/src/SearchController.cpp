@@ -67,11 +67,11 @@ Result SearchController::DoWork() {
 
 }
 
-void SearchController::setCenterLocation(Point centerLocation) {
+void SearchController::SetCenterLocation(Point centerLocation) {
   this->centerLocation = centerLocation;
 }
 
-void SearchController::setCurrentLocation(Point currentLocation) {
+void SearchController::SetCurrentLocation(Point currentLocation) {
   this->currentLocation = currentLocation;
 }
 
@@ -88,6 +88,8 @@ bool SearchController::HasWork() {
   return true;
 }
 
+void SearchController::SetSuccesfullPickup() {
 
+}
 
 

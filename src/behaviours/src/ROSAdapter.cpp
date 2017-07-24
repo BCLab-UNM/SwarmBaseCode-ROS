@@ -228,15 +228,15 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     centerOdom.x = centerLocation.x;
     centerOdom.y = centerLocation.y;
     centerOdom.theta = centerLocation.theta;
-    logicController.setCenterLocationOdom(centerOdom);
+    logicController.SetCenterLocationOdom(centerOdom);
 
     Point centerMap;
     centerMap.x = centerLocationMap.x;
     centerMap.y = centerLocationMap.y;
     centerMap.theta = centerLocationMap.theta;
-    logicController.setCenterLocationMap(centerMap);
+    logicController.SetCenterLocationMap(centerMap);
 
-    logicController.setCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
+    logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
 
     result = logicController.DoWork();
 
@@ -319,7 +319,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
       //loc.theta =
       tags.push_back(loc);
     }
-    logicController.setAprilTags(tags);
+    logicController.SetAprilTags(tags);
   }
 
 }
@@ -331,7 +331,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
 
-  logicController.setSonarData(sonarLeft->range, sonarCenter->range, sonarRight->range);
+  logicController.SetSonarData(sonarLeft->range, sonarCenter->range, sonarRight->range);
 
 }
 
@@ -355,8 +355,8 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
   currentLoc.x = currentLocation.x;
   currentLoc.y = currentLocation.y;
   currentLoc.theta = currentLocation.theta;
-  logicController.setPositionData(currentLoc);
-  logicController.setVelocityData(linearVelocity, angularVelocity);
+  logicController.SetPositionData(currentLoc);
+  logicController.SetVelocityData(linearVelocity, angularVelocity);
 }
 
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
@@ -378,8 +378,8 @@ void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
   currentLoc.x = currentLocation.x;
   currentLoc.y = currentLocation.y;
   currentLoc.theta = currentLocation.theta;
-  logicController.setPositionData(currentLoc);
-  logicController.setMapVelocityData(linearVelocity, angularVelocity);
+  logicController.SetPositionData(currentLoc);
+  logicController.SetMapVelocityData(linearVelocity, angularVelocity);
 }
 
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {

@@ -265,7 +265,7 @@ void DropOffController::Reset() {
 
 }
 
-void DropOffController::setTargetData(vector<TagPoint> tags) {
+void DropOffController::SetTargetData(vector<TagPoint> tags) {
   countRight = 0;
   countLeft = 0;
 
@@ -349,7 +349,7 @@ void DropOffController::SetBlockBlockingUltrasound(bool blockBlock) {
   targetHeld = targetHeld || blockBlock;
 }
 
-void DropOffController::setCurrentTimeInMilliSecs( long int time )
+void DropOffController::SetCurrentTimeInMilliSecs( long int time )
 {
   current_time = time;
 }

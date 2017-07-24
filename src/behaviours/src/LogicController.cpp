@@ -113,7 +113,7 @@ Result LogicController::DoWork() {
       cout << "waypoint" << endl;
 
       logicState = LOGIC_STATE_WAITING;
-      driveController.setResultData(result);
+      driveController.SetResultData(result);
     }
 
   }
@@ -140,7 +140,7 @@ Result LogicController::DoWork() {
 
     result = control_queue.top().controller->DoWork();
 
-    driveController.setResultData(result);
+    driveController.SetResultData(result);
     result = driveController.DoWork();
     break;
   }
@@ -206,49 +206,49 @@ void LogicController::controllerInterconnect() {
 }
 
 
-void LogicController::setPositionData(Point currentLocation) {
-  searchController.setCurrentLocation(currentLocation);
+void LogicController::SetPositionData(Point currentLocation) {
+  searchController.SetCurrentLocation(currentLocation);
   dropOffController.SetCurrentLocation(currentLocation);
   obstacleController.SetCurrentLocation(currentLocation);
   driveController.SetCurrentLocation(currentLocation);
 }
 
-void LogicController::setMapPositionData(Point currentLocationMap) {
+void LogicController::SetMapPositionData(Point currentLocationMap) {
 
 }
 
-void LogicController::setVelocityData(float linearVelocity, float angularVelocity) {
+void LogicController::SetVelocityData(float linearVelocity, float angularVelocity) {
   driveController.SetVelocityData(linearVelocity,angularVelocity);
 }
 
-void LogicController::setMapVelocityData(float linearVelocity, float angularVelocity) {
+void LogicController::SetMapVelocityData(float linearVelocity, float angularVelocity) {
 
 }
 
-void LogicController::setAprilTags(vector<TagPoint> tags) {
+void LogicController::SetAprilTags(vector<TagPoint> tags) {
   pickUpController.SetTagData(tags);
   obstacleController.SetTagData(tags);
-  dropOffController.setTargetData(tags);
+  dropOffController.SetTargetData(tags);
 }
 
-void LogicController::setSonarData(float left, float center, float right) {
+void LogicController::SetSonarData(float left, float center, float right) {
   pickUpController.SetSonarData(center);
   obstacleController.SetSonarData(left,center,right);
 }
 
-void LogicController::setCenterLocationOdom(Point centerLocationOdom) {
-  searchController.setCenterLocation(centerLocationOdom);
+void LogicController::SetCenterLocationOdom(Point centerLocationOdom) {
+  searchController.SetCenterLocation(centerLocationOdom);
   dropOffController.SetCenterLocation(centerLocationOdom);
 }
 
-void LogicController::setCenterLocationMap(Point centerLocationMap) {
+void LogicController::SetCenterLocationMap(Point centerLocationMap) {
 
 }
 
-void LogicController::setCurrentTimeInMilliSecs( long int time )
+void LogicController::SetCurrentTimeInMilliSecs( long int time )
 {
   current_time = time;
-  dropOffController.setCurrentTimeInMilliSecs( time );
-  pickUpController.setCurrentTimeInMilliSecs( time );
-  obstacleController.setCurrentTimeInMilliSecs( time );
+  dropOffController.SetCurrentTimeInMilliSecs( time );
+  pickUpController.SetCurrentTimeInMilliSecs( time );
+  obstacleController.SetCurrentTimeInMilliSecs( time );
 }

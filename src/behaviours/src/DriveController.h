@@ -16,7 +16,7 @@ public:
   bool ShouldInterrupt() override;
   bool HasWork() override;
 
-  void setResultData(Result result) {this->result = result;}
+  void SetResultData(Result result) {this->result = result;}
   void SetVelocityData(float linearVelocity,float angularVelocity);
   void SetCurrentLocation(Point currentLocation) {this->currentLocation = currentLocation;}
 

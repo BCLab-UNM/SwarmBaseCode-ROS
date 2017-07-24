@@ -36,16 +36,16 @@ public:
   bool ShouldInterrupt() override;
   bool HasWork() override;
 
-  void setAprilTags(vector<TagPoint> tags);
-  void setSonarData(float left, float center, float right);
-  void setPositionData(Point currentLocation);
-  void setMapPositionData(Point currentLocationMap);
-  void setVelocityData(float linearVelocity, float angularVelocity);
-  void setMapVelocityData(float linearVelocity, float angularVelocity);
-  void setCenterLocationOdom(Point centerLocationOdom);
-  void setCenterLocationMap(Point centerLocationMap);
+  void SetAprilTags(vector<TagPoint> tags);
+  void SetSonarData(float left, float center, float right);
+  void SetPositionData(Point currentLocation);
+  void SetMapPositionData(Point currentLocationMap);
+  void SetVelocityData(float linearVelocity, float angularVelocity);
+  void SetMapVelocityData(float linearVelocity, float angularVelocity);
+  void SetCenterLocationOdom(Point centerLocationOdom);
+  void SetCenterLocationMap(Point centerLocationMap);
 
-  void setCurrentTimeInMilliSecs( long int time );
+  void SetCurrentTimeInMilliSecs( long int time );
 
 protected:
   void ProcessData();

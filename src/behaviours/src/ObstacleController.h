@@ -19,7 +19,7 @@ public:
   bool ShouldInterrupt() override;
   bool HasWork() override;
   void SetIgnoreCenter();
-  void setCurrentTimeInMilliSecs( long int time );
+  void SetCurrentTimeInMilliSecs( long int time );
   void SetTargetHeld () {targetHeld = true;}
   void SetTargetHeldClear() {targetHeld = false;}
   bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
