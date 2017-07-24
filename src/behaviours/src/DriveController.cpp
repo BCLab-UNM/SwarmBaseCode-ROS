@@ -27,19 +27,21 @@ Result DriveController::DoWork() {
 
   if(result.type == behavior) {
     if(result.b == noChange) {
-
+      //if drive controller gets a no change command it is allowed to continue its previouse action
+      //normally this will be to follow waypoints but it is not specified as such.
     } else if(result.b == wait) {
-
+      //do nothing till told otherwise
       left = 0.0;
       right = 0.0;
       stateMachineState = STATE_MACHINE_WAITING;
 
     }
   } else if(result.type == precisionDriving) {
-
+    //interpret input result as a precision driving command
     stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
 
   } else if(result.type == waypoint) {
+    //interpret input result as new waypoints to add into the queue
     ProcessData();
 
   }

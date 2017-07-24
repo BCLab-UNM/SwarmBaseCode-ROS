@@ -224,6 +224,7 @@ void behaviourStateMachine(const ros::TimerEvent&) {
   // Robot is in automode
   if (currentMode == 2 || currentMode == 3) {
 
+    //TODO: this just sets center to 0 over and over and needs to change
     Point centerOdom;
     centerOdom.x = centerLocation.x;
     centerOdom.y = centerLocation.y;
@@ -236,16 +237,23 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     centerMap.theta = centerLocationMap.theta;
     logicController.SetCenterLocationMap(centerMap);
 
+
+    //update the time used by all the controllers
     logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
 
+    //ask logic controller for the next set of actuator commands
     result = logicController.DoWork();
 
     bool skip = false;
+
+    //if a wait behaviour is thrown sit and do nothing untill logicController is ready
     if (result.type == behavior) {
       if (result.b = wait) {
         skip = true;
       }
     }
+
+    //do this when wait behaviour happens
     if (skip) {
       sendDriveCommand(0.0,0.0);
       std_msgs::Float32 angle;
@@ -255,6 +263,8 @@ void behaviourStateMachine(const ros::TimerEvent&) {
       angle.data = prevWrist;
       wristAnglePublish.publish(angle);
     }
+
+    //normally interpret logic controllers actuator commands and deceminate them over the appropriate ROS topics
     else {
 
       sendDriveCommand(result.pd.left,result.pd.right);
@@ -274,8 +284,12 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
     //publishHandeling here
     //logicController.getPublishData() suggested;
+
+
+    //adds a blank space between sets of debugging data to easly tell one tick from the next
     cout << endl;
   }
+
   // mode is NOT auto
   else {
     // publish current state for the operator to see
