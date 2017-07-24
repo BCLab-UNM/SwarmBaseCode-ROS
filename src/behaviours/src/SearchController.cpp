@@ -34,7 +34,7 @@ Result SearchController::DoWork() {
     attemptCount++;
     if (succesfullPickup) {
       succesfullPickup = false;
-      attemptCount = 0;
+      attemptCount = 1;
     }
     cout <<"attempt again**********************************" << endl;
     return result;
