@@ -24,7 +24,7 @@ public:
     void SetUltraSoundData(bool blockBlock);
 
     bool GetIgnoreCenter() {return ignoreCenterSonar;}
-    bool GetTargetHeld() {bool tmp = targetHeld; targetHeld = false; return tmp;}
+    bool GetTargetHeld() {return targetHeld;}
 
     void setCurrentTimeInMilliSecs( long int time );
 

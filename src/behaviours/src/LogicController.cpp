@@ -100,6 +100,7 @@ Result LogicController::DoWork() {
             if (result.b == nextProcess || result.b == prevProcess) {
                 ProcessData();
                 result.b = wait;
+                driveController.Reset();
             }
             break;
         } else if(result.type == precisionDriving) {
@@ -194,8 +195,6 @@ void LogicController::controllerInterconnect() {
     if(pickUpController.GetTargetHeld()) {
         dropOffController.SetTargetPickedUp();
         obstacleController.SetTargetHeld();
-        driveController.Reset();
-        cout << "drop: target held" << endl;
     }
     if (!dropOffController.HasTarget()) {
         obstacleController.SetTargetHeldClear();
