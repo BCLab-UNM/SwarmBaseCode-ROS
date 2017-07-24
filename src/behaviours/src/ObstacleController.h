@@ -7,62 +7,62 @@
 class ObstacleController : virtual Controller
 {
 public:
-    ObstacleController();
-    
-    Result result;
-    
-    void Reset() override;
-    Result DoWork() override;
-    void SetSonarData(float left, float center, float right);
-    void SetCurrentLocation(Point currentLocation);
-    void SetTagData(vector<TagPoint> tags);
-    bool ShouldInterrupt() override;
-    bool HasWork() override;
-    void SetIgnoreCenter();
-    void setCurrentTimeInMilliSecs( long int time );
-    void SetTargetHeld () {targetHeld = true;}
-    void SetTargetHeldClear() {targetHeld = false;}
-    bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
+  ObstacleController();
+
+  Result result;
+
+  void Reset() override;
+  Result DoWork() override;
+  void SetSonarData(float left, float center, float right);
+  void SetCurrentLocation(Point currentLocation);
+  void SetTagData(vector<TagPoint> tags);
+  bool ShouldInterrupt() override;
+  bool HasWork() override;
+  void SetIgnoreCenter();
+  void setCurrentTimeInMilliSecs( long int time );
+  void SetTargetHeld () {targetHeld = true;}
+  void SetTargetHeldClear() {targetHeld = false;}
+  bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
 
-    void ProcessData();
+  void ProcessData();
 
 private:
 
-    const float K_angular = 0.01500f;
-    const float reactivateCenterThreshold = 0.8;
-    const int targetCountPivot = 6;
-    const float obstacleDistancePivot = 0.2526;
-    const float triggerDistance = 0.8;
+  const float K_angular = 0.01500f;
+  const float reactivateCenterThreshold = 0.8;
+  const int targetCountPivot = 6;
+  const float obstacleDistancePivot = 0.2526;
+  const float triggerDistance = 0.8;
 
-    /*
+  /*
      * Member variables
      */
 
 
-    bool obstacleInterrupt;
-    bool obstacleDetected;
-    bool obstacleAvoided;
-    bool clearWaypoints = false;
-    
-    float left = 0;
-    float center = 0;
-    float right = 0;
+  bool obstacleInterrupt;
+  bool obstacleDetected;
+  bool obstacleAvoided;
+  bool clearWaypoints = false;
 
-    int countLeft;
-    int countRight;
-    bool centerSeen;
+  float left = 0;
+  float center = 0;
+  float right = 0;
 
-    bool ignoreCenter = false;
+  int countLeft;
+  int countRight;
+  bool centerSeen;
 
-    Point currentLocation;
+  bool ignoreCenter = false;
 
-    long int current_time;
-    long int timeSinceTags;
+  Point currentLocation;
 
-    bool targetHeld = false;
-    
+  long int current_time;
+  long int timeSinceTags;
+
+  bool targetHeld = false;
+
 };
 
 #endif // OBSTACLECONTOLLER_H

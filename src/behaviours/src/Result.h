@@ -2,12 +2,12 @@
 // can be returned by a controller object.
 
 /* EXAMPLE:
- * 
+ *
  * struct Result res;
  * res.type = ...;
  * res.b = ...;
  * ...
- * 
+ *
  * if(res.type == behavior) {
  *      if(res.b == targetDropped) {
  *          ...
@@ -20,9 +20,9 @@
  * } else if(res.type == precisionDriving) {
  *      ...
  * }
- * 
- * 
- * 
+ *
+ *
+ *
  */
 
 #include <vector>
@@ -33,22 +33,22 @@
 using namespace std;
 
 enum PIDType {
-    FAST_PID, //quickest turn reasponse time
-    SLOW_PID, //slower turn reasponse time
-    CONST_PID //constant angular turn rate
+  FAST_PID, //quickest turn reasponse time
+  SLOW_PID, //slower turn reasponse time
+  CONST_PID //constant angular turn rate
 };
 
 enum ResultType {
-    behavior,
-    waypoint,
-    precisionDriving
+  behavior,
+  waypoint,
+  precisionDriving
 };
 
 enum BehaviorTrigger {
-    wait,
-    prevProcess,
-    noChange,
-    nextProcess
+  wait,
+  prevProcess,
+  noChange,
+  nextProcess
 };
 
 struct PrecisionDriving {
@@ -63,19 +63,19 @@ struct PrecisionDriving {
 };
 
 struct Waypoints {
-    vector<Point> waypoints;
+  vector<Point> waypoints;
 };
 
 struct Result {
-    ResultType type;
+  ResultType type;
 
-    BehaviorTrigger b;
-    Waypoints wpts;
-    PrecisionDriving pd;
-    
-    float fingerAngle = -1;
-    float wristAngle = -1;
-    PIDType PIDMode;
+  BehaviorTrigger b;
+  Waypoints wpts;
+  PrecisionDriving pd;
 
-    bool reset;
+  float fingerAngle = -1;
+  float wristAngle = -1;
+  PIDType PIDMode;
+
+  bool reset;
 };

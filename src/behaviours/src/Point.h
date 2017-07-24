@@ -3,9 +3,9 @@
 
 
 struct Point {
-    float x;
-    float y;
-    float theta;
+  float x;
+  float y;
+  float theta;
 };
 
 #endif // POINT_H
