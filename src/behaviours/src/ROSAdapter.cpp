@@ -291,6 +291,8 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
     //adds a blank space between sets of debugging data to easly tell one tick from the next
     cout << endl;
+
+    cout << "System is Running" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
   }
 
   // mode is NOT auto

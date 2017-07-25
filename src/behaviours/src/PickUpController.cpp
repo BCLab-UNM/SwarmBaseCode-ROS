@@ -157,6 +157,7 @@ Result PickUpController::DoWork() {
       {
         result.pd.cmdVel = 0.0;
         result.pd.cmdAngularError= 0.0;
+        result.wristAngle = 0.8;
 
         timeOut = true;
         result.pd.cmdAngularError= -blockYawError;

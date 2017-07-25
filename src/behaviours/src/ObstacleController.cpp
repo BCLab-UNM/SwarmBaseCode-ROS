@@ -116,7 +116,6 @@ void ObstacleController::SetTagData(vector<TagPoint> tags){
 }
 
 bool ObstacleController::ShouldInterrupt() {
-  ProcessData();
 
   if(obstacleDetected && !obstacleInterrupt) {
     obstacleInterrupt = true;
