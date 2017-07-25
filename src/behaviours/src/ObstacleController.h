@@ -30,7 +30,7 @@ protected:
 
 private:
 
-  const float K_angular = 0.01500f;
+  const float K_angular = 1.0; //radians a second
   const float reactivateCenterThreshold = 0.8;
   const int targetCountPivot = 6;
   const float obstacleDistancePivot = 0.2526;

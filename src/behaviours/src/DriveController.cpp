@@ -210,6 +210,8 @@ void DriveController::ProcessData()
       float vel = result.pd.cmdVel - linearVelocity;
       float angular = result.pd.cmdAngular - angularVelocity;
 
+      cout << "angular : " << angularVelocity << "cmdAngular : " << result.pd.cmdAngular <<" angular error : " << result.pd.cmdAngular - angularVelocity << endl;
+
       constPID(vel, angular ,result.pd.setPointVel, result.pd.setPointYaw);
     }
   }
@@ -223,6 +225,8 @@ void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel
 
   int left = velOut - yawOut;
   int right = velOut + yawOut;
+
+  cout << "left : " << left << "right : " << right << endl;
 
   int sat = 255;
   if (left  >  sat) {left  =  sat;}
@@ -287,7 +291,7 @@ PIDConfig DriveController::fastVelConfig() {
   config.Kd = 0.8;
   config.satUpper = 255;
   config.satLower = -255;
-  config.antiWindup = config.satUpper/2;
+  config.antiWindup = config.satUpper;
   config.errorHistLength = 4;
   config.alwaysIntegral = true;
   config.resetOnSetpoint = true;

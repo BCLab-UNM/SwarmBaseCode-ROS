@@ -25,9 +25,8 @@
 #include "LogicController.h"
 #include <vector>
 
-#include <Point.h>
-#include <Result.h>
-#include <TagPoint.h>
+#include "Point.h"
+#include "TagPoint.h"
 
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
@@ -252,7 +251,7 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
     //if a wait behaviour is thrown sit and do nothing untill logicController is ready
     if (result.type == behavior) {
-      if (result.b = wait) {
+      if (result.b == wait) {
         wait = true;
       }
     }

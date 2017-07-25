@@ -5,6 +5,7 @@ ObstacleController::ObstacleController()
   obstacleAvoided = true;
   obstacleDetected = false;
   obstacleInterrupt = false;
+  result.PIDMode = CONST_PID;
 }
 
 void ObstacleController::Reset() {
@@ -24,14 +25,14 @@ Result ObstacleController::DoWork() {
     result.pd.cmdVel = 0.0;
 
     if(countLeft < countRight) {
-      result.pd.setPointYaw = -K_angular;
+      result.pd.cmdAngular = -K_angular;
     } else {
-      result.pd.setPointYaw = K_angular;
+      result.pd.cmdAngular = K_angular;
     }
 
     result.pd.setPointVel = 0.0;
     result.pd.cmdVel = 0.0;
-    result.pd.cmdAngularError = (currentLocation.theta + result.pd.setPointYaw);
+    result.pd.setPointYaw = 0;
 
   }
   else {
@@ -40,11 +41,11 @@ Result ObstacleController::DoWork() {
     if (right < 0.8 || center < 0.8 || left < 0.8) {
       result.type = precisionDriving;
 
-      result.pd.setPointYaw = -K_angular;
+      result.pd.cmdAngular = -K_angular;
 
       result.pd.setPointVel = 0.0;
       result.pd.cmdVel = 0.0;
-      result.pd.cmdAngularError = (currentLocation.theta + result.pd.setPointYaw);
+      result.pd.setPointYaw = 0;
     }
   }
 
