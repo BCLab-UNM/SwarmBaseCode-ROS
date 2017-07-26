@@ -74,6 +74,9 @@ float angularVelocity = 0;
 
 float prevWrist = 0;
 float prevFinger = 0;
+long int startTime = 0;
+float minutesTime = 0;
+float hoursTime = 0;
 
 Result result;
 
@@ -217,6 +220,8 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     if (timerTimeElapsed > startDelayInSeconds) {
       // initialization has run
       initilized = true;
+
+      startTime = getROSTimeInMilliSecs();
     } else {
       return;
     }
@@ -292,7 +297,26 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     //adds a blank space between sets of debugging data to easly tell one tick from the next
     cout << endl;
 
-    cout << "System is Running" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
+    float timeDiff = (getROSTimeInMilliSecs()-startTime)/1e3;
+    if (timeDiff >= 60) {
+      minutesTime++;
+      startTime += 60  * 1e3;
+      if (minutesTime >= 60) {
+        hoursTime++;
+        minutesTime -= 60;
+      }
+    }
+    timeDiff = floor(timeDiff*10)/10;
+
+    double intP, frac;
+    frac = modf(timeDiff, &intP);
+    timeDiff -= frac;
+    frac = round(frac*10);
+    if (frac > 9) {
+      frac = 0;
+    }
+
+    cout << "System has been Running for :: " << hoursTime << " : hours " << minutesTime << " : minutes " << timeDiff << "." << frac << " : seconds" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
   }
 
   // mode is NOT auto

@@ -83,6 +83,14 @@ void ObstacleController::ProcessData() {
       center = 3;
     }
   }
+  else {
+    if (center < 0.12) {
+      result.wristAngle = 0.8;
+    }
+    else {
+      result.wristAngle = -1;
+    }
+  }
 
   if (left < triggerDistance || right < triggerDistance || center < triggerDistance || centerSeen) {
     obstacleDetected = true;

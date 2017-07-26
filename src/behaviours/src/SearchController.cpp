@@ -53,7 +53,7 @@ Result SearchController::DoWork() {
     else
     {
       //select new heading from Gaussian distribution around current heading
-      searchLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+      searchLocation.theta = rng->gaussian(currentLocation.theta, 0.785398); //45 degrees in radians
       searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
       searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
     }
