@@ -40,7 +40,10 @@ using namespace std;
 random_numbers::RandomNumberGenerator* rng;
 
 // Create logic controller
+
 LogicController logicController;
+
+void humanTime();
 
 // Behaviours Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
@@ -115,7 +118,7 @@ time_t timerStartTime;
 
 // An initial delay to allow the rover to gather enough position data to 
 // average its location.
-unsigned int startDelayInSeconds = 1;
+unsigned int startDelayInSeconds = 15;
 float timerTimeElapsed = 0;
 
 //Transforms
@@ -246,6 +249,8 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     logicController.SetCenterLocationMap(centerMap);
 
 
+    humanTime();
+
     //update the time used by all the controllers
     logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
 
@@ -297,26 +302,6 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     //adds a blank space between sets of debugging data to easly tell one tick from the next
     cout << endl;
 
-    float timeDiff = (getROSTimeInMilliSecs()-startTime)/1e3;
-    if (timeDiff >= 60) {
-      minutesTime++;
-      startTime += 60  * 1e3;
-      if (minutesTime >= 60) {
-        hoursTime++;
-        minutesTime -= 60;
-      }
-    }
-    timeDiff = floor(timeDiff*10)/10;
-
-    double intP, frac;
-    frac = modf(timeDiff, &intP);
-    timeDiff -= frac;
-    frac = round(frac*10);
-    if (frac > 9) {
-      frac = 0;
-    }
-
-    cout << "System has been Running for :: " << hoursTime << " : hours " << minutesTime << " : minutes " << timeDiff << "." << frac << " : seconds" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
   }
 
   // mode is NOT auto
@@ -457,4 +442,28 @@ long int getROSTimeInMilliSecs()
   // Convert from seconds and nanoseconds to milliseconds.
   return t.sec*1e3 + t.nsec/1e6;
   
+}
+
+void humanTime() {
+
+  float timeDiff = (getROSTimeInMilliSecs()-startTime)/1e3;
+  if (timeDiff >= 60) {
+    minutesTime++;
+    startTime += 60  * 1e3;
+    if (minutesTime >= 60) {
+      hoursTime++;
+      minutesTime -= 60;
+    }
+  }
+  timeDiff = floor(timeDiff*10)/10;
+
+  double intP, frac;
+  frac = modf(timeDiff, &intP);
+  timeDiff -= frac;
+  frac = round(frac*10);
+  if (frac > 9) {
+    frac = 0;
+  }
+
+  cout << "System has been Running for :: " << hoursTime << " : hours " << minutesTime << " : minutes " << timeDiff << "." << frac << " : seconds" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
 }
