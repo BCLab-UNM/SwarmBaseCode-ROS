@@ -647,6 +647,11 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <item>
        <property name="text">
+        <string>0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>1</string>
        </property>
       </item>
