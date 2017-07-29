@@ -145,7 +145,8 @@ QString GazeboSimManager::stopRoverNode( QString rover_name )
     nodes.push_back("BASE2CAM");
     nodes.push_back("DIAGNOSTICS");
     nodes.push_back("MAP");
-    nodes.push_back("MOBILITY");
+    nodes.push_back("BEHAVIOUR");
+    nodes.push_back("SBRIDGE");
     nodes.push_back("NAVSAT");
     nodes.push_back("OBSTACLE");
     nodes.push_back("ODOM");
