@@ -8,83 +8,83 @@
 class DriveController : virtual Controller
 {
 public:
-    DriveController();
-    ~DriveController();
+  DriveController();
+  ~DriveController();
 
-    void Reset() override;
-    Result DoWork() override;
-    bool ShouldInterrupt() override;
-    bool HasWork() override;
+  void Reset() override;
+  Result DoWork() override;
+  bool ShouldInterrupt() override;
+  bool HasWork() override;
 
-    void setResultData(Result result) {this->result = result;}
-    void SetVelocityData(float linearVelocity,float angularVelocity);
-    void SetCurrentLocation(Point currentLocation) {this->currentLocation = currentLocation;}
+  void SetResultData(Result result) {this->result = result;}
+  void SetVelocityData(float linearVelocity,float angularVelocity);
+  void SetCurrentLocation(Point currentLocation) {this->currentLocation = currentLocation;}
 
 private:
 
-    Result result;
+  Result result;
 
-    float left;
-    float right;
+  float left;
+  float right;
 
-    bool interupt = false;
+  bool interupt = false;
 
-    float rotateOnlyAngleTolerance = 0.2;
-    float finalRotationTolerance = 0.1;
-    const float waypointTolerance = 0.1; //10 cm tolerance.
+  float rotateOnlyAngleTolerance = 0.2;
+  float finalRotationTolerance = 0.1;
+  const float waypointTolerance = 0.1; //10 cm tolerance.
 
-    float searchVelocity = 0.2; // meters/second
+  float searchVelocity = 0.2; // meters/second
 
-    float linearVelocity = 0;
-    float angularVelocity = 0;
+  float linearVelocity = 0;
+  float angularVelocity = 0;
 
-    // Numeric Variables for rover positioning
-    Point currentLocation;
-    Point currentLocationMap;
-    Point currentLocationAverage;
+  // Numeric Variables for rover positioning
+  Point currentLocation;
+  Point currentLocationMap;
+  Point currentLocationAverage;
 
-    Point centerLocation;
-    Point centerLocationMap;
-    Point centerLocationOdom;
+  Point centerLocation;
+  Point centerLocationMap;
+  Point centerLocationOdom;
 
-    vector<Point> waypoints;
+  vector<Point> waypoints;
 
-    //PID configs************************
-    PIDConfig fastVelConfig();
-    PIDConfig fastYawConfig();
-    PIDConfig slowVelConfig();
-    PIDConfig slowYawConfig();
-    PIDConfig constVelConfig();
-    PIDConfig constYawConfig();
+  //PID configs************************
+  PIDConfig fastVelConfig();
+  PIDConfig fastYawConfig();
+  PIDConfig slowVelConfig();
+  PIDConfig slowYawConfig();
+  PIDConfig constVelConfig();
+  PIDConfig constYawConfig();
 
-    void fastPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
-    void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
-    void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
+  void fastPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
+  void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
+  void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
 
-    PID fastVelPID;
-    PID fastYawPID;
+  PID fastVelPID;
+  PID fastYawPID;
 
-    PID slowVelPID;
-    PID slowYawPID;
+  PID slowVelPID;
+  PID slowYawPID;
 
-    PID constVelPID;
-    PID constYawPID;
+  PID constVelPID;
+  PID constYawPID;
 
-    // state machine states
-    enum StateMachineStates {
+  // state machine states
+  enum StateMachineStates {
 
-        //WAITING should not be handled- goes to default (it's a placeholder name)
-        STATE_MACHINE_WAITING = 0,
-        STATE_MACHINE_PRECISION_DRIVING,
-        STATE_MACHINE_WAYPOINTS,
-        STATE_MACHINE_ROTATE,
-        STATE_MACHINE_SKID_STEER,
-    };
+    //WAITING should not be handled- goes to default (it's a placeholder name)
+    STATE_MACHINE_WAITING = 0,
+    STATE_MACHINE_PRECISION_DRIVING,
+    STATE_MACHINE_WAYPOINTS,
+    STATE_MACHINE_ROTATE,
+    STATE_MACHINE_SKID_STEER,
+  };
 
 
-    StateMachineStates stateMachineState = STATE_MACHINE_WAITING;
+  StateMachineStates stateMachineState = STATE_MACHINE_WAITING;
 
-    void ProcessData();
+  void ProcessData();
 
 };
 

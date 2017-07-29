@@ -25,6 +25,9 @@
 #include "LogicController.h"
 #include <vector>
 
+#include "Point.h"
+#include "TagPoint.h"
+
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
 #include <ros/ros.h>
@@ -37,7 +40,10 @@ using namespace std;
 random_numbers::RandomNumberGenerator* rng;
 
 // Create logic controller
+
 LogicController logicController;
+
+void humanTime();
 
 // Behaviours Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
@@ -71,6 +77,9 @@ float angularVelocity = 0;
 
 float prevWrist = 0;
 float prevFinger = 0;
+long int startTime = 0;
+float minutesTime = 0;
+float hoursTime = 0;
 
 Result result;
 
@@ -109,7 +118,7 @@ time_t timerStartTime;
 
 // An initial delay to allow the rover to gather enough position data to 
 // average its location.
-unsigned int startDelayInSeconds = 1;
+unsigned int startDelayInSeconds = 15;
 float timerTimeElapsed = 0;
 
 //Transforms
@@ -134,67 +143,67 @@ long int getROSTimeInMilliSecs();
 
 int main(int argc, char **argv) {
   
-    gethostname(host, sizeof (host));
-    string hostname(host);
-    
-    if (argc >= 2) {
-        publishedName = argv[1];
-        cout << "Welcome to the world of tomorrow " << publishedName
-             << "!  Behaviour turnDirectionule started." << endl;
-    } else {
-        publishedName = hostname;
-        cout << "No Name Selected. Default is: " << publishedName << endl;
-    }
-    
-    // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
-    ros::init(argc, argv, (publishedName + "_BEHAVIOUR"), ros::init_options::NoSigintHandler);
-    ros::NodeHandle mNH;
-    
-    // Register the SIGINT event handler so the node can shutdown properly
-    signal(SIGINT, sigintEventHandler);
-    
-    joySubscriber = mNH.subscribe((publishedName + "/joystick"), 10, joyCmdHandler);
-    modeSubscriber = mNH.subscribe((publishedName + "/mode"), 1, modeHandler);
-    targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
-    odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
-    mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
-    message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
-    message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
-    message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
+  gethostname(host, sizeof (host));
+  string hostname(host);
 
-    status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
-    stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
-    fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);
-    wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);
-    infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
-    driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);
-    heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);
-    
-    publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
-    stateMachineTimer = mNH.createTimer(ros::Duration(behaviourLoopTimeStep), behaviourStateMachine);
-    
-    publish_heartbeat_timer = mNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
-       
-    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Range, sensor_msgs::Range, sensor_msgs::Range> sonarSyncPolicy;
-    
-    message_filters::Synchronizer<sonarSyncPolicy> sonarSync(sonarSyncPolicy(10), sonarLeftSubscriber, sonarCenterSubscriber, sonarRightSubscriber);
-    sonarSync.registerCallback(boost::bind(&sonarHandler, _1, _2, _3));
-    
-    tfListener = new tf::TransformListener();
-    std_msgs::String msg;
-    msg.data = "Log Started";
-    infoLogPublisher.publish(msg);
-    
-    stringstream ss;
-    ss << "Rover start delay set to " << startDelayInSeconds << " seconds";
-    msg.data = ss.str();
-    infoLogPublisher.publish(msg);
-    
-    timerStartTime = time(0);
-    
-    ros::spin();
-    
-    return EXIT_SUCCESS;
+  if (argc >= 2) {
+    publishedName = argv[1];
+    cout << "Welcome to the world of tomorrow " << publishedName
+         << "!  Behaviour turnDirectionule started." << endl;
+  } else {
+    publishedName = hostname;
+    cout << "No Name Selected. Default is: " << publishedName << endl;
+  }
+
+  // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
+  ros::init(argc, argv, (publishedName + "_BEHAVIOUR"), ros::init_options::NoSigintHandler);
+  ros::NodeHandle mNH;
+
+  // Register the SIGINT event handler so the node can shutdown properly
+  signal(SIGINT, sigintEventHandler);
+
+  joySubscriber = mNH.subscribe((publishedName + "/joystick"), 10, joyCmdHandler);
+  modeSubscriber = mNH.subscribe((publishedName + "/mode"), 1, modeHandler);
+  targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
+  odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
+  mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
+  message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
+  message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
+  message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
+
+  status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/status"), 1, true);
+  stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);
+  fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);
+  wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);
+  infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
+  driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);
+  heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);
+
+  publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
+  stateMachineTimer = mNH.createTimer(ros::Duration(behaviourLoopTimeStep), behaviourStateMachine);
+
+  publish_heartbeat_timer = mNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
+
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Range, sensor_msgs::Range, sensor_msgs::Range> sonarSyncPolicy;
+
+  message_filters::Synchronizer<sonarSyncPolicy> sonarSync(sonarSyncPolicy(10), sonarLeftSubscriber, sonarCenterSubscriber, sonarRightSubscriber);
+  sonarSync.registerCallback(boost::bind(&sonarHandler, _1, _2, _3));
+
+  tfListener = new tf::TransformListener();
+  std_msgs::String msg;
+  msg.data = "Log Started";
+  infoLogPublisher.publish(msg);
+
+  stringstream ss;
+  ss << "Rover start delay set to " << startDelayInSeconds << " seconds";
+  msg.data = ss.str();
+  infoLogPublisher.publish(msg);
+
+  timerStartTime = time(0);
+
+  ros::spin();
+
+  return EXIT_SUCCESS;
 }
 
 
@@ -203,101 +212,119 @@ int main(int argc, char **argv) {
 // This block passes the goal location to the proportional-integral-derivative
 // controllers in the abridge package.
 void behaviourStateMachine(const ros::TimerEvent&) {
-    std_msgs::String stateMachineMsg;
-    
-    // time since timerStartTime was set to current time
-    timerTimeElapsed = time(0) - timerStartTime;
-    
-    // init code goes here. (code that runs only once at start of
-    // auto mode but wont work in main goes here)
-    if (!initilized) {
-        if (timerTimeElapsed > startDelayInSeconds) {
-            // initialization has run
-            initilized = true;
-        } else {
-            return;
-        }
+  std_msgs::String stateMachineMsg;
 
+  // time since timerStartTime was set to current time
+  timerTimeElapsed = time(0) - timerStartTime;
+
+  // init code goes here. (code that runs only once at start of
+  // auto mode but wont work in main goes here)
+  if (!initilized) {
+    if (timerTimeElapsed > startDelayInSeconds) {
+      // initialization has run
+      initilized = true;
+
+      startTime = getROSTimeInMilliSecs();
+    } else {
+      return;
     }
 
-    
-    // Robot is in automode
-    if (currentMode == 2 || currentMode == 3) {
+  }
 
-        Point centerOdom;
-        centerOdom.x = centerLocation.x;
-        centerOdom.y = centerLocation.y;
-        centerOdom.theta = centerLocation.theta;
-        logicController.setCenterLocationOdom(centerOdom);
 
-        Point centerMap;
-        centerMap.x = centerLocationMap.x;
-        centerMap.y = centerLocationMap.y;
-        centerMap.theta = centerLocationMap.theta;
-        logicController.setCenterLocationMap(centerMap);
-	
-	logicController.setCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
-	
-        result = logicController.DoWork();
+  // Robot is in automode
+  if (currentMode == 2 || currentMode == 3) {
 
-        bool skip = false;
-        if (result.type == behavior) {
-            if (result.b = wait) {
-                skip = true;
-            }
-        }
-        if (skip) {
-            sendDriveCommand(0.0,0.0);
-            std_msgs::Float32 angle;
+    //TODO: this just sets center to 0 over and over and needs to change
+    Point centerOdom;
+    centerOdom.x = centerLocation.x;
+    centerOdom.y = centerLocation.y;
+    centerOdom.theta = centerLocation.theta;
+    logicController.SetCenterLocationOdom(centerOdom);
 
-            angle.data = prevFinger;
-            fingerAnglePublish.publish(angle);
-            angle.data = prevWrist;
-            wristAnglePublish.publish(angle);
-        }
-        else {
+    Point centerMap;
+    centerMap.x = centerLocationMap.x;
+    centerMap.y = centerLocationMap.y;
+    centerMap.theta = centerLocationMap.theta;
+    logicController.SetCenterLocationMap(centerMap);
 
-            sendDriveCommand(result.pd.left,result.pd.right);
 
-            std_msgs::Float32 angle;
-            if (result.fingerAngle != -1) {
-                angle.data = result.fingerAngle;
-                fingerAnglePublish.publish(angle);
-                prevFinger = result.fingerAngle;
-            }
-            if (result.wristAngle != -1) {
-                angle.data = result.wristAngle;
-                wristAnglePublish.publish(angle);
-                prevWrist = result.wristAngle;
-            }
-        }
+    humanTime();
 
-        //publishHandeling here
-        //logicController.getPublishData() suggested;
-        cout << endl;
+    //update the time used by all the controllers
+    logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
+
+    //ask logic controller for the next set of actuator commands
+    result = logicController.DoWork();
+
+    bool wait = false;
+
+    //if a wait behaviour is thrown sit and do nothing untill logicController is ready
+    if (result.type == behavior) {
+      if (result.b == wait) {
+        wait = true;
+      }
     }
-    // mode is NOT auto
+
+    //do this when wait behaviour happens
+    if (wait) {
+      sendDriveCommand(0.0,0.0);
+      std_msgs::Float32 angle;
+
+      angle.data = prevFinger;
+      fingerAnglePublish.publish(angle);
+      angle.data = prevWrist;
+      wristAnglePublish.publish(angle);
+    }
+
+    //normally interpret logic controllers actuator commands and deceminate them over the appropriate ROS topics
     else {
-        // publish current state for the operator to see
-        stateMachineMsg.data = "WAITING";
+
+      sendDriveCommand(result.pd.left,result.pd.right);
+
+      std_msgs::Float32 angle;
+      if (result.fingerAngle != -1) {
+        angle.data = result.fingerAngle;
+        fingerAnglePublish.publish(angle);
+        prevFinger = result.fingerAngle;
+      }
+      if (result.wristAngle != -1) {
+        angle.data = result.wristAngle;
+        wristAnglePublish.publish(angle);
+        prevWrist = result.wristAngle;
+      }
     }
 
-    
-    // publish state machine string for user, only if it has changed, though
-    if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
-        stateMachinePublish.publish(stateMachineMsg);
-        sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
-    }
-    //send pointer to connect centerLocation of searchController and droppOffController
+    //publishHandeling here
+    //logicController.getPublishData() suggested;
+
+
+    //adds a blank space between sets of debugging data to easly tell one tick from the next
+    cout << endl;
+
+  }
+
+  // mode is NOT auto
+  else {
+    // publish current state for the operator to see
+    stateMachineMsg.data = "WAITING";
+  }
+
+
+  // publish state machine string for user, only if it has changed, though
+  if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
+    stateMachinePublish.publish(stateMachineMsg);
+    sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
+  }
 }
 
 void sendDriveCommand(double left, double right)
 {
-    velocity.linear.x = left,
-            velocity.angular.z = right;
-    
-    // publish the drive commands
-    driveControlPublish.publish(velocity);
+  velocity.linear.x = left,
+      velocity.angular.z = right;
+
+  // publish the drive commands
+  driveControlPublish.publish(velocity);
 }
 
 /*************************
@@ -305,106 +332,106 @@ void sendDriveCommand(double left, double right)
  *************************/
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
-    
-    if (message->detections.size() > 0) {
-        vector<TagPoint> tags;
 
-        for (int i = 0; i < message->detections.size(); i++) {
+  if (message->detections.size() > 0) {
+    vector<TagPoint> tags;
 
-                TagPoint loc;
-                loc.id = message->detections[i].id;
-                geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
-                loc.x = tagPose.pose.position.x;
-                loc.y = tagPose.pose.position.y;
-                loc.z = tagPose.pose.position.z;
-                //loc.theta =
-                tags.push_back(loc);
-        }
-        logicController.setAprilTags(tags);
+    for (int i = 0; i < message->detections.size(); i++) {
+
+      TagPoint loc;
+      loc.id = message->detections[i].id;
+      geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
+      loc.x = tagPose.pose.position.x;
+      loc.y = tagPose.pose.position.y;
+      loc.z = tagPose.pose.position.z;
+      //loc.theta =
+      tags.push_back(loc);
     }
-    
+    logicController.SetAprilTags(tags);
+  }
+
 }
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
-    currentMode = message->data;
-    sendDriveCommand(0.0, 0.0);
+  currentMode = message->data;
+  sendDriveCommand(0.0, 0.0);
 }
 
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
 
-    logicController.setSonarData(sonarLeft->range, sonarCenter->range, sonarRight->range);
+  logicController.SetSonarData(sonarLeft->range, sonarCenter->range, sonarRight->range);
 
 }
 
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
-    //Get (x,y) location directly from pose
-    currentLocation.x = message->pose.pose.position.x;
-    currentLocation.y = message->pose.pose.position.y;
-    
-    //Get theta rotation by converting quaternion orientation to pitch/roll/yaw
-    tf::Quaternion q(message->pose.pose.orientation.x, message->pose.pose.orientation.y, message->pose.pose.orientation.z, message->pose.pose.orientation.w);
-    tf::Matrix3x3 m(q);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-    currentLocation.theta = yaw;
+  //Get (x,y) location directly from pose
+  currentLocation.x = message->pose.pose.position.x;
+  currentLocation.y = message->pose.pose.position.y;
 
-    linearVelocity = message->twist.twist.linear.x;
-    angularVelocity = message->twist.twist.angular.z;
+  //Get theta rotation by converting quaternion orientation to pitch/roll/yaw
+  tf::Quaternion q(message->pose.pose.orientation.x, message->pose.pose.orientation.y, message->pose.pose.orientation.z, message->pose.pose.orientation.w);
+  tf::Matrix3x3 m(q);
+  double roll, pitch, yaw;
+  m.getRPY(roll, pitch, yaw);
+  currentLocation.theta = yaw;
+
+  linearVelocity = message->twist.twist.linear.x;
+  angularVelocity = message->twist.twist.angular.z;
 
 
-    Point currentLoc;
-    currentLoc.x = currentLocation.x;
-    currentLoc.y = currentLocation.y;
-    currentLoc.theta = currentLocation.theta;
-    logicController.setPositionData(currentLoc);
-    logicController.setVelocityData(linearVelocity, angularVelocity);
+  Point currentLoc;
+  currentLoc.x = currentLocation.x;
+  currentLoc.y = currentLocation.y;
+  currentLoc.theta = currentLocation.theta;
+  logicController.SetPositionData(currentLoc);
+  logicController.SetVelocityData(linearVelocity, angularVelocity);
 }
 
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
-    //Get (x,y) location directly from pose
-    currentLocationMap.x = message->pose.pose.position.x;
-    currentLocationMap.y = message->pose.pose.position.y;
-    
-    //Get theta rotation by converting quaternion orientation to pitch/roll/yaw
-    tf::Quaternion q(message->pose.pose.orientation.x, message->pose.pose.orientation.y, message->pose.pose.orientation.z, message->pose.pose.orientation.w);
-    tf::Matrix3x3 m(q);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-    currentLocationMap.theta = yaw;
+  //Get (x,y) location directly from pose
+  currentLocationMap.x = message->pose.pose.position.x;
+  currentLocationMap.y = message->pose.pose.position.y;
 
-    linearVelocity = message->twist.twist.linear.x;
-    angularVelocity = message->twist.twist.angular.z;
+  //Get theta rotation by converting quaternion orientation to pitch/roll/yaw
+  tf::Quaternion q(message->pose.pose.orientation.x, message->pose.pose.orientation.y, message->pose.pose.orientation.z, message->pose.pose.orientation.w);
+  tf::Matrix3x3 m(q);
+  double roll, pitch, yaw;
+  m.getRPY(roll, pitch, yaw);
+  currentLocationMap.theta = yaw;
 
-    Point currentLoc;
-    currentLoc.x = currentLocation.x;
-    currentLoc.y = currentLocation.y;
-    currentLoc.theta = currentLocation.theta;
-    logicController.setPositionData(currentLoc);
-    logicController.setMapVelocityData(linearVelocity, angularVelocity);
+  linearVelocity = message->twist.twist.linear.x;
+  angularVelocity = message->twist.twist.angular.z;
+
+  Point currentLoc;
+  currentLoc.x = currentLocation.x;
+  currentLoc.y = currentLocation.y;
+  currentLoc.theta = currentLocation.theta;
+  logicController.SetPositionData(currentLoc);
+  logicController.SetMapVelocityData(linearVelocity, angularVelocity);
 }
 
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
-    if (currentMode == 0 || currentMode == 1) {
-        sendDriveCommand(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
-    }
+  if (currentMode == 0 || currentMode == 1) {
+    sendDriveCommand(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
+  }
 }
 
 
 void publishStatusTimerEventHandler(const ros::TimerEvent&) {
-    std_msgs::String msg;
-    msg.data = "online";
-    status_publisher.publish(msg);
+  std_msgs::String msg;
+  msg.data = "online";
+  status_publisher.publish(msg);
 }
 
 void sigintEventHandler(int sig) {
-    // All the default sigint handler does is call shutdown()
-    ros::shutdown();
+  // All the default sigint handler does is call shutdown()
+  ros::shutdown();
 }
 
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent&) {
-    std_msgs::String msg;
-    msg.data = "";
-    heartbeatPublisher.publish(msg);
+  std_msgs::String msg;
+  msg.data = "";
+  heartbeatPublisher.publish(msg);
 }
 
 long int getROSTimeInMilliSecs()
@@ -415,4 +442,28 @@ long int getROSTimeInMilliSecs()
   // Convert from seconds and nanoseconds to milliseconds.
   return t.sec*1e3 + t.nsec/1e6;
   
+}
+
+void humanTime() {
+
+  float timeDiff = (getROSTimeInMilliSecs()-startTime)/1e3;
+  if (timeDiff >= 60) {
+    minutesTime++;
+    startTime += 60  * 1e3;
+    if (minutesTime >= 60) {
+      hoursTime++;
+      minutesTime -= 60;
+    }
+  }
+  timeDiff = floor(timeDiff*10)/10;
+
+  double intP, frac;
+  frac = modf(timeDiff, &intP);
+  timeDiff -= frac;
+  frac = round(frac*10);
+  if (frac > 9) {
+    frac = 0;
+  }
+
+  cout << "System has been Running for :: " << hoursTime << " : hours " << minutesTime << " : minutes " << timeDiff << "." << frac << " : seconds" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
 }

@@ -12,17 +12,17 @@
  */
 class Controller {
 public:
-    Controller() {}
-    ~Controller() {}
+  Controller() {}
+  ~Controller() {}
 
-    //Resets internal state to defaults
-    virtual void Reset() = 0;
+  //Resets internal state to defaults
+  virtual void Reset() = 0;
 
-    //Determines what action should be taken based on current
-    //internal state and data
-    virtual Result DoWork() = 0;
+  //Determines what action should be taken based on current
+  //internal state and data
+  virtual Result DoWork() = 0;
 
-    /*
+  /*
      * The base UpdataData() method should not be called- it serves as a
      * reference for the interface each derived Controller must implement.
      *
@@ -32,17 +32,17 @@ public:
      * void UpdateData(...) { <Set internal variables> }
      */
 
-    //Returns whether or not an interrupt must be thrown
-    virtual bool ShouldInterrupt() = 0;
+  //Returns whether or not an interrupt must be thrown
+  virtual bool ShouldInterrupt() = 0;
 
-    //Returns whether or not a controller should be polled for a Result
-    virtual bool HasWork() = 0;
+  //Returns whether or not a controller should be polled for a Result
+  virtual bool HasWork() = 0;
 
 protected:
 
-    //Looks at external data and determines if an interrupt must be thrown
-    //or if the controller should be polled
-    virtual void ProcessData() = 0;
+  //Looks at external data and determines if an interrupt must be thrown
+  //or if the controller should be polled
+  virtual void ProcessData() = 0;
 };
 
 #endif // CONTROLLER_H
