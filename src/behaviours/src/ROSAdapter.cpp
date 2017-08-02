@@ -223,6 +223,18 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     if (timerTimeElapsed > startDelayInSeconds) {
       // initialization has run
       initilized = true;
+      //TODO: this just sets center to 0 over and over and needs to change
+      Point centerOdom;
+      centerOdom.x = 1 * cos(currentLocation.theta);
+      centerOdom.y = 1 * sin(currentLocation.theta);
+      centerOdom.theta = centerLocation.theta;
+      logicController.SetCenterLocationOdom(centerOdom);
+
+      Point centerMap;
+      centerMap.x = currentLocationMap.x + (1 * cos(currentLocationMap.theta));
+      centerMap.y = currentLocationMap.y + (1 * sin(currentLocationMap.theta));
+      centerMap.theta = centerLocationMap.theta;
+      logicController.SetCenterLocationMap(centerMap);
 
       startTime = getROSTimeInMilliSecs();
     } else {
@@ -234,20 +246,6 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
   // Robot is in automode
   if (currentMode == 2 || currentMode == 3) {
-
-    //TODO: this just sets center to 0 over and over and needs to change
-    Point centerOdom;
-    centerOdom.x = centerLocation.x;
-    centerOdom.y = centerLocation.y;
-    centerOdom.theta = centerLocation.theta;
-    logicController.SetCenterLocationOdom(centerOdom);
-
-    Point centerMap;
-    centerMap.x = centerLocationMap.x;
-    centerMap.y = centerLocationMap.y;
-    centerMap.theta = centerLocationMap.theta;
-    logicController.SetCenterLocationMap(centerMap);
-
 
     humanTime();
 

@@ -25,9 +25,9 @@ Result ObstacleController::DoWork() {
     result.pd.cmdVel = 0.0;
 
     if(countLeft < countRight) {
-      result.pd.cmdAngular = -K_angular;
-    } else {
       result.pd.cmdAngular = K_angular;
+    } else {
+      result.pd.cmdAngular = -K_angular;
     }
 
     result.pd.setPointVel = 0.0;
@@ -103,6 +103,9 @@ void ObstacleController::ProcessData() {
 void ObstacleController::SetTagData(vector<TagPoint> tags){
   float cameraOffsetCorrection = 0.020; //meters;
   centerSeen = false;
+  countLeft = 0;
+  countRight = 0;
+
   // this loop is to get the number of center tags
   if (!targetHeld) {
     for (int i = 0; i < tags.size(); i++) {

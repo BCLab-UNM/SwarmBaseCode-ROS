@@ -10,6 +10,9 @@ SearchController::SearchController() {
   centerLocation.y = 0;
   centerLocation.theta = 0;
   result.PIDMode = FAST_PID;
+
+  result.fingerAngle = M_PI/2;
+  result.wristAngle = M_PI/4;
 }
 
 void SearchController::Reset() {
