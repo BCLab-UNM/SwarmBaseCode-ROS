@@ -125,6 +125,7 @@ namespace rqt_rover_gui
     connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
     connect(ui.global_offset_checkbox, SIGNAL(toggled(bool)), this, SLOT(globalOffsetCheckboxToggledEventHandler(bool)));
+    connect(ui.unique_rover_colors_checkbox, SIGNAL(toggled(bool)), this, SLOT(uniqueRoverColorsCheckboxToggledEventHandler(bool)));
     connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
     connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
     connect(ui.all_autonomous_button, SIGNAL(pressed()), this, SLOT(allAutonomousButtonEventHandler()));
@@ -1138,6 +1139,11 @@ void RoverGUIPlugin::globalOffsetCheckboxToggledEventHandler(bool checked)
     ui.map_frame->setGlobalOffset(checked);
 }
 
+void RoverGUIPlugin::uniqueRoverColorsCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_frame->setDisplayUniqueRoverColors(checked);
+}
+
 void RoverGUIPlugin::displayDiagLogMessage(QString msg)
 {
     if (msg.isEmpty()) msg = "Message is empty";
@@ -1626,6 +1632,13 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
     QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
 
+    QColor rover_colors[6] = { /* green         */ QColor(  0, 255,   0),
+                               /* yellow        */ QColor(255, 255,   0),
+                               /* white         */ QColor(255, 255, 255),
+                               /* red           */ QColor(255,   0,   0),
+                               /* deep sky blue */ QColor(  0, 191, 255),
+                               /* hot pink      */ QColor(255, 105, 180)  };
+
     /**
      * The distance to the rover from a corner position is calculated differently
      * than the distance to a cardinal position.
@@ -1699,6 +1712,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     {
         // add the global offset needed to display DDSA spirals correctly
         ui.map_frame->setGlobalOffsetForRover(rovers[i].toStdString(), rover_positions[i].x(), rover_positions[i].y());
+        ui.map_frame->setUniqueRoverColor(rovers[i].toStdString(), rover_colors[i]);
 
         emit sendInfoLogMessage("Adding rover "+rovers[i]+"...");
         return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0, 0, 0, rover_yaw[i]);
