@@ -1697,6 +1697,9 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     // Add rovers to the simulation and start the associated ROS nodes
     for (int i = 0; i < n_rovers; i++)
     {
+        // add the global offset needed to display DDSA spirals correctly
+        ui.map_frame->setGlobalOffsetForRover(rovers[i].toStdString(), rover_positions[i].x(), rover_positions[i].y());
+
         emit sendInfoLogMessage("Adding rover "+rovers[i]+"...");
         return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0, 0, 0, rover_yaw[i]);
         emit sendInfoLogMessage(return_msg);
