@@ -51,6 +51,7 @@ namespace rqt_rover_gui
       void setDisplayEncoderData(bool display);
       void setDisplayGPSData(bool display);
       void setDisplayEKFData(bool display);
+      void setGlobalOffset(bool display);
 
       void addToGPSRoverPath(std::string rover, float x, float y);
       void addToEncoderRoverPath(std::string rover, float x, float y);

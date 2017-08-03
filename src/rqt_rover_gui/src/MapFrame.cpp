@@ -425,6 +425,10 @@ void MapFrame::setDisplayEKFData(bool display)
     if(popout_mapframe) popout_mapframe->setDisplayEKFData(display);
 }
 
+void MapFrame::setGlobalOffset(bool display)
+{
+}
+
 void MapFrame::setWhetherToDisplay(string rover, bool yes)
 {
     map_data->lock();
