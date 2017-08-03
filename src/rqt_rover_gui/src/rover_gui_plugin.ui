@@ -342,7 +342,7 @@ border: 1px solid white;
       <string notr="true">color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Global Offset</string>
+      <string>Global Frame</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
