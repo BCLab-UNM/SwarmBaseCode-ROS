@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -327,6 +327,44 @@ border: 1px solid white;
      </property>
      <property name="text">
       <string>Popout</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="global_offset_label">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>190</y>
+       <width>50</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Global Offset</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="global_offset_checkbox">
+     <property name="geometry">
+      <rect>
+       <x>670</x>
+       <y>200</y>
+       <width>75</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -2896,7 +2934,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rover_control_button_group"/>
   <buttongroup name="map_display_button_group"/>
+  <buttongroup name="rover_control_button_group"/>
  </buttongroups>
 </ui>
