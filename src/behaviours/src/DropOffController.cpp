@@ -31,6 +31,8 @@ DropOffController::~DropOffController() {
 
 Result DropOffController::DoWork() {
 
+  cout << "8" << endl;
+
   int count = countLeft + countRight;
 
   if(timerTimeElapsed > -1) {
@@ -43,13 +45,21 @@ Result DropOffController::DoWork() {
   //to resart our search.
   if(reachedCollectionPoint)
   {
-    if (timerTimeElapsed >= 4)
+    cout << "2" << endl;
+    if (timerTimeElapsed >= 5)
     {
-      result.type = behavior;
-      result.b = nextProcess;
-      result.reset = true;
-      finalInterrupt = true;
-      return result;
+      if (finalInterrupt)
+      {
+        result.type = behavior;
+        result.b = nextProcess;
+        result.reset = true;
+        return result;
+      }
+      else
+      {
+        finalInterrupt = true;
+        cout << "1" << endl;
+      }
     }
     else if (timerTimeElapsed >= 0.1)
     {
@@ -124,7 +134,19 @@ Result DropOffController::DoWork() {
 
   if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
   {
+
+    cout << "9" << endl;
     centerSeen = true;
+
+    if (first_center && isPrecisionDriving)
+    {
+      first_center = false;
+      result.type = behavior;
+      result.reset = false;
+      result.b = nextProcess;
+      return result;
+    }
+    isPrecisionDriving = true;
 
     if (seenEnoughCenterTags) //if we have seen enough tags
     {
@@ -141,7 +163,7 @@ Result DropOffController::DoWork() {
     float turnDirection = 1;
     //reverse tag rejection when we have seen enough tags that we are on a
     //trajectory in to the square we dont want to follow an edge.
-    if (seenEnoughCenterTags) turnDirection = -1;
+    if (seenEnoughCenterTags) turnDirection = -3;
 
     result.type = precisionDriving;
 
@@ -197,6 +219,7 @@ Result DropOffController::DoWork() {
     float timeSinceSeeingEnoughCenterTags = elapsed/1e3; // Convert from milliseconds to seconds
     if (timeSinceSeeingEnoughCenterTags > lostCenterCutoff)
     {
+      cout << "4" << endl;
       //go back to drive to center base location instead of drop off attempt
       reachedCollectionPoint = false;
       seenEnoughCenterTags = false;
@@ -204,6 +227,11 @@ Result DropOffController::DoWork() {
 
       result.type = waypoint;
       result.wpts.waypoints.push_back(this->centerLocation);
+      if (isPrecisionDriving) {
+        result.type = behavior;
+        result.b = prevProcess;
+        result.reset = false;
+      }
       isPrecisionDriving = false;
       interrupt = false;
       precisionInterrupt = false;
@@ -255,6 +283,8 @@ void DropOffController::Reset() {
   precisionInterrupt = false;
   targetHeld = false;
   startWaypoint = false;
+  first_center = true;
+  cout << "6" << endl;
 
 }
 

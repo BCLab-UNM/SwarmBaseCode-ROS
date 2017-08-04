@@ -66,5 +66,9 @@ private:
   long int current_time;
 
   bool interupted = false;
+
+  bool interupte_release = false;
+
+  bool has_controle = false;
 };
 #endif // end header define

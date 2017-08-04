@@ -48,8 +48,14 @@ void PickUpController::SetTagData(vector<TagPoint> tags) {
       else {
         nTargetsSeen--;
 
-        if(tags[i].id == 256) {
+        if(tags[i].id == 256)
+        {
           Reset();
+          if (has_controle)
+          {
+            cout << "pickup reset return interupt free" << endl;
+            interupte_release = true;
+          }
           return;
         }
       }
@@ -124,12 +130,21 @@ bool PickUpController::ShouldInterrupt(){
 
   ProcessData();
 
+  if (interupte_release)
+  {
+    interupte_release = false;
+    has_controle = false;
+    return true;
+  }
+
   if ((targetFound && !interupted) || targetHeld) {
     interupted = true;
+    has_controle = false;
     return true;
   }
   else if (!targetFound && interupted) {
     interupted = false;
+    has_controle = false;
     return true;
   }
   else {
@@ -138,6 +153,8 @@ bool PickUpController::ShouldInterrupt(){
 }
 
 Result PickUpController::DoWork() {
+
+  has_controle = true;
 
   if (!targetHeld) {
     //threshold distance to be from the target block before attempting pickup
@@ -238,6 +255,7 @@ bool PickUpController::HasWork() {
 void PickUpController::Reset() {
 
   result.type = precisionDriving;
+  result.PIDMode = SLOW_PID;
   lockTarget = false;
   timeOut = false;
   nTargetsSeen = 0;

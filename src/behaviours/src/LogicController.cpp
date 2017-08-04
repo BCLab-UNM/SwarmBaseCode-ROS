@@ -41,7 +41,7 @@ Result LogicController::DoWork() {
   //logic state switch
   switch(logicState) {
 
-  //when an interrupt has been thorwn or there are no pending actions logic controller is in this state.
+  //when an interrupt has been thorwn or there are no pending control_queue.top().actions logic controller is in this state.
   case LOGIC_STATE_INTERRUPT: {
 
     //Reset the control queue
@@ -93,7 +93,7 @@ Result LogicController::DoWork() {
           processState = (ProcessState)((int)processState + 1);
         }
       }
-      //ask for the procces state to change to the previouse state or loop around to the begining
+      //ask for the procces state to change to the previouse state or loop around to the end
       else if(result.b == prevProcess) {
         if (processState == _FIRST) {
           processState = (ProcessState)((int)_LAST - 1);
@@ -159,13 +159,15 @@ Result LogicController::DoWork() {
     //pass the driving commands to the drive controller so it can interpret them
     driveController.SetResultData(result);
 
-    //the interoreted commands are turned into proper motor commands to be passed the ROS Adapter
+    //the interoreted commands are turned into properinitial_spiral_offset motor commands to be passed the ROS Adapter
     //as left and right wheel PWM values in the result struct.
     result = driveController.DoWork();
     break;
 
   }//end of precision case****************************************************************************************
   }//end switch statment******************************************************************************************
+
+    cout << "logic state " << logicState << " top controller " << control_queue.top().priority << " Proccess " << processState <<endl;
 
 
   //now using proccess logic allow the controller to communicate data between eachother
@@ -197,6 +199,16 @@ void LogicController::ProcessData() {
     prioritizedControllers = {
       PrioritizedController{-1, (Controller*)(&searchController)},
       PrioritizedController{2, (Controller*)(&obstacleController)},
+      PrioritizedController{-1, (Controller*)(&pickUpController)},
+      PrioritizedController{1, (Controller*)(&dropOffController)}
+    };
+  }
+  //this priority is used when returning a target to the center collection zone
+  else if (processState  == PROCCESS_STATE_DROP_OFF)
+  {
+    prioritizedControllers = {
+      PrioritizedController{-1, (Controller*)(&searchController)},
+      PrioritizedController{-1, (Controller*)(&obstacleController)},
       PrioritizedController{-1, (Controller*)(&pickUpController)},
       PrioritizedController{1, (Controller*)(&dropOffController)}
     };
