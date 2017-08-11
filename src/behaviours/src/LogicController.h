@@ -7,6 +7,7 @@
 #include "SearchController.h"
 #include "ObstacleController.h"
 #include "DriveController.h"
+#include "RangeController.h"
 
 #include <vector>
 #include <queue>
@@ -47,6 +48,12 @@ public:
 
   void SetCurrentTimeInMilliSecs( long int time );
 
+  // Tell the logic controller whether rovers should automatically
+  // resstrict their foraging range. If so provide the shape of the
+  // allowed range.
+  void setVirtualFenceOn( RangeShape* range );
+  void setVirtualFenceOff( );
+
 protected:
   void ProcessData();
 
@@ -73,6 +80,7 @@ private:
   SearchController searchController;
   ObstacleController obstacleController;
   DriveController driveController;
+  RangeController range_controller; 
 
   std::vector<PrioritizedController> prioritizedControllers;
   priority_queue<PrioritizedController> control_queue;

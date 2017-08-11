@@ -20,6 +20,7 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
+#include <std_msgs/Float32MultiArray.h>
 
 // Include Controllers
 #include "LogicController.h"
@@ -33,8 +34,29 @@
 #include <ros/ros.h>
 #include <signal.h>
 
+#include <exception> // For exception handling
 
 using namespace std;
+
+// Define Exceptions
+// Define an exception to be thrown if the user tries to create
+// a RangeShape using invalid dimensions
+class ROSAdapterRangeShapeInvalidTypeException : public std::exception {
+ public:
+  ROSAdapterRangeShapeInvalidTypeException(std::string msg) {
+    this->msg = msg;
+  }
+
+  virtual const char* what() const throw()
+  {
+    std::string message = "Invalid RangeShape type provided: " + msg;
+    return message.c_str();
+  }
+
+ private:
+  std::string msg;
+};
+
 
 // Random number generator
 random_numbers::RandomNumberGenerator* rng;
@@ -106,6 +128,7 @@ ros::Subscriber modeSubscriber;
 ros::Subscriber targetSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
+ros::Subscriber virtualFenceSubscriber;
 
 
 // Timers
@@ -133,6 +156,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
+void virtualFenceHandler(const std_msgs::Float32MultiArray& message);
 void behaviourStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
@@ -167,7 +191,8 @@ int main(int argc, char **argv) {
   targetSubscriber = mNH.subscribe((publishedName + "/targets"), 10, targetHandler);
   odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
   mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
-  message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
+  virtualFenceSubscriber = mNH.subscribe(("/virtualFence"), 10, virtualFenceHandler);
+    message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
 
@@ -294,7 +319,7 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     }
 
     //publishHandeling here
-    //logicController.getPublishData() suggested;
+    //logicController.getPublishData(); suggested
 
 
     //adds a blank space between sets of debugging data to easly tell one tick from the next
@@ -385,6 +410,53 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
   logicController.SetVelocityData(linearVelocity, angularVelocity);
 }
 
+// Allows a virtual fence to be defined and enabled or disabled through ROS
+void virtualFenceHandler(const std_msgs::Float32MultiArray& message) 
+{
+  // Read data from the message array
+  // The first element is an integer indicating the shape type
+  // 0 = Disable the virtual fence
+  // 1 = circle
+  // 2 = rectangle
+  int shape_type = static_cast<int>(message.data[0]); // Shape type
+  
+  if (shape_type == 0)
+    {
+      logicController.setVirtualFenceOff();
+    }
+  else
+    {
+      // Elements 2 and 3 are the x and y coordinates of the range center
+      Point center;
+      center.x = message.data[1]; // Range center x
+      center.y = message.data[2]; // Range center y
+      
+      // If the shape type is "circle" then element 4 is the radius, if rectangle then width
+      switch ( shape_type )
+	{
+	case 1: // Circle
+	  {
+	    if ( message.data.size() != 4 ) throw ROSAdapterRangeShapeInvalidTypeException("Wrong number of parameters for circle shape type in ROSAdapter.cpp:virtualFenceHandler()");
+	    float radius = message.data[3]; 
+	    logicController.setVirtualFenceOn( new RangeCircle(center, radius) );
+	    break;
+	  }
+	case 2: // Rectangle 
+	  {
+	    if ( message.data.size() != 5 ) throw ROSAdapterRangeShapeInvalidTypeException("Wrong number of parameters for rectangle shape type in ROSAdapter.cpp:virtualFenceHandler()");
+	    float width = message.data[3]; 
+	    float height = message.data[4]; 
+	    logicController.setVirtualFenceOn( new RangeRectangle(center, width, height) );
+	    break;
+	  }
+	default:
+	  { // Unknown shape type specified
+	    throw ROSAdapterRangeShapeInvalidTypeException("Unknown Shape type in ROSAdapter.cpp:virtualFenceHandler()");
+	  }
+	}
+    }
+}
+
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
   //Get (x,y) location directly from pose
   currentLocationMap.x = message->pose.pose.position.x;
@@ -400,11 +472,11 @@ void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
   linearVelocity = message->twist.twist.linear.x;
   angularVelocity = message->twist.twist.angular.z;
 
-  Point currentLoc;
-  currentLoc.x = currentLocation.x;
-  currentLoc.y = currentLocation.y;
-  currentLoc.theta = currentLocation.theta;
-  logicController.SetPositionData(currentLoc);
+  Point curr_loc;
+  curr_loc.x = currentLocationMap.x;
+  curr_loc.y = currentLocationMap.y;
+  curr_loc.theta = currentLocationMap.theta;
+  logicController.SetMapPositionData(curr_loc);
   logicController.SetMapVelocityData(linearVelocity, angularVelocity);
 }
 
