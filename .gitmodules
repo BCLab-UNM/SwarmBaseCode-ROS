@@ -1,3 +1,9 @@
 [submodule "src/ublox"]
 	path = src/ublox
 	url = https://github.com/KumarRobotics/ublox.git
+[submodule "apriltags_ros"]
+	path = apriltags_ros
+	url = https://github.com/RIVeR-Lab/apriltags_ros.git
+[submodule "src/apriltags_ros"]
+	path = src/apriltags_ros
+	url = https://github.com/RIVeR-Lab/apriltags_ros.git

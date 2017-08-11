@@ -13,6 +13,10 @@ catkin_package(
   CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs message_filters
 )
 
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
+
 add_executable(
   obstacle src/obstacle.cpp
 )

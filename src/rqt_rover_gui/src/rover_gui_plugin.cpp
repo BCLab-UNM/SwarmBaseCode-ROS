@@ -28,9 +28,11 @@
 #include <std_msgs/UInt8.h>
 #include <algorithm>
 
+#ifndef Q_MOC_RUN
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
+#endif // End Q_MOC_RUN
 
 //#include <regex> // For regex expressions
 
@@ -191,7 +193,7 @@ namespace rqt_rover_gui
 
     ui.tab_widget->setCurrentIndex(0);
 
-    ui.texture_combobox->setItemData(0, Qt::white, Qt::TextColorRole);
+    ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
     ui.visualize_simulation_button->setEnabled(false);
     ui.clear_simulation_button->setEnabled(false);

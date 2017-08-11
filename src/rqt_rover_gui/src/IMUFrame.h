@@ -20,7 +20,8 @@
 #include <QImage>
 #include <QMutex>
 #include <QPainter>
-#include <vector>
+#include <vector> // For standard template library vectors
+#include <tuple> //  For standard template library tuples
 #include <utility> // For STL pair
 
 using namespace std;
@@ -33,7 +34,7 @@ class IMUFrame : public QFrame
 {
     Q_OBJECT
 public:
-    IMUFrame(QWidget *parent, Qt::WFlags = 0);
+    IMUFrame(QWidget *parent, Qt::WindowFlags = 0);
     void setLinearAcceleration(float x, float y, float z);
     void setAngularVelocity(float x, float y, float z);
     void setOrientation(float w, float x, float y, float z);

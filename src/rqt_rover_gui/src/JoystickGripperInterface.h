@@ -3,7 +3,9 @@
 
 #include <QTimer>
 #include <exception>
+#ifndef Q_MOC_RUN
 #include <ros/ros.h> // For ROS publishers
+#endif
 #include <string> // For the rover name
 
 // This file recieves input from a Microsoft Xbox 360 compatable joystick
