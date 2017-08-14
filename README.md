@@ -79,11 +79,11 @@ sudo apt install git
 
 ##### 5. Install Swarmathon-ROS
 
-1. Clone this GitHub repository to your home directory (~), renaming the repo so ROS and catkin can properly identify it:
+1. Clone this GitHub repository to your home directory (~), renaming the repo so ROS and catkin can properly identify it (you can name the target directory whatever you like):
 
   ```
   cd ~
-  git clone https://github.com/BCLab-UNM/Swarmathon-ROS.git rover_workspace
+  git clone https://github.com/BCLab-UNM/SwarmBaseCode-ROS.git SwarmBaseCode-ROS
   ```
 
 2. Change your current working directory to the root directory of the downloaded repo.
@@ -100,7 +100,7 @@ sudo apt install git
  
   Make sure bash is aware of the location of the ROS environment:
   ```
-  if ! grep -q "source /opt/ros/kineticqt/setup.bash" ~/.bashrc
+  if ! grep -q "source /opt/ros/kinetic/setup.bash" ~/.bashrc
   then 
     echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
   fi
@@ -115,10 +115,10 @@ sudo apt install git
     
 ##### 6. Run the Swarmathon-ROS simulation:
 
-1. Change the permissions on the simulation run script to make it exectuatable:
+1. Change the permissions on the simulation run script to make it exectuatable (assuming you use the target directory name SwarmBaseCode-ROS):
   
   ```
-  cd ~/rover_workspace
+  cd ~/SwarmBaseCode-ROS
   chmod +x ./run.sh
   ```
   
