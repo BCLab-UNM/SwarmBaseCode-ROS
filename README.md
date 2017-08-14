@@ -35,7 +35,7 @@ sudo rosdep init
 rosdep update      # Note this is not run with sudo
 ```
 
-Note: if you accedently ran ```sudo rosdep update``` you can repair the permissions ```sudo rosdep fix-permissions```.
+Note: if you accidentally ran ```sudo rosdep update``` you can repair the permissions ```sudo rosdep fix-permissions```.
 
 ##### 2. Install additional ROS packages
 
