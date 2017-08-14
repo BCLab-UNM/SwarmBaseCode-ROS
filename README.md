@@ -18,19 +18,19 @@ This repository contains:
 
 ### Quick Start Installation Guide
 
-Swarmathon-ROS is designed and tested exclusively on the 64 bit version of Ubuntu 16.04 LTS (Xenial Xerus) and ROS Indigo Igloo. This framework may compile and run correctly under other versions of Ubuntu and ROS, but **NOTE** that these other systems are untested and are therefore not supported at this time.
+Swarmathon-ROS is designed and tested exclusively on the 64 bit version of Ubuntu 16.04 LTS (Xenial Xerus) and ROS Kinetic Kame. Other systems are untested and are therefore not supported at this time.
 
-##### 1. Install ROS Indigo
+##### 1. Install ROS Kinetic Kame
 
-Detailed instructions for installing ROS Indigo under Ubuntu 16.04 [here](http://wiki.ros.org/kinetic/Installation/Ubuntu) or follow the summarized instructions below:
+Detailed instructions for installing ROS Kinetic Kame under Ubuntu 16.04 [here](http://wiki.ros.org/kinetic/Installation/Ubuntu) or follow the summarized instructions below:
 
 ```
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release-sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 
 sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
-sudo apt-get update
-sudo apt-get install ros-kinetic-desktop-full
+sudo apt update
+sudo apt install ros-kinetic-desktop-full
 sudo rosdep init
 ```
 
@@ -39,19 +39,19 @@ sudo rosdep init
 We use the [catkin_tools](https://catkin-tools.readthedocs.io/) package to build the Swarmathon-ROS code base:
 
 ```
-sudo apt-get install python-rosinstall python-catkin-tools
+sudo apt install python-rosinstall python-catkin-tools
 ```
 
 Our simulated and physical Swarmies use existing ROS plugins, external to this repo, to facilitate non-linear state estimation through sensor fusion and frame transforms. These plugins are contained in the [robot_localization](http://wiki.ros.org/robot_localization) package, which should be installed using the apt-get package management tool:
 
 ```
-sudo apt-get install ros-kinetic-robot-localization
+sudo apt install ros-kinetic-robot-localization
 ```
 
 Finally, our physical Swarmies use a USB camera driver, contained in the [usb_cam](http://wiki.ros.org/usb_cam) package, to interface with the built-in Logitech C170 webcam:
 
 ```
-sudo apt-get install ros-kinetic-usb-cam
+sudo apt install ros-kinetic-usb-cam
 ```
 
 ##### 3. Install additional Gazebo plugins
@@ -59,13 +59,13 @@ sudo apt-get install ros-kinetic-usb-cam
 Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) package, which should be installed using the apt-get package management tool:
 
 ```
-sudo apt-get install ros-kinetic-hector-gazebo-plugins
+sudo apt install ros-kinetic-hector-gazebo-plugins
 ```
 
 Our Swarmies can receive mobility commands from the right thumb stick on a Microsoft Xbox 360 controller. The ROS [joystick_drivers](http://wiki.ros.org/joystick_drivers) package, which contains a generic Linux joystick driver compatible with this controller, should also be installed using the apt-get tool:
 
 ```
- sudo apt-get install ros-indigo-joystick-drivers
+ sudo apt install ros-kinetic-joystick-drivers
 ```
 
 Joystick commands can also be simulated using the direction keys (Up=I, Down=K, Left=J, Right=L) on the keyboard. The Rover GUI window must have focus for keyboard control to work.
@@ -73,7 +73,7 @@ Joystick commands can also be simulated using the direction keys (Up=I, Down=K, 
 ##### 4. Install git (if git is already installed, skip to step 5):
 
 ```
-sudo apt-get install git
+sudo apt install git
 ```
 
 ##### 5. Install Swarmathon-ROS
@@ -179,14 +179,14 @@ To close the simulation and the GUI, click the red exit button in the top left-h
 
 Source code for Swarmathon-ROS can be found in the repository /src directory. This diretory contains severals subdirectories, each of which contain a single ROS package. Here we present a high-level description of each package.
 
-- ```abridge```: A serial interface between Swarmathon-ROS and the A-Star 32U4 microcontroller onboard the physical robot. In the Swarmathon-ROS simulation, ```abridge``` functionality is supplanted by [gazebo_ros_skid_steer_drive](http://docs.ros.org/indigo/api/gazebo_plugins/html/classgazebo_1_1GazeboRosSkidSteerDrive.html) (motor and encoders) and [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) (sonar and IMU; see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
+- ```abridge```: A serial interface between Swarmathon-ROS and the A-Star 32U4 microcontroller onboard the physical robot. In the Swarmathon-ROS simulation, ```abridge``` functionality is supplanted by [gazebo_ros_skid_steer_drive](http://docs.ros.org/kinetic/api/gazebo_plugins/html/classgazebo_1_1GazeboRosSkidSteerDrive.html) (motor and encoders) and [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) (sonar and IMU; see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
 - ```mobility```: The top-level controller class for the physical and simulated robots. This package receives messages on the status of targets and/or obstacles in front of the robot and autonomously makes decisions based on these factors. This packages also receives pose updates from [robot_localization](http://wiki.ros.org/robot_localization) (see [step 2](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#2-install-additional-ros-plugins) of the Quick Start guide) and commands from [joystick_drivers](http://wiki.ros.org/joystick_drivers) (see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
 - ```obstacle_detection```: A logic processor that converts sonar signals into a ternary collision value. This package receives sonar messages from ```abridge``` (for physical robots) or [hector_gazebo_ros_sonar](http://wiki.ros.org/hector_gazebo_plugins) (for simulated robots), and returns a status message to differentiate between three possible cases:
   1. No collision
   2. A collision on the right side of the robot
   3. A collision in front or on the left side of the robot
 - ```rqt_rover_gui```: A Qt-based graphical interface for the physical and simulated robots. See [How to use Qt Creator](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#how-to-use-qt-creator-to-edit-the-simulation-gui) for details on this package.
-- ```target_detection```: An image processor that detects [AprilTag](https://april.eecs.umich.edu/wiki/index.php/AprilTags) fiducial markers in the onboard camera's video stream. This package receives images from the ```usbCamera``` class (for physical robots) or [gazebo_ros_camera](http://docs.ros.org/indigo/api/gazebo_plugins/html/classgazebo_1_1GazeboRosCamera.html) (for simulated robots), and, if an AprilTag is detected in the image, returns the integer value encoded in the tag.
+- ```target_detection```: An image processor that detects [AprilTag](https://april.eecs.umich.edu/wiki/index.php/AprilTags) fiducial markers in the onboard camera's video stream. This package receives images from the ```usbCamera``` class (for physical robots) or [gazebo_ros_camera](http://docs.ros.org/kinetic/api/gazebo_plugins/html/classgazebo_1_1GazeboRosCamera.html) (for simulated robots), and, if an AprilTag is detected in the image, returns the integer value encoded in the tag.
 - ```ublox```: A serial interface to the ublox GPS receiver onboard the physical robot. This package is installed as a git submodule in the Swarmathon-ROS repo. See the [ublox ROS wiki page](http://wiki.ros.org/ublox) for more information.
 
 ### How to use Qt Creator to edit the simulation GUI
