@@ -35,6 +35,8 @@ sudo rosdep init
 rosdep update      # Note this is not run with sudo
 ```
 
+Note: if you accidentally ran ```sudo rosdep update``` you can repair the permissions ```sudo rosdep fix-permissions```.
+
 ##### 2. Install additional ROS packages
 
 We use the [catkin_tools](https://catkin-tools.readthedocs.io/) package to build the Swarmathon-ROS code base:
@@ -49,10 +51,10 @@ Our simulated and physical Swarmies use existing ROS plugins, external to this r
 sudo apt install ros-kinetic-robot-localization
 ```
 
-Finally, our physical Swarmies use a USB camera driver, contained in the [usb_cam](http://wiki.ros.org/usb_cam) package, to interface with the built-in Logitech C170 webcam:
+Finally, our physical Swarmies use a video stream package [video_stream](http://wiki.ros.org/video_stream_opencv), to interface with the built-in Logitech C170 webcam:
 
 ```
-sudo apt install ros-kinetic-usb-cam
+sudo apt install ros-kinetic-video-stream-opencv
 ```
 
 ##### 3. Install additional Gazebo plugins
