@@ -58,6 +58,13 @@ public:
 
     void changeRovers(std::string roverName);
 
+signals:
+
+    void sendJoystickGripperWristControlTimerStart(int);
+    void sendJoystickGripperWristControlTimerStop();
+    void sendJoystickGripperFingerControlTimerStart(int);
+    void sendJoystickGripperFingerControlTimerStop();
+
 private slots:
 
     // These timed events calculate and broadcast the new gripper angles on the gripper control topics
@@ -80,7 +87,7 @@ private:
     // The finger movements are symmetric so we just refer to one finger angle etc
     float fingerAngle, fingerAngleChangeRate, fingerAngleMax, fingerAngleMin, fingerJoystickVector;
 
-    float commandReapplyRate; // Rate at which to apply the joystick command in Hz
+    int commandReapplyRate; // Rate at which to apply the joystick command in Hz
 
     float stickCenterTolerance;
 
