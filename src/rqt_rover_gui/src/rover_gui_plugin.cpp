@@ -1501,7 +1501,11 @@ void RoverGUIPlugin::customWorldButtonEventHandler()
     app_root_cstr = getenv(name);
     QString app_root = QString(app_root_cstr) + "/simulation/worlds/";
 
-    QString path = QFileDialog::getOpenFileName(widget, tr("Open File"),
+    // NOTE: passing a parent widget here (aka, our "widget" variable) will style the dialog box
+    //     in the same manner as the RQT rover GUI, currently with a black background and unreadable
+    //     gray text; meanwhile, passing in a null value results in the default operating system
+    //     style to be used
+    QString path = QFileDialog::getOpenFileName(/*widget*/ NULL, tr("Open File"),
                                                     app_root,
                                                     tr("Gazebo World File (*.world)"));
 
