@@ -379,7 +379,7 @@
 		</joint>
 -->
 		<!--> End Cowcatcher Rear <-->
-<!--
+
 	<link name="gripper_wrist">
 			<inertial>
 				<mass>0.085</mass>
@@ -590,7 +590,7 @@
 				</dynamics>
 			</axis>
 		</joint>
--->
+
 		<link name="left_front_wheel">
 			<pose>0.095 0.135 -0.03 0 0 0</pose>
 			<inertial>
