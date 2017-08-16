@@ -1697,6 +1697,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
         progress_dialog.setValue((++n_rovers_created)*100.0f/n_rovers);
         qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        sleep(rover_load_delay); // Gives plugins enough time to finish loading
     }
 
    if (ui.powerlaw_distribution_radio_button->isChecked())
