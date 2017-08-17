@@ -6,14 +6,14 @@
 
 		<link name='base_link'>
 			<inertial>
-				<mass>10.0</mass>
+				<mass>3.0</mass>
 				<inertia>
-					<ixx>0.04</ixx>
+					<ixx>0.06</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.04</iyy>
+					<iyy>0.06</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.07</izz>
+					<izz>0.06</izz>
 				</inertia>
 			</inertial>
 			<collision name='base_link_collision'>
@@ -232,169 +232,22 @@
 
 		</link>
 
-<!--
-		<link name='top'>
-			<pose>0.0006 0 0.12 0 0 0</pose>
-			<inertial>
-				<mass>0.2</mass>
-				<inertia>
-					<ixx>0.0001</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.0001</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.0002</izz>
-				</inertia>
-			</inertial>
-			<collision name='collision'>
-				<pose>0 0 0 0 0 0</pose>
-				<geometry>
-					<box>
-						<size>0.25 0.30 0.005</size>
-					</box>
-				</geometry>
-			</collision>
-			<visual name='visual'>
-				<geometry>
-					<mesh>
-						<uri>model://swarmie/meshes/CoverPlate.stl</uri>
-					</mesh>
-				</geometry>
-				<material>
-					<script>
-						<name>Gazebo/FlatBlack</name>
-					</script>
-				</material>
-			</visual>
-		</link>
-
-		<joint name="top" type="fixed">
-			<parent>base_link</parent>
-			<child>top</child>
-		</joint>
--->
-
-		<!--> Begin Cowcatcher Front <-->
-		<!--
-		<link name='CowCatcherFront'>
-			<pose>0.1675 0 -0.08 1.57079 0 0</pose>
-			<inertial>
-				<mass>0.2</mass>
-				<inertia>
-					<ixx>0.0001</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.0001</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.0002</izz>
-				</inertia>
-			</inertial>
-
-			<collision name='left_collision'>
-				<pose>-0.02 0.04 -0.07 0 0.4 0.3</pose>
-				<geometry>
-					<box>
-					  <size>0.01 0.08 0.06</size>
-					</box>
-				</geometry>
-			</collision>
-
-			<collision name='right_collision'>
-				<pose>-0.02 0.04 0.07 0 -0.4 0.3</pose>
-				<geometry>
-					<box>
-					  <size>0.01 0.08 0.06</size>
-					</box>
-				</geometry>
-			</collision>
-
-			<visual name='visual'>
-				<geometry>
-					<mesh>
-						<uri>model://swarmie/meshes/CowCatcherFront.stl</uri>
-						<scale>0.001 0.001 0.001</scale>
-					</mesh>
-				</geometry>
-				<material>
-					<script>
-						<name>Gazebo/FlatBlack</name>
-					</script>
-				</material>
-			</visual>
-		</link>
-
-		<joint name="CowCatcherFront" type="fixed">
-			<parent>base_link</parent>
-			<child>CowCatcherFront</child>
-		</joint>
--->
-
-		<!--> End Cowcatcher Front <-->
-
-		<!--> Begin Cowcatcher Rear <-->
-<!--
-		<link name='CowCatcherRear'>
-			<pose>-0.1275 -0.1 -0.04 1.57079 0 3.1415</pose>
-			<inertial>
-				<mass>0.2</mass>
-				<inertia>
-					<ixx>0.0001</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.0001</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.0002</izz>
-				</inertia>
-			</inertial>
-
-			<collision name='lower_collision'>
-				<pose>0.02 -0.03 0.1 0 0 1.05</pose>
-				<geometry>
-					<box>
-					  <size>0.01 0.03 0.18</size>
-					</box>
-				</geometry>
-			</collision>
-
-			<visual name='visual'>
-				<geometry>
-					<mesh>
-						<uri>model://swarmie/meshes/CowCatcherRear.stl</uri>
-						<scale>0.001 0.001 0.001</scale>
-					</mesh>
-				</geometry>
-				<material>
-					<script>
-						<name>Gazebo/FlatBlack</name>
-					</script>
-				</material>
-			</visual>
-		</link>
-
-
-
-		<joint name="CowCatcherRear" type="fixed">
-			<parent>base_link</parent>
-			<child>CowCatcherRear</child>
-		</joint>
--->
-		<!--> End Cowcatcher Rear <-->
-
 	<link name="gripper_wrist">
+			<pose>0.155 0 -0.013 0 0 0</pose>
 			<inertial>
-				<mass>0.085</mass>
-				<inertia>
-					<ixx>0.00005</ixx>
+				<mass>0.03</mass>
+				<inertia> 
+					<ixx>0.245</ixx> <!--> 1/12*(mass)(h^2 + d^2) where h,d,w are in meters and mass is in kilograms <-->
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00006</iyy>
+					<iyy>0.185</iyy> <!--> 1/12*(mass)(w^2 + d^2) <-->
 					<iyz>0.0</iyz>
-					<izz>0.00005</izz>
+					<izz>0.185</izz> <!--> 1/12*(mass)(w^2 + h^2) <-->
 				</inertia>
 			</inertial>
 
 			<visual name="visual">
-				<pose>0 0 -0.06 0 0 0</pose>
+				<pose>0 0 0 0 0 0</pose>
 				<geometry>
 					<mesh>
 						<uri>model://swarmie/meshes/GripperWrist.stl</uri>
@@ -407,10 +260,10 @@
 				</material>
 			</visual>
 			<collision name="collision">
-				<pose>0.16 0 -0.022 0 0 1.57</pose>
+				<pose>0.0 0 -0.013 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.06 0.05 0.08</size>
+						<size>0.05 0.06 0.08</size>
 					</box>
 				</geometry>
 			</collision>
@@ -419,33 +272,34 @@
 		<joint name="gripper_wrist_joint" type="revolute">
 			<parent>base_link</parent>
 			<child>gripper_wrist</child>
-			<pose>0.136 0 -0.029 0 0 0</pose>
+			<pose>-0.0227 0 -0.0105 0 0 0</pose>
 			<axis>
 				<xyz>0 1 0</xyz>
 				<limit>
-					<upper>0.7854</upper>
+					<upper>0.7</upper>
 					<lower>0.0</lower>
 				</limit>
 				<dynamics>
-				  <damping>0.3</damping>
+				  <damping>0.5</damping>
 				</dynamics>
 			</axis>
 		</joint>
 
 		<link name="gripper_left_finger">
+			<pose>0.214 0.016 0.0095 0 0 0</pose>
 			<inertial>
-				<mass>0.005</mass>
+				<mass>0.001</mass>
 				<inertia>
-					<ixx>0.000002</ixx>
+					<ixx>0.0000833</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.000002</iyy>
+					<iyy>0.0005417</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.000004</izz>
+					<izz>0.0006083</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
-				<pose>0.215 0.018 0.01 0 0 -0.38</pose>
+				<pose>0 0 0 0 0 -0.38</pose>
 				<geometry>
 					<box>
 						<size>0.06 0.01 0.007</size>
@@ -461,7 +315,7 @@
 				</surface>
 			</collision>
 			<collision name="collision2">
-				<pose>0.2475 0.007 0.01 0 0 -0.38</pose>
+				<pose>0.033 -0.014 0.000 0 0 -0.38</pose>
 				<geometry>
 					<box>
 						<size>0.01 0.01 0.007</size>
@@ -477,7 +331,7 @@
 				</surface>
 			</collision>
 			<visual name="visual">
-				<pose>0 0 -0.06 0 0 0.0</pose>
+				<pose>0 0 0 0 0 0.0</pose>
 				<geometry>
 					<mesh>
 						<uri>model://swarmie/meshes/GripperFingerLeft.stl</uri>
@@ -499,7 +353,7 @@
 		<joint name ="gripper_left_finger_joint" type="revolute">
 			<parent>gripper_wrist</parent>
 			<child>gripper_left_finger</child>
-			<pose>0.1825 0.02175 0 0 0 0</pose>
+			<pose>-0.0324 0.0052 0 0 0 0</pose>
 			<axis>
 				<xyz>0 0 1</xyz>
 				<limit>
@@ -513,19 +367,20 @@
 		</joint>
 
 		<link name="gripper_right_finger">
+			<pose>0.214 -0.016 0.0095 0 0 0</pose>
 			<inertial>
-				<mass>0.005</mass>
+ 				<mass>0.001</mass>
 				<inertia>
-					<ixx>0.000002</ixx>
+					<ixx>0.0000833</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.000002</iyy>
+					<iyy>0.0005417</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.000004</izz>
+					<izz>0.0006083</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
-				<pose>0.215 -0.018 0.01 0 0 0.38</pose>
+				<pose>0 0 0 0 0 0.38</pose>
 				<geometry>
 					<box>
 						<size>0.06 0.01 0.007</size>
@@ -541,7 +396,7 @@
 				</surface>
 			</collision>
 			<collision name="collision2">
-				<pose>0.2475 -0.007 0.01 0 0 0.38</pose>
+				<pose>0.033 0.014 0.000 0 0 0.38</pose>
 				<geometry>
 					<box>
 						<size>0.01 0.01 0.007</size>
@@ -557,7 +412,7 @@
 				</surface>
 			</collision>
 			<visual name="visual">
-				<pose>0 0 -0.06 0 0 0</pose>
+				<pose>0 0 0 0 0 0</pose>
 				<geometry>
 					<mesh>
 						<uri>model://swarmie/meshes/GripperFingerRight.stl</uri>
@@ -579,7 +434,7 @@
 		<joint name ="gripper_right_finger_joint" type="revolute">
 			<parent>gripper_wrist</parent>
 			<child>gripper_right_finger</child>
-			<pose>0.1825 -0.02175 0 0 0 0</pose>
+			<pose>-0.0324 -0.0052 0 0 0 0</pose>
 			<axis>
 				<xyz>0 0 1</xyz>
 				<limit>
@@ -595,14 +450,14 @@
 		<link name="left_front_wheel">
 			<pose>0.095 0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.5</mass>
+				<mass>0.05</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.000082</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.000063</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.000082</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -644,17 +499,17 @@
 			</axis>
 		</joint>
 
-		<link name="right_front_wheel">
+		<link name="right_front_wheel">base_link
 			<pose>0.095 -0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.5</mass>
+				<mass>0.05</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.000082</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.000063</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.000082</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -699,14 +554,14 @@
 		<link name="left_rear_wheel">
 			<pose>-0.095 0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.5</mass>
+				<mass>0.05</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.000082</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.000082</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.000063</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -751,14 +606,14 @@
 		<link name="right_rear_wheel">
 			<pose>-0.095 -0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.5</mass>
+				<mass>0.05</mass>
 				<inertia>
-					<ixx>0.00635</ixx>
+					<ixx>0.000082</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.00635</iyy>
+					<iyy>0.000063</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.009</izz>
+					<izz>0.000082</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -799,165 +654,7 @@
 				<xyz>0 1 0</xyz>
 			</axis>
 		</joint>   
-<!--
-		<joint name="us_center_joint" type="fixed">
-			<parent>base_link</parent>
-			<child>us_center_link</child>
-		</joint>
 
-		<link name="us_center_link">
-			<sensor type="ray" name="us_center_sensor">
-				<pose>0.15 0 0.053 0 0 0</pose>
-				<visualize>false</visualize>
-				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
-					<topicName>/achilles/sonarCenter</topicName>
-					<frameId>us_center_link</frameId>
-				</plugin>
-			</sensor>
-		</link>
-
-		<joint name="us_right_joint" type="fixed">
-			<parent>base_link</parent>
-			<child>us_right_link</child>
-		</joint>
-
-		<link name="us_right_link">
-			<sensor type="ray" name="us_right_sensor">
-				<pose>0.15 -0.07 0.053 0.0 0.0 -0.43633</pose>
-				<visualize>false</visualize>
-				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
-					<topicName>/achilles/sonarRight</topicName>
-					<frameId>us_center_link</frameId>
-				</plugin>
-			</sensor>
-		</link>
-
-		<joint name="us_left_joint" type="fixed">
-			<parent>base_link</parent>
-			<child>us_left_link</child>
-		</joint>
-
-		<link name="us_left_link">
-			<sensor type="ray" name="us_left_sensor">
-				<pose>0.15 0.07 0.053 0.0 0.0 0.43633</pose>
-				<visualize>false</visualize>
-				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
-					<topicName>/achilles/sonarLeft</topicName>
-					<frameId>us_center_link</frameId>
-				</plugin>
-			</sensor>
-		</link>
-
-		<joint name="camera_joint" type="fixed">
-			<parent>base_link</parent>
-			<child>camera_link</child>
-		</joint>
-
-		<link name="camera_link">
-			<inertial>
-				<mass>0.2</mass>
-				<inertia>
-					<ixx>0.0001</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.0001</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.0002</izz>
-				</inertia>
-			</inertial>
-			<sensor type="camera" name="camera">
-				<pose>0.145 -0.0162 0.088 0.0 0.628 0.0</pose>
-				<visualize>false</visualize>
-				<update_rate>6.0</update_rate>
-				<camera name="head">
-					<horizontal_fov>1.0123</horizontal_fov>
-					<image>
-						<width>320</width>
-						<height>240</height>
-						<format>B8G8R8</format>
-					</image>
-					<clip>
-						<near>0.02</near>
-						<far>300</far>
-					</clip>
-					<noise>
-						<type>gaussian</type>
-						<mean>0.0</mean>
-						<stddev>0.007</stddev>
-					</noise>
-				</camera>
-				<plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-					<alwaysOn>true</alwaysOn>
-					<updateRate>0.0</updateRate>
-					<cameraName>/achilles/camera</cameraName>
-					<imageTopicName>/achilles/camera/image</imageTopicName>
-					<cameraInfoTopicName>/achilles/camera/info</cameraInfoTopicName>
-					<frameName>camera_link</frameName>
-					<hackBaseline>0.1</hackBaseline>
-					<distortionK1>0.0</distortionK1>
-					<distortionK2>0.0</distortionK2>
-					<distortionK3>0.0</distortionK3>
-					<distortionT1>0.0</distortionT1>
-					<distortionT2>0.0</distortionT2>
-					<CxPrime>0.0</CxPrime>
-					<Cx>0.0</Cx>
-					<Cy>0.0</Cy>
-					<focalLength>0.0</focalLength>
-				</plugin>
-			</sensor>
-		</link>
--->
 		<!-- Gripper plugin-->
 		<plugin name="gripper_sim" filename="libgazebo_plugins_gripper.so">
 			<!-- required: joint definitions -->
@@ -1016,7 +713,7 @@
 			<commandTopic>/achilles/skidsteer</commandTopic>
 			<odometryTopic>/achilles/odom</odometryTopic>
 			<odometryFrame>achilles/odom</odometryFrame>
-			<broadcastTF>0</broadcastTF>
+			<broadcastTF>0</broadcastTF>base_link
 		</plugin>
 
 		<!-- GPS plugin -->
