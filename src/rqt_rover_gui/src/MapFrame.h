@@ -111,7 +111,13 @@ namespace rqt_rover_gui
       int frames;
 
       set<string> display_list;
-      std::map<std::string, QColor> unique_rover_colors;
+      std::map<std::string, QColor> unique_simulated_rover_colors;
+      QColor unique_physical_rover_colors[6] = { /* green         */ QColor(  0, 255,   0),
+                                                 /* yellow        */ QColor(255, 255,   0),
+                                                 /* white         */ QColor(255, 255, 255),
+                                                 /* red           */ QColor(255,   0,   0),
+                                                 /* deep sky blue */ QColor(  0, 191, 255),
+                                                 /* hot pink      */ QColor(255, 105, 180)  };
 
       // For external pop out window
       QMainWindow* popout_window;
