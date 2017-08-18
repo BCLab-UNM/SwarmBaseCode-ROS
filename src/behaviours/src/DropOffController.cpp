@@ -6,7 +6,7 @@ DropOffController::DropOffController() {
 
   result.type = behavior;
   result.b = wait;
-  result.wristAngle = 0.8;
+  result.wristAngle = 0.7;
   result.reset = false;
   interrupt = false;
 
@@ -262,7 +262,7 @@ void DropOffController::Reset() {
   result.pd.cmdVel = 0;
   result.pd.cmdAngularError = 0;
   result.fingerAngle = -1;
-  result.wristAngle = 0.8;
+  result.wristAngle = 0.7;
   result.reset = false;
   result.wpts.waypoints.clear();
   spinner = 0;

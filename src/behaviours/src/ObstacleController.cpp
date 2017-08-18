@@ -110,7 +110,7 @@ void ObstacleController::ProcessData() {
   }
   else {
     if (center < 0.12) {
-      result.wristAngle = 0.8;
+      result.wristAngle = 0.7;
     }
     else {
       result.wristAngle = -1;
