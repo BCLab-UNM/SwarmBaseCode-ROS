@@ -153,8 +153,8 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   gazebo::transport::NodePtr gazeboNode(new gazebo::transport::Node());
   gazeboNode->Init();
   
-  string leftFingerContactTopic = "/gazebo/default/"+model->GetName()+"/gripper_left_finger/contacts";
-  string rightFingerContactTopic = "/gazebo/default/"+model->GetName()+"/gripper_right_finger/contacts";
+  string leftFingerContactTopic = "/gazebo/default/"+model->GetName()+"/gripper_left_finger/finger/contacts";
+  string rightFingerContactTopic = "/gazebo/default/"+model->GetName()+"/gripper_right_finger/finger/contacts";
 
   
   // Subscribe to the gripper contact gazebo topics
