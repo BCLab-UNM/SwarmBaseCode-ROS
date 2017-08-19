@@ -179,15 +179,32 @@ Result PickUpController::DoWork() {
     // -----------------------------------------------------------
     if (!timeOut) millTimer = current_time;
 
-    //diffrence between current time and millisecond time
+    //difference between current time and millisecond time
     long int Tdifference = current_time - millTimer;
 
     // converts from a millisecond difference to a second difference
     // Td = [T]ime [D]ifference IN SECONDS
     float Td = Tdifference/1e3;
 
+    // The following nested if statement implements a time based pickup routine.
+    // The sequence of events is:
+    // 1. Target aquisition phase: Align the robot with the closest visible target cube, if near enough to get a target lock then start the pickup timer (Td)
+    // 2. Approach Target phase: until *grasp_time_begin* seconds
+    // 3. Stop and close fingers (hopefully on a block - we won't be able to see it remember): at *grasp_time_begin* seconds 
+    // 4. Raise the gripper - does the rover see a block or did it miss it: at *raise_time_begin* seconds 
+    // 5. If we get here the target was not seen in the robots gripper so drive backwards and and try to get a new lock on a target: at *target_require_begin* seconds
+    // 6. If we get here we give up and release control with a task failed flag: for *target_pickup_task_time_limit* seconds
+    
     // If we don't see any blocks or cubes turn towards the location of the last cube we saw.
     // I.E., try to re-aquire the last cube we saw.
+
+    float grasp_time_begin = 1.7;
+    float raise_time_begin = 2.5;
+    float lower_gripper_time_begin = 4.0;
+    float target_reaquire_begin= 4.2;
+    float target_pickup_task_time_limit = 4.8;
+
+    
     if (nTargetsSeen == 0 && !lockTarget)
     {
       // This if statement causes us to time out if we don't re-aquire a block within the time limit.
@@ -207,10 +224,10 @@ Result PickUpController::DoWork() {
         result.pd.cmdAngularError = -blockYawError;
       }
       //If in a counting state and has been counting for 1 second.
-      else if (Td > 1.0 && Td < 2.5)
+      else if (Td > 1.0 && Td < grasp_time_begin)
       {
         // The rover will reverse straight backwards without turning.
-        result.pd.cmdVel = -0.2;
+        result.pd.cmdVel = -0.25;
         result.pd.cmdAngularError= 0.0;
       }
     }
@@ -235,15 +252,15 @@ Result PickUpController::DoWork() {
       timeOut = true;
       ignoreCenterSonar = true;
     }
-    else if (Td > 2.5) //raise the wrist
+    else if (Td > raise_time_begin) //raise the wrist
     {
-      result.pd.cmdVel = -0.10;
+      result.pd.cmdVel = 0.0;
       result.pd.cmdAngularError= 0.0;
       result.wristAngle = 0;
     }
-    else if (Td > 1.7) //close the fingers and stop driving
+    else if (Td > grasp_time_begin) //close the fingers and stop driving
     {
-      result.pd.cmdVel = -0.1;
+      result.pd.cmdVel = 0.0;
       result.pd.cmdAngularError= 0.0;
       result.fingerAngle = 0;
       return result;
@@ -251,11 +268,11 @@ Result PickUpController::DoWork() {
 
 
     // the magic numbers compared to Td must be in order from greater(top) to smaller(bottom) numbers
-    if (Td > 4.2 && timeOut) {
+    if (Td > target_reaquire_begin && timeOut) {
       lockTarget = false;
       ignoreCenterSonar = true;
     }
-    else if (Td > 4.0 && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
+    else if (Td > lower_gripper_time_begin && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
     {
       result.pd.cmdVel = -0.15;
       result.pd.cmdAngularError= 0.0;
@@ -265,7 +282,7 @@ Result PickUpController::DoWork() {
     }
 
 
-    if (Td > 4.8 && timeOut) //if no targets are found after too long a period go back to search pattern
+    if (Td > target_pickup_task_time_limit && timeOut) //if no targets are found after too long a period go back to search pattern
     {
       Reset();
       interupted = true;

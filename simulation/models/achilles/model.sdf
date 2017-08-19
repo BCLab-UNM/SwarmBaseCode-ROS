@@ -260,10 +260,10 @@
 				</material>
 			</visual>
 			<collision name="collision">
-				<pose>0.0 0 -0.013 0 0 0</pose>
+			  <pose>0.0 0 -0.0055 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.05 0.06 0.08</size>
+					  <size>0.07 0.05 0.07</size>
 					</box>
 				</geometry>
 			</collision>
@@ -681,21 +681,21 @@
 
 			<!-- optional: set the default PID values for the wrist joint -->
 			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
-			<wristPID>2.5 0.0 0.0</wristPID>
+      <wristPID>1.0 0.0 0.0</wristPID>
 
 			<!-- optional: set the default PID values for the finger joints -->
 			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
 			<!-- it is always assumed that both fingers use the same PID values -->
-			<fingerPID>2.5 0.0 0.0</fingerPID>
+      <fingerPID>1.0 0.0 0.0</fingerPID>
 
 			<!-- optional: set the min/max force applicable to the wrist joint in Newtons -->
 			<!-- values in order: minimum force, maximum force -->
-			<wristForceLimits>-10 10</wristForceLimits>
+      <wristForceLimits>-0.5 0.5</wristForceLimits>
 
 			<!-- optional: set the min/max force applicable to the finger joints in Newtons -->
 			<!-- values in order: minimum force, maximum force -->
 			<!-- it is always assumed that both fingers use the same min/max force values -->
-			<fingerForceLimits>-10 10</fingerForceLimits>
+      <fingerForceLimits>-0.5 0.5</fingerForceLimits>
 		</plugin>
 
 		<!-- Skid Steer Drive plugin -->
