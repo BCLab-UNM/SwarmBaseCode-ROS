@@ -1,4 +1,4 @@
-# Swarmathon-ROS
+# SwarmBaseCode-ROS
 
 This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://www.nasaswarmathon.com), a national swarm robotics competition. 
 
