@@ -1,6 +1,7 @@
 #!/bin/bash
+echo "running pkill on old rosnodes"
 pkill usb_cam_node
-pkill behaviour
+pkill behaviours
 pkill obstacle
 pkill apriltag_detector_node
 pkill abridge
@@ -10,8 +11,10 @@ pkill ekf_localization
 pkill diagnostics
 pkill static_transform_publisher
 
+source "../devel/setup.bash"
 
 #Point to ROS master on the network
+echo "point to ROS master on the network"
 if [ -z "$1" ]
 then
     echo "Error: ROS_MASTER_URI hostname was not provided"
@@ -23,10 +26,12 @@ fi
 
 
 #Set prefix to fully qualify transforms for each robot
+echo "set prefix to fully qualify transforms for each robot: $HOSTNAME"
 rosparam set tf_prefix $HOSTNAME
 
 
 #Function to lookup correct path for a given device
+echo "findDevicePath() for usb devices (arduino, camera, etc)"
 findDevicePath() {
     for sysdevpath in $(find /sys/bus/usb/devices/usb*/ -name dev); do
     (
@@ -45,14 +50,20 @@ findDevicePath() {
 
 
 #Startup ROS packages/processes
+echo "rosrun tf static_transform_publisher"
 nohup rosrun tf static_transform_publisher __name:=$HOSTNAME\_BASE2CAM 0.12 -0.03 0.195 -1.57 0 -2.22 /$HOSTNAME/base_link /$HOSTNAME/camera_link 100 &
-nohup rosrun video_stream_opencv video_stream __name:=$HOSTNAME\_CAMERA _video_stream_provider:=/dev/video0 /camera:=/$HOSTNAME/camera/image _camera_info_url:=file://${PWD}/camera_info/head_camera.yaml _width:=320 _height:=240 &
-  nohup rosrun mobility mobility &
-  nohup rosrun obstacle_detection obstacle &
-  nohup rosrun diagnostics diagnostics &
+echo "rosrun video_stream_opencv"
 
+nohup rosrun video_stream_opencv video_stream __name:=$HOSTNAME\_CAMERA _video_stream_provider:=/dev/video0 /camera:=/$HOSTNAME/camera/image _camera_info_url:=file://${HOME}/rover_workspace/camera_info head_camera.yaml _width:=320 _height:=240 &
+
+# deprecated; we are replacing the usb cam with opencv cam
+# mage_raw:=/$HOSTNAME/camera/image _camera_info_url:=file://${HOME}/rover_workspace/camera_info/head_camera.yaml _image_width:=320 _image_height:=240 &
+
+echo "rosrun behaviours"
 nohup rosrun behaviours behaviours &
+echo "rosrun obstacle_detection"
 nohup rosrun obstacle_detection obstacle &
+echo "rosrun diagnostics"
 nohup rosrun diagnostics diagnostics &
 
 rosparam set /$HOSTNAME\_TARGET/sensor_frame_id /$HOSTNAME/camera_link
