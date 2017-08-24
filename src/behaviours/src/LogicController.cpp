@@ -1,6 +1,7 @@
 #include "LogicController.h"
 
 LogicController::LogicController() {
+
   logicState = LOGIC_STATE_INTERRUPT;
   processState = PROCCESS_STATE_SEARCHING;
 
@@ -32,10 +33,11 @@ Result LogicController::DoWork() {
   //most important. A priority of less than 0 is an ignored controller use -1 for standards sake.
   //if any controller needs and interrupt the logic state is changed to interrupt
   for(PrioritizedController cntrlr : prioritizedControllers) {
-    if(cntrlr.controller->ShouldInterrupt() && cntrlr.priority >= 0) {
-      logicState = LOGIC_STATE_INTERRUPT;
-      //do not break all shouldInterupts may need calling in order to properly pre-proccess data.
-    }
+    if(cntrlr.controller->ShouldInterrupt() && cntrlr.priority >= 0) 
+      {
+	logicState = LOGIC_STATE_INTERRUPT;
+	//do not break all shouldInterupts may need calling in order to properly pre-proccess data.
+      }
   }
 
   //logic state switch
@@ -188,8 +190,9 @@ void LogicController::ProcessData() {
   if (processState == PROCCESS_STATE_SEARCHING) {
     prioritizedControllers = {
       PrioritizedController{0, (Controller*)(&searchController)},
-      PrioritizedController{1, (Controller*)(&obstacleController)},
-      PrioritizedController{2, (Controller*)(&pickUpController)},
+      PrioritizedController{10, (Controller*)(&obstacleController)},
+      PrioritizedController{15, (Controller*)(&pickUpController)},
+      PrioritizedController{5, (Controller*)(&range_controller)},
       PrioritizedController{-1, (Controller*)(&dropOffController)}
     };
   }
@@ -198,8 +201,9 @@ void LogicController::ProcessData() {
   else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
     prioritizedControllers = {
       PrioritizedController{-1, (Controller*)(&searchController)},
-      PrioritizedController{2, (Controller*)(&obstacleController)},
+      PrioritizedController{15, (Controller*)(&obstacleController)},
       PrioritizedController{-1, (Controller*)(&pickUpController)},
+      PrioritizedController{10, (Controller*)(&range_controller)},
       PrioritizedController{1, (Controller*)(&dropOffController)}
     };
   }
@@ -254,7 +258,7 @@ void LogicController::controllerInterconnect() {
   }
 }
 
-
+// Recieves position in the world inertial frame (should rename to SetOdomPositionData)
 void LogicController::SetPositionData(Point currentLocation) {
   searchController.SetCurrentLocation(currentLocation);
   dropOffController.SetCurrentLocation(currentLocation);
@@ -262,8 +266,10 @@ void LogicController::SetPositionData(Point currentLocation) {
   driveController.SetCurrentLocation(currentLocation);
 }
 
-void LogicController::SetMapPositionData(Point currentLocationMap) {
-
+// Recieves position in the world frame with global data (GPS)
+void LogicController::SetMapPositionData(Point currentLocation) {
+  range_controller.setCurrentLocation(currentLocation);
+  
 }
 
 void LogicController::SetVelocityData(float linearVelocity, float angularVelocity) {
@@ -285,9 +291,21 @@ void LogicController::SetSonarData(float left, float center, float right) {
   obstacleController.SetSonarData(left,center,right);
 }
 
+// Called once by RosAdapter in guarded init
 void LogicController::SetCenterLocationOdom(Point centerLocationOdom) {
   searchController.SetCenterLocation(centerLocationOdom);
   dropOffController.SetCenterLocation(centerLocationOdom);
+}
+
+void LogicController::setVirtualFenceOn( RangeShape* range )
+{
+  range_controller.setRangeShape(range);
+  range_controller.setEnabled(true);
+}
+
+void LogicController::setVirtualFenceOff()
+{
+  range_controller.setEnabled(false);
 }
 
 void LogicController::SetCenterLocationMap(Point centerLocationMap) {

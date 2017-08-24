@@ -30,6 +30,7 @@ add_executable(
   src/ROSAdapter.cpp
   src/PID.cpp
   src/DriveController.cpp
+  src/RangeController.cpp
   src/LogicController.cpp
 )
 
