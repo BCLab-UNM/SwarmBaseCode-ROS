@@ -3,6 +3,7 @@
 
 #include "Controller.h"
 #include "TagPoint.h"
+#include <math.h>
 
 class ObstacleController : virtual Controller
 {
@@ -21,7 +22,7 @@ public:
   void SetIgnoreCenter();
   void SetCurrentTimeInMilliSecs( long int time );
   void SetTargetHeld ();
-  void SetTargetHeldClear() {targetHeld = false; previousTargetState = false;}
+  void SetTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false;}}
   bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
@@ -60,9 +61,13 @@ private:
 
   long int current_time;
   long int timeSinceTags;
+  long int delay;
 
   bool targetHeld = false;
   bool previousTargetState = false;
+  bool phys = false;
+  bool set_waypoint = false;
+  bool can_set_waypoint = false;
 
 };
 

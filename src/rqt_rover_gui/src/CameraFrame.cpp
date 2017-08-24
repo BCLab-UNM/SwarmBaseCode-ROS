@@ -2,7 +2,7 @@
 
 namespace rqt_rover_gui {
 
-CameraFrame::CameraFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
+CameraFrame::CameraFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent)
 {
   connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()),
           Qt::QueuedConnection);

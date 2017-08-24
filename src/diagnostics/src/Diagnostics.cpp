@@ -53,7 +53,7 @@ Diagnostics::Diagnostics(std::string name) {
     char  arg0[] = "diagnostics";
     char* argv[] = { &arg0[0], NULL };
     int   argc   = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
-    gazebo::setupClient(argc, argv);
+    gazebo::client::setup(argc, argv);
 
     // Create Gazebo node and init
     gazebo::transport::NodePtr newNode(new gazebo::transport::Node());

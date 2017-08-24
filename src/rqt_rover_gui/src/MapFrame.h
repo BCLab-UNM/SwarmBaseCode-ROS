@@ -43,7 +43,7 @@ namespace rqt_rover_gui
 
     public:
 
-      MapFrame(QWidget *parent, Qt::WFlags = 0);
+      MapFrame(QWidget *parent, Qt::WindowFlags = 0);
 
       void setWhetherToDisplay(string rover, bool yes);
       void createPopoutWindow(MapData *map_data);

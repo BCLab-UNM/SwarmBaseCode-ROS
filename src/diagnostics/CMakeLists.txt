@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(diagnostics)
 
-SET(CMAKE_CXX_FLAGS "-std=c++0x")
+SET(CMAKE_CXX_FLAGS "-std=c++11")
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -27,7 +27,7 @@ add_executable(
   src/driver.cpp
   src/Diagnostics.cpp
   src/WirelessDiags.cpp
-  )
+)
 
 add_dependencies(diagnostics ${catkin_EXPORTED_TARGETS})
 

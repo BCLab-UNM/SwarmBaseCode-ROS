@@ -8,7 +8,7 @@
 
 namespace rqt_rover_gui {
 
-USFrame::USFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent) {
+USFrame::USFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent) {
   connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()),
           Qt::QueuedConnection);
   left_range = 3.0;

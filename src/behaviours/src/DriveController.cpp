@@ -25,6 +25,7 @@ void DriveController::Reset() {
 
 Result DriveController::DoWork() {
 
+
   if(result.type == behavior) {
     if(result.b == noChange) {
       //if drive controller gets a no change command it is allowed to continue its previouse action
@@ -37,6 +38,7 @@ Result DriveController::DoWork() {
 
     }
   } else if(result.type == precisionDriving) {
+
     //interpret input result as a precision driving command
     stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
 
@@ -195,6 +197,7 @@ void DriveController::ProcessData()
     }
   }
   else if (result.type == precisionDriving) {
+
     if (result.PIDMode == FAST_PID){
       float vel = result.pd.cmdVel -linearVelocity;
       float setVel = result.pd.cmdVel;
@@ -303,7 +306,7 @@ PIDConfig DriveController::fastVelConfig() {
 PIDConfig DriveController::fastYawConfig() {
   PIDConfig config;
 
-  config.Kp = 200;
+  config.Kp = 240;
   config.Ki = 25;
   config.Kd = 0.5;
   config.satUpper = 255;
@@ -312,7 +315,7 @@ PIDConfig DriveController::fastYawConfig() {
   config.errorHistLength = 4;
   config.alwaysIntegral = false;
   config.resetOnSetpoint = true;
-  config.feedForwardMultiplier = 0; //gives 127 pwm at 0.4 commandedspeed
+  config.feedForwardMultiplier = 0;
   config.integralDeadZone = 0.01;
   config.integralErrorHistoryLength = 10000;
   config.integralMax = config.satUpper/2;
@@ -356,7 +359,7 @@ PIDConfig DriveController::slowYawConfig() {
   config.errorHistLength = 4;
   config.alwaysIntegral = false;
   config.resetOnSetpoint = true;
-  config.feedForwardMultiplier = 0; //gives 127 pwm at 0.4 commandedspeed
+  config.feedForwardMultiplier = 0;
   config.integralDeadZone = 0.01;
   config.integralErrorHistoryLength = 10000;
   config.integralMax = config.satUpper/6;
@@ -400,7 +403,7 @@ PIDConfig DriveController::constYawConfig() {
   config.errorHistLength = 4;
   config.alwaysIntegral = true;
   config.resetOnSetpoint = true;
-  config.feedForwardMultiplier = 120; //gives 127 pwm at 0.4 commandedspeed
+  config.feedForwardMultiplier = 120;
   config.integralDeadZone = 0.01;
   config.integralErrorHistoryLength = 10000;
   config.integralMax = config.satUpper/2;

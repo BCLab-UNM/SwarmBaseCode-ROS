@@ -8,7 +8,7 @@
 namespace rqt_rover_gui
 {
 
-GPSFrame::GPSFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent) {
+GPSFrame::GPSFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent) {
   connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()),
           Qt::QueuedConnection);
   frames = 0;

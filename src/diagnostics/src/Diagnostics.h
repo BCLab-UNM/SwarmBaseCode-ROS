@@ -2,6 +2,7 @@
 #define Diagnostics_h
 
 #include <gazebo/gazebo.hh>
+#include <gazebo/gazebo_client.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 

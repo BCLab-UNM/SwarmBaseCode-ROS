@@ -29,11 +29,11 @@ private:
 
   bool interupt = false;
 
-  float rotateOnlyAngleTolerance = 0.2;
-  float finalRotationTolerance = 0.1;
-  const float waypointTolerance = 0.1; //10 cm tolerance.
+  float rotateOnlyAngleTolerance = 0.1;
+  float finalRotationTolerance = 0.2;
+  const float waypointTolerance = 0.15; //15 cm tolerance.
 
-  float searchVelocity = 0.2; // meters/second
+  float searchVelocity = 0.5; // meters/second
 
   float linearVelocity = 0;
   float angularVelocity = 0;
