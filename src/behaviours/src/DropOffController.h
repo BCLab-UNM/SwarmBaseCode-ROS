@@ -2,10 +2,9 @@
 #define DROPOFCONTROLLER_H
 #define HEADERFILE_H
 
-#include <std_msgs/Float32.h>
-
 #include "Controller.h"
 #include "TagPoint.h"
+#include <math.h>
 
 class DropOffController : virtual Controller
 {
@@ -119,6 +118,7 @@ private:
   bool interrupt = false;
   bool precisionInterrupt = false;
   bool finalInterrupt = false;
+  bool first_center = true;
 
 };
 #endif // end header define

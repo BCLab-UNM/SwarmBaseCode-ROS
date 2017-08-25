@@ -3,43 +3,20 @@
 	<model name="collection_disk">
 		<static>true</static>
 		<link name="link">
-			<inertial>
-				<mass>1.0</mass>
-				<inertia>
-					<ixx>0.083</ixx>
-					<ixy>0</ixy>
-					<ixz>0</ixz>
-					<iyy>0</iyy>
-					<iyz>0</iyz>
-					<izz>0.083</izz>
-				</inertia>
-			</inertial>
-			<collision name ='collision'>
-				<geometry>
-					<box>
-						<size>1.016 1.016 0.001</size>
-					</box>
-				</geometry>
-			</collision>
-			<visual name='visual'>
-				<geometry>
-					<box>
-						<size>1.016 1.016 0.001</size>
-					</box>
-				</geometry>
-	 			<material>
-					<script>
-						<uri>model://collection_disk/materials/scripts</uri>
-						<uri>model://collection_disk/materials/textures</uri>
-						<name>collection_disk/Diffuse</name>
-					</script>
-				</material>
-			</visual>
-			<sensor name='collection_disk' type='contact'>
-				<contact>
-					<collision>collision</collision>
-				</contact>
-			</sensor>
+		  <visual name='visual'>
+		    <geometry>
+		      <box>
+			<size>1.016 1.016 0.001</size>
+		      </box>
+		    </geometry>
+	 	    <material>
+		      <script>
+			<uri>model://collection_disk/materials/scripts</uri>
+			<uri>model://collection_disk/materials/textures</uri>
+			<name>collection_disk/Diffuse</name>
+		      </script>
+		    </material>
+		  </visual>
 		</link>
 		<!-- Score Plugin -->
 		<plugin name="score_sim" filename="libgazebo_plugins_score.so">

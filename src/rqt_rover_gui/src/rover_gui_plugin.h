@@ -286,7 +286,12 @@ namespace rqt_rover_gui {
     size_t max_diag_log_length;
 
     std::mutex diag_update_mutex;
+
+    // Delay the between creating rovers. No delay causes Gazebo plugins to fail under Ubuntu 16.04
+    unsigned int rover_load_delay = 5;
   };
 } // end namespace
 
 #endif // ROVERGUIPLUGIN
+
+

@@ -10,7 +10,7 @@
 namespace rqt_rover_gui
 {
 
-IMUFrame::IMUFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
+IMUFrame::IMUFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent)
 {
     connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()), Qt::QueuedConnection);
 

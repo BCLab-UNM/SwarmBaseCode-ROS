@@ -19,9 +19,10 @@ execute_process(COMMAND date "+%Y-%m-%d-%H:%M"
 string(STRIP ${BUILD_TIME} BUILD_TIME)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/Version.cpp)
+
 set(version_file "${CMAKE_CURRENT_BINARY_DIR}/Version.cpp")
 
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS 
   rqt_gui
@@ -33,26 +34,25 @@ find_package(catkin REQUIRED COMPONENTS
   ublox_serialization
 )
 
-find_package(Qt4 REQUIRED COMPONENTS
-  QtCore
-  QtGui
-  QtXml
-)
+find_package( Qt5 REQUIRED COMPONENTS Widgets Xml )
 
-find_package(gazebo REQUIRED)
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
-#list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
+find_package( gazebo REQUIRED )
+include_directories( ${GAZEBO_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} )
+link_directories( ${GAZEBO_LIBRARY_DIRS} )
 
-catkin_package(
-  CATKIN_DEPENDS rqt_gui rqt_gui_cpp cv_bridge image_transport geometry_msgs
+catkin_package( CATKIN_DEPENDS
+  rqt_gui
+  rqt_gui_cpp
+  cv_bridge
+  image_transport
+  geometry_msgs
 )
 
 SET(rover_gui_plugin_RESOURCES resources/resources.qrc)
 
-qt4_add_resources(rqt_rover_gui_resources_rcc ${rover_gui_plugin_RESOURCES})
+qt5_add_resources(rqt_rover_gui_resources_rcc ${rover_gui_plugin_RESOURCES})
 
-qt4_wrap_cpp(
+qt5_wrap_cpp(
   rover_gui_plugin_MOCS
   src/rover_gui_plugin.h
   src/CameraFrame.h
@@ -63,24 +63,23 @@ qt4_wrap_cpp(
   src/JoystickGripperInterface.h
 )
 
-qt4_wrap_ui(
+qt5_wrap_ui(
   rover_gui_plugin_UIS_H
   src/rover_gui_plugin.ui
-)
-
-include(
-  ${QT_USE_FILE}
 )
 
 include_directories(
   include
   src
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${Qt5Xml_INCLUDE_DIRS}
 )
 
 link_directories(
   lib
 )
+
 
 add_library(
   rqt_rover_gui

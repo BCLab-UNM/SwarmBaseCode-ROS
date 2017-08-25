@@ -57,6 +57,11 @@ JoystickGripperInterface::JoystickGripperInterface(ros::NodeHandle nh, string ro
     connect(joystickGripperWristControlTimer, SIGNAL(timeout()), this, SLOT(joystickGripperWristControlTimerEventHandler()));
     connect(joystickGripperFingerControlTimer, SIGNAL(timeout()), this, SLOT(joystickGripperFingerControlTimerEventHandler()));
 
+    connect(this, SIGNAL(sendJoystickGripperWristControlTimerStart(int)), joystickGripperWristControlTimer, SLOT(start(int)));
+    connect(this, SIGNAL(sendJoystickGripperWristControlTimerStop()), joystickGripperWristControlTimer, SLOT(stop()));
+    connect(this, SIGNAL(sendJoystickGripperFingerControlTimerStart(int)), joystickGripperFingerControlTimer, SLOT(start(int)));
+    connect(this, SIGNAL(sendJoystickGripperFingerControlTimerStop()), joystickGripperFingerControlTimer, SLOT(stop()));
+
     // Initialize gripper angles in radians
     wristAngle = 0;
     fingerAngle = 0;
@@ -104,10 +109,10 @@ void JoystickGripperInterface::moveWrist(float vec) {
     // Check whether the stick is near the center deadzone - if so stop issuing movement commands
     // if not apply the movement indicated by vec
     if (fabs(wristJoystickVector) < stickCenterTolerance) {
-        joystickGripperWristControlTimer->stop();
+        emit sendJoystickGripperWristControlTimerStop();
     } else {
         // The event handler calculates the new angle for the wrist and sends it to the gripper wrist control topic
-        joystickGripperWristControlTimer->start(commandReapplyRate);
+        emit sendJoystickGripperWristControlTimerStart(commandReapplyRate);
     }
 
 
@@ -125,10 +130,10 @@ void JoystickGripperInterface::moveFingers(float vec){
     // Check whether the stick is near the center deadzone - if so stop issuing movement commands
     // if not apply the movement indicated by vec
     if (fabs(fingerJoystickVector) < stickCenterTolerance) {
-        joystickGripperFingerControlTimer->stop();
+        emit sendJoystickGripperFingerControlTimerStop();
     } else {
         // The event handler calculates the new angle for the wrist and sends it to the gripper wrist control topic
-        joystickGripperFingerControlTimer->start(commandReapplyRate);
+        emit sendJoystickGripperFingerControlTimerStart(commandReapplyRate);
     }
 
 

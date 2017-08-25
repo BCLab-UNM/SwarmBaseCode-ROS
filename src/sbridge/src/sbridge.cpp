@@ -23,16 +23,21 @@ sbridge::sbridge(std::string publishedName) {
 void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     double left = (message->linear.x);
     double right = (message->angular.z);
+    
+    float max_turn_rate = 3.14; //radians per second
+    float max_linear_velocity = 0.6; // meters per second
 
     float turn = 0;
     float forward = 0;
 
-    if (currentMode == 1) {
-        forward = left*0.6;
-        turn = right*1.4;
-        if (forward >= 0.4){
+    if (currentMode == 1) 
+    {
+        forward = left*max_linear_velocity;
+        turn = right*max_turn_rate;
+        if (forward >= 0.1)
+        {
 
-            forward -= (abs(turn)/5);
+            forward -= right*max_linear_velocity/2;
         }
 
     }
@@ -59,12 +64,12 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
         }
     }
 
-    if (fabs(forward) >= 0.8) {
-        forward = forward/fabs(forward) * 0.8;
+    if (fabs(forward) >= max_linear_velocity) {
+        forward = forward/fabs(forward) * max_linear_velocity;
     }
 
-    if (fabs(turn) >= 1.0) { //max value needs tuning
-        turn = turn/fabs(turn) * 1.0;
+    if (fabs(turn) >= max_turn_rate) { //max value needs tuning
+        turn = turn/fabs(turn) * max_turn_rate;
     }
 
 

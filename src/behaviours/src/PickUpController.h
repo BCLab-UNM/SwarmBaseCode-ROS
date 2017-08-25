@@ -20,7 +20,6 @@ public:
 
   float getDistance() {return blockDistance;}
   bool GetLockTarget() {return lockTarget;}
-  float GetTD() {return timeDifference;}
   void SetUltraSoundData(bool blockBlock);
 
   bool GetIgnoreCenter() {return ignoreCenterSonar;}
@@ -33,8 +32,9 @@ protected:
   void ProcessData();
 
 private:
-  //set true when the target block is less than targetDist so we continue attempting to pick it up rather than
-  //switching to another block that is in view
+  //Set true when the target block is less than targetDist so we continue attempting to pick it up rather than
+  //switching to another block that is in view. In other words, the robot focuses on one particular target so
+  //it doesn't get confused by having a whole bunch of targets in its view.
   bool lockTarget;
 
   bool targetFound;
@@ -57,14 +57,24 @@ private:
   //struct for returning data to the ROS adapter
   Result result;
 
+  //is the block obstructing the ultrasound
   bool blockBlock;
 
+  //set true when we have locked on to a target to pre-empt obstacle detection being triggered when we pick the target up
   bool ignoreCenterSonar = false;
 
-  float timeDifference;
-
+  //current ROS time from the RosAdapter
   long int current_time;
 
+  //has a controller interupt occurred; this is a guard to prevent this controller from generating multiple interrupts
+  //before doing its work
   bool interupted = false;
+
+  //interupt in order to release control; i.e., this controller has finished interupting
+  bool release_control = false;
+
+  //this controller has control~
+  bool has_control = false;
 };
+
 #endif // end header define

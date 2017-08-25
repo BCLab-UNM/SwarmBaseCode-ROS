@@ -14,7 +14,7 @@
 namespace rqt_rover_gui
 {
 
-MapFrame::MapFrame(QWidget *parent, Qt::WFlags flags) : QFrame(parent)
+MapFrame::MapFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent)
 {
     connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()), Qt::QueuedConnection);
 
