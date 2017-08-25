@@ -169,7 +169,8 @@ Result LogicController::DoWork() {
   }//end of precision case****************************************************************************************
   }//end switch statment******************************************************************************************
 
-    cout << "logic state " << logicState << " top controller " << control_queue.top().priority << " Proccess " << processState <<endl;
+   // bad! causes node to crash
+   // cout << "logic state " << logicState << " top controller " << control_queue.top().priority << " Proccess " << processState <<endl;
 
 
   //now using proccess logic allow the controller to communicate data between eachother
