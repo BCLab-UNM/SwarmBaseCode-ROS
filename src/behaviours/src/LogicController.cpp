@@ -201,11 +201,11 @@ void LogicController::ProcessData() {
   //this priority is used when returning a target to the center collection zone
   else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
     prioritizedControllers = {
-      PrioritizedController{-1, (Controller*)(&searchController)},
-      PrioritizedController{15, (Controller*)(&obstacleController)},
-      PrioritizedController{-1, (Controller*)(&pickUpController)},
-      PrioritizedController{10, (Controller*)(&range_controller)},
-      PrioritizedController{1, (Controller*)(&dropOffController)}
+    PrioritizedController{-1, (Controller*)(&searchController)},
+    PrioritizedController{15, (Controller*)(&obstacleController)},
+    PrioritizedController{-1, (Controller*)(&pickUpController)},
+    PrioritizedController{10, (Controller*)(&range_controller)},
+    PrioritizedController{1, (Controller*)(&dropOffController)}
     };
   }
   //this priority is used when returning a target to the center collection zone
@@ -215,6 +215,7 @@ void LogicController::ProcessData() {
       PrioritizedController{-1, (Controller*)(&searchController)},
       PrioritizedController{-1, (Controller*)(&obstacleController)},
       PrioritizedController{-1, (Controller*)(&pickUpController)},
+      PrioritizedController{10, (Controller*)(&range_controller)},
       PrioritizedController{1, (Controller*)(&dropOffController)}
     };
   }
