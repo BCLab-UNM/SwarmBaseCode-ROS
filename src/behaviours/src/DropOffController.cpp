@@ -161,15 +161,23 @@ Result DropOffController::DoWork() {
     }
 
     float turnDirection = 1;
+    float current_search_velocity = searchVelocity;
+    
     //reverse tag rejection when we have seen enough tags that we are on a
     //trajectory in to the square we dont want to follow an edge.
-    if (seenEnoughCenterTags) turnDirection = -3;
+    //increase turning power to more strongly turn inwards or on occasion outwards
+    //drive more slowly so turning radius is smaller
+    if (seenEnoughCenterTags) 
+    {
+      turnDirection = -4;
+      current_search_velocity = 0.05;
+    }
 
     result.type = precisionDriving;
 
     //otherwise turn till tags on both sides of image then drive straight
-    if (left && right) {
-      result.pd.cmdVel = searchVelocity;
+    if (!(left ^ right)) {
+      result.pd.cmdVel = current_search_velocity;
       result.pd.cmdAngularError = 0.0;
     }
     else if (right) {
@@ -179,11 +187,6 @@ Result DropOffController::DoWork() {
     else if (left){
       result.pd.cmdVel = -0.1 * turnDirection;
       result.pd.cmdAngularError = centeringTurnRate*turnDirection;
-    }
-    else
-    {
-      result.pd.cmdVel = searchVelocity;
-      result.pd.cmdAngularError = 0.0;
     }
 
     //must see greater than this many tags before assuming we are driving into the center and not along an edge.
