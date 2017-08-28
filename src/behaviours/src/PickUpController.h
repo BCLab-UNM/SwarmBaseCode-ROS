@@ -75,6 +75,8 @@ private:
 
   //this controller has control~
   bool has_control = false;
+  
+  float reverse_to_before_reaquire_begin = 4.4;
 };
 
 #endif // end header define

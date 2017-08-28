@@ -45,7 +45,7 @@ private:
   const float initialSpinSize = 0.05; //in meters aka 10cm
   const float spinSizeIncrement = 0.50; //in meters
   const float searchVelocity = 0.15; //in meters per second
-  const float dropDelay = 0.5; //delay in seconds for dropOff
+  const float dropDelay = 0.4; //delay in seconds for dropOff
 
 
 
