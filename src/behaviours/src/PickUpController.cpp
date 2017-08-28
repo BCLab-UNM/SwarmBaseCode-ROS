@@ -108,8 +108,8 @@ void PickUpController::ProcessData() {
   float Td = Tdiff/1e3;
 
   cout << "distance : " << blockDistanceFromCamera << " time is : " << Td << endl;
-
-  if (blockDistanceFromCamera < 0.14 && Td < 3.9) {
+  
+  if (blockDistanceFromCamera < 0.14 && Td < reverse_to_before_reaquire_begin) {
 
     result.type = behavior;
     result.b = nextProcess;
@@ -200,9 +200,10 @@ Result PickUpController::DoWork() {
 
     float grasp_time_begin = 1.7;
     float raise_time_begin = 2.5;
-    float lower_gripper_time_begin = 4.0;
-    float target_reaquire_begin= 4.2;
-    float target_pickup_task_time_limit = 4.8;
+    //float reverse_to_before_reaquire_begin = 4.4; //is declared in header for class usage but refrence is left hear for clarity
+    float target_reaquire_begin= 5.0;
+    float target_pickup_task_time_limit = 5.6;
+    float done_center_begin_reversing = 1.0;
     
     if (nTargetsSeen == 0 && !lockTarget)
     {
@@ -223,10 +224,10 @@ Result PickUpController::DoWork() {
         result.pd.cmdAngularError = -blockYawError;
       }
       //If in a counting state and has been counting for 1 second.
-      else if (Td > 1.0 && Td < target_pickup_task_time_limit)
+      else if (Td > done_center_begin_reversing && Td < target_pickup_task_time_limit)
       {
         // The rover will reverse straight backwards without turning.
-        result.pd.cmdVel = -0.15;
+        result.pd.cmdVel = -0.10;
         result.pd.cmdAngularError= 0.0;
       }
     }
@@ -253,7 +254,7 @@ Result PickUpController::DoWork() {
     }
     else if (Td > raise_time_begin) //raise the wrist
     {
-      result.pd.cmdVel = 0.0;
+      result.pd.cmdVel = -0.15;
       result.pd.cmdAngularError= 0.0;
       result.wristAngle = 0;
     }
@@ -271,9 +272,9 @@ Result PickUpController::DoWork() {
       lockTarget = false;
       ignoreCenterSonar = true;
     }
-    else if (Td > lower_gripper_time_begin && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
+    else if (Td > reverse_to_before_reaquire_begin && timeOut) //if enough time has passed enter a recovery state to re-attempt a pickup
     {
-      result.pd.cmdVel = -0.15;
+      result.pd.cmdVel = -0.2;
       result.pd.cmdAngularError= 0.0;
       //set gripper to open and down
       result.fingerAngle = M_PI_2;
