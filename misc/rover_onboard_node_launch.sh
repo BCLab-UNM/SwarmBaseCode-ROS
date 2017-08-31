@@ -12,6 +12,8 @@ pkill diagnostics
 pkill static_transform_publisher
 
 source "../devel/setup.bash"
+export GAZEBO_MODEL_PATH="../simulation/models"
+export GAZEBO_PLUGIN_PATH="../build/gazebo_plugins"
 
 #Point to ROS master on the network
 echo "point to ROS master on the network"
