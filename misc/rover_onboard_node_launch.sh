@@ -1,5 +1,6 @@
 #!/bin/bash
 echo "running pkill on old rosnodes"
+# Todo: replace usb_cam_node with video_stream_opencv here
 pkill usb_cam_node
 pkill behaviours
 pkill obstacle
