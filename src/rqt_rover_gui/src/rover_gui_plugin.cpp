@@ -1699,6 +1699,13 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
         QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
 
+	QColor rover_colors[6] = { /* green         */ QColor(  0, 255,   0),
+                                   /* yellow        */ QColor(255, 255,   0),
+                                   /* white         */ QColor(255, 255, 255),
+                                   /* red           */ QColor(255,   0,   0),
+                                   /* deep sky blue */ QColor(  0, 191, 255),
+                                   /* hot pink      */ QColor(255, 105, 180) };
+
         /**
          * The distance to the rover from a corner position is calculated differently
          * than the distance to a cardinal position.
@@ -1770,6 +1777,10 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         // Add rovers to the simulation and start the associated ROS nodes
         for (int i = 0; i < n_rovers; i++)
         {
+            // add the global offset for sim rovers
+            ui.map_frame->setGlobalOffsetForRover(rovers[i].toStdString(), rover_positions[i].x(), rover_positions[i].y());
+            ui.map_frame->setUniqueRoverColor(rovers[i].toStdString(), rover_colors[i]);
+
             emit sendInfoLogMessage("Adding rover "+rovers[i]+"...");
             return_msg = sim_mgr.addRover(rovers[i], rover_positions[i].x(), rover_positions[i].y(), 0, 0, 0, rover_yaw[i]);
             emit sendInfoLogMessage(return_msg);
