@@ -339,7 +339,7 @@ border: 1px solid white;
       <rect>
        <x>10</x>
        <y>60</y>
-       <width>301</width>
+       <width>461</width>
        <height>306</height>
       </rect>
      </property>
@@ -352,9 +352,9 @@ border: 1px solid white;
      <widget class="QGroupBox" name="target_distribution_group_box">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>5</x>
         <y>10</y>
-        <width>141</width>
+        <width>161</width>
         <height>161</height>
        </rect>
       </property>
@@ -371,8 +371,8 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>30</y>
+         <x>20</x>
+         <y>20</y>
          <width>91</width>
          <height>22</height>
         </rect>
@@ -393,8 +393,8 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>90</y>
+         <x>20</x>
+         <y>60</y>
          <width>101</width>
          <height>22</height>
         </rect>
@@ -412,8 +412,8 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>60</y>
+         <x>20</x>
+         <y>40</y>
          <width>91</width>
          <height>22</height>
         </rect>
@@ -434,9 +434,9 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>120</y>
-         <width>117</width>
+         <x>20</x>
+         <y>80</y>
+         <width>121</width>
          <height>22</height>
         </rect>
        </property>
@@ -447,7 +447,7 @@ border-color: rgb(255, 255, 255);</string>
         <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
-        <string>Custom</string>
+        <string>Custom World</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -460,8 +460,8 @@ border-color: rgb(255, 255, 255);</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>130</y>
+        <x>160</x>
+        <y>90</y>
         <width>70</width>
         <height>25</height>
        </rect>
@@ -482,8 +482,8 @@ border: 1px solid white;
      <widget class="QGroupBox" name="round_type_button_group">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>30</y>
+        <x>250</x>
+        <y>80</y>
         <width>121</width>
         <height>91</height>
        </rect>
@@ -495,15 +495,15 @@ border-color: rgb(255, 255, 255);</string>
       <property name="title">
        <string>Round Type</string>
       </property>
-      <widget class="QRadioButton" name="joystick_radio_button">
+      <widget class="QRadioButton" name="prelim_radio_button">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
-         <width>161</width>
+         <y>20</y>
+         <width>111</width>
          <height>22</height>
         </rect>
        </property>
@@ -524,8 +524,8 @@ border-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
-         <width>117</width>
+         <y>40</y>
+         <width>71</width>
          <height>22</height>
         </rect>
        </property>
@@ -536,12 +536,31 @@ border-color: rgb(255, 255, 255);</string>
         <string>Final </string>
        </property>
       </widget>
+      <widget class="QRadioButton" name="unbounded_radio_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>111</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Unbounded</string>
+       </property>
+      </widget>
      </widget>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="ground_texture_label">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>190</y>
+        <x>10</x>
+        <y>150</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -559,9 +578,9 @@ border-color: rgb(255, 255, 255);</string>
      <widget class="QComboBox" name="texture_combobox">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>190</y>
-        <width>131</width>
+        <x>130</x>
+        <y>150</y>
+        <width>121</width>
         <height>27</height>
        </rect>
       </property>
@@ -591,9 +610,9 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <widget class="QLabel" name="custom_world_path">
       <property name="geometry">
        <rect>
-        <x>68</x>
-        <y>162</y>
-        <width>200</width>
+        <x>50</x>
+        <y>120</y>
+        <width>181</width>
         <height>20</height>
        </rect>
       </property>
@@ -610,8 +629,8 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>230</y>
+        <x>10</x>
+        <y>185</y>
         <width>181</width>
         <height>22</height>
        </rect>
@@ -632,9 +651,9 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>230</y>
-        <width>71</width>
+        <x>190</x>
+        <y>185</y>
+        <width>61</width>
         <height>27</height>
        </rect>
       </property>
@@ -681,15 +700,15 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="simulation_timer_combo_box">
+     <widget class="QComboBox" name="simulation_timer_combobox">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>270</y>
-        <width>131</width>
+        <x>140</x>
+        <y>220</y>
+        <width>111</width>
         <height>23</height>
        </rect>
       </property>
@@ -742,8 +761,8 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <widget class="QLabel" name="simulation_timer_label">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>270</y>
+        <x>10</x>
+        <y>220</y>
         <width>130</width>
         <height>20</height>
        </rect>
@@ -758,6 +777,243 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
       </property>
      </widget>
+     <widget class="QCheckBox" name="create_savable_world_checkbox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>270</y>
+        <width>231</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When checked, a Gazebo world without rovers, walls, ground texture, or a collection zone will be created. The purpose of this option is to generate tag distributions using the Uniform, Clustered, or Power Law in a way that you can save the world file from Gazebo and re-use that same distribution later using the Custom world option. It will also load much faster as well when loading a pre-built distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, a Gazebo world without rovers, walls, ground texture, or a collection zone will be created. The purpose of this option is to generate tag distributions using the Uniform, Clustered, or Power Law in a way that you can save the world file from Gazebo and re-use that same distribution later using the Custom world option. It will also load much faster as well when loading a pre-built distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Create Savable Gazebo World</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="number_of_tags_combobox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>30</y>
+        <width>131</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string notr="true">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The number of april tag cubes generated by the Uniform or Clustered distributions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of april tag cubes generated by the Uniform or Clustered distributions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: grey;
+border-color: grey;
+border: 1px solid grey; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>256</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>128</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>64</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>32</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>16</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="number_of_tags_label">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>10</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: grey;</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Number of Cubes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="number_of_tags_label_2">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>50</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;*not available for Power Law&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="unbounded_arena_size_combobox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>170</y>
+        <width>71</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: grey;
+border-color: grey;
+border: 1px solid grey; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>15</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>20</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>25</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>30</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>40</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>45</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>50</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="unbounded_arena_size_label">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>170</y>
+        <width>91</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: grey;</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Arena Size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+      </property>
+     </widget>
+     <zorder>unbounded_arena_size_label</zorder>
+     <zorder>round_type_button_group</zorder>
+     <zorder>number_of_tags_label_2</zorder>
+     <zorder>target_distribution_group_box</zorder>
+     <zorder>custom_world_path_button</zorder>
+     <zorder>ground_texture_label</zorder>
+     <zorder>texture_combobox</zorder>
+     <zorder>custom_world_path</zorder>
+     <zorder>override_num_rovers_checkbox</zorder>
+     <zorder>custom_num_rovers_combobox</zorder>
+     <zorder>simulation_timer_combobox</zorder>
+     <zorder>simulation_timer_label</zorder>
+     <zorder>create_savable_world_checkbox</zorder>
+     <zorder>number_of_tags_combobox</zorder>
+     <zorder>number_of_tags_label</zorder>
+     <zorder>unbounded_arena_size_combobox</zorder>
     </widget>
     <widget class="QLabel" name="label_7">
      <property name="geometry">
@@ -810,8 +1066,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_2">
      <property name="geometry">
       <rect>
-       <x>510</x>
-       <y>330</y>
+       <x>560</x>
+       <y>350</y>
        <width>191</width>
        <height>161</height>
       </rect>
@@ -1072,8 +1328,8 @@ border: 1px solid white;
     <widget class="QLabel" name="label_11">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>310</y>
+       <x>410</x>
+       <y>325</y>
        <width>31</width>
        <height>17</height>
       </rect>
@@ -1088,8 +1344,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_4">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>320</y>
+       <x>400</x>
+       <y>335</y>
        <width>151</width>
        <height>181</height>
       </rect>
@@ -1360,8 +1616,8 @@ border: 1px solid white;
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>130</y>
+       <x>490</x>
+       <y>150</y>
        <width>31</width>
        <height>17</height>
       </rect>
@@ -1376,8 +1632,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_5">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>140</y>
+       <x>480</x>
+       <y>160</y>
        <width>271</width>
        <height>171</height>
       </rect>
@@ -1760,8 +2016,8 @@ border: 1px solid white;
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
-       <x>520</x>
-       <y>0</y>
+       <x>540</x>
+       <y>10</y>
        <width>51</width>
        <height>17</height>
       </rect>
@@ -1776,8 +2032,8 @@ border: 1px solid white;
     <widget class="QFrame" name="frame_6">
      <property name="geometry">
       <rect>
-       <x>510</x>
-       <y>10</y>
+       <x>530</x>
+       <y>20</y>
        <width>151</width>
        <height>131</height>
       </rect>
@@ -2018,8 +2274,8 @@ border: 1px solid white;
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>520</x>
-       <y>320</y>
+       <x>570</x>
+       <y>340</y>
        <width>81</width>
        <height>17</height>
       </rect>
@@ -2896,7 +3152,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rover_control_button_group"/>
   <buttongroup name="map_display_button_group"/>
+  <buttongroup name="rover_control_button_group"/>
  </buttongroups>
 </ui>

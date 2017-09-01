@@ -174,6 +174,7 @@ namespace rqt_rover_gui {
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
     void overrideNumRoversCheckboxToggledEventHandler(bool checked);
+    void createSavableWorldCheckboxToggledEventHandler(bool checked);
 
     void mapSelectionListItemChangedHandler(QListWidgetItem* changed_item);
     void mapAutoRadioButtonEventHandler(bool marked);
@@ -186,6 +187,8 @@ namespace rqt_rover_gui {
     void allStopButtonEventHandler();
     void customWorldButtonEventHandler();
     void customWorldRadioButtonEventHandler(bool marked);
+    void powerlawDistributionRadioButtonEventHandler(bool marked);
+    void unboundedRadioButtonEventHandler(bool marked);
 
     void buildSimulationButtonEventHandler();
     void clearSimulationButtonEventHandler();
@@ -260,7 +263,7 @@ namespace rqt_rover_gui {
 
     bool display_sim_visualization;
 
-    // Object clearance. These values are used to quickly determine where objects can be placed int time simulation
+    // Object clearance. These values are used to quickly determine where objects can be placed in the simulation
     float target_cluster_size_64_clearance;
     float target_cluster_size_16_clearance;
     float target_cluster_size_4_clearance;
