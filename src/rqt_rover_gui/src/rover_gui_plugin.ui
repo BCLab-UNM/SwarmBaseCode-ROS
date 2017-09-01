@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -329,6 +329,96 @@ border: 1px solid white;
       <string>Popout</string>
      </property>
     </widget>
+    <widget class="QLabel" name="global_offset_label">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>178</y>
+       <width>50</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Global Frame</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="global_offset_checkbox">
+     <property name="geometry">
+      <rect>
+       <x>670</x>
+       <y>181</y>
+       <width>20</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="unique_rover_colors_checkbox">
+     <property name="geometry">
+      <rect>
+       <x>670</x>
+       <y>233</y>
+       <width>20</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="unique_rover_colors_label">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>220</y>
+       <width>50</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Unique Rover Colors</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <zorder>global_offset_checkbox</zorder>
+    <zorder>imu_frame</zorder>
+    <zorder>map_frame</zorder>
+    <zorder>us_frame</zorder>
+    <zorder>camera_frame</zorder>
+    <zorder>gps_checkbox</zorder>
+    <zorder>ekf_checkbox</zorder>
+    <zorder>encoder_checkbox</zorder>
+    <zorder>map_manual_radio_button</zorder>
+    <zorder>map_auto_radio_button</zorder>
+    <zorder>map_popout_button</zorder>
+    <zorder>global_offset_label</zorder>
+    <zorder>unique_rover_colors_checkbox</zorder>
+    <zorder>unique_rover_colors_label</zorder>
    </widget>
    <widget class="QWidget" name="simulation_parameters_tab">
     <attribute name="title">

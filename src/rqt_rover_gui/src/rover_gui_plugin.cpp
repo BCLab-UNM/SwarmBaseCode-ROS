@@ -124,6 +124,8 @@ namespace rqt_rover_gui
     connect(ui.ekf_checkbox, SIGNAL(toggled(bool)), this, SLOT(EKFCheckboxToggledEventHandler(bool)));
     connect(ui.gps_checkbox, SIGNAL(toggled(bool)), this, SLOT(GPSCheckboxToggledEventHandler(bool)));
     connect(ui.encoder_checkbox, SIGNAL(toggled(bool)), this, SLOT(encoderCheckboxToggledEventHandler(bool)));
+    connect(ui.global_offset_checkbox, SIGNAL(toggled(bool)), this, SLOT(globalOffsetCheckboxToggledEventHandler(bool)));
+    connect(ui.unique_rover_colors_checkbox, SIGNAL(toggled(bool)), this, SLOT(uniqueRoverColorsCheckboxToggledEventHandler(bool)));
     connect(ui.autonomous_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(autonomousRadioButtonEventHandler(bool)));
     connect(ui.joystick_control_radio_button, SIGNAL(toggled(bool)), this, SLOT(joystickRadioButtonEventHandler(bool)));
     connect(ui.all_autonomous_button, SIGNAL(pressed()), this, SLOT(allAutonomousButtonEventHandler()));
@@ -1134,6 +1136,16 @@ void RoverGUIPlugin::EKFCheckboxToggledEventHandler(bool checked)
 void RoverGUIPlugin::encoderCheckboxToggledEventHandler(bool checked)
 {
     ui.map_frame->setDisplayEncoderData(checked);
+}
+
+void RoverGUIPlugin::globalOffsetCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_frame->setGlobalOffset(checked);
+}
+
+void RoverGUIPlugin::uniqueRoverColorsCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_frame->setDisplayUniqueRoverColors(checked);
 }
 
 void RoverGUIPlugin::displayDiagLogMessage(QString msg)

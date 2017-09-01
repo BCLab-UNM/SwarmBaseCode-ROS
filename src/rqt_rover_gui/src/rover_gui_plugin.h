@@ -173,6 +173,8 @@ namespace rqt_rover_gui {
     void GPSCheckboxToggledEventHandler(bool checked);
     void EKFCheckboxToggledEventHandler(bool checked);
     void encoderCheckboxToggledEventHandler(bool checked);
+    void globalOffsetCheckboxToggledEventHandler(bool checked);
+    void uniqueRoverColorsCheckboxToggledEventHandler(bool checked);
     void overrideNumRoversCheckboxToggledEventHandler(bool checked);
     void createSavableWorldCheckboxToggledEventHandler(bool checked);
 
