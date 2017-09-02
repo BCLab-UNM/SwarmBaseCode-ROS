@@ -118,7 +118,7 @@ namespace rqt_rover_gui
                                                  /* red           */ QColor(255,   0,   0),
                                                  /* deep sky blue */ QColor(  0, 191, 255),
                                                  /* hot pink      */ QColor(255, 105, 180),
-                                                 /* turquoise     */ QColor( 64, 224, 208),
+                                                 /* chocolate     */ QColor(210, 105,  30),
                                                  /* indigo        */ QColor( 75,   0, 130) };
 
       // For external pop out window
