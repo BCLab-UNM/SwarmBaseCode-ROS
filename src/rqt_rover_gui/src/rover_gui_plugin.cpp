@@ -1687,6 +1687,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         if (ui.final_radio_button->isChecked()) n_rovers = 6;
 
         // If the user chose to override the number of rovers to add to the simulation read the selected value
+        // Please notice that this will override "n_rovers = 6" above if the final radio button is selected
         if (ui.override_num_rovers_checkbox->isChecked()) n_rovers = ui.custom_num_rovers_combobox->currentText().toInt();
 
         QProgressDialog progress_dialog;
@@ -1697,14 +1698,16 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         progress_dialog.resize(500, 50);
         progress_dialog.show();
 
-        QString rovers[6] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris"};
+        QString rovers[8] = {"achilles", "aeneas", "ajax", "diomedes", "hector", "paris", "thor", "zeus"};
 
-	QColor rover_colors[6] = { /* green         */ QColor(  0, 255,   0),
+        QColor rover_colors[8] = { /* green         */ QColor(  0, 255,   0),
                                    /* yellow        */ QColor(255, 255,   0),
                                    /* white         */ QColor(255, 255, 255),
                                    /* red           */ QColor(255,   0,   0),
                                    /* deep sky blue */ QColor(  0, 191, 255),
-                                   /* hot pink      */ QColor(255, 105, 180) };
+                                   /* hot pink      */ QColor(255, 105, 180),
+                                   /* chocolate     */ QColor(210, 105,  30),
+                                   /* indigo        */ QColor( 75,   0, 130) };
 
         /**
          * The distance to the rover from a corner position is calculated differently
@@ -1749,7 +1752,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
          *     *           *
          *     *************
          */
-        QPointF rover_positions[6] =
+        QPointF rover_positions[8] =
         {
           /* cardinal rovers: North, East, South, West */
           QPointF(-1.308,  0.000), // 1.308 = distance_from_center_to_edge_of_collection_zone
@@ -1759,19 +1762,26 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
           /* corner rovers: Northeast, Southwest */
           QPointF( 1.072,  1.072), // 1.072 = diagonal_distance_from_center_to_edge_of_collection_zone
-          QPointF(-1.072, -1.072)  //             + diagonal_distance_to_move_50cm
-        };                         //             + diagonal_distance_to_move_30cm
+          QPointF(-1.072, -1.072), //             + diagonal_distance_to_move_50cm
+                                   //             + diagonal_distance_to_move_30cm
                                    // 1.072m = 0.508 + 0.354 + 0.212
 
+          /* corner rovers: Northwest, Southeast */
+          QPointF(-1.072,  1.072),
+          QPointF( 1.072, -1.072)
+        };
+
         /* In this case, the yaw is the value that turns rover "left" and "right" */
-        float rover_yaw[6] =
+        float rover_yaw[8] =
         {
            0.000, //  0.00 * PI
            1.571, //  0.50 * PI
           -3.142, // -1.00 * PI
           -1.571, // -0.50 * PI
           -2.356, // -0.75 * PI
-           0.785  //  0.25 * PI
+           0.785, //  0.25 * PI
+          -0.785, // -0.25 * PI
+           2.356  //  0.75 * PI
         };
 
         // Add rovers to the simulation and start the associated ROS nodes

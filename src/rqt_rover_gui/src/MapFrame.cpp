@@ -419,7 +419,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
 
     painter.setPen(Qt::white);
 
-    hardware_rover_color_index = (hardware_rover_color_index + 1) % 6;
+    hardware_rover_color_index = (hardware_rover_color_index + 1) % 8;
 
   } // End rover display list set iteration
 

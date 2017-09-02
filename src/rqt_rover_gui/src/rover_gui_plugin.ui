@@ -106,7 +106,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="sensor_display_tab">
     <property name="styleSheet">
@@ -787,6 +787,16 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <item>
        <property name="text">
         <string>6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8</string>
        </property>
       </item>
      </widget>
@@ -3242,7 +3252,7 @@ QTabBar::tab:only-one {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="map_display_button_group"/>
   <buttongroup name="rover_control_button_group"/>
+  <buttongroup name="map_display_button_group"/>
  </buttongroups>
 </ui>
