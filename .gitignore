@@ -5,3 +5,4 @@ devel
 **/CMakeLists.txt.user*
 *.swp
 logs
+.catkin_tools
