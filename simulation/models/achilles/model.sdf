@@ -25,23 +25,6 @@
 				</geometry>
 			</collision>
 
-            <collision name ='base_link_left_tire_block_blocker'>
-				<pose>0.16 0.13 -0.05 0 0.0 0.0</pose>
-				<geometry>
-					<box>
-					  <size>0.005 0.08 0.06</size>
-					</box>
-				</geometry>
-            </collision>
-            <collision name ='base_link_right_tire_block_blocker'>
-				<pose>0.16 -0.13 -0.05 0 0.0 0.0</pose>
-				<geometry>
-					<box>
-					  <size>0.005 0.08 0.06</size>
-					</box>
-				</geometry>
-            </collision>
-
 			<visual name='base_link_visual'>
 				<pose>0 0 -0.06 0 0 0</pose>
 				<geometry>
