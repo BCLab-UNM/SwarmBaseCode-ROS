@@ -55,12 +55,6 @@ Our simulated and physical Swarmies use existing ROS plugins, external to this r
 sudo apt install ros-kinetic-robot-localization
 ```
 
-Finally, our physical Swarmies use a video stream package [video_stream](http://wiki.ros.org/video_stream_opencv), to interface with the built-in Logitech C170 webcam:
-
-```
-sudo apt install ros-kinetic-video-stream-opencv
-```
-
 ##### 3. Install additional Gazebo plugins
 
 Our simulated Swarmies use existing Gazebo plugins, external to this repo, to replicate sonar, IMU, and GPS sensors. These plugins are contained in the [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) package, which should be installed using the apt-get package management tool:
