@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
-	<model name="hector">
+	<model name="thor">
 
 		<static>false</static>
 
@@ -77,7 +77,7 @@
 				</ray>
 				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
 					<gaussianNoise>0.005</gaussianNoise>
-					<topicName>/hector/sonarLeft</topicName>
+					<topicName>/thor/sonarLeft</topicName>
 					<frameId>us_center_link</frameId>
 				</plugin>
 			</sensor>
@@ -102,7 +102,7 @@
 				</ray>
 				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
 					<gaussianNoise>0.005</gaussianNoise>
-					<topicName>/hector/sonarRight</topicName>
+					<topicName>/thor/sonarRight</topicName>
 					<frameId>us_center_link</frameId>
 				</plugin>
 			</sensor>
@@ -127,7 +127,7 @@
 				</ray>
 				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
 					<gaussianNoise>0.005</gaussianNoise>
-					<topicName>/hector/sonarCenter</topicName>
+					<topicName>/thor/sonarCenter</topicName>
 					<frameId>us_center_link</frameId>
 				</plugin>
 			</sensor>
@@ -155,9 +155,9 @@
 				<plugin name="camera_controller" filename="libgazebo_ros_camera.so">
 					<alwaysOn>true</alwaysOn>
 					<updateRate>0.0</updateRate>
-					<cameraName>/hector/camera</cameraName>
-					<imageTopicName>/hector/camera/image</imageTopicName>
-					<cameraInfoTopicName>/hector/camera/info</cameraInfoTopicName>
+					<cameraName>/thor/camera</cameraName>
+					<imageTopicName>/thor/camera/image</imageTopicName>
+					<cameraInfoTopicName>/thor/camera/info</cameraInfoTopicName>
 					<frameName>camera_link</frameName>
 					<hackBaseline>0.1</hackBaseline>
 					<distortionK1>0.0</distortionK1>
@@ -189,7 +189,7 @@
 				</geometry>
 				<material>
 					<script>
-						<name>Gazebo/Blue</name>
+						<name>Gazebo/Turquoise</name>
 					</script>
 				</material>
 			</visual>
@@ -220,7 +220,7 @@
 				</geometry>
 				<material>
 					<script>
-						<name>Gazebo/Blue</name>
+						<name>Gazebo/Turquoise</name>
 					</script>
 				</material>
 			</visual>
@@ -243,7 +243,7 @@
 				</geometry>
 				<material>
 					<script>
-						<name>Gazebo/Blue</name>
+						<name>Gazebo/Turquoise</name>
 					</script>
 				</material>
 			</visual>
@@ -681,8 +681,8 @@
 			<rightFingerJoint>gripper_right_finger_joint</rightFingerJoint>
 
 			<!-- required: data input topics for this plugin -->
-			<wristTopic>/hector/wristAngle/cmd</wristTopic>
-			<fingerTopic>/hector/fingerAngle/cmd</fingerTopic>
+			<wristTopic>/thor/wristAngle/cmd</wristTopic>
+			<fingerTopic>/thor/fingerAngle/cmd</fingerTopic>
 
 			<!-- optional: print debug info to the console -->
 			<debug>
@@ -726,11 +726,11 @@
 			<rightRearJoint>right_rear</rightRearJoint>
 			<wheelSeparation>0.27</wheelSeparation>
 			<wheelDiameter>0.12</wheelDiameter>
-			<robotBaseFrame>hector/base_link</robotBaseFrame>
+			<robotBaseFrame>thor/base_link</robotBaseFrame>
 			<torque>2.8</torque>
-			<commandTopic>/hector/skidsteer</commandTopic>
-			<odometryTopic>/hector/odom</odometryTopic>
-			<odometryFrame>hector/odom</odometryFrame>
+			<commandTopic>/thor/skidsteer</commandTopic>
+			<odometryTopic>/thor/odom</odometryTopic>
+			<odometryFrame>thor/odom</odometryFrame>
 			<broadcastTF>0</broadcastTF>base_link
 		</plugin>
 
@@ -739,8 +739,8 @@
 			<alwaysOn>1</alwaysOn>
 			<updateRate>5</updateRate>
 			<bodyName>base_link</bodyName>
-			<frameId>hector/base_link</frameId>
-			<topicName>/hector/fix</topicName>
+			<frameId>thor/base_link</frameId>
+			<topicName>/thor/fix</topicName>
 			<referenceLatitude>28.584810</referenceLatitude>
 			<referenceLongitude>-80.649650</referenceLongitude>
 			<referenceHeading>0.0</referenceHeading>
@@ -755,8 +755,8 @@
 		<plugin name="imu_sim" filename="libhector_gazebo_ros_imu.so">
 			<updateRate>10</updateRate>
 			<bodyName>base_link</bodyName>
-			<frameId>hector/base_link</frameId>
-			<topicName>/hector/imu</topicName>
+			<frameId>thor/base_link</frameId>
+			<topicName>/thor/imu</topicName>
 			<xyzOffset>0 0 0</xyzOffset>
 			<rpyOffset>0 0 0</rpyOffset>
 			<gaussianNoise>0</gaussianNoise>  
