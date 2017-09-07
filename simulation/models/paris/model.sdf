@@ -6,14 +6,14 @@
 
 		<link name='base_link'>
 			<inertial>
-				<mass>3.0</mass>
+				<mass>3</mass>
 				<inertia>
-					<ixx>0.06</ixx>
+					<ixx>0.006</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.06</iyy>
+					<iyy>0.006</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.06</izz>
+					<izz>0.006</izz>
 				</inertia>
 			</inertial>
 			<collision name='base_link_collision'>
@@ -93,7 +93,7 @@
 				<visualize>false</visualize>
 				<update_rate>5</update_rate>
 				<ray>
-					<scan>
+					<scan>3.0
 						<horizontal>
 							<samples>3</samples>
 							<resolution>1.0</resolution>
@@ -184,6 +184,16 @@
 					</box>
 				</geometry>
 			</collision>
+      
+			<collision name='wheel_guard_front_left_collision'>
+				<pose>0.148 0.13 -0.05 0 0 0</pose>
+				<geometry>
+					<box>
+					  <size>0.01 0.08 0.06</size>
+					</box>
+				</geometry>
+			</collision>
+
 			<collision name='cow_catcher_front_right_collision'>
 				<pose>0.1675 -0.06 -0.05 0 -0.4 -0.3</pose>
 				<geometry>
@@ -192,6 +202,16 @@
 					</box>
 				</geometry>
 			</collision>
+      
+			<collision name='wheel_guard_front_right_collision'>
+				<pose>0.148 -0.13 -0.05 0 0 0</pose>
+				<geometry>
+					<box>
+					  <size>0.01 0.08 0.06</size>
+					</box>
+				</geometry>
+			</collision>
+      
 			<visual name='cow_catcher_front_visual'>
 				<pose>0.1675 0 -0.08 1.57079 0 0</pose>
 				<geometry>
@@ -202,13 +222,13 @@
 				</geometry>
 				<material>
 					<script>
-						<name>Gazebo/Orange</name>
+						<name>Gazebo/FlatBlack</name>
 					</script>
 				</material>
 			</visual>
 
 			<collision name='cow_catcher_back_lower_collision'>
-				<pose>-0.1375 0.0 -0.0725 1.57079 1.05 0.0</pose>
+				<pose>-0.1305 0.0 -0.0665 1.57079 1.05 0.0</pose>
 				<geometry>
 					<box>
 					  <size>0.01 0.03 0.18</size>
@@ -225,7 +245,7 @@
 				</geometry>
 				<material>
 					<script>
-						<name>Gazebo/Orange</name>
+						<name>Gazebo/FlatBlack</name>
 					</script>
 				</material>
 			</visual>
@@ -237,12 +257,12 @@
 			<inertial>
 				<mass>0.03</mass>
 				<inertia> 
-					<ixx>0.245</ixx> <!--> 1/12*(mass)(h^2 + d^2) where h,d,w are in meters and mass is in kilograms <-->
+					<ixx>0.00245</ixx> <!--> 1/12*(mass)(h^2 + d^2) where h,d,w are in meters and mass is in kilograms <-->
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.185</iyy> <!--> 1/12*(mass)(w^2 + d^2) <-->
+					<iyy>0.00185</iyy> <!--> 1/12*(mass)(w^2 + d^2) <-->
 					<iyz>0.0</iyz>
-					<izz>0.185</izz> <!--> 1/12*(mass)(w^2 + h^2) <-->
+					<izz>0.00185</izz> <!--> 1/12*(mass)(w^2 + h^2) <-->
 				</inertia>
 			</inertial>
 
@@ -260,10 +280,10 @@
 				</material>
 			</visual>
 			<collision name="collision">
-				<pose>0.0 0 -0.013 0 0 0</pose>
+			  <pose>0.0 0 -0.0055 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.05 0.06 0.08</size>
+					  <size>0.07 0.05 0.07</size>
 					</box>
 				</geometry>
 			</collision>
@@ -288,7 +308,7 @@
 		<link name="gripper_left_finger">
 			<pose>0.214 0.016 0.0095 0 0 0</pose>
 			<inertial>
-				<mass>0.001</mass>
+				<mass>0.005</mass>
 				<inertia>
 					<ixx>0.0000833</ixx>
 					<ixy>0.0</ixy>
@@ -369,7 +389,7 @@
 		<link name="gripper_right_finger">
 			<pose>0.214 -0.016 0.0095 0 0 0</pose>
 			<inertial>
- 				<mass>0.001</mass>
+ 				<mass>0.005</mass>
 				<inertia>
 					<ixx>0.0000833</ixx>
 					<ixy>0.0</ixy>
@@ -411,7 +431,7 @@
 					</friction>
 				</surface>
 			</collision>
-			<visual name="visual">
+			<visual name="visual">3.0
 				<pose>0 0 0 0 0 0</pose>
 				<geometry>
 					<mesh>
@@ -450,14 +470,14 @@
 		<link name="left_front_wheel">
 			<pose>0.095 0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.05</mass>
+				<mass>1.0</mass>
 				<inertia>
-					<ixx>0.000082</ixx>
+					<ixx>0.000776</ixx>
 					<ixy>0.0</ixy>
 					<ixz>0.0</ixz>
-					<iyy>0.000063</iyy>
+					<iyy>0.0012</iyy>
 					<iyz>0.0</iyz>
-					<izz>0.000082</izz>
+					<izz>0.000776</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -502,14 +522,14 @@
 		<link name="right_front_wheel">base_link
 			<pose>0.095 -0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.05</mass>
+				<mass>1.0</mass>
 				<inertia>
-					<ixx>0.000082</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.000063</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.000082</izz>
+         <ixx>0.000776</ixx>
+         <ixy>0.0</ixy>
+         <ixz>0.0</ixz>
+         <iyy>0.0012</iyy>
+         <iyz>0.0</iyz>
+         <izz>0.000776</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -554,14 +574,14 @@
 		<link name="left_rear_wheel">
 			<pose>-0.095 0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.05</mass>
+				<mass>1.0</mass>
 				<inertia>
-					<ixx>0.000082</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.000082</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.000063</izz>
+         <ixx>0.000776</ixx>
+         <ixy>0.0</ixy>
+         <ixz>0.0</ixz>
+         <iyy>0.0012</iyy>
+         <iyz>0.0</iyz>
+         <izz>0.000776</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -606,14 +626,14 @@
 		<link name="right_rear_wheel">
 			<pose>-0.095 -0.135 -0.03 0 0 0</pose>
 			<inertial>
-				<mass>0.05</mass>
+				<mass>1.0</mass>
 				<inertia>
-					<ixx>0.000082</ixx>
-					<ixy>0.0</ixy>
-					<ixz>0.0</ixz>
-					<iyy>0.000063</iyy>
-					<iyz>0.0</iyz>
-					<izz>0.000082</izz>
+         <ixx>0.000776</ixx>
+         <ixy>0.0</ixy>
+         <ixz>0.0</ixz>
+         <iyy>0.0012</iyy>
+         <iyz>0.0</iyz>
+         <izz>0.000776</izz>
 				</inertia>
 			</inertial>
 			<collision name="collision">
@@ -681,21 +701,21 @@
 
 			<!-- optional: set the default PID values for the wrist joint -->
 			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
-			<wristPID>2.5 0.0 0.0</wristPID>
+      <wristPID>1.0 0.0 0.0</wristPID>
 
 			<!-- optional: set the default PID values for the finger joints -->
 			<!-- values in order: Proportional gain, Integral gain, Derivative gain -->
 			<!-- it is always assumed that both fingers use the same PID values -->
-			<fingerPID>2.5 0.0 0.0</fingerPID>
+      <fingerPID>1.0 0.0 0.0</fingerPID>
 
 			<!-- optional: set the min/max force applicable to the wrist joint in Newtons -->
 			<!-- values in order: minimum force, maximum force -->
-			<wristForceLimits>-10 10</wristForceLimits>
+      <wristForceLimits>-0.5 0.5</wristForceLimits>
 
 			<!-- optional: set the min/max force applicable to the finger joints in Newtons -->
 			<!-- values in order: minimum force, maximum force -->
 			<!-- it is always assumed that both fingers use the same min/max force values -->
-			<fingerForceLimits>-10 10</fingerForceLimits>
+      <fingerForceLimits>-0.5 0.5</fingerForceLimits>
 		</plugin>
 
 		<!-- Skid Steer Drive plugin -->
