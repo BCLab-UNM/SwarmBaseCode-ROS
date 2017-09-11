@@ -129,7 +129,7 @@ ros::Subscriber targetSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
 ros::Subscriber virtualFenceSubscriber;
-
+ros::Subscriber manualWaypointSubscriber;
 
 // Timers
 ros::Timer stateMachineTimer;
@@ -157,6 +157,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInf
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void virtualFenceHandler(const std_msgs::Float32MultiArray& message);
+void manualWaypointHandler(const geometry_msgs::Pose2D& message);
 void behaviourStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
@@ -192,6 +193,8 @@ int main(int argc, char **argv) {
   odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
   mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
   virtualFenceSubscriber = mNH.subscribe(("/virtualFence"), 10, virtualFenceHandler);
+  manualWaypointSubscriber = mNH.subscribe((publishedName + "/waypoints"), 10, manualWaypointHandler);
+  
     message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
@@ -491,6 +494,14 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&) {
   std_msgs::String msg;
   msg.data = "online";
   status_publisher.publish(msg);
+}
+
+void manualWaypointHandler(const geometry_msgs::Pose2D& message) {
+   Point wp;
+   wp.x = message.x;
+   wp.y = message.y;
+   wp.theta = 0.0;
+   logicController.AddManualWaypoint(wp);
 }
 
 void sigintEventHandler(int sig) {

@@ -194,7 +194,8 @@ void LogicController::ProcessData() {
       PrioritizedController{10, (Controller*)(&obstacleController)},
       PrioritizedController{15, (Controller*)(&pickUpController)},
       PrioritizedController{5, (Controller*)(&range_controller)},
-      PrioritizedController{-1, (Controller*)(&dropOffController)}
+      PrioritizedController{-1, (Controller*)(&dropOffController)},
+      PrioritizedController{20, (Controller*)(&manualWaypointController)}
     };
   }
 
@@ -205,7 +206,8 @@ void LogicController::ProcessData() {
     PrioritizedController{15, (Controller*)(&obstacleController)},
     PrioritizedController{-1, (Controller*)(&pickUpController)},
     PrioritizedController{10, (Controller*)(&range_controller)},
-    PrioritizedController{1, (Controller*)(&dropOffController)}
+    PrioritizedController{1, (Controller*)(&dropOffController)},
+    PrioritizedController{20, (Controller*)(&manualWaypointController)}
     };
   }
   //this priority is used when returning a target to the center collection zone
@@ -216,7 +218,8 @@ void LogicController::ProcessData() {
       PrioritizedController{-1, (Controller*)(&obstacleController)},
       PrioritizedController{-1, (Controller*)(&pickUpController)},
       PrioritizedController{10, (Controller*)(&range_controller)},
-      PrioritizedController{1, (Controller*)(&dropOffController)}
+      PrioritizedController{1, (Controller*)(&dropOffController)},
+      PrioritizedController{20, (Controller*)(&manualWaypointController)}
     };
   }
 }
@@ -258,6 +261,7 @@ void LogicController::controllerInterconnect() {
   if(obstacleController.GetShouldClearWaypoints()) {
     driveController.Reset();
   }
+
 }
 
 // Recieves position in the world inertial frame (should rename to SetOdomPositionData)
@@ -266,6 +270,7 @@ void LogicController::SetPositionData(Point currentLocation) {
   dropOffController.SetCurrentLocation(currentLocation);
   obstacleController.SetCurrentLocation(currentLocation);
   driveController.SetCurrentLocation(currentLocation);
+  manualWaypointController.SetCurrentLocation(currentLocation);
 }
 
 // Recieves position in the world frame with global data (GPS)
@@ -297,6 +302,11 @@ void LogicController::SetSonarData(float left, float center, float right) {
 void LogicController::SetCenterLocationOdom(Point centerLocationOdom) {
   searchController.SetCenterLocation(centerLocationOdom);
   dropOffController.SetCenterLocation(centerLocationOdom);
+}
+
+void LogicController::AddManualWaypoint(Point manualWaypoint)
+{
+   manualWaypointController.AddManualWaypoint(manualWaypoint);
 }
 
 void LogicController::setVirtualFenceOn( RangeShape* range )

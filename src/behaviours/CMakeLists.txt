@@ -32,6 +32,7 @@ add_executable(
   src/DriveController.cpp
   src/RangeController.cpp
   src/LogicController.cpp
+  src/ManualWaypointController.cpp
 )
 
 add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
