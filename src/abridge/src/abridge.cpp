@@ -308,7 +308,7 @@ void parseData(string str) {
 			else if (dataSet.at(0) == "ODOM") {
 				int leftTicks = atoi(dataSet.at(2).c_str());
 				int rightTicks = atoi(dataSet.at(3).c_str());
-				int odomTS = atof(dataSet.at(4).c_str()) / 1000; // Seconds
+				double odomTS = atof(dataSet.at(4).c_str()) / 1000.0; // Seconds
 
 				double rightWheelDistance = ticksToMeters(rightTicks);
 				double leftWheelDistance = ticksToMeters(leftTicks);
