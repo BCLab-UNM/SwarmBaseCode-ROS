@@ -1,0 +1,15 @@
+material box/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      transparent_sorting on
+
+      texture_unit
+      {
+        texture boxTexture.jpg
+      }
+    }
+  }
+}
