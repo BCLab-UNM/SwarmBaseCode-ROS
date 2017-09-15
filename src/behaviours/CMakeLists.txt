@@ -41,3 +41,7 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
+install(TARGETS behaviours behaviours
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
