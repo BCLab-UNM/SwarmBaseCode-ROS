@@ -94,6 +94,7 @@ ros::Timer publish_heartbeat_timer;
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 bool store_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp);
+bool start_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp);
 
 int main(int argc, char **argv) {
     
@@ -136,6 +137,7 @@ int main(int argc, char **argv) {
 
     // Service to tell the Arduino to store calibration
     ros::ServiceServer stc = aNH.advertiseService((publishedName + "/store_magnetometer_calibration"), store_calibration);
+    ros::ServiceServer str = aNH.advertiseService((publishedName + "/start_magnetometer_calibration"), start_calibration);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     publish_heartbeat_timer = aNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
@@ -240,6 +242,14 @@ void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle) {
 bool store_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp) {
 	char cmd[16]={'\0'};
 	sprintf(cmd, "C\n");
+	usb.sendData(cmd);
+	memset(&cmd, '\0', sizeof (cmd));
+	return true;
+}
+
+bool start_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp) {
+	char cmd[16]={'\0'};
+	sprintf(cmd, "M\n");
 	usb.sendData(cmd);
 	memset(&cmd, '\0', sizeof (cmd));
 	return true;
