@@ -24,7 +24,7 @@ private:
    Point currentLocation;
    // list of manual waypoints
    Waypoints waypoints;
-   bool interrupt = false;
+   int num_waypoints = 0;
 
    // coppied from DriveController: 15 cm
    const float waypoint_tolerance = 0.15;

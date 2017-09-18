@@ -17,6 +17,7 @@ DriveController::DriveController() {
 DriveController::~DriveController() {}
 
 void DriveController::Reset() {
+  std::cout << "DriveController.Reset()" << std::endl;
   waypoints.clear();
   if (stateMachineState == STATE_MACHINE_ROTATE || stateMachineState == STATE_MACHINE_SKID_STEER) {
     stateMachineState = STATE_MACHINE_WAYPOINTS;
@@ -30,6 +31,7 @@ Result DriveController::DoWork() {
     if(result.b == noChange) {
       //if drive controller gets a no change command it is allowed to continue its previouse action
       //normally this will be to follow waypoints but it is not specified as such.
+      std::cout<<"DC: no change" << std::endl;
     } else if(result.b == wait) {
       //do nothing till told otherwise
       left = 0.0;
@@ -98,7 +100,6 @@ Result DriveController::DoWork() {
 
     result.pd.setPointVel = 0.0;
     result.pd.setPointYaw = waypoints.back().theta;
-
     // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
     if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
       // rotate but dont drive.

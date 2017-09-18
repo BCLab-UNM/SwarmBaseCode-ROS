@@ -15,6 +15,7 @@ LogicController::~LogicController() {}
 
 void LogicController::Reset() {
 
+  std::cout << "LogicController.Reset()" << std::endl;
   logicState = LOGIC_STATE_INTERRUPT;
   processState = PROCCESS_STATE_SEARCHING;
 
@@ -45,7 +46,6 @@ Result LogicController::DoWork() {
 
   //when an interrupt has been thorwn or there are no pending control_queue.top().actions logic controller is in this state.
   case LOGIC_STATE_INTERRUPT: {
-
     //Reset the control queue
     control_queue = priority_queue<PrioritizedController>();
 
@@ -136,7 +136,6 @@ Result LogicController::DoWork() {
 
     //this case is primarly when logic controller is waiting for drive controller to reach its last waypoint
   case LOGIC_STATE_WAITING: {
-
     //ask drive controller how to drive
     //commands to be passed the ROS Adapter as left and right wheel PWM values in the result struct are returned
     result = driveController.DoWork();
@@ -222,6 +221,16 @@ void LogicController::ProcessData() {
       PrioritizedController{20, (Controller*)(&manualWaypointController)}
     };
   }
+  else if (processState == PROCESS_STATE_MANUAL) {
+    prioritizedControllers = {
+      PrioritizedController{-1, (Controller*)(&searchController)},
+      PrioritizedController{-1, (Controller*)(&obstacleController)},
+      PrioritizedController{-1, (Controller*)(&pickUpController)},
+      PrioritizedController{-1, (Controller*)(&range_controller)},
+      PrioritizedController{-1, (Controller*)(&dropOffController)},
+      PrioritizedController{20, (Controller*)(&manualWaypointController)}
+    };     
+  }
 }
 
 bool LogicController::ShouldInterrupt() {
@@ -306,7 +315,7 @@ void LogicController::SetCenterLocationOdom(Point centerLocationOdom) {
 
 void LogicController::AddManualWaypoint(Point manualWaypoint)
 {
-   manualWaypointController.AddManualWaypoint(manualWaypoint);
+  manualWaypointController.AddManualWaypoint(manualWaypoint);
 }
 
 void LogicController::setVirtualFenceOn( RangeShape* range )
@@ -330,4 +339,14 @@ void LogicController::SetCurrentTimeInMilliSecs( long int time )
   dropOffController.SetCurrentTimeInMilliSecs( time );
   pickUpController.SetCurrentTimeInMilliSecs( time );
   obstacleController.SetCurrentTimeInMilliSecs( time );
+}
+
+void LogicController::SetModeManual()
+{
+  if(processState != PROCESS_STATE_MANUAL) {
+    processState = PROCESS_STATE_MANUAL;
+    ProcessData();
+    control_queue = priority_queue<PrioritizedController>();
+    driveController.Reset();
+  }
 }

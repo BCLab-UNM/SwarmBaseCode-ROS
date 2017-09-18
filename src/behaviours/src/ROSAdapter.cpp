@@ -271,7 +271,6 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
   }
 
-
   // Robot is in automode
   if (currentMode == 2 || currentMode == 3) {
 
@@ -332,8 +331,20 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
   // mode is NOT auto
   else {
+    // there should be no harm in repeatedly reminiding the logic
+    // controller that it is in manual mode.
+    humanTime();
+    logicController.SetModeManual();
+    logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
+    result = logicController.DoWork();
+    if(result.type == behavior && result.b == wait) {
+      sendDriveCommand(0.0, 0.0);
+    }
+    else {
+      sendDriveCommand(result.pd.left,result.pd.right);
+    }
   }
 
 
@@ -379,8 +390,13 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 }
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
+  int oldMode = currentMode;
   currentMode = message->data;
   sendDriveCommand(0.0, 0.0);
+  if(!(oldMode == 2 || oldMode == 3) && (currentMode == 2 || currentMode == 3)) {
+    // If we are switching to auto mode then reset.
+    logicController.Reset();
+  }
 }
 
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
@@ -497,11 +513,11 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&) {
 }
 
 void manualWaypointHandler(const geometry_msgs::Pose2D& message) {
-   Point wp;
-   wp.x = message.x;
-   wp.y = message.y;
-   wp.theta = 0.0;
-   logicController.AddManualWaypoint(wp);
+  Point wp;
+  wp.x = message.x;
+  wp.y = message.y;
+  wp.theta = 0.0;
+  logicController.AddManualWaypoint(wp);
 }
 
 void sigintEventHandler(int sig) {

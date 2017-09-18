@@ -1,48 +1,50 @@
 #include "ManualWaypointController.h"
 #include <angles/angles.h> // for hypot()
 
-ManualWaypointController::ManualWaypointController() {
-   
-}
+ManualWaypointController::ManualWaypointController() {}
 
 ManualWaypointController::~ManualWaypointController() {}
 
 void ManualWaypointController::Reset() {
-   waypoints.waypoints.clear();
+  waypoints.waypoints.clear();
 }
 
 bool ManualWaypointController::HasWork() {
-   return !waypoints.waypoints.empty();
+  return !waypoints.waypoints.empty();
 }
 
 bool ManualWaypointController::ShouldInterrupt() {
-   // If the size of the manual waypoint list has changed, then interrupt.
-   return interrupt;
+  bool interrupt = false;
+  // If the size of the manual waypoint list has changed, then interrupt.
+  if(num_waypoints != waypoints.waypoints.size()) {
+    interrupt = true;
+    num_waypoints = waypoints.waypoints.size();
+  }
+  return interrupt;
 }
 
 Result ManualWaypointController::DoWork() {
-   Result result;
-   result.type = waypoint;
-   result.wpts.waypoints.push_back(waypoints.waypoints.front());
-
-   return result;
+  Result result;
+  result.type = waypoint;
+  result.wpts.waypoints.push_back(waypoints.waypoints.front());
+  result.PIDMode = FAST_PID;
+  std::cout << "returning waypoint" << std::endl;
+  return result;
 }
 
 void ManualWaypointController::SetCurrentLocation(Point currentLocation)
 {
-   this->currentLocation = currentLocation;
-   if(!waypoints.waypoints.empty()) {
-      if(hypot(waypoints.waypoints.front().x-currentLocation.x,
-               waypoints.waypoints.front().y-currentLocation.y)
-         < waypoint_tolerance) {
-         waypoints.waypoints.erase(waypoints.waypoints.begin());
-         // interrupt any time the waypoint list changes and is non-empty.
-         if(!waypoints.waypoints.empty()) {
-            interrupt = true;
-         }
-      }
-   }
+  this->currentLocation = currentLocation;
+  if(!waypoints.waypoints.empty()) {
+    if(hypot(waypoints.waypoints.front().x-currentLocation.x,
+             waypoints.waypoints.front().y-currentLocation.y)
+       < waypoint_tolerance) {
+      waypoints.waypoints.erase(waypoints.waypoints.begin());
+      std::cout << "cleared waypoint!" << std::endl;
+    }
+  }
 }
+
 
 void ManualWaypointController::ProcessData()
 {   
@@ -50,7 +52,5 @@ void ManualWaypointController::ProcessData()
 
 void ManualWaypointController::AddManualWaypoint(Point wpt)
 {
-   waypoints.waypoints.push_back(wpt);
-   // interrupt any time the waypoint list changes and is non-empty.
-   interrupt = true;
+  waypoints.waypoints.push_back(wpt);
 }

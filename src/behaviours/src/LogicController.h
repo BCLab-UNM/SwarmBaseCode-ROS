@@ -48,6 +48,8 @@ public:
   void SetCenterLocationMap(Point centerLocationMap);
   void AddManualWaypoint(Point wpt);
 
+  void SetModeManual();
+
   void SetCurrentTimeInMilliSecs( long int time );
 
   // Tell the logic controller whether rovers should automatically
@@ -72,7 +74,8 @@ private:
     PROCCESS_STATE_SEARCHING = 0,
     PROCCESS_STATE_TARGET_PICKEDUP,
     PROCCESS_STATE_DROP_OFF,
-    _LAST
+    _LAST,
+    PROCESS_STATE_MANUAL
   };
 
   LogicState logicState;
