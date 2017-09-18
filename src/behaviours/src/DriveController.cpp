@@ -220,7 +220,7 @@ void DriveController::ProcessData()
 
 void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw) {
 
-  float velOut = fastVelPID.PIDOut(errorVel, setPointVel);
+  float velOut = 0;//fastVelPID.PIDOut(errorVel, setPointVel);
   float yawOut = fastYawPID.PIDOut(errorYaw, setPointYaw);
 
   int left = velOut - yawOut;
@@ -238,7 +238,7 @@ void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel
 
 void DriveController::slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw) {
 
-  float velOut = slowVelPID.PIDOut(errorVel, setPointVel);
+  float velOut = 0;//slowVelPID.PIDOut(errorVel, setPointVel);
   float yawOut = slowYawPID.PIDOut(errorYaw, setPointYaw);
 
   int left = velOut - yawOut;
@@ -306,9 +306,9 @@ PIDConfig DriveController::fastVelConfig() {
 PIDConfig DriveController::fastYawConfig() {
   PIDConfig config;
 
-  config.Kp = 240;
-  config.Ki = 25;
-  config.Kd = 0.5;
+  config.Kp = 100;
+  config.Ki = 10;
+  config.Kd = 14;
   config.satUpper = 255;
   config.satLower = -255;
   config.antiWindup = config.satUpper/2;
@@ -350,9 +350,9 @@ PIDConfig DriveController::slowVelConfig() {
 PIDConfig DriveController::slowYawConfig() {
   PIDConfig config;
 
-  config.Kp = 80;
-  config.Ki = 15;
-  config.Kd = 1.7;
+  config.Kp = 70;
+  config.Ki = 16;
+  config.Kd = 10;
   config.satUpper = 255;
   config.satLower = -255;
   config.antiWindup = config.satUpper/4;
