@@ -105,26 +105,37 @@ if [ $OPTION == "-G" ]; then
 				break	
 			fi
 
-			echo "-------------------------------------------------------------"
-			echo "Uploading to $roverIP"
-			echo ""
-			echo "Copying compressed repository to swarmie at $roverIP"
-			scp $2.tgz swarmie@$roverIP:~
-			sleep 2
-			echo "Unpacking repository $2 and branch $3 on swarmie at $roverIP"
-			ssh swarmie@$roverIP "tar xzf $2.tgz"
-			echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
+			#If rover is on the network
+			ping -q -w2 $roverIP > /dev/null
+			if [ $? -eq 0 ]; then
 
-			#ssh and run script from rover --WORKS
-			gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;
-				./rover_onboard_node_launch.sh $hostName;
-				exit 1;
-				/bin/bash;' 
-				exec $SHELL"
+				echo "-------------------------------------------------------------"
+				echo "Uploading to $roverIP"
+				echo ""
+				echo "Copying compressed repository to swarmie at $roverIP"
+				scp $2.tgz swarmie@$roverIP:~
+				sleep 2
+				echo "Unpacking repository $2 and branch $3 on swarmie at $roverIP"
+				ssh swarmie@$roverIP "tar xzf $2.tgz"
+				echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
 
-			sleep 10
+				#ssh and run script from rover --WORKS
+				gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;
+					./rover_onboard_node_launch.sh $hostName;
+					exit 1;
+					/bin/bash;' 
+					exec $SHELL"
 
-		done
+				sleep 10
+
+			#if not on the network
+			else
+				echo "$roverIP was not found on the network.  Check IP and network settings!"
+				echo "-------------------------------------------------------------"	
+				sleep 4
+				echo ""
+			fi
+			done
 	fi
 
 	exit 1
@@ -164,30 +175,47 @@ if [ $OPTION == "-F" ]; then
 				break	
 			fi
 
-			cd ~
-			echo "-------------------------------------------------------------"
-			echo "Uploading to $roverIP"
-			echo ""
-			echo "Copying compressed repository to swarmie at $roverIP"
-			scp $2.tgz swarmie@$roverIP:~
-			sleep 2
-			echo "Unpacking repository $2 on swarmie at $roverIP"
-			gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'echo 'Unpacking $2.tgz ...';
-				tar xzf $2.tgz;
-				sleep 2;			
-				echo 'Starting ROS nodes on swarmie at $roverIP with master at $hostName';
-				sleep 2;
-				cd $2/misc/;
-				./rover_onboard_node_launch.sh $hostName;
-				exit 1;
-				/bin/bash;' exec $SHELL"
-				
-			echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
-			echo ""
-			#ssh and run script from rover --WORKS
-			#gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'cd SwarmBaseCode-ROS/misc;./rover_onboard_node_launch.sh 					$hostName;exit 1;/bin/bash;' exec $SHELL"
+			#If rover is on the network
+			ping -q -w2 $roverIP > /dev/null
+			if [ $? -eq 0 ]; then
 
-			sleep 10
+				cd ~
+				echo "Found $roverIP"
+				echo "-------------------------------------------------------------"
+				echo "Uploading to $roverIP"
+				echo ""
+
+				#Pack and send
+
+				echo "Copying compressed repository to swarmie at $roverIP"
+				scp $2.tgz swarmie@$roverIP:~
+				sleep 2
+
+				#unpack and run
+				echo "Unpacking repository $2 on swarmie at $roverIP"
+					gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'echo 'Unpacking $2.tgz ...';
+					tar xzf $2.tgz;
+					sleep 2;			
+					echo 'Starting ROS nodes on swarmie at $roverIP with master at $hostName';
+					sleep 2;
+					cd $2/misc/;
+					./rover_onboard_node_launch.sh $hostName;
+					exit 1;
+					/bin/bash;' exec $SHELL"
+				
+				echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
+				echo ""
+				sleep 10
+
+			#if not on the network
+			else
+				echo "$roverIP was not found on the network.  Check IP and network settings!"
+				echo "-------------------------------------------------------------"	
+				sleep 4
+				echo ""
+			fi
+
+
 
 
 		done	
@@ -208,13 +236,24 @@ if [ $OPTION == "-R" ]; then
 				break	
 			fi
 
-		echo "-------------------------------------------------------------"
-		echo "Starting $roverIP"
+		#If rover is on the network
+		ping -q -w2 $roverIP > /dev/null
+		if [ $? -eq 0 ]; then
+			echo "-------------------------------------------------------------"
+			echo "Starting $roverIP"
 
-		#ssh and run script from rover --WORKS
-		gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;./rover_onboard_node_launch.sh $hostName;exit 1;/bin/bash;' exec $SHELL"
+			#ssh and run script from rover --WORKS
+			gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;./rover_onboard_node_launch.sh $hostName;exit 1;/bin/bash;' exec $SHELL"
 
-		sleep 10
+			sleep 10
+
+		#if not on the network
+		else
+			echo "$roverIP was not found on the network.  Check IP and network settings!"
+			echo "-------------------------------------------------------------"	
+			sleep 4
+			echo ""
+		fi
 
 		done
 	fi
