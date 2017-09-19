@@ -116,7 +116,8 @@ if [ $OPTION == "-G" ]; then
 			echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
 
 			#ssh and run script from rover --WORKS
-			gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;./rover_onboard_node_launch.sh $hostName;
+			gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;
+				./rover_onboard_node_launch.sh $hostName;
 				exit 1;
 				/bin/bash;' 
 				exec $SHELL"
@@ -163,6 +164,7 @@ if [ $OPTION == "-F" ]; then
 				break	
 			fi
 
+			cd ~
 			echo "-------------------------------------------------------------"
 			echo "Uploading to $roverIP"
 			echo ""
