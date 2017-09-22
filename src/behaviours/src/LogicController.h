@@ -49,6 +49,7 @@ public:
   void AddManualWaypoint(Point wpt);
 
   void SetModeManual();
+  void SetModeAuto();
 
   void SetCurrentTimeInMilliSecs( long int time );
 

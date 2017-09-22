@@ -194,7 +194,7 @@ void LogicController::ProcessData() {
       PrioritizedController{15, (Controller*)(&pickUpController)},
       PrioritizedController{5, (Controller*)(&range_controller)},
       PrioritizedController{-1, (Controller*)(&dropOffController)},
-      PrioritizedController{20, (Controller*)(&manualWaypointController)}
+      PrioritizedController{-1, (Controller*)(&manualWaypointController)}
     };
   }
 
@@ -206,7 +206,7 @@ void LogicController::ProcessData() {
     PrioritizedController{-1, (Controller*)(&pickUpController)},
     PrioritizedController{10, (Controller*)(&range_controller)},
     PrioritizedController{1, (Controller*)(&dropOffController)},
-    PrioritizedController{20, (Controller*)(&manualWaypointController)}
+    PrioritizedController{-1, (Controller*)(&manualWaypointController)}
     };
   }
   //this priority is used when returning a target to the center collection zone
@@ -218,7 +218,7 @@ void LogicController::ProcessData() {
       PrioritizedController{-1, (Controller*)(&pickUpController)},
       PrioritizedController{10, (Controller*)(&range_controller)},
       PrioritizedController{1, (Controller*)(&dropOffController)},
-      PrioritizedController{20, (Controller*)(&manualWaypointController)}
+      PrioritizedController{-1, (Controller*)(&manualWaypointController)}
     };
   }
   else if (processState == PROCESS_STATE_MANUAL) {
@@ -341,9 +341,16 @@ void LogicController::SetCurrentTimeInMilliSecs( long int time )
   obstacleController.SetCurrentTimeInMilliSecs( time );
 }
 
+void LogicController::SetModeAuto() {
+  if(processState == PROCESS_STATE_MANUAL) {
+    // only do something if we are in manual mode
+    this->Reset();
+  }
+}
 void LogicController::SetModeManual()
 {
   if(processState != PROCESS_STATE_MANUAL) {
+    logicState = LOGIC_STATE_INTERRUPT;
     processState = PROCESS_STATE_MANUAL;
     ProcessData();
     control_queue = priority_queue<PrioritizedController>();

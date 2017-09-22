@@ -227,6 +227,12 @@ int main(int argc, char **argv) {
   msg.data = ss.str();
   infoLogPublisher.publish(msg);
 
+  if(currentMode != 2 && currentMode != 3)
+  {
+    // ensure the logic controller starts in the correct mode.
+    logicController.SetModeManual();
+  }
+
   timerStartTime = time(0);
 
   ros::spin();
@@ -331,20 +337,15 @@ void behaviourStateMachine(const ros::TimerEvent&) {
 
   // mode is NOT auto
   else {
-    // there should be no harm in repeatedly reminiding the logic
-    // controller that it is in manual mode.
     humanTime();
-    logicController.SetModeManual();
     logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
     result = logicController.DoWork();
-    if(result.type == behavior && result.b == wait) {
-      sendDriveCommand(0.0, 0.0);
-    }
-    else {
+    if(result.type != behavior && result.b != wait) {
       sendDriveCommand(result.pd.left,result.pd.right);
     }
+    cout << endl;
   }
 
 
@@ -390,13 +391,14 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 }
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
-  int oldMode = currentMode;
   currentMode = message->data;
-  sendDriveCommand(0.0, 0.0);
-  if(!(oldMode == 2 || oldMode == 3) && (currentMode == 2 || currentMode == 3)) {
-    // If we are switching to auto mode then reset.
-    logicController.Reset();
+  if(currentMode == 2 || currentMode == 3) {
+    logicController.SetModeAuto();
   }
+  else {
+    logicController.SetModeManual();
+  }
+  sendDriveCommand(0.0, 0.0);
 }
 
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight) {
