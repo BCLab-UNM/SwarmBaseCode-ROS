@@ -18,7 +18,7 @@ This repository contains:
 
 Be: sure you are using the latest drivers for your video card using the "additional drivers tool" in Ubuntu. Gazebo client often does not do well with the open source drivers.
 
-![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/kinetic_kame/readmeImages/InstallGraphics.png "Additional Drivers")
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/InstallGraphics.png "Additional Drivers")
 
 ### Quick Start Installation Guide
 
@@ -40,6 +40,8 @@ rosdep update      # Note this is not run with sudo
 ```
 
 Note: if you accidentally ran ```sudo rosdep update``` you can repair the permissions ```sudo rosdep fix-permissions```.
+
+You may request the installation of addition packages on the competition rovers. To do so create a pull request modifying the [preinstalled packages list](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/PreinstalledCompetitionPackages.md) document.
 
 ##### 2. Install additional ROS packages
 
@@ -132,11 +134,11 @@ The GUI will now launch. The run script kills a number of gazebo and ROS process
 
 This is the first screen of the GUI:
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/guiFirstScreen.png "Opening Screen")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/guiFirstScreen.png "Opening Screen")
 
 Click the "Simulation Control" tab:
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/simControlTab.png "Simulation Parameters")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/simControlTab.png "Simulation Parameters")
 
 Choose the ground texture, whether this is a preliminary or final round (3 or 6 robots), and the distribution of targets.
 
@@ -144,19 +146,19 @@ Click the "Build Simulation" button when ready.
 
 The gazebo physics simulator will open.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/buildSim.png "Gazebo Simulator")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/buildSim.png "Gazebo Simulator")
 
 Click back to the Swarmathon GUI and select the "Sensor Display" tab.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/sensorDisplayTab.png "Sesnor display")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/sensorDisplayTab.png "Sesnor display")
 
 Any active rovers, simulated or real will be displayed in the rover list on the left side.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/activeRovers.png "Active rovers")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/activeRovers.png "Active rovers")
 
 Select a rover to view its sensor outputs. 
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/roverSensorOutputs.png "Rover sensor outputs")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/roverSensorOutputs.png "Rover sensor outputs")
 
 There are four sensor display frames:
 
@@ -170,7 +172,7 @@ The map view shows the path taken by the currently selected rover. Green is the 
 
 Click on the "Task Status" tab.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/development/readmeImages/taskStatusTab.png "Task Status tab")
+![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/taskStatusTab.png "Task Status tab")
 
 This tab displays the number of targets detected, the number of targets collected, and the number of obstacle avoidance calls.
 
