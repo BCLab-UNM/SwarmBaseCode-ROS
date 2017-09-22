@@ -493,10 +493,15 @@ bool Diagnostics::checkIfSimulatedRover() {
   struct stat buffer;
   const char *model_path_env = "GAZEBO_MODEL_PATH";
   char *model_root = getenv(model_path_env);
-  string model_path = string(model_root)+"/"+publishedName+"/model.sdf";
-  return (stat(model_path.c_str(), &buffer) == 0); 
+  if (model_root != NULL) {
+    string model_path = string(model_root)+"/"+publishedName+"/model.sdf";
+    return (stat(model_path.c_str(), &buffer) == 0);
+  }
+  else {
+    return false;
+  }
 }
-     
+
 Diagnostics::~Diagnostics() {
   gazebo::shutdown();
 }
