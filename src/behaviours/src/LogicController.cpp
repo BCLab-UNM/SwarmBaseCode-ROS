@@ -154,13 +154,9 @@ Result LogicController::DoWork() {
     //used for precision driving pass through
   case LOGIC_STATE_PRECISION_COMMAND: {
 
-//  cout << "I MADE IT HERE!" << endl;
-
     //unlike waypoints precision commands change every update tick so we ask the
     //controller for new commands on every update tick.
     result = control_queue.top().controller->DoWork();
-
- //  cout << result.pd.cmdAngularError;
 
     //pass the driving commands to the drive controller so it can interpret them
     driveController.SetResultData(result);

@@ -25,14 +25,7 @@ void SearchController::Reset() {
  */
 Result SearchController::DoWork() {
 
-    result.type = precisionDriving;
-    result.pd.cmdAngularError = angles::shortest_angular_distance(currentLocation.theta, 0);
-    result.pd.cmdVel = 0;
-    result.PIDMode = SLOW_PID;
-
-    cout << "PID:  " << result.pd.cmdAngularError << endl;
-
-/*  if (!result.wpts.waypoints.empty()) {
+  if (!result.wpts.waypoints.empty()) {
     if (hypot(result.wpts.waypoints[0].x-currentLocation.x, result.wpts.waypoints[0].y-currentLocation.y) < 0.10) {
       attemptCount = 0;
     }
@@ -71,7 +64,7 @@ Result SearchController::DoWork() {
 
     result.wpts.waypoints.clear();
     result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
-    */
+    
     return result;
   //}
 

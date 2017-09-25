@@ -220,7 +220,7 @@ void DriveController::ProcessData()
 
 void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw) {
 
-  float velOut = 0;//fastVelPID.PIDOut(errorVel, setPointVel);
+  float velOut = fastVelPID.PIDOut(errorVel, setPointVel);
   float yawOut = fastYawPID.PIDOut(errorYaw, setPointYaw);
 
   int left = velOut - yawOut;
@@ -238,7 +238,7 @@ void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel
 
 void DriveController::slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw) {
 
-  float velOut = 0;//slowVelPID.PIDOut(errorVel, setPointVel);
+  float velOut = slowVelPID.PIDOut(errorVel, setPointVel);
   float yawOut = slowYawPID.PIDOut(errorYaw, setPointYaw);
 
   int left = velOut - yawOut;
