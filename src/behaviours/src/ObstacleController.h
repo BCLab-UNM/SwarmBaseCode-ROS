@@ -31,6 +31,9 @@ protected:
 
 private:
 
+  void avoidCenter();
+  void avoidObstacle();
+  
   const float K_angular = 1.0; //radians a second
   const float reactivateCenterThreshold = 0.8;
   const int targetCountPivot = 6;
@@ -53,7 +56,6 @@ private:
 
   int countLeft;
   int countRight;
-  bool centerSeen;
 
   bool ignoreCenter = false;
 
@@ -65,10 +67,12 @@ private:
 
   bool targetHeld = false;
   bool previousTargetState = false;
-  bool phys = false;
+
+  bool phys = false; // Physical obstacle
+  bool center_seen = false; // The obstacle is the center collection zone
+  
   bool set_waypoint = false;
   bool can_set_waypoint = false;
-
 };
 
 #endif // OBSTACLECONTOLLER_H

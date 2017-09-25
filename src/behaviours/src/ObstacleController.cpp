@@ -15,33 +15,9 @@ void ObstacleController::Reset() {
   delay = current_time;
 }
 
-Result ObstacleController::DoWork() {
-
-  clearWaypoints = true;
-  set_waypoint = true;
-  result.PIDMode = CONST_PID;
-
-  if(centerSeen){
-
-
-    result.type = precisionDriving;
-
-    result.pd.cmdVel = 0.0;
-
-    if(countLeft < countRight) {
-      result.pd.cmdAngular = K_angular;
-    } else {
-      result.pd.cmdAngular = -K_angular;
-    }
-
-    result.pd.setPointVel = 0.0;
-    result.pd.cmdVel = 0.0;
-    result.pd.setPointYaw = 0;
-
-  }
-  else {
-
-
+// Avoid crashing into objects detected by the ultraound
+void ObstacleController::avoidObstacle() {
+  
     //obstacle on right side
     if (right < 0.8 || center < 0.8 || left < 0.8) {
       result.type = precisionDriving;
@@ -52,6 +28,42 @@ Result ObstacleController::DoWork() {
       result.pd.cmdVel = 0.0;
       result.pd.setPointYaw = 0;
     }
+}
+
+// The center was seen in front of the rover and we are not carrying a target
+// so avoid running over the center and possibly pushing cubes out.
+void ObstacleController::avoidCenter() {
+  
+    result.type = precisionDriving;
+
+    result.pd.cmdVel = 0.0;
+
+    // Decide which side of the rover sees the most april tags and turn away
+    // from that side
+    if(countLeft < countRight) {
+      result.pd.cmdAngular = K_angular;
+    } else {
+      result.pd.cmdAngular = -K_angular;
+    }
+
+    result.pd.setPointVel = 0.0;
+    result.pd.cmdVel = 0.0;
+    result.pd.setPointYaw = 0;
+}
+
+
+Result ObstacleController::DoWork() {
+
+  clearWaypoints = true;
+  set_waypoint = true;
+  result.PIDMode = CONST_PID;
+
+  // The obstacle is an april tag marking the collection zone
+  if(center_seen){
+    avoidCenter();
+  }
+  else {
+    avoidObstacle();
   }
 
   if (can_set_waypoint) {
@@ -91,7 +103,7 @@ void ObstacleController::ProcessData() {
   long int Tdifference = current_time - timeSinceTags;
   float Td = Tdifference/1e3;
   if (Td >= 0.5) {
-    centerSeen = false;
+    center_seen = false;
     phys= false;
     if (!obstacleAvoided)
     {
@@ -124,7 +136,7 @@ void ObstacleController::ProcessData() {
   }
 
 
-  if (centerSeen || phys)
+  if (center_seen || phys)
   {
     obstacleDetected = true;
     obstacleAvoided = false;
@@ -136,9 +148,14 @@ void ObstacleController::ProcessData() {
   }
 }
 
+// Report April tags seen by the rovers camera so it can avoid
+// the collection zone
+// TODO: Add relative pose information so we know whether the
+// top of the AprilTag is pointing towards the rover or away.
+// If the top of the tags are away from the rover then treat them as obstacles 
 void ObstacleController::SetTagData(vector<TagPoint> tags){
   float cameraOffsetCorrection = 0.020; //meters;
-  centerSeen = false;
+  center_seen = false;
   countLeft = 0;
   countRight = 0;
 
@@ -154,7 +171,7 @@ void ObstacleController::SetTagData(vector<TagPoint> tags){
         } else {
           countLeft++;
         }
-        centerSeen = true;
+        center_seen = true;
         timeSinceTags = current_time;
       }
     }
