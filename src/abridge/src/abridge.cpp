@@ -175,6 +175,7 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
     right = linear + angular;
   }
 
+  // Check that the resulting motor commands do not exceed the specified safe maximum value
   if (left > max_motor_cmd)
   {
     left = max_motor_cmd;
