@@ -16,7 +16,7 @@ public:
   bool ShouldInterrupt() override;
   bool HasWork() override;
 
-  void SetResultData(Result result) {std::cout << "DC: setting result" << std::endl;this->result = result;}
+  void SetResultData(Result result) {this->result = result;}
   void SetVelocityData(float linearVelocity,float angularVelocity);
   void SetCurrentLocation(Point currentLocation) {this->currentLocation = currentLocation;}
 

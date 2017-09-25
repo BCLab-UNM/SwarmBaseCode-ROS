@@ -224,11 +224,11 @@ void LogicController::ProcessData() {
   else if (processState == PROCESS_STATE_MANUAL) {
     prioritizedControllers = {
       PrioritizedController{-1, (Controller*)(&searchController)},
-      PrioritizedController{-1, (Controller*)(&obstacleController)},
+      PrioritizedController{10, (Controller*)(&obstacleController)},
       PrioritizedController{-1, (Controller*)(&pickUpController)},
       PrioritizedController{-1, (Controller*)(&range_controller)},
       PrioritizedController{-1, (Controller*)(&dropOffController)},
-      PrioritizedController{20, (Controller*)(&manualWaypointController)}
+      PrioritizedController{5,  (Controller*)(&manualWaypointController)}
     };     
   }
 }

@@ -342,7 +342,7 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
     result = logicController.DoWork();
-    if(result.type != behavior && result.b != wait) {
+    if(result.type != behavior || result.b != wait) {
       sendDriveCommand(result.pd.left,result.pd.right);
     }
     cout << endl;
@@ -502,8 +502,29 @@ void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
 }
 
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
+  const int max_motor_cmd = 255;
   if (currentMode == 0 || currentMode == 1) {
-    sendDriveCommand(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
+    float linear  = abs(message->axes[4]) >= 0.1 ? message->axes[4]*max_motor_cmd : 0.0;
+    float angular = abs(message->axes[3]) >= 0.1 ? message->axes[3]*max_motor_cmd : 0.0;
+
+    float left = linear - angular;
+    float right = linear + angular;
+
+    if(left > max_motor_cmd) {
+      left = max_motor_cmd;
+    }
+    else if(left < -max_motor_cmd) {
+      left = -max_motor_cmd;
+    }
+
+    if(right > max_motor_cmd) {
+      right = max_motor_cmd;
+    }
+    else if(right < -max_motor_cmd) {
+      right = -max_motor_cmd;
+    }
+
+    sendDriveCommand(left, right);
   }
 }
 
