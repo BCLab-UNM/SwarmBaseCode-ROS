@@ -15,8 +15,6 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>random_numbers</build_depend>
   <build_depend>tf</build_depend>
-  <build_depend>apriltags_ros</build_depend>
-  
   <run_depend>geometry_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
