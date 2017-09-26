@@ -2,9 +2,12 @@
 
 OPTION=$1
 
-roverpass=KSC-2018
-rover=swarmie
-roverIP="r02"
+roverpass=""
+roverIP=""
+
+cd ..
+dirPath="$(pwd)"
+dirName="$(basename `pwd`)"
 
 #GOALS
 #SSH and begin ssh protocol back to workstation
@@ -19,6 +22,9 @@ roverIP="r02"
 userIP=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
 hostName=$(hostname)
 
+echo "$dirPath"
+echo "$dirName"
+
 #No Connection
 #-------------------------------------------------------------
 if [ -z "$userIP" ]; then
@@ -32,8 +38,8 @@ fi
 if [ -z $OPTION ]; then
 	echo "-------------------------------------------------------------"
 	echo "Please run this script with the following commands:"
-	echo "-G {repository name} {branch} to pull and transfer workspace to swarmie(s)"
-	echo "-F for duplicating current workspace and transferring to swarmie(s)"
+	echo "-G {branch} pulls and transfers workspace to swarmie(s)"
+	echo "-F duplicates current workspace and transfers to swarmie(s)"
 	echo "-R to run current code on all swarmie(s)"
 	echo "-------------------------------------------------------------"
 	exit 1
@@ -46,24 +52,29 @@ echo "Your network info:  $hostName@$userIP"
 #check OPTION given
 #------------------------------------------------------------
 
+while(true); do
+
 #GitHub Selection
 #------------------------------------------------------------
 if [ $OPTION == "-G" ]; then
 
+	branch=$2
+
 	#if not everything is filled out
-	if [ $# -ne 3 ]; then
-    		echo "Usage -G: {repository name} {branch}"
-	    	exit 1
+	if [ "$branch"="" ]; then
+		echo ""
+    		read -p "Branch?:  " branch
+		echo ""
 	fi
 
 	cd ~
 
-	if [ -z "$(ls -A $2/src/ublox/)" ]; then
+	if [ -z "$(ls -A $dirPath/src/ublox/)" ]; then
   		echo "The ublox submodule is missing."
   		exit 1
 	fi
 
-	if [ -z "$(ls -A $2/src/apriltags_ros/)" ]; then
+	if [ -z "$(ls -A $dirPath/src/apriltags_ros/)" ]; then
   		echo "The apriltags submodule is missing."
   		exit 1
 	fi
@@ -77,106 +88,141 @@ if [ $OPTION == "-G" ]; then
 
 	echo "Retrieving and Transferring Code from GitHub:  "
 	echo ""
-	echo "dir: $2 branch: $3"
+	echo "Type 'done' to finish, '-F' or '-R' to change your option, or 'branch' to change branches"
+	echo "dir: $dirPath branch: $branch"
 	echo "-------------------------------------------------------------"
 	echo ""
 
-	gnome-terminal -x bash -c "cd $2;
+	gnome-terminal -x bash -c "cd $dirPath;
 		echo 'Checking out branch $3';
-		git checkout $3;
+		git checkout $2;
 		sleep 2;
-		echo 'Pulling latest build on branch $3';
+		echo 'Pulling latest build on branch $2';
 		git pull;
 		sleep 2;
-		echo 'Compiling $2 branch $3...';
+		echo 'Compiling $dirName branch $2...';
 		catkin build;
 		sleep 2;
 		cd -;
 		echo 'Packing up the repository... ';
-		tar czf $2.tgz $2;
+		tar czf $dirName.tgz $dirName;
 		sleep 2; 
 		exit 1; 
 		/bin/bash;' exec $SHELL"
 
-	if [ true ]; then
-		while(true); do
-		read -p "Rover Name/IP To Start (Type 'done' to finish):  " roverIP
+	while(true); do
+		read -p "Rover Name/IP To Start:  " roverIP
 			if [ "$roverIP" =  "done" ]; then
+				exit 1
+			elif [ "$roverIP" = "-R" ]; then
+				OPTION="-R"
+				echo ""
+				echo ""
 				break	
-			fi
-
-			#If rover is on the network
-			ping -q -w2 $roverIP > /dev/null
-			if [ $? -eq 0 ]; then
-
-				echo "-------------------------------------------------------------"
-				echo "Uploading to $roverIP"
+			elif [ "$roverIP" = "-F" ]; then
+				OPTION="-F"
 				echo ""
-				echo "Copying compressed repository to swarmie at $roverIP"
-				scp $2.tgz swarmie@$roverIP:~
-				sleep 2
-				echo "Unpacking repository $2 and branch $3 on swarmie at $roverIP"
-				ssh swarmie@$roverIP "tar xzf $2.tgz"
-				echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
-
-				#ssh and run script from rover --WORKS
-				gnome-terminal -x bash -c "ssh -t $rover@$roverIP 'cd SwarmBaseCode-ROS/misc;
-					./rover_onboard_node_launch.sh $hostName;
-					exit 1;
-					/bin/bash;' 
-					exec $SHELL"
-
-				sleep 10
-
-			#if not on the network
-			else
-				echo "$roverIP was not found on the network.  Check IP and network settings!"
-				echo "-------------------------------------------------------------"	
-				sleep 4
 				echo ""
+				break
+			elif [ "$roverIP" = "branch" ]; then
+				branch=""
+				echo ""
+				echo ""
+				break
 			fi
-			done
-	fi
+		#If rover is on the network
+		ping -q -w2 $roverIP > /dev/null
+		
+		if [ $? -eq 0 ]; then
 
-	exit 1
+			echo "-------------------------------------------------------------"
+			echo "Uploading to $roverIP"
+			echo ""
+			echo "Copying compressed repository to swarmie at $roverIP"
+			scp $dirName.tgz swarmie@$roverIP:~
+			sleep 2
+			echo "Unpacking repository $dirName and branch $2 on swarmie at $roverIP"
+			gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'echo 'Unpacking $dirName.tgz ...';
+				tar xzf $dirName.tgz;
+				sleep 2;			
+				echo 'Starting ROS nodes on swarmie at $roverIP with master at $hostName';
+				sleep 2;
+				cd $dirName/misc/;
+				./rover_onboard_node_launch.sh $hostName;
+				exit 1;
+				/bin/bash;' exec $SHELL"
+
+			echo "Starting ROS nodes on swarmie at $roverIP with master at $hostName"
+			echo ""
+
+			sleep 10
+
+		#if not on the network
+		else
+			echo "$roverIP was not found on the network.  Check IP and network settings!"
+			echo "-------------------------------------------------------------"	
+			sleep 4
+			echo ""
+		fi
+
+		done
+
 fi
 
 #Transfer Local Copy
 #-------------------------------------------------------------
 if [ $OPTION == "-F" ]; then
+
+	cd ~
+
+	if [ -z "$(ls -A $dirPath/src/ublox/)" ]; then
+  		echo "The ublox submodule is missing."
+  		exit 1
+	fi
+
+	if [ -z "$(ls -A $dirPath/src/apriltags_ros/)" ]; then
+  		echo "The apriltags submodule is missing."
+  		exit 1
+	fi
+
 	echo "Copying and transferring current folder to swarmie(s)"
 	echo ""
-	echo "dir: $2"
+	echo "Type 'done' to finish or '-G' or '-R' to change your option"
+	echo ""
+	echo "dir: $dirPath"
 	echo "-------------------------------------------------------------"
 	echo ""
 
-
-	#if not everything is filled out
-	if [ $# -ne 2 ]; then
-    		echo "Usage -F: {folder name}"
-	    	exit 1
-	fi
-
-	gnome-terminal -x bash -c "cd ~/$2;
-		echo 'Compiling $2 branch $3...';
+	gnome-terminal -x bash -c "cd $dirPath;
+		echo 'Compiling $dirName';
 		catkin build;
 		sleep 2;
 		cd ~;
 		echo 'Packing up the repository... ';
-		tar czf $2.tgz $2;
+		tar czf $dirName.tgz $dirName;
 		sleep 2; 
 		exit 1; 
 		/bin/bash;' exec $SHELL"
 
-	if [ true ]; then
-		while(true); do
-		read -p "Rover Name/IP To Start (Type 'done' to finish):  " roverIP
+	while(true); do
+		read -p "Rover Name/IP To Start:  " roverIP
 			if [ "$roverIP" =  "done" ]; then
+				exit 1
+			elif [ "$roverIP" = "-G" ]; then
+				OPTION="-G"
+				echo ""
+				echo ""
 				break	
+			elif [ "$roverIP" = "-R" ]; then
+				OPTION="-R"
+				echo ""
+				echo ""
+				break
 			fi
 
 			#If rover is on the network
 			ping -q -w2 $roverIP > /dev/null
+	
 			if [ $? -eq 0 ]; then
 
 				cd ~
@@ -188,21 +234,21 @@ if [ $OPTION == "-F" ]; then
 				#Pack and send
 
 				echo "Copying compressed repository to swarmie at $roverIP"
-				scp $2.tgz swarmie@$roverIP:~
+				scp $dirName.tgz swarmie@$roverIP:~
 				sleep 2
 
 				#unpack and run
-				echo "Unpacking repository $2 on swarmie at $roverIP"
-					gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'echo 'Unpacking $2.tgz ...';
-					tar xzf $2.tgz;
+				echo "Unpacking repository $dirName on swarmie at $roverIP"
+				gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'echo 'Unpacking $dirName.tgz ...';
+					tar xzf $dirName.tgz;
 					sleep 2;			
 					echo 'Starting ROS nodes on swarmie at $roverIP with master at $hostName';
 					sleep 2;
-					cd $2/misc/;
+					cd $dirName/misc/;
 					./rover_onboard_node_launch.sh $hostName;
 					exit 1;
 					/bin/bash;' exec $SHELL"
-				
+			
 				echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
 				echo ""
 				sleep 10
@@ -215,26 +261,36 @@ if [ $OPTION == "-F" ]; then
 				echo ""
 			fi
 
+	done	
 
-
-
-		done	
-	fi
 fi
 
 #Just Run
 #-------------------------------------------------------------
 if [ $OPTION == "-R" ]; then
 	echo "Running current code on all swarmie(s)"
+	echo ""
+	echo "Type 'done' to finish or '-G' or '-F' to change your option"
 	echo "-------------------------------------------------------------"
 	echo ""
 
-	if [ true ]; then
-		while(true); do
-		read -p "Rover Name/IP To Start (Type 'done' to finish):  " roverIP
+	while(true); do
+		read -p "Rover Name/IP To Start:  " roverIP
 			if [ "$roverIP" =  "done" ]; then
+				exit 1
+			elif [ "$roverIP" = "-G" ]; then
+				OPTION="-G"
+				echo ""
+				echo ""
 				break	
+			elif [ "$roverIP" = "-F" ]; then
+				OPTION="-F"
+				echo ""
+				echo ""
+				break
 			fi
+
+		echo "$OPTION"
 
 		#If rover is on the network
 		ping -q -w2 $roverIP > /dev/null
@@ -255,6 +311,7 @@ if [ $OPTION == "-R" ]; then
 			echo ""
 		fi
 
-		done
-	fi
+	done
 fi
+
+done
