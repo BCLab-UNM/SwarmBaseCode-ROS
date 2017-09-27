@@ -15,8 +15,8 @@ function finish {
 
 trap finish EXIT
 
-# Build the current workspace 
-cd ~/rover_workspace
+# Build the current workspace
+cd $(catkin locate)
 catkin build --no-status --no-color
 
 

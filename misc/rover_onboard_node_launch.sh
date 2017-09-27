@@ -15,7 +15,7 @@ else
   ublox_dev=/dev/ttyACM0
 fi
 
-launchfile=~/rover_workspace/launch/swarmie.launch
+launchfile=$(dirname $0)/../launch/swarmie.launch
 if [ -f ./launch/swarmie.launch ]; then
     launchfile=./launch/swarmie.launch
 fi
