@@ -171,11 +171,18 @@ void ObstacleController::SetTagData(vector<Tag> tags){
         } else {
           countLeft++;
         }
-        center_seen = true;
+
+	center_seen = checkForCenterTags( tags );
         timeSinceTags = current_time;
       }
     }
   }
+
+}
+
+bool ObstacleController::checkForCenterTags( vector<Tag> tags ) {
+
+  return true;
 
 }
 

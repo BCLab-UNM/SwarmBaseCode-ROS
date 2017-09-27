@@ -31,8 +31,15 @@ protected:
 
 private:
 
+  // Try not to run over the collection zone
   void avoidCenter();
+
+  // Try not to run into a physical object
   void avoidObstacle();
+
+  // Are there AprilTags in the camera view that mark the collection zone
+  // and are those AprilTags oriented towards or away from the camera.
+  bool checkForCenterTags( vector<Tag> );
   
   const float K_angular = 1.0; //radians a second
   const float reactivateCenterThreshold = 0.8;
