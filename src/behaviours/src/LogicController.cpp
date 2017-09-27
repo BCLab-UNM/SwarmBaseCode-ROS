@@ -282,7 +282,7 @@ void LogicController::SetMapVelocityData(float linearVelocity, float angularVelo
 
 }
 
-void LogicController::SetAprilTags(vector<TagPoint> tags) {
+void LogicController::SetAprilTags(vector<Tag> tags) {
   pickUpController.SetTagData(tags);
   obstacleController.SetTagData(tags);
   dropOffController.SetTargetData(tags);

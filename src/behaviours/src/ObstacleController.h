@@ -2,7 +2,7 @@
 #define OBSTACLECONTOLLER_H
 
 #include "Controller.h"
-#include "TagPoint.h"
+#include "Tag.h"
 #include <math.h>
 
 class ObstacleController : virtual Controller
@@ -16,7 +16,7 @@ public:
   Result DoWork() override;
   void SetSonarData(float left, float center, float right);
   void SetCurrentLocation(Point currentLocation);
-  void SetTagData(vector<TagPoint> tags);
+  void SetTagData(vector<Tag> tags);
   bool ShouldInterrupt() override;
   bool HasWork() override;
   void SetIgnoreCenter();
