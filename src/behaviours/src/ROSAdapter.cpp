@@ -361,13 +361,17 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
     for (int i = 0; i < message->detections.size(); i++) {
 
+      // Package up the ROS AprilTag data into our own type that does not rely on ROS.
       TagPoint loc;
       loc.id = message->detections[i].id;
       geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
       loc.x = tagPose.pose.position.x;
       loc.y = tagPose.pose.position.y;
       loc.z = tagPose.pose.position.z;
-      //loc.theta =
+      loc.orientation = ::boost::math::quaternion<float>( tagPose.pose.orientation.x,
+						   tagPose.pose.orientation.y,
+						   tagPose.pose.orientation.z,
+						   tagPose.pose.orientation.w );
       tags.push_back(loc);
     }
     logicController.SetAprilTags(tags);
