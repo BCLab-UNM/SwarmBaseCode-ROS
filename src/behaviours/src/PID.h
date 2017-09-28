@@ -44,7 +44,7 @@ private:
   float prevSetPoint = std::numeric_limits<float>::min();
   vector<float> integralErrorHistArray;
   int step = 0;
-  float hz = 10;
+  float hz = 10;	//Rate that PID is running at
 
 };
 

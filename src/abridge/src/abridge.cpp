@@ -170,7 +170,7 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
     // Assumes left and right are always between -1 and 1
     float linear = left * max_motor_cmd; 
     float angular = right * max_motor_cmd; 
-	  
+
     left = linear - angular;
     right = linear + angular;
   }

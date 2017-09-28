@@ -306,9 +306,9 @@ PIDConfig DriveController::fastVelConfig() {
 PIDConfig DriveController::fastYawConfig() {
   PIDConfig config;
 
-  config.Kp = 240;
-  config.Ki = 25;
-  config.Kd = 0.5;
+  config.Kp = 100;
+  config.Ki = 10;
+  config.Kd = 14;
   config.satUpper = 255;
   config.satLower = -255;
   config.antiWindup = config.satUpper/2;
@@ -350,9 +350,9 @@ PIDConfig DriveController::slowVelConfig() {
 PIDConfig DriveController::slowYawConfig() {
   PIDConfig config;
 
-  config.Kp = 80;
-  config.Ki = 15;
-  config.Kd = 1.7;
+  config.Kp = 70;
+  config.Ki = 16;
+  config.Kd = 10;
   config.satUpper = 255;
   config.satLower = -255;
   config.antiWindup = config.satUpper/4;
