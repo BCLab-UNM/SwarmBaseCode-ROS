@@ -127,18 +127,48 @@ void Tag::setOrientationW( float w ){
   orientation = quaternion<float>( getOrientationX(), getOrientationY(), getOrientationZ(), w );
 }
 
+// ***
+// Consider whether to memoise the "calc" functions for performace
+// ***
+
 // Returns orientation as Roll-Pitch-Yaw
 tuple<float, float, float> Tag::calcRollPitchYaw() const {
+
+  float yaw = calcYaw();
+  float pitch = calcPitch();
+  float roll = calcRoll();
+
+  return make_tuple(roll, pitch, yaw);
+}
+
+float Tag::calcYaw() const {
 
   float x = getOrientationX();
   float y = getOrientationY();
   float z = getOrientationZ();
   float w = getOrientationW();
 
-  float yaw = atan2(2.0f*(y*z + w*x), w*w - x*x - y*y + z*z);
-  float pitch = asin(-2.0f*(x*z - w*y));
-  float roll = atan2(2.0f*(y + w*z), w*w + x*x - y*y - z*z);
-
-  return make_tuple(roll, pitch, yaw);
+  return atan2(2.0f*(y*z + w*x), w*w - x*x - y*y + z*z);
 }
+
+float Tag::calcPitch() const {
+
+  float x = getOrientationX();
+  float y = getOrientationY();
+  float z = getOrientationZ();
+  float w = getOrientationW();
+
+  return asin(-2.0f*(x*z - w*y));
+}
+
+float Tag::calcRoll() const {
+
+  float x = getOrientationX();
+  float y = getOrientationY();
+  float z = getOrientationZ();
+  float w = getOrientationW();
+
+  return atan2(2.0f*(y + w*z), w*w + x*x - y*y - z*z);
+}
+
 

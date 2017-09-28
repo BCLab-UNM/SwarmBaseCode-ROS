@@ -44,7 +44,10 @@ class Tag {
   void setOrientationW( float );
   
   std::tuple<float,float,float> calcRollPitchYaw() const;;
-
+  float calcRoll() const;
+  float calcPitch() const;
+  float calcYaw() const;
+  
   // Allow writing of tag data to an output stream by  extending ostream.
   friend std::ostream& operator<<(std::ostream&, const Tag& );
   

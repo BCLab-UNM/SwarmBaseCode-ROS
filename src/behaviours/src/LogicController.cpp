@@ -238,24 +238,24 @@ void LogicController::controllerInterconnect() {
 
     //obstacle needs to know if the center ultrasound should be ignored
     if(pickUpController.GetIgnoreCenter()) {
-      obstacleController.SetIgnoreCenter();
+      obstacleController.setIgnoreCenterSonar();
     }
 
     //pickup controller annouces it has pickedup a target
     if(pickUpController.GetTargetHeld()) {
       dropOffController.SetTargetPickedUp();
-      obstacleController.SetTargetHeld();
+      obstacleController.setTargetHeld();
       searchController.SetSuccesfullPickup();
     }
   }
 
   //ask if drop off has released the target from the claws yet
   if (!dropOffController.HasTarget()) {
-    obstacleController.SetTargetHeldClear();
+    obstacleController.setTargetHeldClear();
   }
 
   //obstacle controller is running driveController needs to clear its waypoints
-  if(obstacleController.GetShouldClearWaypoints()) {
+  if(obstacleController.getShouldClearWaypoints()) {
     driveController.Reset();
   }
 }
@@ -264,7 +264,7 @@ void LogicController::controllerInterconnect() {
 void LogicController::SetPositionData(Point currentLocation) {
   searchController.SetCurrentLocation(currentLocation);
   dropOffController.SetCurrentLocation(currentLocation);
-  obstacleController.SetCurrentLocation(currentLocation);
+  obstacleController.setCurrentLocation(currentLocation);
   driveController.SetCurrentLocation(currentLocation);
 }
 
@@ -284,13 +284,13 @@ void LogicController::SetMapVelocityData(float linearVelocity, float angularVelo
 
 void LogicController::SetAprilTags(vector<Tag> tags) {
   pickUpController.SetTagData(tags);
-  obstacleController.SetTagData(tags);
+  obstacleController.setTagData(tags);
   dropOffController.SetTargetData(tags);
 }
 
 void LogicController::SetSonarData(float left, float center, float right) {
   pickUpController.SetSonarData(center);
-  obstacleController.SetSonarData(left,center,right);
+  obstacleController.setSonarData(left,center,right);
 }
 
 // Called once by RosAdapter in guarded init
@@ -319,5 +319,5 @@ void LogicController::SetCurrentTimeInMilliSecs( long int time )
   current_time = time;
   dropOffController.SetCurrentTimeInMilliSecs( time );
   pickUpController.SetCurrentTimeInMilliSecs( time );
-  obstacleController.SetCurrentTimeInMilliSecs( time );
+  obstacleController.setCurrentTimeInMilliSecs( time );
 }
