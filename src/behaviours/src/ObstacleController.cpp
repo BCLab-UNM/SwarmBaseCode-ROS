@@ -150,9 +150,9 @@ void ObstacleController::ProcessData() {
 
 // Report April tags seen by the rovers camera so it can avoid
 // the collection zone
-// TODO: Add relative pose information so we know whether the
+// Added relative pose information so we know whether the
 // top of the AprilTag is pointing towards the rover or away.
-// If the top of the tags are away from the rover then treat them as obstacles 
+// If the top of the tags are away from the rover then treat them as obstacles. 
 void ObstacleController::setTagData(vector<Tag> tags){
   collection_zone_seen = false;
   count_left_collection_zone_tags = 0;
