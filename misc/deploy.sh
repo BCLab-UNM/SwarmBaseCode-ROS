@@ -12,10 +12,6 @@ dirName="$(basename `pwd`)"
 #Functions
 #--------------------------------------------------------------------------
 
-setTitle() {
-    echo -e "\033]0;$@\007" 
-}
-
 Check()
 {
 
@@ -103,6 +99,9 @@ Run()
 
 DispOpt()
 {
+	clear
+
+	echo "Your network info:  $hostName@$userIP"
 	echo ""
 	echo "Type 'exit' to quit"
 
@@ -171,8 +170,6 @@ fi
 
 clear
 
-echo "Your network info:  $hostName@$userIP"
-
 #check OPTION given
 #------------------------------------------------------------
 
@@ -204,7 +201,6 @@ if [ $OPTION == "-G" ]; then
 	Check
 	PullGit_Pack
 
-
 	while(true); do
 		read -p "Rover Name/IP To Start:  " roverIP
 			if [ "$roverIP" =  "exit" ]; then
@@ -228,7 +224,6 @@ if [ $OPTION == "-G" ]; then
 
 		#If rover is on the network
 		ping -q -w2 $roverIP > /dev/null
-		
 		if [ $? -eq 0 ]; then
 
 			SuccessPing
@@ -236,7 +231,6 @@ if [ $OPTION == "-G" ]; then
 			#Transfer/Unpack/Run
 			Transfer
 			Unpack_Run
-
 			sleep 10
 
 		#if not on the network
@@ -282,7 +276,6 @@ if [ $OPTION == "-L" ]; then
 
 			#If rover is on the network
 			ping -q -w2 $roverIP > /dev/null
-
 			if [ $? -eq 0 ]; then
 
 				SuccessPing
@@ -290,22 +283,18 @@ if [ $OPTION == "-L" ]; then
 				#Transfer/Unpack/Run
 				Transfer
 				Unpack_Run
-
 				sleep 10
 
 			#if not on the network
 			else
 				FailPing
 			fi
-
 	done	
-
 fi
 
 #Just Run
 #-------------------------------------------------------------
 if [ $OPTION == "-R" ]; then
-
 
 	DispOpt
 
@@ -334,17 +323,13 @@ if [ $OPTION == "-R" ]; then
 		if [ $? -eq 0 ]; then
 
 			SuccessPing
-
-			#Run Rover Script
 			Run
-
 			sleep 10
 
 		#if not on the network
-		else
+		else	
 			FailPing
 		fi
-
 	done
 fi
 
