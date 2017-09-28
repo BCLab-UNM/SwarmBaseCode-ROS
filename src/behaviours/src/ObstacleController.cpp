@@ -154,7 +154,6 @@ void ObstacleController::ProcessData() {
 // top of the AprilTag is pointing towards the rover or away.
 // If the top of the tags are away from the rover then treat them as obstacles 
 void ObstacleController::SetTagData(vector<Tag> tags){
-  float cameraOffsetCorrection = 0.020; //meters;
   center_seen = false;
   countLeft = 0;
   countRight = 0;
@@ -163,14 +162,6 @@ void ObstacleController::SetTagData(vector<Tag> tags){
   if (!targetHeld) {
     for (int i = 0; i < tags.size(); i++) {
       if (tags[i].getID() == 256) {
-
-        // checks if tag is on the right or left side of the image
-        if (tags[i].getPositionX() + cameraOffsetCorrection > 0) {
-          countRight++;
-
-        } else {
-          countLeft++;
-        }
 
 	center_seen = checkForCenterTags( tags );
         timeSinceTags = current_time;
@@ -182,6 +173,23 @@ void ObstacleController::SetTagData(vector<Tag> tags){
 
 bool ObstacleController::checkForCenterTags( vector<Tag> tags ) {
 
+  // Get the orientation of the tags
+  for ( auto & tag : tags ) { 
+
+    // Check the orientation of the tag
+
+    cout << tag << endl;
+    
+    // checks if tag is on the right or left side of the image
+    if (tag.getPositionX() + camera_offset_correction > 0) {
+      countRight++;
+      
+    } else {
+      countLeft++;
+    }
+    
+  }
+  
   return true;
 
 }

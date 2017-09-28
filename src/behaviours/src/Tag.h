@@ -3,6 +3,7 @@
 
 #include <boost/math/quaternion.hpp> // For quaternion
 #include <tuple> // For packaging position and orientation values
+#include <iostream> // For output streams
 
 // Stores AprilTag data
 class Tag {
@@ -13,25 +14,26 @@ class Tag {
   Tag( const Tag &that);
   
   // Getters and setters
-  int getID();
+  int getID() const;
   void setID( int ); 
 
   // Get and set positions as <x,y,z> tuples
-  std::tuple<float, float, float> getPosition();
+  std::tuple<float, float, float> getPosition() const;;
   void setPosition( std::tuple<float, float, float> );
   
   // Get and set orientation as a <x,y,z,w> quaternion
-  ::boost::math::quaternion<float> getOrientation();
+  ::boost::math::quaternion<float> getOrientation() const;;
   void setOrientation( ::boost::math::quaternion<float> );
 
-  // convenience accessor functions
-  float getPositionX();
-  float getPositionY();
-  float getPositionZ();
-  float getOrientationX();
-  float getOrientationY();
-  float getOrientationZ();
-  float getOrientationW();
+  // convenience accessor functions. The const keyword promises that we will not modify
+  // class data as a side-effect of getting data.
+  float getPositionX() const;
+  float getPositionY() const;
+  float getPositionZ() const;
+  float getOrientationX() const;
+  float getOrientationY() const;
+  float getOrientationZ() const;
+  float getOrientationW() const;
 
   void setPositionX( float );
   void setPositionY( float );
@@ -41,8 +43,14 @@ class Tag {
   void setOrientationZ( float );
   void setOrientationW( float );
   
+  std::tuple<float,float,float> calcRollPitchYaw() const;;
+
+  // Allow writing of tag data to an output stream by  extending ostream.
+  friend std::ostream& operator<<(std::ostream&, const Tag& );
   
- private:
+
+  
+  private:
 
   // Tag ID
   int id = 0;

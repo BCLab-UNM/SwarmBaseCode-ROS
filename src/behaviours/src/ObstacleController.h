@@ -80,6 +80,8 @@ private:
   
   bool set_waypoint = false;
   bool can_set_waypoint = false;
+
+  float camera_offset_correction = 0.020; //meters;
 };
 
 #endif // OBSTACLECONTOLLER_H
