@@ -16,7 +16,7 @@ bool ManualWaypointController::HasWork() {
 bool ManualWaypointController::ShouldInterrupt() {
   bool interrupt = false;
   // If the size of the manual waypoint list has changed, then interrupt.
-  if(num_waypoints != waypoints.waypoints.size()) {
+  if(num_waypoints != waypoints.waypoints.size() && !waypoints.waypoints.empty()) {
     interrupt = true;
     num_waypoints = waypoints.waypoints.size();
   }
@@ -28,7 +28,6 @@ Result ManualWaypointController::DoWork() {
   result.type = waypoint;
   result.wpts.waypoints.push_back(waypoints.waypoints.front());
   result.PIDMode = FAST_PID;
-  std::cout << "returning waypoint" << std::endl;
   return result;
 }
 
@@ -40,7 +39,6 @@ void ManualWaypointController::SetCurrentLocation(Point currentLocation)
              waypoints.waypoints.front().y-currentLocation.y)
        < waypoint_tolerance) {
       waypoints.waypoints.erase(waypoints.waypoints.begin());
-      std::cout << "cleared waypoint!" << std::endl;
     }
   }
 }
