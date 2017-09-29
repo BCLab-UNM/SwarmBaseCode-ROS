@@ -105,20 +105,24 @@ float PID::PIDOut(float calculatedError, float setPoint) {
   if (fabs(P) < config.antiWindup)
   {
     float avgPrevError = 0;
-    for (int i = 1; i < Error.size(); i++) {
+    for (int i = 1; i < Error.size(); i++)
+    {
       avgPrevError += Error[i];
     }
-    if (Error.size() > 1) {
+    if (Error.size() > 1)
+    {
       avgPrevError /= Error.size()-1;
     }
-    else {
+    else
+    {
       avgPrevError = Error[0];
     }
 
-    D = config.Kd * (((1-config.derivativeAlpha)*Error[0]) - (config.derivativeAlpha * avgPrevError));
+    D = config.Kd * (Error[0] - Error[1]) * hz;
   }
 
   float PIDOut = P + I + D + FF;
+
   if (PIDOut > config.satUpper) //cap vel command
   {
     PIDOut = config.satUpper;
