@@ -111,7 +111,20 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
+catkin_python_setup()
+
 set(CMAKE_BUILD_TYPE Debug)
+
+install (
+  PROGRAMS 
+  scripts/rqt_rover_gui
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS rqt_rover_gui
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
 install(FILES plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

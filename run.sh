@@ -5,8 +5,13 @@ previous_gazebo_plugin_path=${GAZEBO_PLUGIN_PATH}
 export SWARMATHON_APP_ROOT="$PWD"
 export GAZEBO_MODEL_PATH="$PWD/simulation/models"
 export GAZEBO_PLUGIN_PATH="$PWD/build/gazebo_plugins"
-source "$PWD/devel/setup.bash"
 echo Cleaning up ROS and Gazebo Processes
+
+if [ -d "$(dirname $0)/install" ]; then 
+    source "$(dirname $0)/install/setup.bash"
+else
+    source "$(dirname $0)/devel/setup.bash"
+fi
 
 #Delete the rqt cache - can take 24 hours for changes in the UI
 # to show up otherwise
