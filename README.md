@@ -248,3 +248,24 @@ Since ROS is multithreaded you may need to attach the debugger to threads that h
 ```sudo setcap cap_sys_ptrace=eip /usr/bin/gdb```
 
 To use QT Creator to debug your already running program click the "Debug" menu. Choose "Start Debugging" and then "Attach to Running Application...". You will be able to use the graphical interface to GDB from here. 
+
+### Using the deploy.sh Script
+
+"deploy.sh" is a new script found in the SwarmBaseCode-ROS/misc folder that automates some of the old manual means of connecting rovers to a workstation.  Instead of needing to ssh and run the startup scripts yourself, you can run deploy.sh and have it automate the process for you.  Now connecting to swarmies takes seconds.
+
+The script is ran from your workstation and not the swarmies themselves.  Before running the script from your workstation ensure you run the commands:
+
+```cd ~/SwarmBaseCode-ROS/misc```
+
+```chmod +x deploy.sh```
+
+The script has several built in features:
+
+deploy.sh -R
+- This will simply connect and run the startup scripts to what ever code you currently have on the swarmie.  
+
+deploy.sh -L
+- This will take your current local file, build, package, and send to the physical rover and run the startup script.  This was added so groups could make changes to code on their local machines as opposed to writing code on the rovers themselves.  This allows you to quickly make a tweak on your current machine and test it on the rovers with relative ease.
+
+deploy.sh -G {branch}
+- This option will pull the latest code from the {branch} selected and transfer that code onto the swarmie and run the startup scripts.  This is a great tool for updating and testing changes made to rovers that have code to test from github.
