@@ -21,6 +21,7 @@
 #include <nav_msgs/Odometry.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32MultiArray.h>
+#include "swarmie_msgs/Waypoint.h"
 
 // Include Controllers
 #include "LogicController.h"
@@ -157,7 +158,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInf
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void virtualFenceHandler(const std_msgs::Float32MultiArray& message);
-void manualWaypointHandler(const geometry_msgs::Pose2D& message);
+void manualWaypointHandler(const swarmie_msgs::Waypoint& message);
 void behaviourStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
@@ -535,7 +536,7 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&) {
   status_publisher.publish(msg);
 }
 
-void manualWaypointHandler(const geometry_msgs::Pose2D& message) {
+void manualWaypointHandler(const swarmie_msgs::Waypoint& message) {
   Point wp;
   wp.x = message.x;
   wp.y = message.y;
