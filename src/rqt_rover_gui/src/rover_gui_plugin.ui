@@ -41,7 +41,7 @@ border-color: rgb(255, 255, 255);</string>
      <x>330</x>
      <y>10</y>
      <width>761</width>
-     <height>551</height>
+     <height>521</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -118,10 +118,10 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>290</y>
-       <width>281</width>
-       <height>191</height>
+       <x>246</x>
+       <y>306</y>
+       <width>209</width>
+       <height>179</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -140,10 +140,10 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::MapFrame" name="map_frame">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>10</y>
-       <width>320</width>
-       <height>271</height>
+       <x>392</x>
+       <y>26</y>
+       <width>354</width>
+       <height>249</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -162,10 +162,10 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::USFrame" name="us_frame">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>290</y>
-       <width>281</width>
-       <height>191</height>
+       <x>16</x>
+       <y>306</y>
+       <width>209</width>
+       <height>179</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -178,10 +178,10 @@ QTabBar::tab:only-one {
     <widget class="rqt_rover_gui::CameraFrame" name="camera_frame">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>320</width>
-       <height>271</height>
+       <x>16</x>
+       <y>26</y>
+       <width>354</width>
+       <height>249</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -191,144 +191,425 @@ QTabBar::tab:only-one {
       <enum>QFrame::Raised</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="gps_checkbox">
+    <widget class="QFrame" name="map_settings_frame">
      <property name="geometry">
       <rect>
-       <x>670</x>
-       <y>50</y>
-       <width>81</width>
-       <height>22</height>
+       <x>470</x>
+       <y>300</y>
+       <width>281</width>
+       <height>191</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GPS aligned with the map output (mutually recursive with MAP)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
-     <property name="text">
-      <string>NAVSAT</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
+     <widget class="QPushButton" name="map_popout_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>145</y>
+        <width>60</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+      </property>
+      <property name="text">
+       <string>Popout</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ekf_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>40</y>
+        <width>60</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EKF combination of IMU, Encoders and GPS (mutually recursive with NAVSAT)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>MAP</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="encoder_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>40</y>
+        <width>75</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EKF combination of IMU and Encoders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>ODOM</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="gps_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>91</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GPS aligned with the map output (mutually recursive with MAP)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>NAVSAT</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="map_manual_radio_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>110</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Manual</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="map_auto_radio_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>110</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Auto</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="unique_rover_colors_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>145</y>
+        <width>165</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Unique Rover Colors</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="global_offset_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Global Frame</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="map_frame_views_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>125</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Frame Views</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="map_frame_views_label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>90</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Panning</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
-    <widget class="QCheckBox" name="ekf_checkbox">
+    <widget class="QLabel" name="map_settings_label">
      <property name="geometry">
       <rect>
-       <x>670</x>
-       <y>10</y>
-       <width>91</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EKF combination of IMU, Encoders and GPS (mutually recursive with NAVSAT)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>MAP</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="encoder_checkbox">
-     <property name="geometry">
-      <rect>
-       <x>670</x>
-       <y>30</y>
-       <width>81</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EKF combination of IMU and Encoders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>ODOM</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="map_manual_radio_button">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>670</x>
-       <y>85</y>
-       <width>117</width>
+       <x>490</x>
+       <y>290</y>
+       <width>105</width>
        <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
      </property>
      <property name="text">
-      <string>Manual</string>
+      <string>Map Settings</string>
      </property>
-     <property name="checked">
-      <bool>false</bool>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
-     <attribute name="buttonGroup">
-      <string notr="true">map_display_button_group</string>
-     </attribute>
-    </widget>
-    <widget class="QRadioButton" name="map_auto_radio_button">
-     <property name="enabled">
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
+    </widget>
+    <widget class="QFrame" name="imu_frame_frame">
      <property name="geometry">
       <rect>
-       <x>670</x>
-       <y>110</y>
-       <width>171</width>
-       <height>16</height>
+       <x>240</x>
+       <y>300</y>
+       <width>221</width>
+       <height>191</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="us_frame_frame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>300</y>
+       <width>221</width>
+       <height>191</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="IMU_label">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>290</y>
+       <width>40</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
      </property>
      <property name="text">
-      <string>Auto</string>
+      <string>IMU</string>
      </property>
-     <property name="checked">
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
-     <attribute name="buttonGroup">
-      <string notr="true">map_display_button_group</string>
-     </attribute>
     </widget>
-    <widget class="QPushButton" name="map_popout_button">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
+    <widget class="QLabel" name="ultrasound_label">
      <property name="geometry">
       <rect>
-       <x>680</x>
-       <y>140</y>
-       <width>61</width>
-       <height>22</height>
+       <x>30</x>
+       <y>290</y>
+       <width>90</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);
-border: 1px solid white; 
-</string>
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
      </property>
      <property name="text">
-      <string>Popout</string>
+      <string>Ultrasound</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <widget class="QFrame" name="camera_frame_frame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>366</width>
+       <height>261</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="map_frame_frame">
+     <property name="geometry">
+      <rect>
+       <x>386</x>
+       <y>20</y>
+       <width>366</width>
+       <height>261</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="map_label">
+     <property name="geometry">
+      <rect>
+       <x>406</x>
+       <y>10</y>
+       <width>40</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
+     </property>
+     <property name="text">
+      <string>Map</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="map_label_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>10</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
+     </property>
+     <property name="text">
+      <string>Camera</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <zorder>map_frame_frame</zorder>
+    <zorder>camera_frame_frame</zorder>
+    <zorder>us_frame_frame</zorder>
+    <zorder>imu_frame_frame</zorder>
+    <zorder>map_settings_frame</zorder>
+    <zorder>imu_frame</zorder>
+    <zorder>map_frame</zorder>
+    <zorder>us_frame</zorder>
+    <zorder>camera_frame</zorder>
+    <zorder>map_settings_label</zorder>
+    <zorder>map_label_2</zorder>
+    <zorder>map_label</zorder>
+    <zorder>ultrasound_label</zorder>
+    <zorder>IMU_label</zorder>
    </widget>
    <widget class="QWidget" name="simulation_parameters_tab">
     <attribute name="title">
@@ -338,9 +619,9 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
-       <width>301</width>
-       <height>306</height>
+       <y>20</y>
+       <width>531</width>
+       <height>311</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -353,9 +634,9 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>141</width>
-        <height>161</height>
+        <y>20</y>
+        <width>161</width>
+        <height>111</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -371,10 +652,10 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>30</y>
          <width>91</width>
-         <height>22</height>
+         <height>16</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -393,10 +674,10 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>90</y>
+         <x>20</x>
+         <y>70</y>
          <width>101</width>
-         <height>22</height>
+         <height>16</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -412,10 +693,10 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>60</y>
-         <width>91</width>
-         <height>22</height>
+         <x>20</x>
+         <y>50</y>
+         <width>101</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -434,10 +715,10 @@ border-color: rgb(255, 255, 255);</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>120</y>
-         <width>117</width>
-         <height>22</height>
+         <x>20</x>
+         <y>90</y>
+         <width>121</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="toolTip">
@@ -447,7 +728,7 @@ border-color: rgb(255, 255, 255);</string>
         <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
-        <string>Custom</string>
+        <string>Custom World</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -460,8 +741,8 @@ border-color: rgb(255, 255, 255);</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>130</y>
+        <x>160</x>
+        <y>105</y>
         <width>70</width>
         <height>25</height>
        </rect>
@@ -482,10 +763,10 @@ border: 1px solid white;
      <widget class="QGroupBox" name="round_type_button_group">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>30</y>
-        <width>121</width>
-        <height>91</height>
+        <x>280</x>
+        <y>120</y>
+        <width>211</width>
+        <height>131</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -495,7 +776,7 @@ border-color: rgb(255, 255, 255);</string>
       <property name="title">
        <string>Round Type</string>
       </property>
-      <widget class="QRadioButton" name="joystick_radio_button">
+      <widget class="QRadioButton" name="prelim_radio_button">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -503,7 +784,7 @@ border-color: rgb(255, 255, 255);</string>
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>161</width>
+         <width>111</width>
          <height>22</height>
         </rect>
        </property>
@@ -524,8 +805,8 @@ border-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
-         <width>117</width>
+         <y>50</y>
+         <width>71</width>
          <height>22</height>
         </rect>
        </property>
@@ -536,12 +817,107 @@ border-color: rgb(255, 255, 255);</string>
         <string>Final </string>
        </property>
       </widget>
+      <widget class="QRadioButton" name="unbounded_radio_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>111</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>Unbounded</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="unbounded_arena_size_label">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>98</y>
+         <width>81</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: grey;</string>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Arena Size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="unbounded_arena_size_combobox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>125</x>
+         <y>95</y>
+         <width>71</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: grey;
+border-color: grey;
+border: 1px solid grey; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>15</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>20</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>25</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>30</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>35</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>40</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>45</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>50</string>
+        </property>
+       </item>
+      </widget>
      </widget>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="ground_texture_label">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>190</y>
+        <y>180</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -559,9 +935,9 @@ border-color: rgb(255, 255, 255);</string>
      <widget class="QComboBox" name="texture_combobox">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>190</y>
-        <width>131</width>
+        <x>140</x>
+        <y>180</y>
+        <width>121</width>
         <height>27</height>
        </rect>
       </property>
@@ -591,14 +967,16 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <widget class="QLabel" name="custom_world_path">
       <property name="geometry">
        <rect>
-        <x>68</x>
-        <y>162</y>
-        <width>200</width>
+        <x>58</x>
+        <y>140</y>
+        <width>203</width>
         <height>20</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
+       <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
       </property>
       <property name="text">
        <string/>
@@ -611,7 +989,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>230</y>
+        <y>220</y>
         <width>181</width>
         <height>22</height>
        </rect>
@@ -632,9 +1010,9 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>230</y>
-        <width>71</width>
+        <x>200</x>
+        <y>220</y>
+        <width>61</width>
         <height>27</height>
        </rect>
       </property>
@@ -680,17 +1058,27 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
         <string>6</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </item>
      </widget>
-     <widget class="QComboBox" name="simulation_timer_combo_box">
+     <widget class="QComboBox" name="simulation_timer_combobox">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>270</y>
-        <width>131</width>
-        <height>23</height>
+        <y>260</y>
+        <width>111</width>
+        <height>27</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -730,6 +1118,11 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </item>
       <item>
        <property name="text">
+        <string>20 min (Preliminary)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>30 min (Preliminary)</string>
        </property>
       </item>
@@ -743,7 +1136,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>270</y>
+        <y>260</y>
         <width>130</width>
         <height>20</height>
        </rect>
@@ -758,340 +1151,217 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
       </property>
      </widget>
+     <widget class="QCheckBox" name="create_savable_world_checkbox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>260</y>
+        <width>211</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When checked, a Gazebo world without rovers, walls, ground texture, or a collection zone will be created. The purpose of this option is to generate tag distributions using the Uniform, Clustered, or Power Law in a way that you can save the world file from Gazebo and re-use that same distribution later using the Custom world option. It will also load much faster as well when loading a pre-built distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, a Gazebo world without rovers, walls, ground texture, or a collection zone will be created. The purpose of this option is to generate tag distributions using the Uniform, Clustered, or Power Law in a way that you can save the world file from Gazebo and re-use that same distribution later using the Custom world option. It will also load much faster as well when loading a pre-built distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Create Savable Gazebo World</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="number_of_tags_combobox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>55</y>
+        <width>131</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string notr="true">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The number of april tag cubes generated by the Uniform or Clustered distributions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of april tag cubes generated by the Uniform or Clustered distributions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: grey;
+border-color: grey;
+border: 1px solid grey; 
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>256</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>128</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>64</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>32</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>16</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="number_of_tags_label">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>35</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: grey;</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Number of Cubes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="number_of_tags_label_2">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>80</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;*not available for Power Law or Custom World&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+      </property>
+     </widget>
+     <zorder>round_type_button_group</zorder>
+     <zorder>target_distribution_group_box</zorder>
+     <zorder>custom_world_path_button</zorder>
+     <zorder>ground_texture_label</zorder>
+     <zorder>texture_combobox</zorder>
+     <zorder>custom_world_path</zorder>
+     <zorder>override_num_rovers_checkbox</zorder>
+     <zorder>custom_num_rovers_combobox</zorder>
+     <zorder>simulation_timer_combobox</zorder>
+     <zorder>simulation_timer_label</zorder>
+     <zorder>create_savable_world_checkbox</zorder>
+     <zorder>number_of_tags_label</zorder>
+     <zorder>number_of_tags_label_2</zorder>
+     <zorder>number_of_tags_combobox</zorder>
     </widget>
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>50</y>
-       <width>121</width>
+       <x>205</x>
+       <y>10</y>
+       <width>140</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Simulation Setup&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-    </widget>
-    <widget class="QLabel" name="rover_image_label">
-     <property name="geometry">
-      <rect>
-       <x>290</x>
-       <y>20</y>
-       <width>501</width>
-       <height>427</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../resources/rover.png</pixmap>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="build_simulation_button">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>370</y>
-       <width>161</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);
-border: 1px solid white; 
-</string>
-     </property>
-     <property name="text">
-      <string>Build Simulation</string>
-     </property>
-    </widget>
-    <widget class="QFrame" name="frame_2">
-     <property name="geometry">
-      <rect>
-       <x>510</x>
-       <y>330</y>
-       <width>191</width>
-       <height>161</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <widget class="QLabel" name="label_39">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>71</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Horz. Res</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_40">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>70</y>
-        <width>71</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Min Ang.</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_41">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>71</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Max Ang.</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_42">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>71</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Max</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_43">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>71</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Min</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_44">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>110</y>
-        <width>131</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Range Resolution</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_range_res">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>110</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_max_angle">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>90</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_min_angle">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>70</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_max">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>50</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_min">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>30</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_horz_res">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>10</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_65">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>130</y>
-        <width>121</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Gaussian Noise</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="sonar_gaussian_noise">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>130</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>val</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QPushButton" name="clear_simulation_button">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>400</y>
-       <width>161</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);
-border: 1px solid white; 
-</string>
-     </property>
-     <property name="text">
-      <string>End Simulation</string>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="label_11">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>310</y>
-       <width>31</width>
-       <height>17</height>
+       <x>220</x>
+       <y>340</y>
+       <width>40</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
      </property>
      <property name="text">
       <string>GPS</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
-    <widget class="QFrame" name="frame_4">
+    <widget class="QFrame" name="GPS_frame">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>320</y>
-       <width>151</width>
-       <height>181</height>
+       <x>200</x>
+       <y>350</y>
+       <width>201</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -1104,10 +1374,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>25</y>
         <width>61</width>
-        <height>17</height>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1122,8 +1397,13 @@ border: 1px solid white;
         <x>10</x>
         <y>10</y>
         <width>61</width>
-        <height>17</height>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1136,10 +1416,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
-        <width>71</width>
-        <height>17</height>
+        <y>40</y>
+        <width>61</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1152,10 +1437,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
-        <width>71</width>
-        <height>17</height>
+        <y>55</y>
+        <width>61</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1167,11 +1457,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_update_rate">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>79</x>
         <y>10</y>
-        <width>51</width>
-        <height>17</height>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1183,11 +1478,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_ref_lat">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>30</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>25</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1199,11 +1499,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_ref_long">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>50</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>40</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1215,11 +1520,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_ref_heading">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>70</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>55</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1232,10 +1542,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
-        <width>71</width>
-        <height>17</height>
+        <y>85</y>
+        <width>61</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1248,10 +1563,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
-        <width>71</width>
-        <height>17</height>
+        <y>100</y>
+        <width>61</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1264,10 +1584,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>150</y>
-        <width>71</width>
-        <height>17</height>
+        <y>115</y>
+        <width>61</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1279,11 +1604,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_drift">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>110</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>85</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1295,11 +1625,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_drift_freq">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>130</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>100</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1311,11 +1646,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_noise">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>150</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>115</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1328,10 +1668,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
-        <width>71</width>
-        <height>17</height>
+        <y>70</y>
+        <width>61</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1343,11 +1688,16 @@ border: 1px solid white;
      <widget class="QLabel" name="gps_ref_alt">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>90</y>
-        <width>51</width>
-        <height>17</height>
+        <x>79</x>
+        <y>70</y>
+        <width>111</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1357,29 +1707,13 @@ border: 1px solid white;
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_12">
+    <widget class="QFrame" name="IMU_frame">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>130</y>
-       <width>31</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>IMU</string>
-     </property>
-    </widget>
-    <widget class="QFrame" name="frame_5">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>140</y>
-       <width>271</width>
-       <height>171</height>
+       <x>410</x>
+       <y>350</y>
+       <width>341</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -1391,11 +1725,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_27">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>170</x>
         <y>10</y>
-        <width>61</width>
-        <height>17</height>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1408,10 +1747,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
-        <width>91</width>
-        <height>17</height>
+        <y>25</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1424,10 +1768,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
-        <width>61</width>
-        <height>17</height>
+        <y>40</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1440,10 +1789,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
-        <width>81</width>
-        <height>17</height>
+        <y>75</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1455,11 +1809,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_31">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>30</y>
-        <width>91</width>
-        <height>17</height>
+        <x>170</x>
+        <y>25</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1471,11 +1830,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_32">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>50</y>
-        <width>91</width>
-        <height>17</height>
+        <x>170</x>
+        <y>40</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1489,9 +1853,14 @@ border: 1px solid white;
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>61</width>
-        <height>17</height>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1503,11 +1872,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_34">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>100</y>
-        <width>91</width>
-        <height>17</height>
+        <x>170</x>
+        <y>75</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1519,11 +1893,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_35">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>120</y>
-        <width>91</width>
-        <height>17</height>
+        <x>170</x>
+        <y>90</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1535,11 +1914,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_36">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>80</y>
-        <width>91</width>
-        <height>17</height>
+        <x>170</x>
+        <y>60</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1552,10 +1936,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
-        <width>81</width>
-        <height>17</height>
+        <y>60</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1568,10 +1957,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
-        <width>81</width>
-        <height>17</height>
+        <y>95</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1583,11 +1977,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_update_rate">
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>240</x>
         <y>10</y>
-        <width>41</width>
-        <height>17</height>
+        <width>90</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1599,11 +1998,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_rate_drift">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>30</y>
-        <width>41</width>
-        <height>17</height>
+        <x>240</x>
+        <y>25</y>
+        <width>90</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1615,11 +2019,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_rate_noise">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>50</y>
-        <width>41</width>
-        <height>17</height>
+        <x>240</x>
+        <y>40</y>
+        <width>90</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1631,11 +2040,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_heading_drift">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>100</y>
-        <width>41</width>
-        <height>17</height>
+        <x>240</x>
+        <y>75</y>
+        <width>90</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1647,11 +2061,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_heading_noise">
       <property name="geometry">
        <rect>
-        <x>180</x>
-        <y>120</y>
-        <width>41</width>
-        <height>17</height>
+        <x>240</x>
+        <y>90</y>
+        <width>90</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1663,11 +2082,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_accel_drift">
       <property name="geometry">
        <rect>
-        <x>60</x>
-        <y>30</y>
-        <width>41</width>
+        <x>80</x>
+        <y>25</y>
+        <width>85</width>
         <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1679,11 +2103,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_accel_noise">
       <property name="geometry">
        <rect>
-        <x>60</x>
-        <y>50</y>
-        <width>41</width>
+        <x>80</x>
+        <y>40</y>
+        <width>85</width>
         <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1695,11 +2124,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_rpy_offsets">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>100</y>
-        <width>41</width>
-        <height>17</height>
+        <x>80</x>
+        <y>75</y>
+        <width>85</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1711,11 +2145,16 @@ border: 1px solid white;
      <widget class="QLabel" name="imu_noise">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>130</y>
-        <width>51</width>
-        <height>17</height>
+        <x>80</x>
+        <y>95</y>
+        <width>85</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1727,27 +2166,40 @@ border: 1px solid white;
      <widget class="QLabel" name="label_63">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>150</y>
-        <width>151</width>
-        <height>17</height>
+        <x>10</x>
+        <y>110</y>
+        <width>60</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Magnetic Declination&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>Magnetic Declination</string>
+       <string>Mag. Dec.</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_64">
       <property name="geometry">
        <rect>
-        <x>180</x>
-        <y>150</y>
-        <width>51</width>
-        <height>17</height>
+        <x>80</x>
+        <y>110</y>
+        <width>85</width>
+        <height>16</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1757,28 +2209,12 @@ border: 1px solid white;
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_17">
+    <widget class="QFrame" name="camera_frame_status">
      <property name="geometry">
       <rect>
-       <x>520</x>
-       <y>0</y>
-       <width>51</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Camera</string>
-     </property>
-    </widget>
-    <widget class="QFrame" name="frame_6">
-     <property name="geometry">
-      <rect>
-       <x>510</x>
-       <y>10</y>
-       <width>151</width>
+       <x>560</x>
+       <y>20</y>
+       <width>191</width>
        <height>131</height>
       </rect>
      </property>
@@ -1792,10 +2228,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>15</y>
         <width>61</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1808,10 +2249,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>35</y>
         <width>61</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1829,6 +2275,11 @@ border: 1px solid white;
         <height>17</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
@@ -1840,10 +2291,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>65</y>
         <width>61</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1855,11 +2311,16 @@ border: 1px solid white;
      <widget class="QLabel" name="camera_update_rate">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>10</y>
-        <width>51</width>
+        <x>120</x>
+        <y>15</y>
+        <width>60</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1871,11 +2332,16 @@ border: 1px solid white;
      <widget class="QLabel" name="camera_width">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>30</y>
-        <width>51</width>
+        <x>120</x>
+        <y>35</y>
+        <width>60</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1887,11 +2353,16 @@ border: 1px solid white;
      <widget class="QLabel" name="camera_height">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>120</x>
         <y>50</y>
-        <width>51</width>
+        <width>60</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1903,11 +2374,16 @@ border: 1px solid white;
      <widget class="QLabel" name="camera_format">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>70</y>
-        <width>51</width>
+        <x>120</x>
+        <y>65</y>
+        <width>60</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1920,10 +2396,15 @@ border: 1px solid white;
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>85</y>
         <width>81</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1935,11 +2416,16 @@ border: 1px solid white;
      <widget class="QLabel" name="camera_noise_mean">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>90</y>
-        <width>41</width>
+        <x>120</x>
+        <y>85</y>
+        <width>60</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1951,11 +2437,16 @@ border: 1px solid white;
      <widget class="QLabel" name="label_45">
       <property name="geometry">
        <rect>
-        <x>50</x>
-        <y>110</y>
+        <x>47</x>
+        <y>100</y>
         <width>41</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1967,11 +2458,16 @@ border: 1px solid white;
      <widget class="QLabel" name="camera_noise_stdev">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>110</y>
-        <width>41</width>
+        <x>120</x>
+        <y>100</y>
+        <width>60</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);</string>
@@ -1993,238 +2489,13 @@ border: 1px solid white;
      <zorder>label_45</zorder>
      <zorder>camera_noise_stdev</zorder>
     </widget>
-    <widget class="QPushButton" name="visualize_simulation_button">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
+    <widget class="QFrame" name="ultrasound_frame">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>430</y>
-       <width>161</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);
-border: 1px solid white; 
-</string>
-     </property>
-     <property name="text">
-      <string>Toggle Visualization</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>520</x>
-       <y>320</y>
-       <width>81</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Ultrasound</string>
-     </property>
-    </widget>
-    <zorder>rover_image_label</zorder>
-    <zorder>setup_group</zorder>
-    <zorder>label_7</zorder>
-    <zorder>build_simulation_button</zorder>
-    <zorder>frame_2</zorder>
-    <zorder>clear_simulation_button</zorder>
-    <zorder>frame_4</zorder>
-    <zorder>label_11</zorder>
-    <zorder>frame_5</zorder>
-    <zorder>label_12</zorder>
-    <zorder>frame_6</zorder>
-    <zorder>label_17</zorder>
-    <zorder>visualize_simulation_button</zorder>
-    <zorder>label_10</zorder>
-   </widget>
-   <widget class="QWidget" name="stats_tab">
-    <attribute name="title">
-     <string>Task Status</string>
-    </attribute>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>60</y>
-       <width>201</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Number of Targets Detected:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="num_targets_detected_label">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>60</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_8">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>90</y>
-       <width>201</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Number of Targets Collected:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="num_targets_collected_label">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>90</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>150</y>
-       <width>181</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Obstacle Avoidance Calls:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="perc_of_time_avoiding_obstacles">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>150</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="currentSimulationTimeLabel">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>250</y>
-       <width>250</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="simulationTimerStartLabel">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>280</y>
-       <width>250</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="simulationTimerStopLabel">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>310</y>
-       <width>250</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="currentSimulationTimeTitle">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>250</y>
-       <width>100</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Current Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="simulationTimerStartTitle">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>280</y>
-       <width>100</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Timer Start:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="simulationTimerStopTitle">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>310</y>
-       <width>100</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Timer Stop:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QFrame" name="Simulation_Timer_Frame">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>220</y>
-       <width>400</width>
-       <height>120</height>
+       <x>560</x>
+       <y>170</y>
+       <width>191</width>
+       <height>161</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -2233,14 +2504,308 @@ border: 1px solid white;
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
+     <widget class="QLabel" name="label_39">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>71</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Horz. Res</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_40">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>71</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Min Ang.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_41">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>71</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Max Ang.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_42">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>71</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Max</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_43">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>71</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Min</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_44">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>131</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Range Resolution</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_range_res">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>110</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_max_angle">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>90</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_min_angle">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>70</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_max">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>50</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_min">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>30</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_horz_res">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>10</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_65">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Gaussian Noise</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sonar_gaussian_noise">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>130</y>
+        <width>60</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>val</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QLabel" name="simulation_timer_frame_label">
+    <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>100</x>
-       <y>210</y>
-       <width>310</width>
-       <height>25</height>
+       <x>580</x>
+       <y>160</y>
+       <width>90</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -2249,26 +2814,213 @@ border: 1px solid white;
 padding: 1px;</string>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Simulation Timer (for simulated rovers only)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Ultrasound</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <zorder>Simulation_Timer_Frame</zorder>
-    <zorder>label_6</zorder>
-    <zorder>num_targets_detected_label</zorder>
-    <zorder>label_8</zorder>
-    <zorder>num_targets_collected_label</zorder>
-    <zorder>label_9</zorder>
-    <zorder>perc_of_time_avoiding_obstacles</zorder>
-    <zorder>currentSimulationTimeLabel</zorder>
-    <zorder>simulationTimerStartLabel</zorder>
-    <zorder>simulationTimerStopLabel</zorder>
-    <zorder>currentSimulationTimeTitle</zorder>
-    <zorder>simulationTimerStartTitle</zorder>
-    <zorder>simulationTimerStopTitle</zorder>
-    <zorder>simulation_timer_frame_label</zorder>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>340</y>
+       <width>40</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
+     </property>
+     <property name="text">
+      <string>IMU</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>580</x>
+       <y>10</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
+     </property>
+     <property name="text">
+      <string>Camera</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QFrame" name="button_frame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>350</y>
+       <width>181</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QCheckBox" name="start_visualization_on_build_checkbox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>105</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When checked, a Gazebo world without rovers, walls, ground texture, or a collection zone will be created. The purpose of this option is to generate tag distributions using the Uniform, Clustered, or Power Law in a way that you can save the world file from Gazebo and re-use that same distribution later using the Custom world option. It will also load much faster as well when loading a pre-built distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="whatsThis">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="start_visualization_on_build_label">
+      <property name="geometry">
+       <rect>
+        <x>55</x>
+        <y>100</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Start Visualization On Build&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="build_simulation_button">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>161</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+      </property>
+      <property name="text">
+       <string>Build Simulation</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="clear_simulation_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>161</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+      </property>
+      <property name="text">
+       <string>End Simulation</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="visualize_simulation_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>161</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white; 
+</string>
+      </property>
+      <property name="text">
+       <string>Toggle Visualization</string>
+      </property>
+     </widget>
+    </widget>
+    <zorder>button_frame</zorder>
+    <zorder>setup_group</zorder>
+    <zorder>label_7</zorder>
+    <zorder>GPS_frame</zorder>
+    <zorder>label_11</zorder>
+    <zorder>IMU_frame</zorder>
+    <zorder>camera_frame_status</zorder>
+    <zorder>ultrasound_frame</zorder>
+    <zorder>label_10</zorder>
+    <zorder>label_12</zorder>
+    <zorder>label_17</zorder>
    </widget>
   </widget>
   <widget class="QFrame" name="control_frame">
@@ -2277,10 +3029,10 @@ padding: 1px;</string>
    </property>
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>560</y>
-     <width>201</width>
-     <height>141</height>
+     <x>650</x>
+     <y>547</y>
+     <width>211</width>
+     <height>163</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -2292,10 +3044,10 @@ padding: 1px;</string>
    <widget class="QGroupBox" name="control_group_box">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>24</x>
       <y>10</y>
-      <width>181</width>
-      <height>121</height>
+      <width>161</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -2311,8 +3063,8 @@ padding: 1px;</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
-       <width>171</width>
+       <y>50</y>
+       <width>121</width>
        <height>30</height>
       </rect>
      </property>
@@ -2333,7 +3085,7 @@ padding: 1px;</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>25</y>
+       <y>30</y>
        <width>117</width>
        <height>20</height>
       </rect>
@@ -2358,7 +3110,7 @@ padding: 1px;</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>95</y>
+       <y>110</y>
        <width>150</width>
        <height>22</height>
       </rect>
@@ -2380,7 +3132,7 @@ border: 1px solid white;
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>85</y>
        <width>150</width>
        <height>22</height>
       </rect>
@@ -2400,10 +3152,10 @@ border: 1px solid white;
   <widget class="QFrame" name="joystick_frame">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>590</y>
-     <width>191</width>
-     <height>111</height>
+     <x>870</x>
+     <y>547</y>
+     <width>211</width>
+     <height>163</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -2415,8 +3167,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_drive_forward">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>40</y>
+      <x>118</x>
+      <y>70</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2430,8 +3182,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_drive_left">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>60</y>
+      <x>98</x>
+      <y>90</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2445,8 +3197,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_drive_right">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>60</y>
+      <x>138</x>
+      <y>90</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2460,8 +3212,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_drive_back">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>80</y>
+      <x>118</x>
+      <y>110</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2475,8 +3227,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_gripper_up">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>40</y>
+      <x>24</x>
+      <y>70</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2490,8 +3242,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_gripper_open">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>60</y>
+      <x>44</x>
+      <y>90</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2505,8 +3257,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_gripper_close">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>60</y>
+      <x>5</x>
+      <y>90</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2520,8 +3272,8 @@ border: 1px solid white;
    <widget class="QLCDNumber" name="joy_lcd_gripper_down">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>80</y>
+      <x>24</x>
+      <y>110</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -2535,10 +3287,10 @@ border: 1px solid white;
    <widget class="QLabel" name="drive_label">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>10</y>
-      <width>67</width>
-      <height>17</height>
+      <x>128</x>
+      <y>30</y>
+      <width>51</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -2547,14 +3299,17 @@ border: 1px solid white;
     <property name="text">
      <string>Drive</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="gripper_label">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>10</y>
-      <width>67</width>
-      <height>17</height>
+      <x>20</x>
+      <y>30</y>
+      <width>81</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -2562,6 +3317,9 @@ border: 1px solid white;
     </property>
     <property name="text">
      <string>Gripper</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
@@ -2630,26 +3388,13 @@ border: 1px solid white;
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;version&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="rover_name">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>330</y>
-     <width>191</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Not Connected&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </widget>
   <widget class="BWTabWidget" name="log_tab">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>510</y>
-     <width>571</width>
-     <height>211</height>
+     <y>520</y>
+     <width>631</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -2708,7 +3453,7 @@ QTabBar::tab:only-one {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="info_log_tab">
     <attribute name="title">
@@ -2719,8 +3464,8 @@ QTabBar::tab:only-one {
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>561</width>
-       <height>171</height>
+       <width>631</width>
+       <height>161</height>
       </rect>
      </property>
     </widget>
@@ -2734,8 +3479,8 @@ QTabBar::tab:only-one {
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>571</width>
-       <height>171</height>
+       <width>631</width>
+       <height>161</height>
       </rect>
      </property>
     </widget>
@@ -2840,25 +3585,381 @@ QTabBar::tab:only-one {
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; color:#ffffff;&quot;&gt;Map&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="gps_numSV_label">
+  <widget class="QFrame" name="Simulation_Timer_Frame">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>360</y>
-     <width>191</width>
+     <y>404</y>
+     <width>311</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="currentSimulationTimeTitle">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>80</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Current Time:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="simulationTimerStartTitle">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>55</y>
+      <width>80</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Timer Start:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="simulationTimerStopTitle">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>80</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Timer Stop:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="currentSimulationTimeLabel">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>205</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="simulationTimerStartLabel">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>55</y>
+      <width>205</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="simulationTimerStopLabel">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>70</y>
+      <width>205</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;---&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Number of Targets Collected:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="num_targets_collected_label">
+    <property name="geometry">
+     <rect>
+      <x>192</x>
+      <y>20</y>
+      <width>110</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="simulation_timer_frame_label">
+   <property name="geometry">
+    <rect>
+     <x>29</x>
+     <y>394</y>
+     <width>271</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="mouseTracking">
-    <bool>true</bool>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the number of GPS Satellites detected by the selected physical rover. Simulated rovers will not display a value here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   <property name="styleSheet">
+    <string notr="true">color: white;
+border: 1px solid white;
+padding: 1px;</string>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Sim Timer And Status (simulated rovers only)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QFrame" name="status_frame">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>300</y>
+     <width>311</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="rover_name">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>191</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Not Connected&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gps_numSV_label">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>120</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="mouseTracking">
+     <bool>true</bool>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the number of GPS Satellites detected by the selected physical rover. Simulated rovers will not display a value here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;---&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>150</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#fefefe;&quot;&gt;Obstacle Avoidance Calls:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="perc_of_time_avoiding_obstacles">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>50</y>
+      <width>120</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gps_numSV_title">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>150</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of GPS Satellites:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="joystick_disabled_frame">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>547</y>
+     <width>211</width>
+     <height>163</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="auto_enabled_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>55</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Autonomous Control Enabled&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <zorder>joystick_disabled_frame</zorder>
+  <zorder>joystick_frame</zorder>
+  <zorder>tab_widget</zorder>
+  <zorder>control_frame</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>version_number_label</zorder>
+  <zorder>log_tab</zorder>
+  <zorder>Rover_frame</zorder>
+  <zorder>label_13</zorder>
+  <zorder>map_list_label</zorder>
+  <zorder>Simulation_Timer_Frame</zorder>
+  <zorder>simulation_timer_frame_label</zorder>
+  <zorder>status_frame</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -2897,6 +3998,5 @@ QTabBar::tab:only-one {
  <connections/>
  <buttongroups>
   <buttongroup name="rover_control_button_group"/>
-  <buttongroup name="map_display_button_group"/>
  </buttongroups>
 </ui>
