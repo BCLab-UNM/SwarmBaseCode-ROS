@@ -46,6 +46,9 @@ MapFrame::MapFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent)
     popout_window = NULL;
 
     map_data = NULL;
+
+    // Trigger mouseMoveEvent even when button not pressed
+    setMouseTracking(true);
 }
 
 // This can't go in the constructor or there will be an infinite regression.
@@ -461,26 +464,31 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
     // cause undesired results.
     if (auto_transform == true) return;
 
-    if (event->type() == QEvent::MouseMove) {
+    if (event->type() == QEvent::MouseMove )
+    {
+      // Check whether only the left button is down
+      if ( event->buttons() == Qt::LeftButton )
+      {
         QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
         float max_width = this->width();
         float max_height = this->height();
-
+        
         // start with the previous translate
         translate_x = previous_translate_x;
         translate_y = previous_translate_y;
-
+        
         // add the scaled translation based on the previous mouse click
         // and the current mouse position while dragging; multiply the translation
         // by the given translate speed to keep the map lined up with mouse movement
         translate_x += translate_speed * (previous_clicked_position.x() - mouse_event->pos().x()) / max_width;
         translate_y += translate_speed * (previous_clicked_position.y() - mouse_event->pos().y()) / max_height;
-
+        
         // debug info log messages
         // emit sendInfoLogMessage("MapFrame: mouse move: translate_x: " + QString::number(translate_x) + " translate_y: " + QString::number(translate_y) + "\n");
         // emit sendInfoLogMessage("MapFrame: mouse move: frame_width: " + QString::number(this->width()) + " frame_height: " + QString::number(this->height()));
         // emit sendInfoLogMessage("MapFrame: mouse move: x: " + QString::number(mouse_event->pos().x()) + " y: " + QString::number(mouse_event->pos().y()));
         // emit sendInfoLogMessage("MapFrame: mouse move: xp: " + QString::number(previous_clicked_position.x()) + " yp: " + QString::number(previous_clicked_position.y()));
+      }
     }
 }
 
@@ -625,6 +633,10 @@ void MapFrame::popout()
          emit delayedUpdate();
      }
  }
+
+void MapFrame::addWaypoint( string rover, float x, float y) {
+  
+}
 
 MapFrame::~MapFrame()
 {
