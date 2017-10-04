@@ -4,6 +4,8 @@ OPTION=$1
 
 roverpass=""
 roverIP=""
+branch=""
+wait=true
 
 cd ..
 dirPath="$(pwd)"
@@ -14,7 +16,6 @@ dirName="$(basename `pwd`)"
 
 Check()
 {
-
 	cd ~
 
 	if [ -z "$(ls -A $dirPath/src/ublox/)" ]; then
@@ -30,40 +31,56 @@ Check()
 
 PullGit_Pack()
 {
-	gnome-terminal -x bash -c "cd $dirPath;
-		echo 'Checking out branch $3';
-		git checkout $2;
-		sleep 2;
-		echo 'Pulling latest build on branch $2';
-		git pull;
-		sleep 2;
-		echo 'Compiling $dirName branch $2...';
-		catkin build;
-		sleep 2;
+	info="Pulling from $branch, Compiling, and Packing..."
+	gnome-terminal -x bash -c "echo -n -e '\033]0;$info\007';
+		cd $dirPath;
+		echo 'Checking out branch $branch';
+		git checkout $branch || 
+			{
+				echo 'checkout conflict';
+				cat;
+			}
+		echo 'Pulling latest build on branch $branch';
+		git pull || 
+			{
+				echo 'Pull conflict';
+				cat;
+			}		
+		echo 'Compiling $dirName branch $branch...';
+		catkin build || 
+			{
+				echo 'Build Error';
+				cat;
+			}
 		cd -;
 		echo 'Packing up the repository... ';
 		tar czf $dirName.tgz $dirPath;
-		exit 1; 
+		exit 1;
 		/bin/bash;' exec $SHELL"
 }
 
 Pack()
 {
-	gnome-terminal -x bash -c "cd $dirPath;
-		echo 'Compiling $dirName';
-		catkin build;
-		sleep 2;
-		cd ~;
-		echo 'Packing up the repository... ';
-		tar czf $dirName.tgz $dirName;
-		sleep 2; 
-		exit 1; 
+	info="Compiling and Packing Local Files..."
+	gnome-terminal -x bash -c "echo -n -e '\033]0;$info\007';
+		cd $dirPath;
+		{
+			echo 'Compiling $dirName';
+			catkin build &&
+			{ 
+			cd ~;
+			echo 'Packing up the repository... ';
+			tar czf $dirName.tgz $dirName;
+			exit 1;
+			}
+		cat
+		}
 		/bin/bash;' exec $SHELL"
+		wait=false;
 }
 
 Transfer()
 {
-
 	echo "Copying compressed repository to swarmie at $roverIP"
 	scp $dirName.tgz swarmie@$roverIP:~
 }
@@ -72,7 +89,8 @@ Unpack_Run()
 {
 	echo "Unpacking repository $dirName on swarmie at $roverIP"
 
-	gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'echo 'Unpacking $dirName.tgz ...';
+	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$roverIP\007'
+		ssh -t swarmie@$roverIP 'echo 'Unpacking $dirName.tgz ...';
 		tar xzf $dirName.tgz;
 		sleep 2;			
 		echo 'Starting ROS nodes on swarmie at $roverIP with master at $hostName';
@@ -88,9 +106,10 @@ Unpack_Run()
 
 Run()
 {
-
 	#ssh and run script from rover --WORKS
-	gnome-terminal -x bash -c "ssh -t swarmie@$roverIP 'cd SwarmBaseCode-ROS/misc;
+	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$roverIP\007';
+		ssh -t swarmie@$roverIP 'echo 'Running $roverIP';
+		cd SwarmBaseCode-ROS/misc;
 		./rover_onboard_node_launch.sh $hostName;
 		exit 1;
 		exit 1;
@@ -142,7 +161,7 @@ FailPing()
 #-----------------------------------------------------------------
 
 #find users current IP and store it
-userIP=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
+userIP=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1 }')
 hostName=$(hostname)
 
 echo "$dirPath"
@@ -161,7 +180,7 @@ fi
 if [ -z $OPTION ]; then
 	echo "-------------------------------------------------------------"
 	echo "Please run this script with the following commands:"
-	echo "'-G'[ithub] {branch} pulls and transfers workspace to swarmie(s)"
+	echo "'-G'[ithub] pulls and transfers workspace to swarmie(s)"
 	echo "'-L'[ocal Files] duplicates current workspace and transfers to swarmie(s)"
 	echo "'-R'[un] to run current code on all swarmie(s)"
 	echo "-------------------------------------------------------------"
@@ -199,6 +218,7 @@ if [ $OPTION == "-G" ]; then
 	echo ""
 
 	Check
+
 	PullGit_Pack
 
 	while(true); do
@@ -257,6 +277,12 @@ if [ $OPTION == "-L" ]; then
 	echo ""
 
 	Pack
+
+	while($wait); do
+		sleep 0;
+	done 
+
+	wait=true
 
 	while(true); do
 		read -p "Rover Name/IP To Start:  " roverIP
