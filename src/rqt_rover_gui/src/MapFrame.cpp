@@ -117,14 +117,14 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     QColor green(17, 192, 131);
     QColor red(255, 65, 30);
 
-    float max_seen_x = -std::numeric_limits<float>::max(); // std::numeric_limits<float>::max() is the max possible floating point value
-    float max_seen_y = -std::numeric_limits<float>::max();
+    max_seen_x = -std::numeric_limits<float>::max(); // std::numeric_limits<float>::max() is the max possible floating point value
+    max_seen_y = -std::numeric_limits<float>::max();
 
-    float min_seen_x = std::numeric_limits<float>::max();
-    float min_seen_y = std::numeric_limits<float>::max();
+    min_seen_x = std::numeric_limits<float>::max();
+    min_seen_y = std::numeric_limits<float>::max();
 
-    float max_seen_width = -std::numeric_limits<float>::max();
-    float max_seen_height = -std::numeric_limits<float>::max();
+    max_seen_width = -std::numeric_limits<float>::max();
+    max_seen_height = -std::numeric_limits<float>::max();
 
     int no_data_offset = 0; // So the "no data" message is not overlayed if there are multiple rovers with no data.
 
@@ -205,14 +205,14 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     max_seen_height > max_seen_width ? max_seen_width = max_seen_height : max_seen_height = max_seen_width;
 
     // Calculate the axis positions
-    int map_origin_x = fm.width(QString::number(-max_seen_height, 'f', 1)+"m");
-    int map_origin_y = 2*fm.height();
-
-    int map_width = this->width()-1;// Minus 1 or will go off the edge
-    int map_height = this->height()-1;//
-
-    int map_center_x = map_origin_x+((map_width-map_origin_x)/2);
-    int map_center_y = map_origin_y+((map_height-map_origin_y)/2);
+    map_origin_x = fm.width(QString::number(-max_seen_height, 'f', 1)+"m");
+    map_origin_y = 2*fm.height();
+    
+    map_width = this->width()-1;// Minus 1 or will go off the edge
+    map_height = this->height()-1;//
+    
+    map_center_x = map_origin_x+((map_width-map_origin_x)/2);
+    map_center_y = map_origin_y+((map_height-map_origin_y)/2);
 
     // The map axes do not need to be redrawn for each rover so this code is
     // sandwiched between the two rover display list loops
@@ -479,9 +479,21 @@ void MapFrame::mouseReleaseEvent(QMouseEvent *event) {
     previous_translate_y = translate_y;
 }
 
-void MapFrame::mousePressEvent(QMouseEvent *event)
-{
+void MapFrame::mousePressEvent(QMouseEvent *event) {
+  // 
+  if ( event->buttons() == Qt::RightButton )
+  {
+    // Solve for map coordinates in terms of frame coordinates
+    float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
+    float mouse_map_y = -(((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
+    
+
+  }
+  else if ( event->buttons() == Qt::LeftButton )
+  {
     previous_clicked_position = event->pos();
+      }
+  
     // emit sendInfoLogMessage("MapFrame: mouse press. x: " + QString::number(mouse_event->pos().x()) + ", y: " + QString::number(mouse_event->pos().y()));
 }
 

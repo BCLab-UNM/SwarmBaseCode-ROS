@@ -134,6 +134,27 @@ namespace rqt_rover_gui
       QPoint mouse_pointer_position = QPoint(0,0);
       
       MapData* map_data;
+
+      // Map coordinate data
+      // Calculate the axis positions
+      int map_origin_x = 0;
+      int map_origin_y = 0;
+      
+      int map_width = 0;
+      int map_height = 0; 
+      
+      int map_center_x = 0; 
+      int map_center_y = 0;
+
+      float max_seen_x = -std::numeric_limits<float>::max();
+      float max_seen_y = -std::numeric_limits<float>::max();
+      
+      float min_seen_x = std::numeric_limits<float>::max();
+      float min_seen_y = std::numeric_limits<float>::max();
+      
+      float max_seen_width = -std::numeric_limits<float>::max();
+      float max_seen_height = -std::numeric_limits<float>::max();
+
   };
 
 }
