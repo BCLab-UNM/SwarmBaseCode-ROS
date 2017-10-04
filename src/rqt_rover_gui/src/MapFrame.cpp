@@ -385,6 +385,26 @@ void MapFrame::paintEvent(QPaintEvent* event) {
           painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display) + "-" + QString::number(x) + ", " + QString::number(y));
         }
 
+
+        // Draw the waypoints for the current rover
+        painter.setPen(Qt::blue);
+        
+        QPainterPath scaled_waypoint_rover_path;
+        for(std::vector< pair<float,float> >::iterator it = map_data->getWaypointPath(rover_to_display)->begin(); it < map_data->getWaypointPath(rover_to_display)->end(); ++it) {
+         
+            pair<float,float> coordinate  = *it;
+           
+            float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+            float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+
+            // Move to the starting point of the path without drawing a line
+            if (it == map_data->getWaypointPath(rover_to_display)->begin()) scaled_waypoint_rover_path.moveTo(x, y);
+
+            QPoint point(x,y);
+            painter.drawPoint(point);
+            scaled_waypoint_rover_path.lineTo(x, y);
+        }
+
         map_data->unlock();
 
         painter.setPen(Qt::white);
@@ -650,7 +670,7 @@ void MapFrame::addToEKFRoverPath(std::string rover, float x, float y)
 void MapFrame::addWaypoint( string rover, float x, float y ) {
   if (map_data)
   {
-    map_data->addWaypoint(rover, x, y);
+    map_data->addToWaypointPath(rover, x, y);
     emit delayedUpdate();
   }
 }

@@ -57,13 +57,13 @@ void MapData::addToEKFRoverPath(string rover, float x, float y)
 }
 
 
-void MapData::addWaypoint(string rover, float x, float y)
+void MapData::addToWaypointPath(string rover, float x, float y)
 {
   // Negate the y direction to orient the map so up is north.
   y = -y;
 
   update_mutex.lock();
-  waypoints[rover].push_back(pair<float,float>(x,y));
+  waypoint_path[rover].push_back(pair<float,float>(x,y));
   update_mutex.unlock();
 
 }
@@ -147,6 +147,10 @@ std::vector< std::pair<float,float> >* MapData::getTargetLocations(std::string r
 std::vector< std::pair<float,float> >* MapData::getCollectionPoints(std::string rover_name)
 {
     return &collection_points[rover_name];
+}
+
+std::vector< std::pair<float,float> >* MapData::getWaypointPath(std::string rover_name) {
+    return &waypoint_path[rover_name];
 }
 
 // These functions report the maximum and minimum map values seen. This is useful for the GUI when it is calculating the map coordinate system.
