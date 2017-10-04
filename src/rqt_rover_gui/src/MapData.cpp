@@ -56,6 +56,18 @@ void MapData::addToEKFRoverPath(string rover, float x, float y)
 
 }
 
+
+void MapData::addWaypoint(string rover, float x, float y)
+{
+  // Negate the y direction to orient the map so up is north.
+  y = -y;
+
+  update_mutex.lock();
+  waypoints[rover].push_back(pair<float,float>(x,y));
+  update_mutex.unlock();
+
+}
+
 void MapData::addTargetLocation(string rover, float x, float y)
 {
   //The QT drawing coordinate system is reversed from the robot coordinate system in the y direction

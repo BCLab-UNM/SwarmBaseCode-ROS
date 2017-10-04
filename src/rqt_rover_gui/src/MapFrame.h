@@ -131,6 +131,8 @@ namespace rqt_rover_gui
       float min_seen_x_when_manual_enabled;
       float min_seen_y_when_manual_enabled;
 
+      QPoint mouse_pointer_position = QPoint(0,0);
+      
       MapData* map_data;
   };
 

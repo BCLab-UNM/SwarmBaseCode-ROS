@@ -281,6 +281,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         float x_label_f = (i+1)*max_seen_width/n_ticks-fraction_of_map_to_rover_x*max_seen_width;
         float y_label_f = (i+1)*max_seen_height/n_ticks-fraction_of_map_to_rover_y*max_seen_height;
 
+
         QString x_label = QString::number(x_label_f, 'f', 1) + "m";
         QString y_label = QString::number(-y_label_f, 'f', 1) + "m";
 
@@ -381,7 +382,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
           float radius = 2.5;
 
           painter.drawEllipse(QPointF(x,y), radius, radius);
-          painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display));
+          painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display) + "-" + QString::number(x) + ", " + QString::number(y));
         }
 
         map_data->unlock();
@@ -403,6 +404,13 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     painter.drawText(QPoint(0,135), "map_center_x: " + QString::number(map_center_x));
     */
 
+    // Solve for map coordinates in terms of frame coordinates
+    float mouse_map_x = ((mouse_pointer_position.x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
+    float mouse_map_y = -(((mouse_pointer_position.y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
+   
+    QString mouse_pointer_text = QString::number(mouse_map_x) + ", " + QString::number(mouse_map_y) + " - " + QString::number(mouse_pointer_position.x()) + ", " + QString::number(mouse_pointer_position.y());
+    painter.drawText(mouse_pointer_position, mouse_pointer_text);
+    
     painter.setPen(Qt::white);
 }
 
@@ -459,7 +467,10 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
 
 void MapFrame::mouseMoveEvent(QMouseEvent *event)
 {
-    // Do not adjust panning in auto-transform mode.. the changes will not be reflected
+  // Get the mouse pointer position to print on the map
+  mouse_pointer_position = event->pos();
+
+  // Do not adjust panning in auto-transform mode.. the changes will not be reflected
     // and will be applied only when the user clicks on manual panning mode which will
     // cause undesired results.
     if (auto_transform == true) return;
@@ -488,6 +499,8 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
         // emit sendInfoLogMessage("MapFrame: mouse move: frame_width: " + QString::number(this->width()) + " frame_height: " + QString::number(this->height()));
         // emit sendInfoLogMessage("MapFrame: mouse move: x: " + QString::number(mouse_event->pos().x()) + " y: " + QString::number(mouse_event->pos().y()));
         // emit sendInfoLogMessage("MapFrame: mouse move: xp: " + QString::number(previous_clicked_position.x()) + " yp: " + QString::number(previous_clicked_position.y()));
+
+        // Store the current mouse position for use in the map
       }
     }
 }
@@ -616,26 +629,30 @@ void MapFrame::popout()
      }
  }
 
- void MapFrame::addToEncoderRoverPath(std::string rover, float x, float y)
- {
-     if (map_data)
-     {
-        map_data->addToEncoderRoverPath(rover, x, y);
-        emit delayedUpdate();
-     }
+void MapFrame::addToEncoderRoverPath(std::string rover, float x, float y)
+{
+  if (map_data)
+  {
+    map_data->addToEncoderRoverPath(rover, x, y);
+    emit delayedUpdate();
+  }
 }
 
- void MapFrame::addToEKFRoverPath(std::string rover, float x, float y)
- {
-     if (map_data)
-     {
-         map_data->addToEKFRoverPath(rover, x, y);
-         emit delayedUpdate();
-     }
- }
+void MapFrame::addToEKFRoverPath(std::string rover, float x, float y)
+{
+  if (map_data)
+  {
+    map_data->addToEKFRoverPath(rover, x, y);
+    emit delayedUpdate();
+  }
+}
 
-void MapFrame::addWaypoint( string rover, float x, float y) {
-  
+void MapFrame::addWaypoint( string rover, float x, float y ) {
+  if (map_data)
+  {
+    map_data->addWaypoint(rover, x, y);
+    emit delayedUpdate();
+  }
 }
 
 MapFrame::~MapFrame()
