@@ -1,0 +1,100 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='red_sky_filter'>
+    <link name='link_1'>
+      <pose frame=''>0 0 0 0 0 0</pose>
+      <visual name='visual1'>
+        <pose frame=''>-500 0 0 0 0 1.5708</pose>
+        <geometry>
+          <box>
+            <size>1000 0.1 1000</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>1 0 0 1</specular>
+          <emissive>1 0 0 1</emissive>
+        </material>
+        <transparency>0.4</transparency>
+      </visual>
+      <visual name='visual2'>
+        <pose frame=''>500 0 0 0 0 1.5708</pose>
+        <geometry>
+          <box>
+            <size>1000 0.1 1000</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>1 0 0 1</specular>
+          <emissive>1 0 0 1</emissive>
+        </material>
+        <transparency>0.4</transparency>
+      </visual>
+      <visual name='visual3'>
+        <pose frame=''>0 500 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1000 0.1 1000</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>1 0 0 1</specular>
+          <emissive>1 0 0 1</emissive>
+        </material>
+        <transparency>0.4</transparency>
+      </visual>
+      <visual name='visual4'>
+        <pose frame=''>0 -500 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1000 0.1 1000</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>1 0 0 1</specular>
+          <emissive>1 0 0 1</emissive>
+        </material>
+        <transparency>0.4</transparency>
+      </visual>
+      <visual name='visual5'>
+        <pose frame=''>0 0 500 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1000 1000 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>1 0 0 1</specular>
+          <emissive>1 0 0 1</emissive>
+        </material>
+        <transparency>0.4</transparency>
+      </visual>
+    </link>
+    <static>1</static>
+    <allow_auto_disable>1</allow_auto_disable>
+  </model>
+</sdf>

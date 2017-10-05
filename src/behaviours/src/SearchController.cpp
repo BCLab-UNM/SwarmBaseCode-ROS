@@ -1,4 +1,5 @@
 #include "SearchController.h"
+#include <angles/angles.h>
 
 SearchController::SearchController() {
   rng = new random_numbers::RandomNumberGenerator();
@@ -38,7 +39,8 @@ Result SearchController::DoWork() {
     }
     return result;
   }
-  else if (attemptCount >= 5 || attemptCount == 0) {
+  else if (attemptCount >= 5 || attemptCount == 0) 
+  {
     attemptCount = 1;
 
 
@@ -63,7 +65,7 @@ Result SearchController::DoWork() {
 
     result.wpts.waypoints.clear();
     result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
-
+    
     return result;
   }
 
