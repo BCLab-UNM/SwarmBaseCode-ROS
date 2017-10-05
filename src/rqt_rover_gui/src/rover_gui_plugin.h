@@ -195,6 +195,7 @@ namespace rqt_rover_gui {
     void gazeboServerFinishedEventHandler();
     void displayInfoLogMessage(QString msg);
     void displayDiagLogMessage(QString msg);
+    void receiveWaypointCmd(WaypointCmd, int, float, float);
 
     // Needed to refocus the keyboard events when the user clicks on the widget list
     // to the main widget so keyboard manual control is handled properly
@@ -207,6 +208,7 @@ namespace rqt_rover_gui {
 
     // ROS Publishers
     map<string,ros::Publisher> control_mode_publishers;
+    map<string,ros::Publisher> waypoint_cmd_publishers;
     ros::Publisher joystick_publisher;
 
     // ROS Subscribers

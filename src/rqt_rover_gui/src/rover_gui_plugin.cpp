@@ -160,6 +160,9 @@ namespace rqt_rover_gui
     connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
 
     connect(this, SIGNAL(updateMapFrameWithCurrentRoverName(QString)), ui.map_frame, SLOT(receiveCurrentRoverName(QString)));
+
+    // Receive waypoint commands from MapFrame
+    connect(ui.map_frame, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)), this, SLOT(receiveWaypointCmd(WaypointCmd, int, float, float)));
     
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
@@ -2677,6 +2680,10 @@ void RoverGUIPlugin::receiveDiagsDataUpdate(QString rover_name, QString text, QC
 void RoverGUIPlugin::refocusKeyboardEventHandler()
 {
     widget->setFocus();
+}
+
+void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd, int, float, float)
+{
 }
 
 // Clean up memory when this object is deleted

@@ -390,9 +390,9 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         painter.setPen(Qt::blue);
         
         QPainterPath scaled_waypoint_rover_path;
-        for(std::vector< pair<float,float> >::iterator it = map_data->getWaypointPath(rover_to_display)->begin(); it < map_data->getWaypointPath(rover_to_display)->end(); ++it) {
+        for(map< int, std::pair<float,float> >::iterator it = map_data->getWaypointPath(rover_to_display)->begin(); it != map_data->getWaypointPath(rover_to_display)->end(); ++it) {
          
-            pair<float,float> coordinate  = *it;
+          pair<float,float> coordinate  = it->second; // Get the value from the map
            
             float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
             float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
@@ -693,9 +693,10 @@ void MapFrame::addToEKFRoverPath(std::string rover, float x, float y)
 void MapFrame::addWaypoint( string rover, float x, float y ) {
   if (map_data)
   {
-    map_data->addToWaypointPath(rover, x, y);
-    cout << "Waypoint created. There are now " << map_data->getWaypointPath(rover_currently_selected)->size() << " waypoints" << endl;
+    int id = map_data->addToWaypointPath(rover, x, y);
+    //cout << "Waypoint created. There are now " << map_data->getWaypointPath(rover_currently_selected)->size() << " waypoints" << endl;
     emit delayedUpdate();
+    emit sendWaypointCmd(ADD, id, x, y);
   }
 }
 

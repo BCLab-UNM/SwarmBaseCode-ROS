@@ -34,6 +34,10 @@ class MapData;
 
 using namespace std;
 
+// Possible waypoint commands to send to the rover
+// See custom ROS message type in swarmie_msgs package for options.
+enum WaypointCmd {ADD, REMOVE};
+
 namespace rqt_rover_gui
 {
 
@@ -82,6 +86,7 @@ namespace rqt_rover_gui
     signals:
 
       void sendInfoLogMessage(QString msg);
+      void sendWaypointCmd(WaypointCmd, int, float, float);
       void delayedUpdate();
 
     public slots:

@@ -57,15 +57,16 @@ void MapData::addToEKFRoverPath(string rover, float x, float y)
 }
 
 
-void MapData::addToWaypointPath(string rover, float x, float y)
+int MapData::addToWaypointPath(string rover, float x, float y)
 {
   // Negate the y direction to orient the map so up is north.
   y = -y;
 
   update_mutex.lock();
-  waypoint_path[rover].push_back(pair<float,float>(x,y));
+  int this_id = waypoint_id_counter++; // Get the next waypoint id.
+  waypoint_path[rover][this_id]=pair<float,float>(x,y);
   update_mutex.unlock();
-
+  return this_id;
 }
 
 void MapData::addTargetLocation(string rover, float x, float y)
@@ -149,7 +150,7 @@ std::vector< std::pair<float,float> >* MapData::getCollectionPoints(std::string 
     return &collection_points[rover_name];
 }
 
-std::vector< std::pair<float,float> >* MapData::getWaypointPath(std::string rover_name) {
+std::map<int, std::pair<float,float> >* MapData::getWaypointPath(std::string rover_name) {
     return &waypoint_path[rover_name];
 }
 
