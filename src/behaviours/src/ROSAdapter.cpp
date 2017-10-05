@@ -108,6 +108,8 @@ long int startTime = 0;
 float minutesTime = 0;
 float hoursTime = 0;
 
+float drift_tolerance = 1.2; // meters
+
 Result result;
 
 std_msgs::String msg;
@@ -588,7 +590,7 @@ void transformMapCentertoOdom()
   
   float diff = hypot(xdiff, ydiff);
   
-  if (diff > 1.5)
+  if (diff > drift_tolerance)
   {
     centerLocationOdom.x += xdiff/diff;
     centerLocationOdom.y += ydiff/diff;
