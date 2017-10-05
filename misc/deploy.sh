@@ -5,7 +5,7 @@ OPTION=$1
 roverpass=""
 roverIP=""
 branch=""
-wait=true
+needsReboot=false
 
 cd ..
 dirPath="$(pwd)"
@@ -35,26 +35,26 @@ PullGit_Pack()
 	gnome-terminal -x bash -c "echo -n -e '\033]0;$info\007';
 		cd $dirPath;
 		echo 'Checking out branch $branch';
-		git checkout $branch || 
+		git checkout $branch &&
+		{
+			echo 'Pulling latest build on branch $branch';
+			git pull && 
 			{
-				echo 'checkout conflict';
-				cat;
+				echo 'Compiling $dirName branch $branch...';
+				catkin build &&
+				{
+					cd -;
+					echo 'Packing up the repository... ';
+					tar czf $dirName.tgz $dirPath;
+					exit 1;
+				}
+				read stuff;
+				exit 1; 
 			}
-		echo 'Pulling latest build on branch $branch';
-		git pull || 
-			{
-				echo 'Pull conflict';
-				cat;
-			}		
-		echo 'Compiling $dirName branch $branch...';
-		catkin build || 
-			{
-				echo 'Build Error';
-				cat;
-			}
-		cd -;
-		echo 'Packing up the repository... ';
-		tar czf $dirName.tgz $dirPath;
+			read stuff;
+			exit 1;
+		}		
+		read stuff
 		exit 1;
 		/bin/bash;' exec $SHELL"
 }
@@ -62,21 +62,21 @@ PullGit_Pack()
 Pack()
 {
 	info="Compiling and Packing Local Files..."
-	gnome-terminal -x bash -c "echo -n -e '\033]0;$info\007';
+	gnome-terminal --disable-factory -x bash -c "echo -n -e '\033]0;$info\007';
 		cd $dirPath;
 		{
 			echo 'Compiling $dirName';
 			catkin build &&
 			{ 
-			cd ~;
-			echo 'Packing up the repository... ';
-			tar czf $dirName.tgz $dirName;
-			exit 1;
+				cd ~;
+				echo 'Packing up the repository... ';
+				tar czf $dirName.tgz $dirName;
+				exit 0;
 			}
-		cat
+			read stuff
+			exit 1;
 		}
 		/bin/bash;' exec $SHELL"
-		wait=false;
 }
 
 Transfer()
@@ -118,23 +118,28 @@ Run()
 
 DispOpt()
 {
-	clear
-
 	echo "Your network info:  $hostName@$userIP"
 	echo ""
 	echo "Type 'exit' to quit"
 
 	if [ "$OPTION" != "-G" ]; then
 		echo "Type '-G' to pull, transfer, and run on swarmie(s) "
-	fi
-	
-	if [ "$OPTION" != "-L" ]; then
-		echo "Type '-L' to transfer local code and run on swarmie(s)"
+	elif [ $OPTION == "-G" ]; then
+		echo "Type 'RP' to Re Pull from the github Repository"
+		echo "Type 'NB' to pull from a new Branch"
 	fi
 
 	if [ "$OPTION" != "-R" ]; then
 		echo "Type '-R' to run current code loaded on Swarmies"
 	fi
+	
+	if [ "$OPTION" != "-L" ]; then
+		echo "Type '-L' to transfer local code and run on swarmie(s)"
+	elif [ $OPTION == "-L" ]; then
+		echo "Type 'RC' to recompile Source Code"
+	fi
+
+	echo "Type reboot {hostname} to reboot a swarmie"
 
 	echo "-------------------------------------------------------------"
 	echo ""
@@ -145,8 +150,6 @@ SuccessPing()
 	cd ~
 	echo "Found $roverIP"
 	echo "-------------------------------------------------------------"
-	echo "Uploading to $roverIP"
-	echo ""
 }
 
 FailPing()
@@ -155,6 +158,27 @@ FailPing()
 	echo "-------------------------------------------------------------"	
 	sleep 4
 	echo ""
+}
+
+Reboot()
+{
+	echo "REBOOTING"
+	info="Rebooting $roverIP"
+	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$info\007';
+		ssh -t swarmie@$roverIP 'sudo reboot now';
+		exit 1;
+		/bin/bash;' exec $SHELL"
+}
+
+WaitForReconnect()
+{
+	while(true); do
+		ping -q -w2 $roverIP > /dev/null;
+		if [ $? -eq 0 ]; then
+			echo "$roverIP is up"
+			break
+		fi
+	done
 }
 
 #Code Start
@@ -201,7 +225,7 @@ if [ $OPTION == "-G" ]; then
 	branch=$2
 
 	#if not everything is filled out
-	if [ "$branch"="" ]; then
+	if [ "$branch" == "" ]; then
 		echo ""
     		read -p "Branch?:  " branch
 		echo ""
@@ -211,35 +235,44 @@ if [ $OPTION == "-G" ]; then
 
 	echo "Retrieving and Transferring Code from GitHub:  "
 
-	DispOpt
-
 	echo "dir: $dirPath branch: $branch"
 	echo "-------------------------------------------------------------"
 	echo ""
 
 	Check
 
-	PullGit_Pack
+	DispOpt
+
+	PullGit_Pack &
+	wait
 
 	while(true); do
-		read -p "Rover Name/IP To Start:  " roverIP
-			if [ "$roverIP" =  "exit" ]; then
+		read -p "Rover Name/IP To Start:  " roverIP add
+			if [ "$roverIP" == "exit" ]; then
 				exit 1
-			elif [ "$roverIP" = "-R" ]; then
+			elif [ "$roverIP" == "-R" ]; then
 				OPTION="-R"
-				echo ""
-				echo ""
+				clear
 				break	
-			elif [ "$roverIP" = "-L" ]; then
+			elif [ "$roverIP" == "-L" ]; then
 				OPTION="-L"
-				echo ""
-				echo ""
+				clear
 				break
-			elif [ "$roverIP" = "branch" ]; then
+			elif [ "$roverIP" == "NB" ]; then
 				branch=""
-				echo ""
-				echo ""
+				clear
 				break
+			elif [ $roverIP == "RP" ]; then
+				clear
+				echo ""
+				echo "-------------------------------------------------------------"
+				echo ""
+				echo "Pulling new code from $branch"
+				echo ""
+			elif [ $roverIP == "reboot" ]; then
+				roverIP=$add
+				echo "Rebooting $roverIP"
+				needsReboot=true				
 			fi
 
 		#If rover is on the network
@@ -248,17 +281,27 @@ if [ $OPTION == "-G" ]; then
 
 			SuccessPing
 
+			if [ $needsReboot == true ]; then
+				Reboot &
+				wait
+				WaitForReconnect &
+				wait
+			fi
+
 			#Transfer/Unpack/Run
-			Transfer
-			Unpack_Run
-			sleep 10
+			Transfer &
+			wait
+			Unpack_Run &
+			wait			
 
 		#if not on the network
 		else
 			FailPing
 		fi
 
-		done
+	needsReboot=false
+
+	done
 
 fi
 
@@ -268,36 +311,41 @@ if [ $OPTION == "-L" ]; then
 
 	Check
 
-	echo "Copying and transferring current folder to swarmie(s)"
-
 	DispOpt
+
+	echo "Copying and transferring current folder to swarmie(s)"
 
 	echo "dir: $dirPath"
 	echo "-------------------------------------------------------------"
 	echo ""
 
-	Pack
+	Pack &
+	wait
 
-	while($wait); do
-		sleep 0;
-	done 
-
-	wait=true
-
-	while(true); do
-		read -p "Rover Name/IP To Start:  " roverIP
-			if [ "$roverIP" =  "exit" ]; then
+	while [ true ]; do
+		read -p "Rover Name/IP To Start:  " roverIP add
+			if [ $roverIP =  "exit" ]; then
 				exit 1
-			elif [ "$roverIP" = "-G" ]; then
+			elif [ $roverIP = "-G" ]; then
 				OPTION="-G"
-				echo ""
-				echo ""
+				clear
 				break	
-			elif [ "$roverIP" = "-R" ]; then
+			elif [ $roverIP = "-R" ]; then
 				OPTION="-R"
+				clear
+				break
+			elif [ $roverIP = "RC" ]; then
+				clear
 				echo ""
+				echo "-------------------------------------------------------------"
+				echo ""
+				echo "Recompiling Source Code!"
 				echo ""
 				break
+			elif [ $roverIP == "reboot" ]; then
+				roverIP=$add
+				echo "Rebooting $roverIP"
+				needsReboot=true				
 			fi
 
 			#If rover is on the network
@@ -306,16 +354,26 @@ if [ $OPTION == "-L" ]; then
 
 				SuccessPing
 
+				if [ $needsReboot == true ]; then
+					Reboot &
+					wait
+					WaitForReconnect &
+					wait
+				fi
+
 				#Transfer/Unpack/Run
-				Transfer
-				Unpack_Run
-				sleep 10
+				Transfer &
+				wait
+				Unpack_Run &
+				wait
 
 			#if not on the network
 			else
 				FailPing
 			fi
-	done	
+
+			needsReboot=false
+	done
 fi
 
 #Just Run
@@ -329,19 +387,21 @@ if [ $OPTION == "-R" ]; then
 	echo ""
 
 	while(true); do
-		read -p "Rover Name/IP To Start:  " roverIP
+		read -p "Rover Name/IP To Start:  " roverIP add
 			if [ "$roverIP" =  "exit" ]; then
 				exit 1
 			elif [ "$roverIP" = "-G" ]; then
 				OPTION="-G"
-				echo ""
-				echo ""
+				clear
 				break	
 			elif [ "$roverIP" = "-L" ]; then
 				OPTION="-L"
-				echo ""
-				echo ""
+				clear
 				break
+			elif [ $roverIP == "reboot" ]; then
+				roverIP=$add
+				echo "Rebooting $roverIP"
+				needsReboot=true				
 			fi
 
 		#If rover is on the network
@@ -349,13 +409,27 @@ if [ $OPTION == "-R" ]; then
 		if [ $? -eq 0 ]; then
 
 			SuccessPing
-			Run
-			sleep 10
+
+			if [ $needsReboot == true ]; then
+
+				Reboot &
+				wait
+
+				WaitForReconnect &
+				wait
+
+			fi
+
+			Run &
+			wait
 
 		#if not on the network
 		else	
 			FailPing
 		fi
+
+		needsReboot=false
+
 	done
 fi
 
