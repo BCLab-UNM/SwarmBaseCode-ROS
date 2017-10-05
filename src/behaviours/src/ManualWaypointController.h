@@ -1,6 +1,8 @@
 #ifndef MAUNALWAYPOINTCONTROLLER_H
 #define MANULAWAYPOINTCONTROLLER_H
 
+#include <map>
+
 #include "Controller.h"
 
 class ManualWaypointController : virtual Controller
@@ -15,7 +17,9 @@ public:
    bool ShouldInterrupt() override;
 
    void SetCurrentLocation(Point currentLocation);
-   void AddManualWaypoint(Point wpt);
+   void AddManualWaypoint(Point wpt, int id);
+   void RemoveManualWaypoint(int id);
+   std::vector<int> ReachedWaypoints();
    
 protected:
    void ProcessData() override;
@@ -23,7 +27,8 @@ protected:
 private:
    Point currentLocation;
    // list of manual waypoints
-   Waypoints waypoints;
+   std::map<int,Point> waypoints;
+   std::vector<int> cleared_waypoints;
    int num_waypoints = 0;
 
    // coppied from DriveController: 15 cm
