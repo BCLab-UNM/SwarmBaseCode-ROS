@@ -163,6 +163,8 @@ namespace rqt_rover_gui {
     void allStopButtonSignal();
     void updateCurrentSimulationTimeLabel(QString text);
 
+    void updateMapFrameWithCurrentRoverName(QString text);
+
   private slots:
 
     void receiveDiagsDataUpdate(QString, QString, QColor);

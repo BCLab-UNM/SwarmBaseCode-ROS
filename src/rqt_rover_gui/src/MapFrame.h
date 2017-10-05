@@ -86,6 +86,8 @@ namespace rqt_rover_gui
 
     public slots:
 
+        void receiveCurrentRoverName(QString);
+        
     protected:
 
       void paintEvent(QPaintEvent *event);
@@ -155,6 +157,8 @@ namespace rqt_rover_gui
       float max_seen_width = -std::numeric_limits<float>::max();
       float max_seen_height = -std::numeric_limits<float>::max();
 
+      std::string rover_currently_selected; // This is the rover selected in the main GUI.
+      
   };
 
 }

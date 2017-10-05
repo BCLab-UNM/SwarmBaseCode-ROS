@@ -82,6 +82,8 @@ private:
     std::map<std::string, float> min_ekf_seen_y;
 
     QMutex update_mutex; // To prevent race conditions when the data is being displayed by MapFrame
+
+    std::string currently_selected_rover;
 };
 
 #endif // MAPDATA_H

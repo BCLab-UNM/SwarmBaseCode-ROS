@@ -159,6 +159,8 @@ namespace rqt_rover_gui
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
     connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
 
+    connect(this, SIGNAL(updateMapFrameWithCurrentRoverName(QString)), ui.map_frame, SLOT(receiveCurrentRoverName(QString)));
+    
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
 
@@ -612,6 +614,9 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.rover_name->setText(rover_name_msg_qstr);
 
     emit sendInfoLogMessage(QString("Selected rover: ") + QString::fromStdString(selected_rover_name));
+
+    // Tell the MapFrame that the currently selected rover changed
+    emit updateMapFrameWithCurrentRoverName(QString::fromStdString(selected_rover_name));
 
     // Attempt to read the simulation model xml file if it exists. If it does not exist assume this is a physical rover.
     const char *name = "GAZEBO_MODEL_PATH";

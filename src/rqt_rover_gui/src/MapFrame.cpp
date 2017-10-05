@@ -398,11 +398,21 @@ void MapFrame::paintEvent(QPaintEvent* event) {
             float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
             // Move to the starting point of the path without drawing a line
-            if (it == map_data->getWaypointPath(rover_to_display)->begin()) scaled_waypoint_rover_path.moveTo(x, y);
-
+            if (it == map_data->getWaypointPath(rover_to_display)->begin())
+            {
+              scaled_waypoint_rover_path.moveTo(x, y);
+            }
+            
             QPoint point(x,y);
+            int default_pen_width = painter.pen().width();
+            QPen previous_pen = painter.pen();
+            QPen pen;
+            pen.setColor(Qt::blue);
+            pen.setWidth(5);
+            painter.setPen(pen);
             painter.drawPoint(point);
             scaled_waypoint_rover_path.lineTo(x, y);
+            painter.setPen(previous_pen);
         }
 
         map_data->unlock();
@@ -486,7 +496,8 @@ void MapFrame::mousePressEvent(QMouseEvent *event) {
     // Solve for map coordinates in terms of frame coordinates
     float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
     float mouse_map_y = -(((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
-    
+
+    addWaypoint(rover_currently_selected, mouse_map_x, mouse_map_y);
 
   }
   else if ( event->buttons() == Qt::LeftButton )
@@ -683,8 +694,14 @@ void MapFrame::addWaypoint( string rover, float x, float y ) {
   if (map_data)
   {
     map_data->addToWaypointPath(rover, x, y);
+    cout << "Waypoint created. There are now " << map_data->getWaypointPath(rover_currently_selected)->size() << " waypoints" << endl;
     emit delayedUpdate();
   }
+}
+
+void MapFrame::receiveCurrentRoverName( QString rover_name )
+{
+  this->rover_currently_selected = rover_name.toStdString();
 }
 
 MapFrame::~MapFrame()
