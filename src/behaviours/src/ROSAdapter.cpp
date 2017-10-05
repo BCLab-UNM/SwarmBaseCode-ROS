@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "Point.h"
-#include "TagPoint.h"
+#include "Tag.h"
 
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
@@ -357,19 +357,28 @@ void sendDriveCommand(double left, double right)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
 
   if (message->detections.size() > 0) {
-    vector<TagPoint> tags;
+    vector<Tag> tags;
 
     for (int i = 0; i < message->detections.size(); i++) {
 
-      TagPoint loc;
-      loc.id = message->detections[i].id;
+      // Package up the ROS AprilTag data into our own type that does not rely on ROS.
+      Tag loc;
+      loc.setID( message->detections[i].id );
+
+      // Pass the position of the AprilTag
       geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
-      loc.x = tagPose.pose.position.x;
-      loc.y = tagPose.pose.position.y;
-      loc.z = tagPose.pose.position.z;
-      //loc.theta =
+      loc.setPosition( make_tuple( tagPose.pose.position.x,
+				   tagPose.pose.position.y,
+				   tagPose.pose.position.z ) );
+
+      // Pass the orientation of the AprilTag
+      loc.setOrientation( ::boost::math::quaternion<float>( tagPose.pose.orientation.x,
+							    tagPose.pose.orientation.y,
+							    tagPose.pose.orientation.z,
+							    tagPose.pose.orientation.w ) );
       tags.push_back(loc);
     }
+    
     logicController.SetAprilTags(tags);
   }
 
