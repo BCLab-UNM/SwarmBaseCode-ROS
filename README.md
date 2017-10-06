@@ -280,7 +280,9 @@ You are now set for rapid deployment and development!
 	+ Typing 'CB' will allow you to change branches at anytime
 	+ Typing 'RP' will allow you to re-pull from your current selected github branch
 
-- Typing "REBOOT {hostname}" will allow you to reboot the selected rover.
+Feature:
+Typing "REBOOT {hostname}" in any option will allow you to reboot the selected rover.
+- If you have changed the password for your swarmie, you need to change the password in the script file as well in the variable "roverPass" to allow it to work!
 
 NOTES:
 This script runs better when using ssh-keys.  Keys allow you to SSH without requiring the user to type in a password every time
