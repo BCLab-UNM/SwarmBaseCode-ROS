@@ -9,6 +9,7 @@ roverPass="KSC-2018"
 #--------------------------------------------------------------#
 
 OPTION=$1
+branch=$2
 roverIP=""
 branch=""
 needsReboot=false
@@ -225,8 +226,6 @@ while(true); do
 #------------------------------------------------------------
 if [ $OPTION == "-G" ]; then
 
-	branch=$2
-
 	#if not everything is filled out
 	if [ "$branch" == "" ]; then
 		echo ""
@@ -303,7 +302,7 @@ if [ $OPTION == "-G" ]; then
 			if [ $needsReboot == true ]; then
 				echo "Attempting to Reboot $roverIP"
 			else
-				"Transferring to and Running $roverIP"s
+				echo "Transferring to and Running $roverIP"s
 			fi
 
 			#If rover is on the network
