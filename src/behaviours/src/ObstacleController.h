@@ -2,8 +2,7 @@
 #define OBSTACLECONTOLLER_H
 
 #include "Controller.h"
-#include "TagPoint.h"
-#include <math.h>
+#include "Tag.h"
 
 class ObstacleController : virtual Controller
 {
@@ -14,16 +13,16 @@ public:
 
   void Reset() override;
   Result DoWork() override;
-  void SetSonarData(float left, float center, float right);
-  void SetCurrentLocation(Point currentLocation);
-  void SetTagData(vector<TagPoint> tags);
+  void setSonarData(float left, float center, float right);
+  void setCurrentLocation(Point currentLocation);
+  void setTagData(vector<Tag> tags);
   bool ShouldInterrupt() override;
   bool HasWork() override;
-  void SetIgnoreCenter();
-  void SetCurrentTimeInMilliSecs( long int time );
-  void SetTargetHeld ();
-  void SetTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false;}}
-  bool GetShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
+  void setIgnoreCenterSonar();
+  void setCurrentTimeInMilliSecs( long int time );
+  void setTargetHeld ();
+  void setTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false;}}
+  bool getShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
 
@@ -31,8 +30,18 @@ protected:
 
 private:
 
+  // Try not to run over the collection zone
+  void avoidCollectionZone();
+
+  // Try not to run into a physical object
+  void avoidObstacle();
+
+  // Are there AprilTags in the camera view that mark the collection zone
+  // and are those AprilTags oriented towards or away from the camera.
+  bool checkForCollectionZoneTags( vector<Tag> );
+  
   const float K_angular = 1.0; //radians a second
-  const float reactivateCenterThreshold = 0.8;
+  const float reactivate_center_sonar_threshold = 0.8;
   const int targetCountPivot = 6;
   const float obstacleDistancePivot = 0.2526;
   const float triggerDistance = 0.8;
@@ -51,11 +60,11 @@ private:
   float center = 0;
   float right = 0;
 
-  int countLeft;
-  int countRight;
-  bool centerSeen;
+  unsigned int count_left_collection_zone_tags;
+  unsigned int count_right_collection_zone_tags;
 
-  bool ignoreCenter = false;
+  // Ignore the center sonar because we are carrying a target
+  bool ignore_center_sonar = false;
 
   Point currentLocation;
 
@@ -65,10 +74,14 @@ private:
 
   bool targetHeld = false;
   bool previousTargetState = false;
-  bool phys = false;
+
+  bool phys = false; // Physical obstacle
+  bool collection_zone_seen = false; // The obstacle is the collection zone
+  
   bool set_waypoint = false;
   bool can_set_waypoint = false;
 
+  float camera_offset_correction = 0.020; //meters;
 };
 
 #endif // OBSTACLECONTOLLER_H

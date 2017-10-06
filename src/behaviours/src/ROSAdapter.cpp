@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "Point.h"
-#include "TagPoint.h"
+#include "Tag.h"
 
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
@@ -281,10 +281,9 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     
   }
   
-  transformMapCentertoOdom();
-  cout << "currentOdom x : " << currentLocation.x << " currentOdom y : " << currentLocation.y << endl;
+  /*cout << "currentOdom x : " << currentLocation.x << " currentOdom y : " << currentLocation.y << endl;
   cout << "centtLocOd x : " << centerLocationOdom.x << " centLocOd : y " << centerLocationOdom.y << endl;
-  cout << endl;
+  cout << endl;*/
   
   
   // Robot is in automode
@@ -378,19 +377,28 @@ void sendDriveCommand(double left, double right)
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
   
   if (message->detections.size() > 0) {
-    vector<TagPoint> tags;
-    
+    vector<Tag> tags;
+
     for (int i = 0; i < message->detections.size(); i++) {
-      
-      TagPoint loc;
-      loc.id = message->detections[i].id;
+
+      // Package up the ROS AprilTag data into our own type that does not rely on ROS.
+      Tag loc;
+      loc.setID( message->detections[i].id );
+
+      // Pass the position of the AprilTag
       geometry_msgs::PoseStamped tagPose = message->detections[i].pose;
-      loc.x = tagPose.pose.position.x;
-      loc.y = tagPose.pose.position.y;
-      loc.z = tagPose.pose.position.z;
-      //loc.theta =
+      loc.setPosition( make_tuple( tagPose.pose.position.x,
+				   tagPose.pose.position.y,
+				   tagPose.pose.position.z ) );
+
+      // Pass the orientation of the AprilTag
+      loc.setOrientation( ::boost::math::quaternion<float>( tagPose.pose.orientation.x,
+							    tagPose.pose.orientation.y,
+							    tagPose.pose.orientation.z,
+							    tagPose.pose.orientation.w ) );
       tags.push_back(loc);
     }
+    
     logicController.SetAprilTags(tags);
   }
   
@@ -583,7 +591,7 @@ void transformMapCentertoOdom()
   centerLocationMapRef.x = odomPose.pose.position.x; //set centerLocation in odom frame
   centerLocationMapRef.y = odomPose.pose.position.y;
   
-  cout << "x ref : "<< centerLocationMapRef.x << " y ref : " << centerLocationMapRef.y << endl;
+ // cout << "x ref : "<< centerLocationMapRef.x << " y ref : " << centerLocationMapRef.y << endl;
   
   float xdiff = centerLocationMapRef.x - centerLocationOdom.x;
   float ydiff = centerLocationMapRef.y - centerLocationOdom.y;
@@ -596,8 +604,8 @@ void transformMapCentertoOdom()
     centerLocationOdom.y += ydiff/diff;
   }
   
-  cout << "center x diff : " << centerLocationMapRef.x - centerLocationOdom.x << " center y diff : " << centerLocationMapRef.y - centerLocationOdom.y << endl;
-  cout << hypot(centerLocationMapRef.x - centerLocationOdom.x, centerLocationMapRef.y - centerLocationOdom.y) << endl;
+  //cout << "center x diff : " << centerLocationMapRef.x - centerLocationOdom.x << " center y diff : " << centerLocationMapRef.y - centerLocationOdom.y << endl;
+  //cout << hypot(centerLocationMapRef.x - centerLocationOdom.x, centerLocationMapRef.y - centerLocationOdom.y) << endl;
           
 }
 
