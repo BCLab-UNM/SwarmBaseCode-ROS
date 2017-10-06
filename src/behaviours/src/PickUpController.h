@@ -2,7 +2,7 @@
 #define PICKUPCONTROLLER_H
 
 #include "Controller.h"
-#include "TagPoint.h"
+#include "Tag.h"
 
 class PickUpController : virtual Controller
 {
@@ -12,7 +12,7 @@ public:
 
   void Reset() override;
   Result DoWork() override;
-  void SetTagData(vector<TagPoint> tags);
+  void SetTagData(vector<Tag> tags);
   bool ShouldInterrupt() override;
   bool HasWork() override;
 
