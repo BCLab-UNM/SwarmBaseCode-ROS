@@ -51,6 +51,7 @@
 #include <set>
 #include <mutex>
 #include <ublox_msgs/NavSOL.h>
+#include "swarmie_msgs/Waypoint.h" // For waypoint commands
 
 //ROS msg types
 //#include "rover_onboard_target_detection/ATag.h"

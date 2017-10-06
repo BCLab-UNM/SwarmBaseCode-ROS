@@ -747,9 +747,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
+        waypoint_cmd_publishers[*it].shutdown();
 
         // Delete Publishers
         control_mode_publishers.erase(*it);
+        waypoint_cmd_publishers.erase(*it);
     }
 
     // Wait for a rover to connect
@@ -835,6 +837,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     {
         //Set up publishers
         control_mode_publishers[*i]=nh.advertise<std_msgs::UInt8>("/"+*i+"/mode", 10, true); // last argument sets latch to true
+        waypoint_cmd_publishers[*i]=nh.advertise<swarmie_msgs::Waypoint>("/"+*i+"/waypoints/cmd", 10, true);
+        
 
         //Set up subscribers
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
@@ -1860,6 +1864,14 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
       }
     control_mode_publishers.clear();
 
+    for (map<string,ros::Publisher>::iterator it=waypoint_cmd_publishers.begin(); it!=waypoint_cmd_publishers.end(); ++it)
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
+    waypoint_cmd_publishers.clear();
+    
+    
     return_msg += sim_mgr.stopGazeboClient();
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return_msg += "<br>";
@@ -2682,8 +2694,16 @@ void RoverGUIPlugin::refocusKeyboardEventHandler()
     widget->setFocus();
 }
 
-void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd, int, float, float)
+void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float y)
 {
+  
+    swarmie_msgs::Waypoint msg;
+    msg.action = cmd;
+    msg.id = id;
+    msg.x = x;
+    msg.y = y;
+    
+    waypoint_cmd_publishers[selected_rover_name].publish(msg);
 }
 
 // Clean up memory when this object is deleted
