@@ -95,7 +95,7 @@ Unpack_Run()
 {
 	echo "Unpacking repository $dirName on swarmie at $roverIP"
 
-	gnome-terminal --disable-factory -x bash -c "echo -n -e '\033]0;$roverIP\007'
+	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$roverIP\007'
 		ssh -t swarmie@$roverIP 'echo 'Unpacking $dirName.tgz ...';
 		tar xzf $dirName.tgz;
 		sleep 2;			
@@ -132,7 +132,7 @@ DispOpt()
 		echo "Type '-G' to pull, transfer, and run on swarmie(s) "
 	elif [ $OPTION == "-G" ]; then
 		echo "Type 'RP' to Re Pull from the github Repository"
-		echo "Type 'CB' to pull from a new Branch"
+		echo "Type 'CB' to pull from a new branch"
 	fi
 
 	if [ "$OPTION" != "-R" ]; then
@@ -273,6 +273,7 @@ if [ $OPTION == "-G" ]; then
 				echo ""
 				echo "Pulling new code from $branch"
 				echo ""
+				break;
 			elif [ $roverIP == "REBOOT" ]; then
 				roverIP=$add
 				echo "Rebooting $roverIP"
@@ -423,8 +424,8 @@ if [ $OPTION == "-R" ]; then
 			FailPing
 		fi
 
+		
 		needsReboot=false
-
 	done
 fi
 
