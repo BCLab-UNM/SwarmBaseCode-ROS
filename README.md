@@ -8,9 +8,9 @@ This repository contains:
 2. 3D .STL models for the physical Swarmie build 
 3. Bash shell scripts for initializing simulated Swarmies in the Gazebo simulator, as well as physical Swarmies
 
-- For a step-by-step guide to using Swarmathon-ROS to control a physical Swarmie robot, please see the instructions in the physical robot [Quick Start Guide](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/Quick%20Start%20Physical%20Guide.md).
+- For a step-by-step guide to using SwarmBaseCode-ROS to control a physical Swarmie robot, please see the instructions in the physical robot [Quick Start Guide](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/Quick%20Start%20Physical%20Guide.md).
 
-- Please submit bug reports for Swarmathon-ROS through GitHub's Issues system. For all other questions regarding the Swarmathon-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
+- Please submit bug reports for SwarmBaseCode-ROS through GitHub's Issues system. For all other questions regarding the SwarmBaseCode-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
 - We recommend Jason M. O'Kane's [A Gentle Introduction to ROS](https://cse.sc.edu/~jokane/agitr/) for an in-depth walkthrough.
 
@@ -22,7 +22,7 @@ Be: sure you are using the latest drivers for your video card using the "additio
 
 ### Quick Start Installation Guide
 
-Swarmathon-ROS is designed and tested exclusively on the 64 bit version of Ubuntu 16.04 LTS (Xenial Xerus) and ROS Kinetic Kame. Other systems are untested and are therefore not supported at this time.
+SwarmBaseCode-ROS is designed and tested exclusively on the 64 bit version of Ubuntu 16.04 LTS (Xenial Xerus) and ROS Kinetic Kame. Other systems are untested and are therefore not supported at this time.
 
 ##### 1. Install ROS Kinetic Kame
 
@@ -45,7 +45,7 @@ You may request the installation of addition packages on the competition rovers.
 
 ##### 2. Install additional ROS packages
 
-We use the [catkin_tools](https://catkin-tools.readthedocs.io/) package to build the Swarmathon-ROS code base:
+We use the [catkin_tools](https://catkin-tools.readthedocs.io/) package to build the SwarmBaseCode-ROS code base:
 
 ```
 sudo apt install python-rosinstall python-catkin-tools
@@ -79,7 +79,7 @@ Joystick commands can also be simulated using the direction keys (Up=I, Down=K, 
 sudo apt install git
 ```
 
-##### 5. Install Swarmathon-ROS
+##### 5. Install SwarmBaseCode-ROS
 
 1. Clone this GitHub repository to your home directory (~), renaming the repo so ROS and catkin can properly identify it (you can name the target directory whatever you like):
 
@@ -98,7 +98,7 @@ sudo apt install git
   git submodule update
   ```
 
-4. Compile Swarmathon-ROS as a ROS catkin workspace:
+4. Compile SwarmBaseCode-ROS as a ROS catkin workspace:
  
   Make sure bash is aware of the location of the ROS environment:
   ```
@@ -115,7 +115,7 @@ sudo apt install git
   catkin build
   ```
     
-##### 6. Run the Swarmathon-ROS simulation:
+##### 6. Run the SwarmBaseCode-ROS simulation:
 
 1. Change the permissions on the simulation run script to make it exectuatable (assuming you use the target directory name SwarmBaseCode-ROS):
   
@@ -134,33 +134,54 @@ The GUI will now launch. The run script kills a number of gazebo and ROS process
 
 This is the first screen of the GUI:
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/guiFirstScreen.png "Opening Screen")
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/guiFirstScreen.png "Opening Screen")
 
 Click the "Simulation Control" tab:
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/simControlTab.png "Simulation Parameters")
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/simControlTab.png "Simulation Parameters")
 
-Choose the ground texture, whether this is a preliminary or final round (3 or 6 robots), and the distribution of targets.
+There are several settings you can change:
+
+- Target Distribution: Choose between randomly generating a uniform, clustered, or power law distribution. You can also select a custom Gazebo world file; there are several pre-made world files included in the base code!
+
+- Number of Cubes: When you select a uniform or clustered target distribution, you can select the total number of apriltag cubes placed. This is not available for the power law distribution or custom world files at this time. The point of this option is to speed up the process of placing cubes in the simulation using these distribution types.
+
+- Ground Texture: Choose the kind of ground texture that will appear in the Gazebo simulation.
+
+- Round Type: Preliminary round creates a 15 meter square arena and generates a default of three rovers. Final round creates a 23.1 meter square arena and generates a default of six rovers. Unbounded round does not place any barriers around the edge of the arena, it generates a default of three rovers, and you can set the size of the arena in the dropbox below the unbounded radio button. Cubes placed using the uniform, clustered, or powerlaw target distributions will use this arena size to determine random placements.
+
+- Set Number of Rovers: Optional. If you select this checkbox, you can customize the exact number of rovers that will be created regardless of the round type. You can create from 0 to 8 rovers.
+
+- Simulation Length: Optional. By default there is no timer set. If you select a timer from the drop down list, when you click the "All Autonomous" button the Gazebo simulation will run for the specified time before stopping all of the rovers (the equivalent of pressing the "Stop All Rovers" button). Please note that a twenty minute timer will run for twenty minutes of simulated time. That is, the amount of time that the simulation needs to simulate twenty real world minutes of time. You can look at the real time factor in Gazebo to get a feel for this, but it is generally slower than real time.
+
+    tldr: A simulation timer for twenty minutes *might* take anywhere from thirty minutes to sixty minutes to actually complete.
+
+- Create Savable Gazebo World: Selecting this option will create a Gazebo simulation that does not include rovers, a collection zone, or wall barriers. The point of this is to create a uniform, clustered, or power law distribution (which takes a long time to do) and then save that Gazebo world so that you can load it MUCH more quickly for testing your simulated rovers later on.
 
 Click the "Build Simulation" button when ready.
 
-The gazebo physics simulator will open.
+The Gazebo physics simulator will open.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/buildSim.png "Gazebo Simulator")
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/buildSim.png "Gazebo Simulator")
 
 Click back to the Swarmathon GUI and select the "Sensor Display" tab.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/sensorDisplayTab.png "Sesnor display")
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/sensorDisplayTab.png "Sesnor display")
 
-Any active rovers, simulated or real will be displayed in the rover list on the left side.
+Any active rovers, simulated and/or real, will be displayed in the rover list on the left side. To the right of the rover list is their corresponding connection status. Please note that the number here reflects different things for simulated vs. physical rovers:
+- physical rovers: This number represents the wireless link quality and the bitrate of their connection.
+- simulated rovers: This number represents their simulation rate as a percentage of real time. For example, 1.0 = moving at 100% real time factor, 0.5 = moving at 50% real time factor, etc.
+- all rovers: Green = good connection. Yellow = meh connection. Red = bad connection and/or disconnected.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/activeRovers.png "Active rovers")
+To the right of the connection status is a checkbox for the map frame. If you select a checkbox for a given rover, it's map information will appear in the map to the right. You can arbitrarily select any number of rovers to be displayed in the map frame.
+
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/activeRovers.png "Active rovers")
 
 Select a rover to view its sensor outputs. 
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/roverSensorOutputs.png "Rover sensor outputs")
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/roverSensorOutputs.png "Rover sensor outputs")
 
-There are four sensor display frames:
+There are four sensor display frames and one settings frame:
 
 The camera output. This is a rover eye's view of the world.
 
@@ -170,23 +191,36 @@ The IMU sensor display consists of a cube where the red face is the bottom of th
  
 The map view shows the path taken by the currently selected rover. Green is the encoder position data. In simulation, the encoder position data comes from the odometry topic being published by Gazebo's skid steer controller plugin. In the real robots, it is the encoder output. GPS points are shown as red dots. The EKF is the output of an extended Kalman filter which fuses data from the IMU, GPS, and encoder sensors.
 
-Click on the "Task Status" tab.
+The map settings frame contains several settings that affect the map view:
+- Frame Views: You can check whether the map displays data from EKF (MAP), odometry (ODOM), and/or GPS (NAVSAT).
+    Additionally, the Global Frame checkbox moves rovers from all starting at (0,0) to their actual start points (this is for simulated rovers only at this time).
+- Panning: You can select whether the map automatically pans to fit all of the map data into the map frame or you can choose to manually pan the map yourself using the mouse to click-and-drag and also zooming with the scroll wheel.
+- Unique Rover Colors: Select this option to change the colors in the map frame to display unique rover colors. This will help people to tell the rover paths apart in the map frame after long simulation runs.
+- Popout: Click on this box to generate a popout map window that you can maximize or resize however you want. The popout map retains all of the settings you had selected in the original map frame. Changing settings in the RQT GUI will also change things in your popout map.
 
-![Alt text](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/readmeImages/taskStatusTab.png "Task Status tab")
+Look on the left hand side of the RQT Rover GUI.
 
-This tab displays the number of targets detected, the number of targets collected, and the number of obstacle avoidance calls.
+![Alt text](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/readmeImages/taskStatusTab.png "Task Status tab")
+
+This section displays important status information:
+
+1. (all rovers) The currently selected rover in the RQT GUI.
+2. (physical rovers) The number of GPS satellites detected.
+3. (all rovers) The number of obstacle avoidance calls.
+4. (simulated rovers) The number of targets collected.
+5. (simulated rovers) The current status of the simulation timer after selecting a timer length and clicking the "All Autonomous" button.
 
 To close the simulation and the GUI, click the red exit button in the top left-hand corner.
 
 ### Software Documentation
 
-Source code for Swarmathon-ROS can be found in the repository /src directory. This diretory contains severals subdirectories, each of which contain a single ROS package. Here we present a high-level description of each package.
+Source code for SwarmBaseCode-ROS can be found in the repository /src directory. This diretory contains severals subdirectories, each of which contain a single ROS package. Here we present a high-level description of each package.
 
-- ```abridge```: A serial interface between Swarmathon-ROS and the A-Star 32U4 microcontroller onboard the physical robot. In the Swarmathon-ROS simulation, ```abridge``` functionality is supplanted by [gazebo_ros_skid_steer_drive](http://docs.ros.org/kinetic/api/gazebo_plugins/html/classgazebo_1_1GazeboRosSkidSteerDrive.html) (motor and encoders) and [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) (sonar and IMU; see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
-- ```behavours```: The top-level controller class for the physical and simulated robots. This package receives messages from sensors and implements behaviours the robot should follow in response. This packages also receives pose updates from [robot_localization](http://wiki.ros.org/robot_localization) (see [step 2](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#2-install-additional-ros-plugins) of the Quick Start guide) and commands from [joystick_drivers](http://wiki.ros.org/joystick_drivers) (see [step 3](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
-- ```rqt_rover_gui```: A Qt-based graphical interface for the physical and simulated robots. See [How to use Qt Creator](https://github.com/BCLab-UNM/Swarmathon-ROS/blob/master/README.md#how-to-use-qt-creator-to-edit-the-simulation-gui) for details on this package.
+- ```abridge```: A serial interface between SwarmBaseCode-ROS and the A-Star 32U4 microcontroller onboard the physical robot. In the SwarmBaseCode-ROS simulation, ```abridge``` functionality is supplanted by [gazebo_ros_skid_steer_drive](http://docs.ros.org/kinetic/api/gazebo_plugins/html/classgazebo_1_1GazeboRosSkidSteerDrive.html) (motor and encoders) and [hector_gazebo_plugins](http://wiki.ros.org/hector_gazebo_plugins) (sonar and IMU; see [step 3](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
+- ```behavours```: The top-level controller class for the physical and simulated robots. This package receives messages from sensors and implements behaviours the robot should follow in response. This packages also receives pose updates from [robot_localization](http://wiki.ros.org/robot_localization) (see [step 2](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/README.md#2-install-additional-ros-plugins) of the Quick Start guide) and commands from [joystick_drivers](http://wiki.ros.org/joystick_drivers) (see [step 3](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/README.md#3-install-additional-gazebo-plugins) of the Quick Start guide).
+- ```rqt_rover_gui```: A Qt-based graphical interface for the physical and simulated robots. See [How to use Qt Creator](https://github.com/BCLab-UNM/SwarmBaseCode-ROS/blob/master/README.md#how-to-use-qt-creator-to-edit-the-simulation-gui) for details on this package.
 - ```target_detection```: An image processor that detects [AprilTag](https://april.eecs.umich.edu/wiki/index.php/AprilTags) fiducial markers in the onboard camera's video stream. This package receives images from the ```usbCamera``` class (for physical robots) or [gazebo_ros_camera](http://docs.ros.org/kinetic/api/gazebo_plugins/html/classgazebo_1_1GazeboRosCamera.html) (for simulated robots), and, if an AprilTag is detected in the image, returns the integer value encoded in the tag.
-- ```ublox```: A serial interface to the ublox GPS receiver onboard the physical robot. This package is installed as a git submodule in the Swarmathon-ROS repo. See the [ublox ROS wiki page](http://wiki.ros.org/ublox) for more information.
+- ```ublox```: A serial interface to the ublox GPS receiver onboard the physical robot. This package is installed as a git submodule in the SwarmBaseCode-ROS repo. See the [ublox ROS wiki page](http://wiki.ros.org/ublox) for more information.
 
 ### How to use Qt Creator to edit the simulation GUI
 
