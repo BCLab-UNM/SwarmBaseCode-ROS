@@ -387,7 +387,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
 
 
         // Draw the waypoints for the current rover
-        painter.setPen(Qt::blue);
+        painter.setPen(Qt::cyan);
         
         QPainterPath scaled_waypoint_rover_path;
         for(map< int, std::pair<float,float> >::iterator it = map_data->getWaypointPath(rover_to_display)->begin(); it != map_data->getWaypointPath(rover_to_display)->end(); ++it) {
@@ -397,24 +397,34 @@ void MapFrame::paintEvent(QPaintEvent* event) {
             float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
             float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
-            // Move to the starting point of the path without drawing a line
-            if (it == map_data->getWaypointPath(rover_to_display)->begin())
-            {
-              scaled_waypoint_rover_path.moveTo(x, y);
-            }
             
             QPoint point(x,y);
             int default_pen_width = painter.pen().width();
             QPen previous_pen = painter.pen();
             QPen pen;
-            pen.setColor(Qt::blue);
+            pen.setColor(Qt::cyan);
             pen.setWidth(5);
             painter.setPen(pen);
             painter.drawPoint(point);
-            scaled_waypoint_rover_path.lineTo(x, y);
+            
+            // Draw lines connecting waypoints
             painter.setPen(previous_pen);
+
+            painter.setPen(Qt::blue);
+
+            // Move to the starting point of the path without drawing a line
+            if (it == map_data->getWaypointPath(rover_to_display)->begin())
+            {
+              scaled_waypoint_rover_path.moveTo(x, y);
+            }
+            else
+            {
+              scaled_waypoint_rover_path.lineTo(x, y);
+            }
         }
 
+        painter.drawPath(scaled_waypoint_rover_path);
+        
         map_data->unlock();
 
         painter.setPen(Qt::white);
@@ -439,7 +449,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     float mouse_map_y = -(((mouse_pointer_position.y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
    
     QString mouse_pointer_text = QString::number(mouse_map_x) + ", " + QString::number(mouse_map_y) + " - " + QString::number(mouse_pointer_position.x()) + ", " + QString::number(mouse_pointer_position.y());
-    painter.drawText(mouse_pointer_position, mouse_pointer_text);
+    // painter.drawText(mouse_pointer_position, mouse_pointer_text);
     
     painter.setPen(Qt::white);
 }
@@ -484,26 +494,58 @@ void MapFrame::setWhetherToDisplay(string rover, bool yes)
     if(popout_mapframe) popout_mapframe->setWhetherToDisplay(rover, yes);
 }
 
-void MapFrame::mouseReleaseEvent(QMouseEvent *event) {
+void MapFrame::mouseReleaseEvent(QMouseEvent *event)
+{
     previous_translate_x = translate_x;
     previous_translate_y = translate_y;
 }
 
-void MapFrame::mousePressEvent(QMouseEvent *event) {
-  // 
+void MapFrame::mousePressEvent(QMouseEvent *event)
+{
+
+  float waypoint_click_tolerance = 0.25*(scale/10);
+  
   if ( event->buttons() == Qt::RightButton )
   {
     // Solve for map coordinates in terms of frame coordinates
     float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
-    float mouse_map_y = -(((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
+    float mouse_map_y = ((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y;
+    
+    // If click is within eplison of an existing waypoint remove the waypoint
+    bool waypoint_removed = false;
+    for(map< int, std::pair<float,float> >::iterator it = map_data->getWaypointPath(rover_currently_selected)->begin(); it != map_data->getWaypointPath(rover_currently_selected)->end(); ++it)
+    {
+      // Get the distance between the mouse click and the coordinates of the existing waypoints
+      pair<float,float> coordinate  = it->second;
+      float x1 = coordinate.first;
+      float x2 = mouse_map_x;
+      float y1 = coordinate.second;
+      float y2 = mouse_map_y;
 
-    addWaypoint(rover_currently_selected, mouse_map_x, mouse_map_y);
-
+emit sendInfoLogMessage(" x1: " + QString::number(x1)
+                              + " x2: " + QString::number(x2)
+                              + " y1: " + QString::number(y1)
+                              + " y2: " + QString::number(y2)
+                        + " dist: " + QString::number(sqrt( pow( x1 - x2, 2 ) + pow( y1 - y2, 2 ) ) ) + " scale: " + QString::number(scale) );
+      
+      if ( sqrt( pow( x1 - x2, 2 ) + pow( y1 - y2, 2 ) ) < waypoint_click_tolerance ) 
+      {
+        int waypoint_id = it->first;
+        removeWaypoint( rover_currently_selected, waypoint_id );
+        waypoint_removed = true;
+      }
+    }
+    
+    if ( !waypoint_removed )
+    {
+      emit sendInfoLogMessage(" Adding x1 " + QString::number(mouse_map_x) + " y: " + QString::number(mouse_map_y));
+      addWaypoint(rover_currently_selected, mouse_map_x, mouse_map_y);
+    }
   }
   else if ( event->buttons() == Qt::LeftButton )
   {
     previous_clicked_position = event->pos();
-      }
+  }
   
     // emit sendInfoLogMessage("MapFrame: mouse press. x: " + QString::number(mouse_event->pos().x()) + ", y: " + QString::number(mouse_event->pos().y()));
 }
@@ -694,9 +736,21 @@ void MapFrame::addWaypoint( string rover, float x, float y ) {
   if (map_data)
   {
     int id = map_data->addToWaypointPath(rover, x, y);
-    //cout << "Waypoint created. There are now " << map_data->getWaypointPath(rover_currently_selected)->size() << " waypoints" << endl;
+    cout << "Waypoint created. There are now " << map_data->getWaypointPath(rover_currently_selected)->size() << " waypoints" << endl;
     emit delayedUpdate();
-    emit sendWaypointCmd(ADD, id, x, y);
+    // The y coordinate must be negated to translatAe between the
+    // map frame and the rover frame.
+    emit sendWaypointCmd(ADD, id, x, -y);
+  }
+}
+
+void MapFrame::removeWaypoint( string rover, int id ) {
+  if (map_data)
+  {
+    map_data->removeFromWaypointPath(rover, id );
+    cout << "Waypoint removed. There are now " << map_data->getWaypointPath(rover_currently_selected)->size() << " waypoints" << endl;
+    emit delayedUpdate();
+    emit sendWaypointCmd(REMOVE, id, 0, 0); // x and y are 0 here because they are unused in a remove command
   }
 }
 

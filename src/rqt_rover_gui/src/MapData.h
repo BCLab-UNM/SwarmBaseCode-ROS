@@ -28,6 +28,8 @@ public:
     // Returns the id of the waypoint. IDs are use to issue waypoint commands to the rover.
     int addToWaypointPath(std::string rover, float x, float y);
 
+    void removeFromWaypointPath(std::string rover, int id);
+
     void clear();
     void clear(std::string rover_name);
     void lock();

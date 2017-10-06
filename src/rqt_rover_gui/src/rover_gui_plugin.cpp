@@ -2694,6 +2694,7 @@ void RoverGUIPlugin::refocusKeyboardEventHandler()
     widget->setFocus();
 }
 
+// Publish the waypoint commands recieved from MapFrame to ROS
 void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float y)
 {
   

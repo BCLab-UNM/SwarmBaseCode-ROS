@@ -219,6 +219,7 @@ namespace rqt_rover_gui {
     map<string,ros::Subscriber> gps_nav_solution_subscribers;
     map<string,ros::Subscriber> ekf_subscribers;
     map<string,ros::Subscriber> rover_diagnostic_subscribers;
+    map<string,ros::Subscriber> waypoint_subscribers;
     ros::Subscriber us_center_subscriber;
     ros::Subscriber us_left_subscriber;
     ros::Subscriber us_right_subscriber;

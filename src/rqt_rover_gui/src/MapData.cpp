@@ -39,7 +39,7 @@ void MapData::addToEncoderRoverPath(string rover, float x, float y)
 
 }
 
-
+// Expects the input y to be flipped with respect to y the map coordinate system
 void MapData::addToEKFRoverPath(string rover, float x, float y)
 {
   // Negate the y direction to orient the map so up is north.
@@ -56,17 +56,22 @@ void MapData::addToEKFRoverPath(string rover, float x, float y)
 
 }
 
-
+// Expects the input y to be consistent with the map coordinate system
 int MapData::addToWaypointPath(string rover, float x, float y)
 {
-  // Negate the y direction to orient the map so up is north.
-  y = -y;
 
   update_mutex.lock();
   int this_id = waypoint_id_counter++; // Get the next waypoint id.
   waypoint_path[rover][this_id]=pair<float,float>(x,y);
   update_mutex.unlock();
   return this_id;
+}
+
+void MapData::removeFromWaypointPath(std::string rover, int id)
+{
+  update_mutex.lock();
+  waypoint_path[rover].erase(id);
+  update_mutex.unlock();
 }
 
 void MapData::addTargetLocation(string rover, float x, float y)
@@ -102,6 +107,7 @@ void MapData::clear()
     gps_rover_path.clear();
     target_locations.clear();
     collection_points.clear();
+    waypoint_path.clear();
 
     update_mutex.unlock();
 }

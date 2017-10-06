@@ -64,7 +64,8 @@ namespace rqt_rover_gui
 
       // Create a waypoint on map. Rovers will navigate to the waypoint.
       void addWaypoint(std::string rover, float x, float y);
-      
+      void removeWaypoint( std::string rover, int id );
+     
       void clear();
       void clear(std::string rover);
 
