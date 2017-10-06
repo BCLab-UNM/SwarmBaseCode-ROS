@@ -46,7 +46,9 @@ public:
   void SetMapVelocityData(float linearVelocity, float angularVelocity);
   void SetCenterLocationOdom(Point centerLocationOdom);
   void SetCenterLocationMap(Point centerLocationMap);
-  void AddManualWaypoint(Point wpt);
+  void AddManualWaypoint(Point wpt, int waypoint_id);
+  void RemoveManualWaypoint(int waypoint_id);
+  std::vector<int> GetClearedWaypoints();
 
   void SetModeManual();
   void SetModeAuto();

@@ -122,6 +122,7 @@ ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
 ros::Publisher driveControlPublish;
 ros::Publisher heartbeatPublisher;
+ros::Publisher waypointFeedbackPublisher;
 
 // Subscribers
 ros::Subscriber joySubscriber;
@@ -207,6 +208,7 @@ int main(int argc, char **argv) {
   infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
   driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);
   heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);
+  waypointFeedbackPublisher = mNH.advertise<swarmie_msgs::Waypoint>((publishedName + "/waypoints"), 1, true);
 
   publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
   stateMachineTimer = mNH.createTimer(ros::Duration(behaviourLoopTimeStep), behaviourStateMachine);
@@ -342,13 +344,20 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
+    std::vector<int> cleared_waypoints = logicController.GetClearedWaypoints();
+    for(std::vector<int>::iterator it = cleared_waypoints.begin();
+        it != cleared_waypoints.end(); it++) {
+      swarmie_msgs::Waypoint wpt;
+      wpt.action = swarmie_msgs::Waypoint::ACTION_REACHED;
+      wpt.id = *it;
+      waypointFeedbackPublisher.publish(wpt);
+    }
     result = logicController.DoWork();
     if(result.type != behavior || result.b != wait) {
       sendDriveCommand(result.pd.left,result.pd.right);
     }
     cout << endl;
   }
-
 
   // publish state machine string for user, only if it has changed, though
   if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
@@ -541,7 +550,14 @@ void manualWaypointHandler(const swarmie_msgs::Waypoint& message) {
   wp.x = message.x;
   wp.y = message.y;
   wp.theta = 0.0;
-  logicController.AddManualWaypoint(wp);
+  switch(message.action) {
+  case swarmie_msgs::Waypoint::ACTION_ADD:
+    logicController.AddManualWaypoint(wp, message.id);
+    break;
+  case swarmie_msgs::Waypoint::ACTION_REMOVE:
+    logicController.RemoveManualWaypoint(message.id);
+    break;
+  }
 }
 
 void sigintEventHandler(int sig) {

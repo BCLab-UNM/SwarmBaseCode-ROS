@@ -313,9 +313,19 @@ void LogicController::SetCenterLocationOdom(Point centerLocationOdom) {
   dropOffController.SetCenterLocation(centerLocationOdom);
 }
 
-void LogicController::AddManualWaypoint(Point manualWaypoint)
+void LogicController::AddManualWaypoint(Point manualWaypoint, int waypoint_id)
 {
-  manualWaypointController.AddManualWaypoint(manualWaypoint);
+  manualWaypointController.AddManualWaypoint(manualWaypoint, waypoint_id);
+}
+
+void LogicController::RemoveManualWaypoint(int waypoint_id)
+{
+  manualWaypointController.RemoveManualWaypoint(waypoint_id);
+}
+
+std::vector<int> LogicController::GetClearedWaypoints()
+{
+  return manualWaypointController.ReachedWaypoints();
 }
 
 void LogicController::setVirtualFenceOn( RangeShape* range )
