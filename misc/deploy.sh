@@ -1,8 +1,12 @@
 #!/bin/bash
 
-OPTION=$1
+#-------------------------READ THIS----------------------------#
+#If you have changed your rovers password you MUST edit this variable with the correct password to 
+#allow the reboot feature to work correctly!!
+roverPass="KSC-2018"
+#--------------------------------------------------------------#
 
-roverpass=""
+OPTION=$1
 roverIP=""
 branch=""
 needsReboot=false
@@ -89,7 +93,7 @@ Unpack_Run()
 {
 	echo "Unpacking repository $dirName on swarmie at $roverIP"
 
-	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$roverIP\007'
+	gnome-terminal --disable-factory -x bash -c "echo -n -e '\033]0;$roverIP\007'
 		ssh -t swarmie@$roverIP 'echo 'Unpacking $dirName.tgz ...';
 		tar xzf $dirName.tgz;
 		sleep 2;			
@@ -100,8 +104,8 @@ Unpack_Run()
 		exit 1;
 		/bin/bash;' exec $SHELL"
 		
-		echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
-		echo ""
+	echo "Starting ROS nodes on swarmie at $3 with master at $hostName"
+	echo ""
 }
 
 Run()
@@ -139,7 +143,7 @@ DispOpt()
 		echo "Type 'RC' to recompile Source Code"
 	fi
 
-	echo "Type reboot {hostname} to reboot a swarmie"
+	echo "Type 'REBOOT {hostname}' to reboot a swarmie"
 
 	echo "-------------------------------------------------------------"
 	echo ""
@@ -162,23 +166,20 @@ FailPing()
 
 Reboot()
 {
-	echo "REBOOTING"
-	info="Rebooting $roverIP"
-	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$info\007';
-		ssh -t swarmie@$roverIP 'sudo reboot now';
-		exit 1;
-		/bin/bash;' exec $SHELL"
-}
+	info="Rebooting $roverIP and Reconnecting..."
+	echo "$info"
+	ssh -t swarmie@$roverIP "echo $roverPass | sudo -S reboot now; exit 1;"
+	sleep 5
+	{
+		while(true); do
+			ping -q -w10 $roverIP > /dev/null;
+			if [ $? -eq 0 ]; then
+				break;
+			fi
+		done
+	}
 
-WaitForReconnect()
-{
-	while(true); do
-		ping -q -w2 $roverIP > /dev/null;
-		if [ $? -eq 0 ]; then
-			echo "$roverIP is up"
-			break
-		fi
-	done
+	echo "Rover $roverIP is up... Ready to Reconnect!";
 }
 
 #Code Start
@@ -248,7 +249,8 @@ if [ $OPTION == "-G" ]; then
 
 	while(true); do
 		read -p "Rover Name/IP To Start:  " roverIP add
-			if [ "$roverIP" == "exit" ]; then
+		roverIP=${roverIP^^} && add=${add^^}
+			if [ "$roverIP" == "EXIT" ]; then
 				exit 1
 			elif [ "$roverIP" == "-R" ]; then
 				OPTION="-R"
@@ -269,7 +271,7 @@ if [ $OPTION == "-G" ]; then
 				echo ""
 				echo "Pulling new code from $branch"
 				echo ""
-			elif [ $roverIP == "reboot" ]; then
+			elif [ $roverIP == "REBOOT" ]; then
 				roverIP=$add
 				echo "Rebooting $roverIP"
 				needsReboot=true				
@@ -282,17 +284,14 @@ if [ $OPTION == "-G" ]; then
 			SuccessPing
 
 			if [ $needsReboot == true ]; then
-				Reboot &
-				wait
-				WaitForReconnect &
-				wait
+				Reboot
+				echo ""
 			fi
 
 			#Transfer/Unpack/Run
-			Transfer &
-			wait
-			Unpack_Run &
-			wait			
+			Transfer
+			Unpack_Run	
+			sleep 10	
 
 		#if not on the network
 		else
@@ -324,7 +323,8 @@ if [ $OPTION == "-L" ]; then
 
 	while [ true ]; do
 		read -p "Rover Name/IP To Start:  " roverIP add
-			if [ $roverIP =  "exit" ]; then
+		roverIP=${roverIP^^} && add=${add^^}
+			if [ $roverIP =  "EXIT" ]; then
 				exit 1
 			elif [ $roverIP = "-G" ]; then
 				OPTION="-G"
@@ -342,37 +342,34 @@ if [ $OPTION == "-L" ]; then
 				echo "Recompiling Source Code!"
 				echo ""
 				break
-			elif [ $roverIP == "reboot" ]; then
+			elif [ $roverIP == "REBOOT" ]; then
 				roverIP=$add
 				echo "Rebooting $roverIP"
 				needsReboot=true				
 			fi
 
-			#If rover is on the network
-			ping -q -w2 $roverIP > /dev/null
-			if [ $? -eq 0 ]; then
+		#If rover is on the network
+		ping -q -w2 $roverIP > /dev/null
+		if [ $? -eq 0 ]; then
 
-				SuccessPing
+			SuccessPing
 
-				if [ $needsReboot == true ]; then
-					Reboot &
-					wait
-					WaitForReconnect &
-					wait
-				fi
-
-				#Transfer/Unpack/Run
-				Transfer &
-				wait
-				Unpack_Run &
-				wait
-
-			#if not on the network
-			else
-				FailPing
+			if [ $needsReboot == true ]; then
+				Reboot
+				echo ""
 			fi
 
-			needsReboot=false
+			#Transfer/Unpack/Run
+			Transfer
+			Unpack_Run
+			sleep 10
+
+		#if not on the network
+		else
+			FailPing
+		fi
+
+		needsReboot=false
 	done
 fi
 
@@ -388,22 +385,23 @@ if [ $OPTION == "-R" ]; then
 
 	while(true); do
 		read -p "Rover Name/IP To Start:  " roverIP add
+		roverIP=${roverIP^^} && add=${add^^}
 			if [ "$roverIP" =  "exit" ]; then
 				exit 1
-			elif [ "$roverIP" = "-G" ]; then
+			elif [ "$roverIP" == "-G" ]; then
 				OPTION="-G"
 				clear
 				break	
-			elif [ "$roverIP" = "-L" ]; then
+			elif [ "$roverIP" == "-L" ]; then
 				OPTION="-L"
 				clear
 				break
-			elif [ $roverIP == "reboot" ]; then
+			elif [ $roverIP == "REBOOT" ]; then
 				roverIP=$add
-				echo "Rebooting $roverIP"
-				needsReboot=true				
+				needsReboot=true
+				echo ""				
 			fi
-
+		
 		#If rover is on the network
 		ping -q -w2 $roverIP > /dev/null
 		if [ $? -eq 0 ]; then
@@ -411,17 +409,12 @@ if [ $OPTION == "-R" ]; then
 			SuccessPing
 
 			if [ $needsReboot == true ]; then
-
-				Reboot &
-				wait
-
-				WaitForReconnect &
-				wait
-
+				Reboot
+				echo ""
 			fi
 
-			Run &
-			wait
+			Run
+			sleep 10
 
 		#if not on the network
 		else	
