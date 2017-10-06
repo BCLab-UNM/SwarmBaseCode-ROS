@@ -251,21 +251,34 @@ To use QT Creator to debug your already running program click the "Debug" menu. 
 
 ### Using the deploy.sh Script
 
-"deploy.sh" is a new script found in the SwarmBaseCode-ROS/misc folder that automates some of the old manual means of connecting rovers to a workstation.  Instead of needing to ssh and run the startup scripts yourself, you can run deploy.sh and have it automate the process for you.  Now connecting to swarmies takes seconds.
+The "deploy.sh" script has been added to allow for rapid deployment and easy development for teams and judges alike! This script is found in the SwarmBaseCode-ROS/misc folder and automates several key tasks for the user! Now connecting to swarmies takes seconds.
 
-The script is ran from your workstation and not the swarmies themselves.  Before running the script from your workstation ensure you run the commands:
+The script is ran from your workstation and not the swarmies themselves. This is to allow for easy deployment and to keep work and code on the workstation as opposed to developing and running everything from the swarmies themselves(giving you a fast and reliable way to transfer and run code between the 2). You will need to ensure the GUI is running before running this script!
+
+Before running the code, navigate to the misc folder:
 
 ```cd ~/SwarmBaseCode-ROS/misc```
 
+Give permission to the script to be executable:
+
 ```chmod +x deploy.sh```
 
-The script has several built in features:
+You are now set for rapid deployment and development!
 
-deploy.sh -R
-- This will simply connect and run the startup scripts to what ever code you currently have on the swarmie.  
+"deploy.sh" has 3 built-in options to be used:
 
-deploy.sh -L
-- This will take your current local file, build, package, and send to the physical rover and run the startup script.  This was added so groups could make changes to code on their local machines as opposed to writing code on the rovers themselves.  This allows you to quickly make a tweak on your current machine and test it on the rovers with relative ease.
+```./deploy.sh -R```
+- -R will ask the user for which rovers they wish to connect with and start sending information back to the workstation GUI
 
-deploy.sh -G {branch}
-- This option will pull the latest code from the {branch} selected and transfer that code onto the swarmie and run the startup scripts.  This is a great tool for updating and testing changes made to rovers that have code to test from github.
+```./deploy.sh -L```
+- -L will give users the ability to compile and package the repository that they are CURRENTLY running the script from, transfer, unpack, and start sending information back to the workstation automatically. This option has a unique option to assist users in rapid development:
+	+ Typing 'RC' recompiles the code base you are currently using to deploy to a swarmie
+
+```deploy.sh -G {branch}```
+(where branch is the desired branch you wish to pull)
+- -G requires the branch you wish to pull from. This allows users to choose different branches for testing. This will then follow a similar logic to -L and begin sending information back to the workstation GUI.  Like -L this has unique built-in options
+	+ Typing 'NB' will allow you to change branches at anytime
+	+ Typing 'RP' will allow you to re-pull from your current selected github branch
+
+NOTES:
+- Typing "REBOOT {hostname}" will allow you to reboot the selected rover.

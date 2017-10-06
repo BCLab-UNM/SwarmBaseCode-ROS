@@ -36,7 +36,7 @@ Check()
 PullGit_Pack()
 {
 	info="Pulling from $branch, Compiling, and Packing..."
-	gnome-terminal -x bash -c "echo -n -e '\033]0;$info\007';
+	gnome-terminal --disable-factory -x bash -c "echo -n -e '\033]0;$info\007';
 		cd $dirPath;
 		echo 'Checking out branch $branch';
 		git checkout $branch &&
