@@ -250,21 +250,38 @@ if [ $OPTION == "-G" ]; then
 	wait
 
 	while(true); do
-		read -p "Rover Name/IP To Start:  " roverIP add
-		roverIP=${roverIP^^} && add=${add^^}
+
+	i=0
+	changeOption=false
+
+		read -p "Rover Name/IP To Start:  " -a arr 
+
+		size=${#arr[@]}
+
+		while [ $i -lt $size ]; do
+
+			#retrieve string from arr
+			roverIP=${arr[i]}
+			roverIP=${roverIP^^}
+
+			i=$((i+1))
+
 			if [ "$roverIP" == "EXIT" ]; then
 				exit 1
 			elif [ "$roverIP" == "-R" ]; then
 				OPTION="-R"
 				clear
+				changeOption=true
 				break	
 			elif [ "$roverIP" == "-L" ]; then
 				OPTION="-L"
 				clear
+				changeOption=true
 				break
 			elif [ "$roverIP" == "CB" ]; then
 				branch=""
 				clear
+				changeOption=true
 				break
 			elif [ $roverIP == "RP" ]; then
 				clear
@@ -273,40 +290,54 @@ if [ $OPTION == "-G" ]; then
 				echo ""
 				echo "Pulling new code from $branch"
 				echo ""
+				changeOption=true
 				break;
 			elif [ $roverIP == "REBOOT" ]; then
-				roverIP=$add
-				echo "Rebooting $roverIP"
-				needsReboot=true				
+				needsReboot=true
+				roverIP=${arr[i]}
+				roverIP=${roverIP^^}
+				i=$((i+1))				
 			fi
 
-		#If rover is on the network
-		ping -q -w2 $roverIP > /dev/null
-		if [ $? -eq 0 ]; then
-
-			SuccessPing
-
+			#check if rebooting
 			if [ $needsReboot == true ]; then
-				Reboot
-				echo ""
-				Run
+				echo "Attempting to Reboot $roverIP"
 			else
-				#Transfer/Unpack/Run
-				Transfer
-				Unpack_Run	
-			fi	
+				"Transferring to and Running $roverIP"s
+			fi
 
-			sleep 10
+			#If rover is on the network
+			ping -q -w2 $roverIP > /dev/null
+			if [ $? -eq 0 ]; then
 
-		#if not on the network
-		else
-			FailPing
+				SuccessPing
+	
+				if [ $needsReboot == true ]; then
+					Reboot
+					echo ""
+					Run
+					needsReboot=false
+					sleep 10
+				else
+					#Transfer/Unpack/Run
+					Transfer
+					Unpack_Run
+					sleep 10	
+				fi	
+			#if not on the network
+			else
+				FailPing
+				needsReboot=false
+			fi
+		done
+
+
+		if [ $changeOption == true ]; then
+			break
 		fi
 
-	needsReboot=false
-
+		i=0
 	done
-
 fi
 
 #Transfer Local Copy
@@ -326,21 +357,38 @@ if [ $OPTION == "-L" ]; then
 	Pack &
 	wait
 
-	while [ true ]; do
-		read -p "Rover Name/IP To Start:  " roverIP add
-		roverIP=${roverIP^^} && add=${add^^}
+	while(true); do
+
+	i=0
+	changeOption=false
+
+		read -p "Rover Name/IP To Start:  " -a arr 
+
+		size=${#arr[@]}
+
+		while [ $i -lt $size ]; do
+
+			#retrieve string from arr
+			roverIP=${arr[i]}
+			roverIP=${roverIP^^}
+
+			i=$((i+1))
+
 			if [ $roverIP =  "EXIT" ]; then
 				exit 1
 			elif [ $roverIP = "-G" ]; then
 				OPTION="-G"
+				changeOption=true
 				clear
 				break	
 			elif [ $roverIP = "-R" ]; then
 				OPTION="-R"
+				changeOption=true
 				clear
 				break
 			elif [ $roverIP = "RC" ]; then
 				clear
+				changeOption=true
 				echo ""
 				echo "-------------------------------------------------------------"
 				echo ""
@@ -348,35 +396,54 @@ if [ $OPTION == "-L" ]; then
 				echo ""
 				break
 			elif [ $roverIP == "REBOOT" ]; then
-				roverIP=$add
-				echo "Rebooting $roverIP"
-				needsReboot=true				
+				needsReboot=true
+				roverIP=${arr[i]}
+				roverIP=${roverIP^^}
+				i=$((i+1))		
 			fi
 
-		#If rover is on the network
-		ping -q -w2 $roverIP > /dev/null
-		if [ $? -eq 0 ]; then
-
-			SuccessPing
-
+			#check if rebooting
 			if [ $needsReboot == true ]; then
-				Reboot
-				echo ""
-				Run
+				echo "Attempting to Reboot $roverIP"
 			else
-				#Transfer/Unpack/Run
-				Transfer
-				Unpack_Run
+				echo "Transferring to and Running $roverIP"
 			fi
 
-			sleep 10
+			#if we didn't just select the reboot option
+			if [ $roverIP != "REBOOT" ]; then
+	
+				#If rover is on the network
+				ping -q -w2 $roverIP > /dev/null
 
-		#if not on the network
-		else
-			FailPing
+				if [ $? -eq 0 ]; then	
+					SuccessPing
+
+					if [ $needsReboot == true ]; then
+						Reboot
+						echo ""
+						Run
+						needsReboot=false
+						sleep 10
+					else
+						#Transfer/Unpack/Run
+						Transfer
+						Unpack_Run
+						sleep 10
+					fi
+	
+				#if not on the network
+				else
+					FailPing
+					needsReboot=false
+				fi
+			fi
+		done
+
+		if [ $changeOption == true ]; then
+			break
 		fi
 
-		needsReboot=false
+		i=0
 	done
 fi
 
@@ -392,47 +459,83 @@ if [ $OPTION == "-R" ]; then
 
 	while(true); do
 
+	i=0
+	changeOption=false
 
-		read -p "Rover Name/IP To Start:  " roverIP add
+		read -p "Rover Name/IP To Start:  " -a arr 
 
-		roverIP=${roverIP^^} && add=${add^^}
+		size=${#arr[@]}
+		echo $size
+
+		while [ $i -lt $size ]; do
+
+			#retrieve string from arr
+			roverIP=${arr[i]}
+			roverIP=${roverIP^^}
+
+			i=$((i+1))
+		
+			#check input
 			if [ "$roverIP" =  "exit" ]; then
 				exit 1
 			elif [ "$roverIP" == "-G" ]; then
 				OPTION="-G"
+				changeOption=true
 				clear
 				break	
 			elif [ "$roverIP" == "-L" ]; then
 				OPTION="-L"
+				changeOption=true
 				clear
 				break
 			elif [ $roverIP == "REBOOT" ]; then
-				roverIP=$add
 				needsReboot=true
-				echo ""				
+				roverIP=${arr[i]}
+				roverIP=${roverIP^^}
+				i=$((i+1))		
 			fi
-		
-		#If rover is on the network
-		ping -q -w2 $roverIP > /dev/null
-		if [ $? -eq 0 ]; then
 
-			SuccessPing
-
+			#check if rebooting
 			if [ $needsReboot == true ]; then
-				Reboot
-				echo ""
+				echo "Attempting to Reboot $roverIP"
+			else
+				echo "Running $roverIP"
 			fi
+	
+			#if we didn't just select the reboot option
+			if [ $roverIP != "REBOOT" ]; then
+			
+				#If rover is on the network
+				ping -q -w2 $roverIP > /dev/null
+				if [ $? -eq 0 ]; then
+		
+					SuccessPing
 
-			Run
-			sleep 10
+					#reboot
+					if [ $needsReboot == true ]; then
+						Reboot
+						echo ""
+						Run
+						sleep 10
+						needsReboot=false
+					else
+						Run
+						sleep 10
+					fi
+	
+				#if not on the network
+				else	
+					FailPing
+					needsReboot=false
+				fi
+			fi
+		done
 
-		#if not on the network
-		else	
-			FailPing
+		if [ $changeOption == true ]; then
+			break
 		fi
 
-		done
-		needsReboot=false
+		i=0
 	done
 fi
 
