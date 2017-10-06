@@ -25,7 +25,6 @@ void DriveController::Reset() {
 
 Result DriveController::DoWork() {
 
-
   if(result.type == behavior) {
     if(result.b == noChange) {
       //if drive controller gets a no change command it is allowed to continue its previouse action
@@ -63,7 +62,6 @@ Result DriveController::DoWork() {
     //Handles route planning and navigation as well as makeing sure all waypoints are valid.
   case STATE_MACHINE_WAYPOINTS: {
 
-
     bool tooClose = true;
     while (!waypoints.empty() && tooClose) {
       if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
@@ -91,14 +89,12 @@ Result DriveController::DoWork() {
     // Stay in this state until angle is minimized
   case STATE_MACHINE_ROTATE: {
 
-
     waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
     // Calculate the diffrence between current and desired heading in radians.
     float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
     result.pd.setPointVel = 0.0;
     result.pd.setPointYaw = waypoints.back().theta;
-
     // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
     if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
       // rotate but dont drive.
@@ -116,7 +112,6 @@ Result DriveController::DoWork() {
     // Drive forward
     // Stay in this state until angle is at least PI/2
   case STATE_MACHINE_SKID_STEER: {
-
     // calculate the distance between current and desired heading in radians
     float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
