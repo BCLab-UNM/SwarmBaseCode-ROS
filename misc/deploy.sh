@@ -289,12 +289,14 @@ if [ $OPTION == "-G" ]; then
 			if [ $needsReboot == true ]; then
 				Reboot
 				echo ""
-			fi
+				Run
+			else
+				#Transfer/Unpack/Run
+				Transfer
+				Unpack_Run	
+			fi	
 
-			#Transfer/Unpack/Run
-			Transfer
-			Unpack_Run	
-			sleep 10	
+			sleep 10
 
 		#if not on the network
 		else
@@ -360,11 +362,13 @@ if [ $OPTION == "-L" ]; then
 			if [ $needsReboot == true ]; then
 				Reboot
 				echo ""
+				Run
+			else
+				#Transfer/Unpack/Run
+				Transfer
+				Unpack_Run
 			fi
 
-			#Transfer/Unpack/Run
-			Transfer
-			Unpack_Run
 			sleep 10
 
 		#if not on the network
@@ -387,7 +391,10 @@ if [ $OPTION == "-R" ]; then
 	echo ""
 
 	while(true); do
+
+
 		read -p "Rover Name/IP To Start:  " roverIP add
+
 		roverIP=${roverIP^^} && add=${add^^}
 			if [ "$roverIP" =  "exit" ]; then
 				exit 1
@@ -424,7 +431,7 @@ if [ $OPTION == "-R" ]; then
 			FailPing
 		fi
 
-		
+		done
 		needsReboot=false
 	done
 fi
