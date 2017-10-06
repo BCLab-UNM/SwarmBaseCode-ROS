@@ -1,4 +1,6 @@
 #!/bin/bash
+#This script has been added to aid in rapid development and deployment of multiple robots!
+
 
 #-------------------------READ THIS----------------------------#
 #If you have changed your rovers password you MUST edit this variable with the correct password to 
@@ -130,7 +132,7 @@ DispOpt()
 		echo "Type '-G' to pull, transfer, and run on swarmie(s) "
 	elif [ $OPTION == "-G" ]; then
 		echo "Type 'RP' to Re Pull from the github Repository"
-		echo "Type 'NB' to pull from a new Branch"
+		echo "Type 'CB' to pull from a new Branch"
 	fi
 
 	if [ "$OPTION" != "-R" ]; then
@@ -260,7 +262,7 @@ if [ $OPTION == "-G" ]; then
 				OPTION="-L"
 				clear
 				break
-			elif [ "$roverIP" == "NB" ]; then
+			elif [ "$roverIP" == "CB" ]; then
 				branch=""
 				clear
 				break

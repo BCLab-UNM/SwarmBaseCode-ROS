@@ -249,9 +249,9 @@ Since ROS is multithreaded you may need to attach the debugger to threads that h
 
 To use QT Creator to debug your already running program click the "Debug" menu. Choose "Start Debugging" and then "Attach to Running Application...". You will be able to use the graphical interface to GDB from here. 
 
-### Using the deploy.sh Script
+### Using the deploy.sh script
 
-The "deploy.sh" script has been added to allow for rapid deployment and easy development for teams and judges alike! This script is found in the SwarmBaseCode-ROS/misc folder and automates several key tasks for the user! Now connecting to swarmies takes seconds.
+The "deploy.sh" script has been added to allow for rapid deployment and easy development for physical teams and judges alike! This script is found in the SwarmBaseCode-ROS/misc folder and automates several key tasks for the user! Now connecting to swarmies takes seconds.
 
 The script is ran from your workstation and not the swarmies themselves. This is to allow for easy deployment and to keep work and code on the workstation as opposed to developing and running everything from the swarmies themselves(giving you a fast and reliable way to transfer and run code between the 2). You will need to ensure the GUI is running before running this script!
 
@@ -277,8 +277,20 @@ You are now set for rapid deployment and development!
 ```deploy.sh -G {branch}```
 (where branch is the desired branch you wish to pull)
 - -G requires the branch you wish to pull from. This allows users to choose different branches for testing. This will then follow a similar logic to -L and begin sending information back to the workstation GUI.  Like -L this has unique built-in options
-	+ Typing 'NB' will allow you to change branches at anytime
+	+ Typing 'CB' will allow you to change branches at anytime
 	+ Typing 'RP' will allow you to re-pull from your current selected github branch
 
-NOTES:
 - Typing "REBOOT {hostname}" will allow you to reboot the selected rover.
+
+NOTES:
+This script runs better when using ssh-keys.  Keys allow you to SSH without requiring the user to type in a password every time
+
+- Follow this guide to learn about using keys: https://www.ssh.com/ssh/copy-id
+
+If you have not setup an SSH-Key on your machine type:
+```ssh-keygen``` and follow the prompt
+
+once the key has been setup, copy to each rover you wish to add it to with
+```ssh-copy-id swarmie@{hostname}``` where hostname is the rovers hostname
+
+Thats it! You should now have a seamless way to SSH without having to type in passwords each time!
