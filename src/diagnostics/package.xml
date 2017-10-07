@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>The diagnostics package</description>
   <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
-  <license>GPLv2</license>
+  <license>MIT</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>

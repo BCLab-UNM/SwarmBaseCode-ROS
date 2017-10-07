@@ -3,7 +3,7 @@
 #define HEADERFILE_H
 
 #include "Controller.h"
-#include "TagPoint.h"
+#include "Tag.h"
 #include <math.h>
 
 class DropOffController : virtual Controller
@@ -22,12 +22,12 @@ public:
   void SetCurrentLocation(Point current);
   void SetTargetPickedUp();
   void SetBlockBlockingUltrasound(bool blockBlock);
-  void SetTargetData(vector<TagPoint> tags);
+  void SetTargetData(vector<Tag> tags);
   bool HasTarget() {return targetHeld;}
 
   float GetSpinner() {return spinner;}
 
-  void UpdateData(vector<TagPoint> tags);
+  void UpdateData(vector<Tag> tags);
 
   void SetCurrentTimeInMilliSecs( long int time );
 

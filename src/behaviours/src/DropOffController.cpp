@@ -288,7 +288,7 @@ void DropOffController::Reset() {
 
 }
 
-void DropOffController::SetTargetData(vector<TagPoint> tags) {
+void DropOffController::SetTargetData(vector<Tag> tags) {
   countRight = 0;
   countLeft = 0;
 
@@ -298,10 +298,10 @@ void DropOffController::SetTargetData(vector<TagPoint> tags) {
 
       // this loop is to get the number of center tags
       for (int i = 0; i < tags.size(); i++) {
-        if (tags[i].id == 256) {
+        if (tags[i].getID() == 256) {
 
           // checks if tag is on the right or left side of the image
-          if (tags[i].x + cameraOffsetCorrection > 0) {
+          if (tags[i].getPositionX() + cameraOffsetCorrection > 0) {
             countRight++;
 
           } else {

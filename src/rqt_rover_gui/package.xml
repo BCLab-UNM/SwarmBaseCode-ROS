@@ -3,9 +3,9 @@
   <version>0.0.1</version>
   <description>The Rover Interface</description>
 
-  <maintainer email="matthew@fricke.co.uk">Matthew Fricke</maintainer>
+  <maintainer email="swarmathon@cs.unm.edu">NASA Swarmathon</maintainer>
   
-  <license>GPLv3</license>
+  <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 

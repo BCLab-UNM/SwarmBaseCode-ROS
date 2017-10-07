@@ -32,6 +32,9 @@ public:
     void removeFromWaypointPath(std::string rover, int id);
     void reachedWaypoint(int waypoint_id);
 
+    void setGlobalOffset(bool display);
+    void setGlobalOffsetForRover(std::string rover, float x, float y);
+
     void clear();
     void clear(std::string rover_name);
     void lock();
@@ -65,8 +68,13 @@ public:
 private:
 
     std::map<std::string, std::vector< std::pair<float,float> > > gps_rover_path;
-    std::map<std::string, std::vector< std::pair<float,float> > >  ekf_rover_path;
-    std::map<std::string, std::vector< std::pair<float,float> > >  encoder_rover_path;
+    std::map<std::string, std::vector< std::pair<float,float> > > ekf_rover_path;
+    std::map<std::string, std::vector< std::pair<float,float> > > encoder_rover_path;
+
+    std::map<std::string, std::pair<float,float> > rover_global_offsets;
+    std::map<std::string, std::vector< std::pair<float,float> > > global_offset_gps_rover_path;
+    std::map<std::string, std::vector< std::pair<float,float> > > global_offset_ekf_rover_path;
+    std::map<std::string, std::vector< std::pair<float,float> > > global_offset_encoder_rover_path;
 
     std::map<std::string, std::vector< std::pair<float,float> > >  collection_points;
     std::map<std::string, std::vector< std::pair<float,float> > >  target_locations;
@@ -86,6 +94,8 @@ private:
     std::map<std::string, float> max_ekf_seen_y;
     std::map<std::string, float> min_ekf_seen_x;
     std::map<std::string, float> min_ekf_seen_y;
+
+    bool display_global_offset;
 
     QMutex update_mutex; // To prevent race conditions when the data is being displayed by MapFrame
 

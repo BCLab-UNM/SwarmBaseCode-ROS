@@ -22,7 +22,7 @@ PickUpController::PickUpController() {
 PickUpController::~PickUpController() {
 }
 
-void PickUpController::SetTagData(vector<TagPoint> tags) {
+void PickUpController::SetTagData(vector<Tag> tags) {
 
   if (tags.size() > 0) {
 
@@ -32,11 +32,11 @@ void PickUpController::SetTagData(vector<TagPoint> tags) {
     int target  = 0;
     for (int i = 0; i < tags.size(); i++) { //this loop selects the closest visible block to makes goals for it
 
-      if (tags[i].id == 0) {
+      if (tags[i].getID() == 0) {
 
         targetFound = true;
 
-        double test = hypot(hypot(tags[i].x, tags[i].y), tags[i].z); //absolute distance to block from camera lens
+        double test = hypot(hypot(tags[i].getPositionX(), tags[i].getPositionY()), tags[i].getPositionZ()); //absolute distance to block from camera lens
         if (closest > test)
         {
           target = i;
@@ -46,7 +46,7 @@ void PickUpController::SetTagData(vector<TagPoint> tags) {
       else {
         nTargetsSeen--;
 
-        if(tags[i].id == 256)
+        if(tags[i].getID() == 256)
         {
           Reset();
           if (has_control)
@@ -61,12 +61,12 @@ void PickUpController::SetTagData(vector<TagPoint> tags) {
 
     float cameraOffsetCorrection = 0.023; //meters;
 
-    blockYawError = atan((tags[target].x + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
+    blockYawError = atan((tags[target].getPositionX() + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
 
     ///TODO: Explain the trig going on here- blockDistance is c, 0.195 is b; find a
-    blockDistance = hypot(tags[target].z, tags[target].y); //distance from bottom center of chassis ignoring height.
+    blockDistance = hypot(tags[target].getPositionX(), tags[target].getPositionY()); //distance from bottom center of chassis ignoring height.
 
-    blockDistanceFromCamera = hypot(hypot(tags[target].x, tags[target].y), tags[target].z);
+    blockDistanceFromCamera = hypot(hypot(tags[target].getPositionX(), tags[target].getPositionY()), tags[target].getPositionZ());
   }
 
 }
@@ -246,14 +246,14 @@ Result PickUpController::DoWork() {
     else if (!lockTarget) //if a target hasn't been locked lock it and enter a counting state while slowly driving forward.
     {
       lockTarget = true;
-      result.pd.cmdVel = 0.15;
+      result.pd.cmdVel = 0.18;
       result.pd.cmdAngularError= 0.0;
       timeOut = true;
       ignoreCenterSonar = true;
     }
     else if (Td > raise_time_begin) //raise the wrist
     {
-      result.pd.cmdVel = 0.0;
+      result.pd.cmdVel = -0.15;
       result.pd.cmdAngularError= 0.0;
       result.wristAngle = 0;
     }

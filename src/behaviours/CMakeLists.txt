@@ -23,6 +23,7 @@ include_directories(
 
 add_executable(
   behaviours
+  src/Tag.cpp
   src/ObstacleController.cpp 
   src/PickUpController.cpp
   src/DropOffController.cpp
