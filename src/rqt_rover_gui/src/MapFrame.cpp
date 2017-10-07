@@ -382,7 +382,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
           float radius = 2.5;
 
           painter.drawEllipse(QPointF(x,y), radius, radius);
-          painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display) + "-" + QString::number(x) + ", " + QString::number(y));
+          painter.drawText(QPoint(x,y), QString::fromStdString(rover_to_display)); // + "-" + QString::number(x) + ", " + QString::number(y));
         }
 
 
@@ -452,10 +452,10 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     */
 
     // Solve for map coordinates in terms of frame coordinates
-    float mouse_map_x = ((mouse_pointer_position.x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
-    float mouse_map_y = -(((mouse_pointer_position.y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
+    //float mouse_map_x = ((mouse_pointer_position.x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
+    //float mouse_map_y = -(((mouse_pointer_position.y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y);
    
-    QString mouse_pointer_text = QString::number(mouse_map_x) + ", " + QString::number(mouse_map_y) + " - " + QString::number(mouse_pointer_position.x()) + ", " + QString::number(mouse_pointer_position.y());
+    //QString mouse_pointer_text = QString::number(mouse_map_x) + ", " + QString::number(mouse_map_y) + " - " + QString::number(mouse_pointer_position.x()) + ", " + QString::number(mouse_pointer_position.y());
     // painter.drawText(mouse_pointer_position, mouse_pointer_text);
     
     painter.setPen(Qt::white);
