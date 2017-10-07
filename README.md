@@ -251,9 +251,9 @@ To use QT Creator to debug your already running program click the "Debug" menu. 
 
 ### Using the deploy.sh script
 
-The "deploy.sh" script has been added to allow for rapid deployment and easy development for physical teams and judges alike! This script is found in the SwarmBaseCode-ROS/misc folder and automates several key tasks for the user! Now connecting to swarmies takes seconds.
+The "deploy.sh" script has been added to allow for rapid and easy development for physical teams and judges alike! This script is found in the SwarmBaseCode-ROS/misc folder and automates several key tasks for the user! Now connecting to swarmies takes seconds.
 
-The script is ran from your workstation and not the swarmies themselves. This is to allow for easy deployment and to keep work and code on the workstation as opposed to developing and running everything from the swarmies themselves(giving you a fast and reliable way to transfer and run code between the 2). You will need to ensure the GUI is running before running this script!
+The script is run from your workstation and not the swarmies themselves. Keeping work on the workstation has many benefits with one being a fast and reliable way to transfer and run code.  You will need to ensure the GUI is running before running this script!
 
 Before running the code, navigate to the misc folder:
 
@@ -272,13 +272,13 @@ You are now set for rapid deployment and development!
 
 ```./deploy.sh -L```
 - -L will give users the ability to compile and package the repository that they are CURRENTLY running the script from, transfer, unpack, and start sending information back to the workstation automatically. This option has a unique option to assist users in rapid development:
-	+ Typing 'RC' recompiles the code base you are currently using to deploy to a swarmie
+	+ Typing '-RC' recompiles the code base you are currently using to deploy to a swarmie
 
 ```deploy.sh -G {branch}```
 (where branch is the desired branch you wish to pull)
 - -G requires the branch you wish to pull from. This allows users to choose different branches for testing. This will then follow a similar logic to -L and begin sending information back to the workstation GUI.  Like -L this has unique built-in options
-	+ Typing 'CB' will allow you to change branches at anytime
-	+ Typing 'RP' will allow you to re-pull from your current selected github branch
+	+ Typing '-NB' will allow you to get a new branch at anytime
+	+ Typing '-RP' will allow you to re-pull from your current selected github branch
 
 Feature:
 Typing "REBOOT {hostname}" in any option will allow you to reboot the selected rover.
@@ -292,7 +292,7 @@ This script runs better when using ssh-keys.  Keys allow you to SSH without requ
 If you have not setup an SSH-Key on your machine type:
 ```ssh-keygen``` and follow the prompt
 
-once the key has been setup, copy to each rover you wish to add it to with
+Once the key has been setup, copy to each rover you wish to add it to with
 ```ssh-copy-id swarmie@{hostname}``` where hostname is the rovers hostname
 
-Thats it! You should now have a seamless way to SSH without having to type in passwords each time!
+That's it! You should now have a seamless way to SSH without having to type in passwords each time!
