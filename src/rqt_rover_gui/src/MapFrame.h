@@ -92,6 +92,7 @@ namespace rqt_rover_gui
 
     public slots:
 
+        void receiveWaypointReached(int);
         void receiveCurrentRoverName(QString);
         
     protected:

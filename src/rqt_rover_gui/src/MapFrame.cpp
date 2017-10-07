@@ -390,19 +390,26 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         painter.setPen(Qt::cyan);
         
         QPainterPath scaled_waypoint_rover_path;
-        for(map< int, std::pair<float,float> >::iterator it = map_data->getWaypointPath(rover_to_display)->begin(); it != map_data->getWaypointPath(rover_to_display)->end(); ++it) {
+        for(map< int, std::tuple<float,float,bool> >::iterator it = map_data->getWaypointPath(rover_to_display)->begin(); it != map_data->getWaypointPath(rover_to_display)->end(); ++it) {
          
-          pair<float,float> coordinate  = it->second; // Get the value from the map
+          tuple<float,float,bool> coordinate  = it->second; // Get the value from the map
            
-            float x = map_origin_x+((coordinate.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
-            float y = map_origin_y+((coordinate.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+          float x = map_origin_x+((get<0>(coordinate)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+          float y = map_origin_y+((get<1>(coordinate)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
             
             QPoint point(x,y);
             int default_pen_width = painter.pen().width();
             QPen previous_pen = painter.pen();
             QPen pen;
-            pen.setColor(Qt::cyan);
+            if(!get<2>(coordinate))
+            {
+              pen.setColor(Qt::cyan);
+            }
+            else
+            {
+              pen.setColor(Qt::yellow);
+            }
             pen.setWidth(5);
             painter.setPen(pen);
             painter.drawPoint(point);
@@ -513,13 +520,13 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
     
     // If click is within eplison of an existing waypoint remove the waypoint
     bool waypoint_removed = false;
-    for(map< int, std::pair<float,float> >::iterator it = map_data->getWaypointPath(rover_currently_selected)->begin(); it != map_data->getWaypointPath(rover_currently_selected)->end(); ++it)
+    for(map< int, std::tuple<float,float,bool> >::iterator it = map_data->getWaypointPath(rover_currently_selected)->begin(); it != map_data->getWaypointPath(rover_currently_selected)->end(); ++it)
     {
       // Get the distance between the mouse click and the coordinates of the existing waypoints
-      pair<float,float> coordinate  = it->second;
-      float x1 = coordinate.first;
+      tuple<float,float,bool> coordinate  = it->second;
+      float x1 = get<0>(coordinate);
       float x2 = mouse_map_x;
-      float y1 = coordinate.second;
+      float y1 = get<1>(coordinate);
       float y2 = mouse_map_y;
 
 emit sendInfoLogMessage(" x1: " + QString::number(x1)
@@ -752,6 +759,11 @@ void MapFrame::removeWaypoint( string rover, int id ) {
     emit delayedUpdate();
     emit sendWaypointCmd(REMOVE, id, 0, 0); // x and y are 0 here because they are unused in a remove command
   }
+}
+
+void MapFrame::receiveWaypointReached(int waypoint_id)
+{
+  map_data->reachedWaypoint(waypoint_id);
 }
 
 void MapFrame::receiveCurrentRoverName( QString rover_name )

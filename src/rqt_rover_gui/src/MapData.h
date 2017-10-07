@@ -5,6 +5,7 @@
 #include <set>
 #include <utility> // For STL std::pair
 #include <map>
+#include <tuple>
 #include <string>
 #include <QMutex>
 
@@ -29,6 +30,7 @@ public:
     int addToWaypointPath(std::string rover, float x, float y);
 
     void removeFromWaypointPath(std::string rover, int id);
+    void reachedWaypoint(int waypoint_id);
 
     void clear();
     void clear(std::string rover_name);
@@ -40,7 +42,7 @@ public:
     std::vector< std::pair<float,float> >* getEncoderPath(std::string rover_name);
     std::vector< std::pair<float,float> >* getTargetLocations(std::string rover_name);
     std::vector< std::pair<float,float> >* getCollectionPoints(std::string rover_name);
-    std::map< int, std::pair<float,float> >* getWaypointPath(std::string rover_name);
+    std::map< int, std::tuple<float,float,bool> >* getWaypointPath(std::string rover_name);
 
     // These functions provide a fast way to get the min and max coords
     float getMaxGPSX(std::string rover_name);
@@ -68,7 +70,7 @@ private:
 
     std::map<std::string, std::vector< std::pair<float,float> > >  collection_points;
     std::map<std::string, std::vector< std::pair<float,float> > >  target_locations;
-    std::map<std::string, std::map< int, std::pair<float,float> > >  waypoint_path;
+    std::map<std::string, std::map< int, std::tuple<float,float,bool> > >  waypoint_path;
 
     std::map<std::string, float> max_gps_seen_x;
     std::map<std::string, float> max_gps_seen_y;

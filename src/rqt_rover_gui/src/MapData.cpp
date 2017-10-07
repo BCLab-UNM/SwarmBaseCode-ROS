@@ -62,7 +62,7 @@ int MapData::addToWaypointPath(string rover, float x, float y)
 
   update_mutex.lock();
   int this_id = waypoint_id_counter++; // Get the next waypoint id.
-  waypoint_path[rover][this_id]=pair<float,float>(x,y);
+  waypoint_path[rover][this_id]=make_tuple(x,y,false);
   update_mutex.unlock();
   return this_id;
 }
@@ -71,6 +71,21 @@ void MapData::removeFromWaypointPath(std::string rover, int id)
 {
   update_mutex.lock();
   waypoint_path[rover].erase(id);
+  update_mutex.unlock();
+}
+
+void MapData::reachedWaypoint(int waypoint_id)
+{
+  update_mutex.lock();
+  for(auto &rover : waypoint_path)
+  {
+    map<int, std::tuple<float,float,bool>>::iterator found;
+    if ( (found = rover.second.find(waypoint_id))  != rover.second.end() )
+    {
+      get<2>(found->second) = true;
+    }
+  }
+   
   update_mutex.unlock();
 }
 
@@ -156,7 +171,7 @@ std::vector< std::pair<float,float> >* MapData::getCollectionPoints(std::string 
     return &collection_points[rover_name];
 }
 
-std::map<int, std::pair<float,float> >* MapData::getWaypointPath(std::string rover_name) {
+std::map<int, std::tuple<float,float,bool> >* MapData::getWaypointPath(std::string rover_name) {
     return &waypoint_path[rover_name];
 }
 

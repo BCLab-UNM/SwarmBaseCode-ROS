@@ -104,6 +104,7 @@ namespace rqt_rover_gui {
     QString stopROSJoyNode();
 
     void statusEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
+    void waypointEventHandler(const swarmie_msgs::Waypoint& event);
     void joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg);
     void cameraEventHandler(const sensor_msgs::ImageConstPtr& image);
     void EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odometry> &event);
@@ -142,6 +143,7 @@ namespace rqt_rover_gui {
 
   signals:
 
+    void sendWaypointReached(int waypoint_id);
     void sendInfoLogMessage(QString); // log message updates need to be implemented as signals so they can be used in ROS event handlers.
     void sendDiagLogMessage(QString);    
     void sendDiagsDataUpdate(QString, QString, QColor); // Provide the item to update and the diags text and text color
