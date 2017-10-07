@@ -132,18 +132,18 @@ DispOpt()
 	if [ "$OPTION" != "-G" ]; then
 		echo "Type '-G' to pull, transfer, and run on swarmie(s) "
 	elif [ $OPTION == "-G" ]; then
-		echo "Type 'RP' to Re Pull from the github Repository"
-		echo "Type 'CB' to pull from a new branch"
+		echo "Type '-RP' to Re Pull from the github Repository"
+		echo "Type '-NB' to pull from a New Branch"
 	fi
 
 	if [ "$OPTION" != "-R" ]; then
-		echo "Type '-R' to run current code loaded on Swarmies"
+		echo "Type '-R' to run current code loaded on swarmie(s)"
 	fi
 	
 	if [ "$OPTION" != "-L" ]; then
 		echo "Type '-L' to transfer local code and run on swarmie(s)"
 	elif [ $OPTION == "-L" ]; then
-		echo "Type 'RC' to recompile Source Code"
+		echo "Type '-RC' to recompile Source Code"
 	fi
 
 	echo "Type 'REBOOT {hostname}' to reboot a swarmie"
@@ -277,12 +277,12 @@ if [ $OPTION == "-G" ]; then
 				clear
 				changeOption=true
 				break
-			elif [ "$roverIP" == "CB" ]; then
+			elif [ "$roverIP" == "-NB" ]; then
 				branch=""
 				clear
 				changeOption=true
 				break
-			elif [ $roverIP == "RP" ]; then
+			elif [ $roverIP == "-RP" ]; then
 				clear
 				echo ""
 				echo "-------------------------------------------------------------"
@@ -302,7 +302,7 @@ if [ $OPTION == "-G" ]; then
 			if [ $needsReboot == true ]; then
 				echo "Attempting to Reboot $roverIP"
 			else
-				echo "Transferring to and Running $roverIP"s
+				echo "Transferring to and Running $roverIP"
 			fi
 
 			#If rover is on the network
@@ -385,7 +385,7 @@ if [ $OPTION == "-L" ]; then
 				changeOption=true
 				clear
 				break
-			elif [ $roverIP = "RC" ]; then
+			elif [ $roverIP = "-RC" ]; then
 				clear
 				changeOption=true
 				echo ""
