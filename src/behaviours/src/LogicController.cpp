@@ -180,15 +180,18 @@ Result LogicController::DoWork() {
   return result;
 }
 
-void LogicController::UpdateData() {
+void LogicController::UpdateData() 
+{
 
 
 }
 
-void LogicController::ProcessData() {
+void LogicController::ProcessData() 
+{
 
   //this controller priority is used when searching
-  if (processState == PROCCESS_STATE_SEARCHING) {
+  if (processState == PROCCESS_STATE_SEARCHING) 
+  {
     prioritizedControllers = {
       PrioritizedController{0, (Controller*)(&searchController)},
       PrioritizedController{10, (Controller*)(&obstacleController)},
@@ -199,7 +202,8 @@ void LogicController::ProcessData() {
   }
 
   //this priority is used when returning a target to the center collection zone
-  else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) {
+  else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP) 
+  {
     prioritizedControllers = {
     PrioritizedController{-1, (Controller*)(&searchController)},
     PrioritizedController{15, (Controller*)(&obstacleController)},
@@ -221,28 +225,34 @@ void LogicController::ProcessData() {
   }
 }
 
-bool LogicController::ShouldInterrupt() {
+bool LogicController::ShouldInterrupt() 
+{
   ProcessData();
 
   return false;
 }
 
-bool LogicController::HasWork() {
+bool LogicController::HasWork() 
+{
   return false;
 }
 
 
-void LogicController::controllerInterconnect() {
+void LogicController::controllerInterconnect() 
+{
 
-  if (processState == PROCCESS_STATE_SEARCHING) {
+  if (processState == PROCCESS_STATE_SEARCHING) 
+  {
 
     //obstacle needs to know if the center ultrasound should be ignored
-    if(pickUpController.GetIgnoreCenter()) {
+    if(pickUpController.GetIgnoreCenter()) 
+    {
       obstacleController.setIgnoreCenterSonar();
     }
 
     //pickup controller annouces it has pickedup a target
-    if(pickUpController.GetTargetHeld()) {
+    if(pickUpController.GetTargetHeld()) 
+    {
       dropOffController.SetTargetPickedUp();
       obstacleController.setTargetHeld();
       searchController.SetSuccesfullPickup();
@@ -250,18 +260,21 @@ void LogicController::controllerInterconnect() {
   }
 
   //ask if drop off has released the target from the claws yet
-  if (!dropOffController.HasTarget()) {
+  if (!dropOffController.HasTarget()) 
+  {
     obstacleController.setTargetHeldClear();
   }
 
   //obstacle controller is running driveController needs to clear its waypoints
-  if(obstacleController.getShouldClearWaypoints()) {
+  if(obstacleController.getShouldClearWaypoints()) 
+  {
     driveController.Reset();
   }
 }
 
 // Recieves position in the world inertial frame (should rename to SetOdomPositionData)
-void LogicController::SetPositionData(Point currentLocation) {
+void LogicController::SetPositionData(Point currentLocation) 
+{
   searchController.SetCurrentLocation(currentLocation);
   dropOffController.SetCurrentLocation(currentLocation);
   obstacleController.setCurrentLocation(currentLocation);
@@ -269,32 +282,37 @@ void LogicController::SetPositionData(Point currentLocation) {
 }
 
 // Recieves position in the world frame with global data (GPS)
-void LogicController::SetMapPositionData(Point currentLocation) {
-  range_controller.setCurrentLocation(currentLocation);
-  
+void LogicController::SetMapPositionData(Point currentLocation) 
+{
+  range_controller.setCurrentLocation(currentLocation);  
 }
 
-void LogicController::SetVelocityData(float linearVelocity, float angularVelocity) {
+void LogicController::SetVelocityData(float linearVelocity, float angularVelocity) 
+{
   driveController.SetVelocityData(linearVelocity,angularVelocity);
 }
 
-void LogicController::SetMapVelocityData(float linearVelocity, float angularVelocity) {
+void LogicController::SetMapVelocityData(float linearVelocity, float angularVelocity) 
+{
 
 }
 
-void LogicController::SetAprilTags(vector<Tag> tags) {
+void LogicController::SetAprilTags(vector<Tag> tags) 
+{
   pickUpController.SetTagData(tags);
   obstacleController.setTagData(tags);
   dropOffController.SetTargetData(tags);
 }
 
-void LogicController::SetSonarData(float left, float center, float right) {
+void LogicController::SetSonarData(float left, float center, float right) 
+{
   pickUpController.SetSonarData(center);
   obstacleController.setSonarData(left,center,right);
 }
 
 // Called once by RosAdapter in guarded init
-void LogicController::SetCenterLocationOdom(Point centerLocationOdom) {
+void LogicController::SetCenterLocationOdom(Point centerLocationOdom) 
+{
   searchController.SetCenterLocation(centerLocationOdom);
   dropOffController.SetCenterLocation(centerLocationOdom);
 }
@@ -310,7 +328,8 @@ void LogicController::setVirtualFenceOff()
   range_controller.setEnabled(false);
 }
 
-void LogicController::SetCenterLocationMap(Point centerLocationMap) {
+void LogicController::SetCenterLocationMap(Point centerLocationMap) 
+{
 
 }
 
