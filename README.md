@@ -272,27 +272,31 @@ You are now set for rapid deployment and development!
 
 ```./deploy.sh -L```
 - -L will give users the ability to compile and package the repository that they are CURRENTLY running the script from, transfer, unpack, and start sending information back to the workstation automatically. This option has a unique option to assist users in rapid development:
-	+ Typing '-RC' recompiles the code base you are currently using to deploy to a swarmie
+	+ Typing '-RC' recompiles the code base the user is currently using to deploy to a swarmie
 
 ```deploy.sh -G {branch}```
 (where branch is the desired branch you wish to pull)
-- -G requires the branch you wish to pull from. This allows users to choose different branches for testing. This will then follow a similar logic to -L and begin sending information back to the workstation GUI.  Like -L this has unique built-in options
-	+ Typing '-NB' will allow you to get a new branch at anytime
-	+ Typing '-RP' will allow you to re-pull from your current selected github branch
+- -G requires the branch users wish to pull from. This allows users to choose different branches for testing. This will then follow a similar logic to -L and begin sending information back to the workstation GUI.  Like -L this has unique built-in options
+	+ Typing '-NB' will allow users to get a new branch at anytime
+	+ Typing '-RP' will allow users to re-pull from your current selected github branch
 
 Feature:
-Typing "REBOOT {hostname}" in any option will allow you to reboot the selected rover.
-- If you have changed the password for your swarmie, you need to change the password in the script file as well in the variable "roverPass" to allow it to work!
 
-NOTES:
-This script runs better when using ssh-keys.  Keys allow you to SSH without requiring the user to type in a password every time
+Typing "REBOOT {hostname}" in any option will allow you to reboot the selected rover.
+- If changes been made to the password for a swarmie, users will need to change the password in the script file as well in the variable "roverPass" to allow it to work!
+
+Running multiple commands at once is allowed. So typing in a line such as "rover1 rover2 REBOOT rover3" will work.
+
+### NOTES FOR DEPLOY.SH SCRIPT:  Applying Keys
+
+This script runs better when using ssh-keys.  Keys allow you to SSH without requiring the user to type in a password every time.
 
 - Follow this guide to learn about using keys: https://www.ssh.com/ssh/copy-id
 
-If you have not setup an SSH-Key on your machine type:
+If unfamiliar or have not setup an SSH-Key on a current machine, users can type:
 ```ssh-keygen``` and follow the prompt
 
-Once the key has been setup, copy to each rover you wish to add it to with
-```ssh-copy-id swarmie@{hostname}``` where hostname is the rovers hostname
+Once the key has been setup, copy the key from the users machine to each rover you wish to add it to with
+```ssh-copy-id swarmie@{hostname}``` where hostname is the rover's hostname
 
 That's it! You should now have a seamless way to SSH without having to type in passwords each time!
