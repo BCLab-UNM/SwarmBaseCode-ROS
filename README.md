@@ -65,7 +65,7 @@ Our simulated Swarmies use existing Gazebo plugins, external to this repo, to re
 sudo apt install ros-kinetic-hector-gazebo-plugins
 ```
 
-Thw Swarmies can receive commands from the thumb sticks on a Microsoft Xbox 360 controller. The ROS [joystick_drivers](http://wiki.ros.org/joystick_drivers) package, which contains a generic Linux joystick driver compatible with this controller, should also be installed using the apt tool:
+The Swarmies can receive commands from the thumb sticks on a Microsoft Xbox 360 controller. The ROS [joystick_drivers](http://wiki.ros.org/joystick_drivers) package, which contains a generic Linux joystick driver compatible with this controller, should also be installed using the apt tool:
 
 ```
  sudo apt install ros-kinetic-joystick-drivers
