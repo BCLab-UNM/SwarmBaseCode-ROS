@@ -5,6 +5,7 @@
 #include <set>
 #include <utility> // For STL std::pair
 #include <map>
+#include <tuple>
 #include <string>
 #include <QMutex>
 
@@ -24,6 +25,13 @@ public:
     void addTargetLocation(std::string rover, float x, float y);
     void addCollectionPoint(std::string rover, float x, float y);
 
+    // Add a waypoint for the specified rover name
+    // Returns the id of the waypoint. IDs are use to issue waypoint commands to the rover.
+    int addToWaypointPath(std::string rover, float x, float y);
+
+    void removeFromWaypointPath(std::string rover, int id);
+    void reachedWaypoint(int waypoint_id);
+
     void setGlobalOffset(bool display);
     void setGlobalOffsetForRover(std::string rover, float x, float y);
 
@@ -37,6 +45,7 @@ public:
     std::vector< std::pair<float,float> >* getEncoderPath(std::string rover_name);
     std::vector< std::pair<float,float> >* getTargetLocations(std::string rover_name);
     std::vector< std::pair<float,float> >* getCollectionPoints(std::string rover_name);
+    std::map< int, std::tuple<float,float,bool> >* getWaypointPath(std::string rover_name);
 
     // These functions provide a fast way to get the min and max coords
     float getMaxGPSX(std::string rover_name);
@@ -69,6 +78,7 @@ private:
 
     std::map<std::string, std::vector< std::pair<float,float> > >  collection_points;
     std::map<std::string, std::vector< std::pair<float,float> > >  target_locations;
+    std::map<std::string, std::map< int, std::tuple<float,float,bool> > >  waypoint_path;
 
     std::map<std::string, float> max_gps_seen_x;
     std::map<std::string, float> max_gps_seen_y;
@@ -88,6 +98,10 @@ private:
     bool display_global_offset;
 
     QMutex update_mutex; // To prevent race conditions when the data is being displayed by MapFrame
+
+    std::string currently_selected_rover;
+
+    int waypoint_id_counter = 0;
 };
 
 #endif // MAPDATA_H

@@ -21,6 +21,7 @@
 #include <nav_msgs/Odometry.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32MultiArray.h>
+#include "swarmie_msgs/Waypoint.h"
 
 // Include Controllers
 #include "LogicController.h"
@@ -128,6 +129,7 @@ ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
 ros::Publisher driveControlPublish;
 ros::Publisher heartbeatPublisher;
+ros::Publisher waypointFeedbackPublisher;
 
 // Subscribers
 ros::Subscriber joySubscriber;
@@ -136,7 +138,7 @@ ros::Subscriber targetSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
 ros::Subscriber virtualFenceSubscriber;
-
+ros::Subscriber manualWaypointSubscriber;
 
 // Timers
 ros::Timer stateMachineTimer;
@@ -164,6 +166,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInf
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void virtualFenceHandler(const std_msgs::Float32MultiArray& message);
+void manualWaypointHandler(const swarmie_msgs::Waypoint& message);
 void behaviourStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
@@ -199,6 +202,7 @@ int main(int argc, char **argv) {
   odometrySubscriber = mNH.subscribe((publishedName + "/odom/filtered"), 10, odometryHandler);
   mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);
   virtualFenceSubscriber = mNH.subscribe(("/virtualFence"), 10, virtualFenceHandler);
+  manualWaypointSubscriber = mNH.subscribe((publishedName + "/waypoints/cmd"), 10, manualWaypointHandler);
   message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
@@ -210,7 +214,8 @@ int main(int argc, char **argv) {
   infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);
   driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);
   heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);
-  
+  waypointFeedbackPublisher = mNH.advertise<swarmie_msgs::Waypoint>((publishedName + "/waypoints"), 1, true);
+
   publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
   stateMachineTimer = mNH.createTimer(ros::Duration(behaviourLoopTimeStep), behaviourStateMachine);
   
@@ -230,7 +235,13 @@ int main(int argc, char **argv) {
   ss << "Rover start delay set to " << startDelayInSeconds << " seconds";
   msg.data = ss.str();
   infoLogPublisher.publish(msg);
-  
+
+  if(currentMode != 2 && currentMode != 3)
+  {
+    // ensure the logic controller starts in the correct mode.
+    logicController.SetModeManual();
+  }
+
   timerStartTime = time(0);
   
   ros::spin();
@@ -280,12 +291,7 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     }
     
   }
-  
-  /*cout << "currentOdom x : " << currentLocation.x << " currentOdom y : " << currentLocation.y << endl;
-  cout << "centtLocOd x : " << centerLocationOdom.x << " centLocOd : y " << centerLocationOdom.y << endl;
-  cout << endl;*/
-  
-  
+
   // Robot is in automode
   if (currentMode == 2 || currentMode == 3) {
     
@@ -349,11 +355,25 @@ void behaviourStateMachine(const ros::TimerEvent&) {
   
   // mode is NOT auto
   else {
+    humanTime();
+    logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
+    std::vector<int> cleared_waypoints = logicController.GetClearedWaypoints();
+    for(std::vector<int>::iterator it = cleared_waypoints.begin();
+        it != cleared_waypoints.end(); it++) {
+      swarmie_msgs::Waypoint wpt;
+      wpt.action = swarmie_msgs::Waypoint::ACTION_REACHED;
+      wpt.id = *it;
+      waypointFeedbackPublisher.publish(wpt);
+    }
+    result = logicController.DoWork();
+    if(result.type != behavior || result.b != wait) {
+      sendDriveCommand(result.pd.left,result.pd.right);
+    }
+    cout << endl;
   }
-  
-  
+
   // publish state machine string for user, only if it has changed, though
   if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
     stateMachinePublish.publish(stateMachineMsg);
@@ -406,6 +426,12 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
   currentMode = message->data;
+  if(currentMode == 2 || currentMode == 3) {
+    logicController.SetModeAuto();
+  }
+  else {
+    logicController.SetModeManual();
+  }
   sendDriveCommand(0.0, 0.0);
 }
 
@@ -510,8 +536,29 @@ void mapHandler(const nav_msgs::Odometry::ConstPtr& message) {
 }
 
 void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message) {
+  const int max_motor_cmd = 255;
   if (currentMode == 0 || currentMode == 1) {
-    sendDriveCommand(abs(message->axes[4]) >= 0.1 ? message->axes[4] : 0, abs(message->axes[3]) >= 0.1 ? message->axes[3] : 0);
+    float linear  = abs(message->axes[4]) >= 0.1 ? message->axes[4]*max_motor_cmd : 0.0;
+    float angular = abs(message->axes[3]) >= 0.1 ? message->axes[3]*max_motor_cmd : 0.0;
+
+    float left = linear - angular;
+    float right = linear + angular;
+
+    if(left > max_motor_cmd) {
+      left = max_motor_cmd;
+    }
+    else if(left < -max_motor_cmd) {
+      left = -max_motor_cmd;
+    }
+
+    if(right > max_motor_cmd) {
+      right = max_motor_cmd;
+    }
+    else if(right < -max_motor_cmd) {
+      right = -max_motor_cmd;
+    }
+
+    sendDriveCommand(left, right);
   }
 }
 
@@ -520,6 +567,21 @@ void publishStatusTimerEventHandler(const ros::TimerEvent&) {
   std_msgs::String msg;
   msg.data = "online";
   status_publisher.publish(msg);
+}
+
+void manualWaypointHandler(const swarmie_msgs::Waypoint& message) {
+  Point wp;
+  wp.x = message.x;
+  wp.y = message.y;
+  wp.theta = 0.0;
+  switch(message.action) {
+  case swarmie_msgs::Waypoint::ACTION_ADD:
+    logicController.AddManualWaypoint(wp, message.id);
+    break;
+  case swarmie_msgs::Waypoint::ACTION_REMOVE:
+    logicController.RemoveManualWaypoint(message.id);
+    break;
+  }
 }
 
 void sigintEventHandler(int sig) {

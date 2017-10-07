@@ -46,6 +46,7 @@ catkin_package( CATKIN_DEPENDS
   cv_bridge
   image_transport
   geometry_msgs
+  swarmie_msgs
 )
 
 SET(rover_gui_plugin_RESOURCES resources/resources.qrc)

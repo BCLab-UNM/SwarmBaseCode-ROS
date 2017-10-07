@@ -8,6 +8,7 @@
 #include "ObstacleController.h"
 #include "DriveController.h"
 #include "RangeController.h"
+#include "ManualWaypointController.h"
 
 #include <vector>
 #include <queue>
@@ -45,6 +46,12 @@ public:
   void SetMapVelocityData(float linearVelocity, float angularVelocity);
   void SetCenterLocationOdom(Point centerLocationOdom);
   void SetCenterLocationMap(Point centerLocationMap);
+  void AddManualWaypoint(Point wpt, int waypoint_id);
+  void RemoveManualWaypoint(int waypoint_id);
+  std::vector<int> GetClearedWaypoints();
+
+  void SetModeManual();
+  void SetModeAuto();
 
   void SetCurrentTimeInMilliSecs( long int time );
 
@@ -70,7 +77,8 @@ private:
     PROCCESS_STATE_SEARCHING = 0,
     PROCCESS_STATE_TARGET_PICKEDUP,
     PROCCESS_STATE_DROP_OFF,
-    _LAST
+    _LAST,
+    PROCESS_STATE_MANUAL
   };
 
   LogicState logicState;
@@ -81,7 +89,8 @@ private:
   SearchController searchController;
   ObstacleController obstacleController;
   DriveController driveController;
-  RangeController range_controller; 
+  RangeController range_controller;
+  ManualWaypointController manualWaypointController;
 
   std::vector<PrioritizedController> prioritizedControllers;
   priority_queue<PrioritizedController> control_queue;

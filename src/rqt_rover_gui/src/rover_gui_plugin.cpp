@@ -165,6 +165,12 @@ namespace rqt_rover_gui
     connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
     connect(ui.create_savable_world_checkbox, SIGNAL(toggled(bool)), this, SLOT(createSavableWorldCheckboxToggledEventHandler(bool)));
 
+    connect(this, SIGNAL(updateMapFrameWithCurrentRoverName(QString)), ui.map_frame, SLOT(receiveCurrentRoverName(QString)));
+
+    // Receive waypoint commands from MapFrame
+    connect(ui.map_frame, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)), this, SLOT(receiveWaypointCmd(WaypointCmd, int, float, float)));
+    connect(this, SIGNAL(sendWaypointReached(int)), ui.map_frame, SLOT(receiveWaypointReached(int)));
+    
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
 
@@ -532,6 +538,11 @@ void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String
     rover_statuses[rover_name] = rover_status;
 }
 
+void RoverGUIPlugin::waypointEventHandler(const swarmie_msgs::Waypoint& msg)
+{
+  emit sendWaypointReached(msg.id);
+}
+
 // Counts the number of obstacle avoidance calls
 void RoverGUIPlugin::obstacleEventHandler(const ros::MessageEvent<const std_msgs::UInt8> &event)
 {
@@ -618,6 +629,9 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     ui.rover_name->setText(rover_name_msg_qstr);
 
     emit sendInfoLogMessage(QString("Selected rover: ") + QString::fromStdString(selected_rover_name));
+
+    // Tell the MapFrame that the currently selected rover changed
+    emit updateMapFrameWithCurrentRoverName(QString::fromStdString(selected_rover_name));
 
     // Attempt to read the simulation model xml file if it exists. If it does not exist assume this is a physical rover.
     const char *name = "GAZEBO_MODEL_PATH";
@@ -729,6 +743,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         // Shutdown the subscribers
         status_subscribers[*it].shutdown();
+        waypoint_subscribers[*it].shutdown();
         encoder_subscribers[*it].shutdown();
         gps_subscribers[*it].shutdown();
         gps_nav_solution_subscribers[*it].shutdown();
@@ -737,6 +752,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
         // Delete the subscribers
         status_subscribers.erase(*it);
+        waypoint_subscribers.erase(*it);
         encoder_subscribers.erase(*it);
         gps_subscribers.erase(*it);
         gps_nav_solution_subscribers.erase(*it);
@@ -745,9 +761,11 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
+        waypoint_cmd_publishers[*it].shutdown();
 
         // Delete Publishers
         control_mode_publishers.erase(*it);
+        waypoint_cmd_publishers.erase(*it);
     }
 
     // Wait for a rover to connect
@@ -833,9 +851,12 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     {
         //Set up publishers
         control_mode_publishers[*i]=nh.advertise<std_msgs::UInt8>("/"+*i+"/mode", 10, true); // last argument sets latch to true
+        waypoint_cmd_publishers[*i]=nh.advertise<swarmie_msgs::Waypoint>("/"+*i+"/waypoints/cmd", 10, true);
+        
 
         //Set up subscribers
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
+        waypoint_subscribers[*i] = nh.subscribe("/"+*i+"/waypoints", 10, &RoverGUIPlugin::waypointEventHandler, this);
         obstacle_subscribers[*i] = nh.subscribe("/"+*i+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
         encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered", 10, &RoverGUIPlugin::encoderEventHandler, this);
         ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
@@ -1967,6 +1988,13 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
       }
     status_subscribers.clear();
 
+    for (map<string,ros::Subscriber>::iterator it=waypoint_subscribers.begin(); it!=waypoint_subscribers.end(); ++it) 
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
+    waypoint_subscribers.clear();
+
     for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) 
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -1987,6 +2015,14 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
       }
     control_mode_publishers.clear();
 
+    for (map<string,ros::Publisher>::iterator it=waypoint_cmd_publishers.begin(); it!=waypoint_cmd_publishers.end(); ++it)
+      {
+	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+	it->second.shutdown();
+      }
+    waypoint_cmd_publishers.clear();
+    
+    
     return_msg += sim_mgr.stopGazeboClient();
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return_msg += "<br>";
@@ -2885,6 +2921,19 @@ void RoverGUIPlugin::receiveDiagsDataUpdate(QString rover_name, QString text, QC
 void RoverGUIPlugin::refocusKeyboardEventHandler()
 {
     widget->setFocus();
+}
+
+// Publish the waypoint commands recieved from MapFrame to ROS
+void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float y)
+{
+  
+    swarmie_msgs::Waypoint msg;
+    msg.action = cmd;
+    msg.id = id;
+    msg.x = x;
+    msg.y = y;
+    
+    waypoint_cmd_publishers[selected_rover_name].publish(msg);
 }
 
 // Clean up memory when this object is deleted

@@ -16,6 +16,7 @@
   <build_depend>geometry_msgs</build_depend>
   <build_depend>ublox_serialization</build_depend>
   <build_depend>ublox_msgs</build_depend>
+  <build_depend>swarmie_msgs</build_depend>
   
   <run_depend>rqt_gui</run_depend>
   <run_depend>rqt_gui_cpp</run_depend>
@@ -24,7 +25,8 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>ublox_serialization</run_depend>
   <run_depend>ublox_msgs</run_depend>
-
+  <run_depend>swarmie_msgs</run_depend>
+  
   <export>
     <archetecture_independent/>
     <rqt_gui plugin="${prefix}/plugin.xml"/>

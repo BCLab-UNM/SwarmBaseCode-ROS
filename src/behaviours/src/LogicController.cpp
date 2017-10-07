@@ -15,6 +15,7 @@ LogicController::~LogicController() {}
 
 void LogicController::Reset() {
 
+  std::cout << "LogicController.Reset()" << std::endl;
   logicState = LOGIC_STATE_INTERRUPT;
   processState = PROCCESS_STATE_SEARCHING;
 
@@ -45,7 +46,6 @@ Result LogicController::DoWork() {
 
   //when an interrupt has been thorwn or there are no pending control_queue.top().actions logic controller is in this state.
   case LOGIC_STATE_INTERRUPT: {
-
     //Reset the control queue
     control_queue = priority_queue<PrioritizedController>();
 
@@ -136,7 +136,6 @@ Result LogicController::DoWork() {
 
     //this case is primarly when logic controller is waiting for drive controller to reach its last waypoint
   case LOGIC_STATE_WAITING: {
-
     //ask drive controller how to drive
     //commands to be passed the ROS Adapter as left and right wheel PWM values in the result struct are returned
     result = driveController.DoWork();
@@ -197,7 +196,8 @@ void LogicController::ProcessData()
       PrioritizedController{10, (Controller*)(&obstacleController)},
       PrioritizedController{15, (Controller*)(&pickUpController)},
       PrioritizedController{5, (Controller*)(&range_controller)},
-      PrioritizedController{-1, (Controller*)(&dropOffController)}
+      PrioritizedController{-1, (Controller*)(&dropOffController)},
+      PrioritizedController{-1, (Controller*)(&manualWaypointController)}
     };
   }
 
@@ -209,7 +209,8 @@ void LogicController::ProcessData()
     PrioritizedController{15, (Controller*)(&obstacleController)},
     PrioritizedController{-1, (Controller*)(&pickUpController)},
     PrioritizedController{10, (Controller*)(&range_controller)},
-    PrioritizedController{1, (Controller*)(&dropOffController)}
+    PrioritizedController{1, (Controller*)(&dropOffController)},
+    PrioritizedController{-1, (Controller*)(&manualWaypointController)}
     };
   }
   //this priority is used when returning a target to the center collection zone
@@ -220,8 +221,19 @@ void LogicController::ProcessData()
       PrioritizedController{-1, (Controller*)(&obstacleController)},
       PrioritizedController{-1, (Controller*)(&pickUpController)},
       PrioritizedController{10, (Controller*)(&range_controller)},
-      PrioritizedController{1, (Controller*)(&dropOffController)}
+      PrioritizedController{1, (Controller*)(&dropOffController)},
+      PrioritizedController{-1, (Controller*)(&manualWaypointController)}
     };
+  }
+  else if (processState == PROCESS_STATE_MANUAL) {
+    prioritizedControllers = {
+      PrioritizedController{-1, (Controller*)(&searchController)},
+      PrioritizedController{-1, (Controller*)(&obstacleController)},
+      PrioritizedController{-1, (Controller*)(&pickUpController)},
+      PrioritizedController{-1, (Controller*)(&range_controller)},
+      PrioritizedController{-1, (Controller*)(&dropOffController)},
+      PrioritizedController{5,  (Controller*)(&manualWaypointController)}
+    };     
   }
 }
 
@@ -270,6 +282,7 @@ void LogicController::controllerInterconnect()
   {
     driveController.Reset();
   }
+
 }
 
 // Recieves position in the world inertial frame (should rename to SetOdomPositionData)
@@ -279,6 +292,7 @@ void LogicController::SetPositionData(Point currentLocation)
   dropOffController.SetCurrentLocation(currentLocation);
   obstacleController.setCurrentLocation(currentLocation);
   driveController.SetCurrentLocation(currentLocation);
+  manualWaypointController.SetCurrentLocation(currentLocation);
 }
 
 // Recieves position in the world frame with global data (GPS)
@@ -317,6 +331,21 @@ void LogicController::SetCenterLocationOdom(Point centerLocationOdom)
   dropOffController.SetCenterLocation(centerLocationOdom);
 }
 
+void LogicController::AddManualWaypoint(Point manualWaypoint, int waypoint_id)
+{
+  manualWaypointController.AddManualWaypoint(manualWaypoint, waypoint_id);
+}
+
+void LogicController::RemoveManualWaypoint(int waypoint_id)
+{
+  manualWaypointController.RemoveManualWaypoint(waypoint_id);
+}
+
+std::vector<int> LogicController::GetClearedWaypoints()
+{
+  return manualWaypointController.ReachedWaypoints();
+}
+
 void LogicController::setVirtualFenceOn( RangeShape* range )
 {
   range_controller.setRangeShape(range);
@@ -339,4 +368,21 @@ void LogicController::SetCurrentTimeInMilliSecs( long int time )
   dropOffController.SetCurrentTimeInMilliSecs( time );
   pickUpController.SetCurrentTimeInMilliSecs( time );
   obstacleController.setCurrentTimeInMilliSecs( time );
+}
+
+void LogicController::SetModeAuto() {
+  if(processState == PROCESS_STATE_MANUAL) {
+    // only do something if we are in manual mode
+    this->Reset();
+  }
+}
+void LogicController::SetModeManual()
+{
+  if(processState != PROCESS_STATE_MANUAL) {
+    logicState = LOGIC_STATE_INTERRUPT;
+    processState = PROCESS_STATE_MANUAL;
+    ProcessData();
+    control_queue = priority_queue<PrioritizedController>();
+    driveController.Reset();
+  }
 }
