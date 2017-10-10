@@ -73,6 +73,9 @@ void MapFrame::createPopoutWindow( MapData * map_data )
   popout_window->setCentralWidget(central_widget);
 
   connect(this, SIGNAL(delayedUpdate()), popout_mapframe, SLOT(update()), Qt::QueuedConnection);
+
+  // Forward info messages from the popout framt to the rover gui via the signal in this parent map frame
+  connect(popout_mapframe, SIGNAL(sendInfoLogMessage(QString)), this, SIGNAL(sendInfoLogMessage(QString)));
 }
 
 void MapFrame::paintEvent(QPaintEvent* event) {
@@ -879,7 +882,6 @@ void MapFrame::receiveCurrentRoverName( QString rover_name )
 {
   this->rover_currently_selected = rover_name.toStdString();
 }
-
 
 MapFrame::~MapFrame()
 {
