@@ -74,8 +74,12 @@ void MapFrame::createPopoutWindow( MapData * map_data )
 
   connect(this, SIGNAL(delayedUpdate()), popout_mapframe, SLOT(update()), Qt::QueuedConnection);
 
-  // Forward info messages from the popout framt to the rover gui via the signal in this parent map frame
+
+  // Forward signals from the popout map to the parent map for handling. We only need to forward signals
+  // triggered by the popout object - such as mouse clicks
   connect(popout_mapframe, SIGNAL(sendInfoLogMessage(QString)), this, SIGNAL(sendInfoLogMessage(QString)));
+  connect(popout_mapframe, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)), this, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)));
+
 }
 
 void MapFrame::paintEvent(QPaintEvent* event) {
@@ -881,6 +885,12 @@ void MapFrame::receiveWaypointReached(int waypoint_id)
 void MapFrame::receiveCurrentRoverName( QString rover_name )
 {
   this->rover_currently_selected = rover_name.toStdString();
+
+  // Forward the change to the popout map if it exists
+  if (popout_mapframe)
+  {
+      popout_mapframe->receiveCurrentRoverName(rover_name);
+  }
 }
 
 MapFrame::~MapFrame()
