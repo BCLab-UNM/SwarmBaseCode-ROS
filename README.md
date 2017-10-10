@@ -224,6 +224,8 @@ Source code for SwarmBaseCode-ROS can be found in the repository /src directory.
 
 ### How to use Qt Creator to edit the simulation GUI
 
+Steps that are crossed out below show how the procedure has changed for QT Creator 3.5.1 which is installed with QT 5.
+
 1. Install Qt Creator:
 
   ```
@@ -253,17 +255,21 @@ Replace ~/SwarmBaseCode-ROS with the path to your git repository.
 
 8. Enter ```path to your home directory ~/SwarmBaseCode-ROS/build``` in the text box, this is the default build path. You cannot use the ~ as a shorthand to your home directory here.
 
-9. Click Configure Project.
+~~9. Click Configure Project.~~
 
-10. Click on the Projects icon on the left toolbar.
+~~10. Click on the Projects icon on the left toolbar.~~
 
-11. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box.
+9. QTCreator will prompt you to enter cmake arguments.
 
-12. Click the "Edit" toolbox icon on the left.
+10. Enter ```-DCMAKE_INSTALL_PREFIX=../install -DCATKIN_DEVEL_PREFIX=../devel``` in the CMake arguments text box.
 
-13. Double-click CMakeLists.txt.
+11. Press the run cmake button.
 
-14. Click the "Build Now" button to build the project.
+~~11. Click the "Edit" toolbox icon on the left.~~
+
+~~12. Double-click CMakeLists.txt.~~
+
+13. Click the "Build Now" button to build the project.
 
 Qt Creator can now be used to build your git repository.
 
