@@ -881,6 +881,12 @@ void MapFrame::receiveWaypointReached(int waypoint_id)
 void MapFrame::receiveCurrentRoverName( QString rover_name )
 {
   this->rover_currently_selected = rover_name.toStdString();
+
+  // Forward the change to the popout map if it exists
+  if (popout_mapframe)
+  {
+      popout_mapframe->receiveCurrentRoverName(rover_name);
+  }
 }
 
 MapFrame::~MapFrame()
