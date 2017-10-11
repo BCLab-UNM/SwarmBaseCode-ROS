@@ -13,6 +13,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Range.h>
 #include <std_msgs/UInt8.h>
+#include <std_srvs/Empty.h>
 
 //Package include
 #include <usbSerial.h>
@@ -47,6 +48,9 @@ string publishedName;
 
 float heartbeat_publish_interval = 2;
 
+const double wheelBase = 0.278; //distance between left and right wheels (in M)
+const double wheelDiameter = 0.122; //diameter of wheel (in M)
+const int cpr = 8400; //"cycles per revolution" -- number of encoder increments per one wheel revolution
 
 //PID constants and arrays
 const int histArrayLength = 1000;
@@ -89,6 +93,8 @@ ros::Timer publish_heartbeat_timer;
 //Callback handlers
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 void modeHandler(const std_msgs::UInt8::ConstPtr& message);
+bool store_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp);
+bool start_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp);
 
 int main(int argc, char **argv) {
     
@@ -129,6 +135,9 @@ int main(int argc, char **argv) {
     wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle/cmd"), 1, wristAngleHandler);
     modeSubscriber = aNH.subscribe((publishedName + "/mode"), 1, modeHandler);
 
+    // Service to tell the Arduino to store calibration
+    ros::ServiceServer stc = aNH.advertiseService((publishedName + "/store_magnetometer_calibration"), store_calibration);
+    ros::ServiceServer str = aNH.advertiseService((publishedName + "/start_magnetometer_calibration"), start_calibration);
     
     publishTimer = aNH.createTimer(ros::Duration(deltaTime), serialActivityTimer);
     publish_heartbeat_timer = aNH.createTimer(ros::Duration(heartbeat_publish_interval), publishHeartBeatTimerEventHandler);
@@ -234,6 +243,22 @@ void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle) {
   memset(&cmd, '\0', sizeof (cmd));
 }
 
+bool store_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp) {
+	char cmd[16]={'\0'};
+	sprintf(cmd, "C\n");
+	usb.sendData(cmd);
+	memset(&cmd, '\0', sizeof (cmd));
+	return true;
+}
+
+bool start_calibration(std_srvs::Empty::Request &req, std_srvs::Empty::Response &rsp) {
+	char cmd[16]={'\0'};
+	sprintf(cmd, "M\n");
+	usb.sendData(cmd);
+	memset(&cmd, '\0', sizeof (cmd));
+	return true;
+}
+
 void serialActivityTimer(const ros::TimerEvent& e) {
     usb.sendData(dataCmd);
     parseData(usb.readData());
@@ -250,7 +275,18 @@ void publishRosTopics() {
     sonarRightPublish.publish(sonarRight);
 }
 
+double ticksToMeters(double ticks) {
+	return (M_PI * wheelDiameter * ticks) / cpr;
+}
+
+double diffToTheta(double right, double left) {
+	return (right - left) / wheelBase;
+}
+
 void parseData(string str) {
+    static double lastOdomTS = 0;
+    static double odomTheta = 0;
+
     istringstream oss(str);
     string sentence;
     
@@ -284,14 +320,45 @@ void parseData(string str) {
 				imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(atof(dataSet.at(8).c_str()), atof(dataSet.at(9).c_str()), atof(dataSet.at(10).c_str()));
 			}
 			else if (dataSet.at(0) == "ODOM") {
+				int leftTicks = atoi(dataSet.at(2).c_str());
+				int rightTicks = atoi(dataSet.at(3).c_str());
+				double odomTS = atof(dataSet.at(4).c_str()) / 1000.0; // Seconds
+
+				double rightWheelDistance = ticksToMeters(rightTicks);
+				double leftWheelDistance = ticksToMeters(leftTicks);
+
+				//Calculate relative angle that robot has turned
+				double dtheta = diffToTheta(rightWheelDistance, leftWheelDistance);
+
+				//Accumulate angles to calculate absolute heading
+				odomTheta += dtheta;
+
+				//Decompose linear distance into its component values
+				double meanWheelDistance = (rightWheelDistance + leftWheelDistance) / 2;
+				double x = meanWheelDistance * cos(dtheta);
+				double y = meanWheelDistance * sin(dtheta);
+
+				// Calculate velocities if possible.
+				double vtheta = 0;
+				double vx = 0;
+				double vy = 0;
+				if (lastOdomTS > 0) {
+					double deltaT = odomTS - lastOdomTS;
+					vtheta = dtheta / deltaT;
+					vx = x / deltaT;
+					vy = y / deltaT;
+				}
+				lastOdomTS = odomTS;
+
 				odom.header.stamp = ros::Time::now();
-				odom.pose.pose.position.x += atof(dataSet.at(2).c_str()) / 100.0;
-				odom.pose.pose.position.y += atof(dataSet.at(3).c_str()) / 100.0;
-				odom.pose.pose.position.z = 0.0;
-				odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(atof(dataSet.at(4).c_str()));
-				odom.twist.twist.linear.x = atof(dataSet.at(5).c_str()) / 100.0;
-				odom.twist.twist.linear.y = atof(dataSet.at(6).c_str()) / 100.0;
-				odom.twist.twist.angular.z = atof(dataSet.at(7).c_str());
+				odom.pose.pose.position.x += x;
+				odom.pose.pose.position.y += y;
+				odom.pose.pose.position.z = 0;
+				odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(odomTheta);
+
+				odom.twist.twist.linear.x = vx;
+				odom.twist.twist.linear.y = vy;
+				odom.twist.twist.angular.z = vtheta;
 			}
 			else if (dataSet.at(0) == "USL") {
 				sonarLeft.header.stamp = ros::Time::now();
