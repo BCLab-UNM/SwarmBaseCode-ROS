@@ -22,7 +22,8 @@ PickUpController::PickUpController() {
 PickUpController::~PickUpController() {
 }
 
-void PickUpController::SetTagData(vector<Tag> tags) {
+void PickUpController::SetTagData(vector<Tag> tags)
+{
 
   if (tags.size() > 0) {
 
@@ -61,18 +62,35 @@ void PickUpController::SetTagData(vector<Tag> tags) {
 
     float cameraOffsetCorrection = 0.023; //meters;
 
+    ///TODO: Explain the trig going on here- blockDistance is c, 0.195 is b; find a
+    blockDistanceFromCamera = hypot(hypot(tags[target].getPositionX(), tags[target].getPositionY()), tags[target].getPositionZ());
+
+    //WRONG WRONG WRONG WRONG
+    //blockDistance = hypot(tags[target].getPositionZ(), tags[target].getPositionY()); //distance from bottom center of chassis ignoring height.
+
+    if ( (blockDistanceFromCamera*blockDistanceFromCamera - 0.195*0.195) > 0 )
+    {
+      blockDistance = sqrt(blockDistanceFromCamera*blockDistanceFromCamera - 0.195*0.195);
+    }
+    else
+    {
+      float epsilon = 0.00001; // A small non-zero positive number
+      blockDistance = epsilon;
+    }
+
+    //cout << "blockDistance  TAGDATA:  " << blockDistance << endl;
+
     blockYawError = atan((tags[target].getPositionX() + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
 
-    ///TODO: Explain the trig going on here- blockDistance is c, 0.195 is b; find a
-    blockDistance = hypot(tags[target].getPositionX(), tags[target].getPositionY()); //distance from bottom center of chassis ignoring height.
+    cout << "blockYawError TAGDATA:  " << blockYawError << endl;
 
-    blockDistanceFromCamera = hypot(hypot(tags[target].getPositionX(), tags[target].getPositionY()), tags[target].getPositionZ());
   }
 
 }
 
 
-bool PickUpController::SetSonarData(float rangeCenter){
+bool PickUpController::SetSonarData(float rangeCenter)
+{
 
   if (rangeCenter < 0.12 && targetFound) {
     result.type = behavior;
@@ -86,20 +104,12 @@ bool PickUpController::SetSonarData(float rangeCenter){
 
 }
 
-void PickUpController::ProcessData() {
-  if(!targetFound){
+void PickUpController::ProcessData()
+{
+  if(!targetFound)
+  {
     // Do nothing
     return;
-  }
-
-  if ( (blockDistance*blockDistance - 0.195*0.195) > 0 )
-  {
-    blockDistance = sqrt(blockDistance*blockDistance - 0.195*0.195);
-  }
-  else
-  {
-    float epsilon = 0.00001; // A small non-zero positive number
-    blockDistance = epsilon;
   }
 
   //if target is close enough
@@ -107,10 +117,10 @@ void PickUpController::ProcessData() {
   long int Tdiff = current_time - millTimer;
   float Td = Tdiff/1e3;
 
-  cout << "distance : " << blockDistanceFromCamera << " time is : " << Td << endl;
+  //cout << "distance : " << blockDistanceFromCamera << " time is : " << Td << endl;
 
-  if (blockDistanceFromCamera < 0.14 && Td < 3.9) {
-
+  if (blockDistanceFromCamera < 0.14 && Td < 3.9)
+  {
     result.type = behavior;
     result.b = nextProcess;
     result.reset = true;
@@ -203,6 +213,8 @@ Result PickUpController::DoWork() {
     float lower_gripper_time_begin = 4.0;
     float target_reaquire_begin= 4.2;
     float target_pickup_task_time_limit = 4.8;
+
+    //cout << "blockDistance DOWORK:  " << blockDistance << endl;
     
     if (nTargetsSeen == 0 && !lockTarget)
     {
