@@ -253,7 +253,7 @@ Replace ~/SwarmBaseCode-ROS with the path to your git repository.
 
 7. Click "Open" to continue.
 
-8. Enter ```path to your home directory ~/SwarmBaseCode-ROS/build``` in the text box, this is the default build path. You cannot use the ~ as a shorthand to your home directory here.
+8. Enter ```path to your home directory/SwarmBaseCode-ROS/build``` in the text box, this is the default build path. You cannot use the ~ as a shorthand to your home directory here.
 
 ~~9. Click Configure Project.~~
 
