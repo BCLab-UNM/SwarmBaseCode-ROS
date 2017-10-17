@@ -222,7 +222,7 @@ Source code for SwarmBaseCode-ROS can be found in the repository /src directory.
 - ```target_detection```: An image processor that detects [AprilTag](https://april.eecs.umich.edu/wiki/index.php/AprilTags) fiducial markers in the onboard camera's video stream. This package receives images from the ```usbCamera``` class (for physical robots) or [gazebo_ros_camera](http://docs.ros.org/kinetic/api/gazebo_plugins/html/classgazebo_1_1GazeboRosCamera.html) (for simulated robots), and, if an AprilTag is detected in the image, returns the integer value encoded in the tag.
 - ```ublox```: A serial interface to the ublox GPS receiver onboard the physical robot. This package is installed as a git submodule in the SwarmBaseCode-ROS repo. See the [ublox ROS wiki page](http://wiki.ros.org/ublox) for more information.
 
-### How to use Qt Creator to edit the simulation GUI
+### How to use Qt Creator to edit the GUI
 
 Steps that are crossed out below show how the procedure has changed for QT Creator 3.5.1 which is installed with QT 5.
 
