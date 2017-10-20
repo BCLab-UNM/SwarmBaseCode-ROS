@@ -3,6 +3,8 @@
 
 #include "Controller.h"
 #include "Tag.h"
+#include <limits> // For numeric limits
+#include <cmath> // For hypot
 
 class PickUpController : virtual Controller
 {
@@ -44,6 +46,7 @@ private:
   bool timeOut;
   int nTargetsSeen;
   long int millTimer;
+  long int target_timer;
 
   //yaw error to target block
   double blockYawError;
