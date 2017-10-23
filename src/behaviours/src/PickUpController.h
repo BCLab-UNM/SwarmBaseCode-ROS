@@ -3,8 +3,6 @@
 
 #include "Controller.h"
 #include "Tag.h"
-#include <limits> // For numeric limits
-#include <cmath> // For hypot
 
 class PickUpController : virtual Controller
 {
