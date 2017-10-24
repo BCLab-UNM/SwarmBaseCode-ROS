@@ -8,7 +8,7 @@ This repository contains:
 2. 3D .STL models for the physical Swarmie build 
 3. Bash shell scripts for initializing simulated Swarmies in the Gazebo simulator, as well as physical Swarmies
 
-- For a step-by-step guide to using SwarmBaseCode-ROS to control a physical Swarmie robot, please see the instructions in the physical robot [Quick Start Guide](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/Quick%20Start%20Physical%20Guide.md).
+- For a step-by-step guide to using SwarmBaseCode-ROS to control a physical Swarmie robot, please see the instructions in the physical robot [Quick Start Guide](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/PhysicalInstallGuide.md).
 
 - Please submit bug reports for SwarmBaseCode-ROS through GitHub's Issues system. For all other questions regarding the SwarmBaseCode-ROS code base, please visit the forums on the [NASA Swarmathon website](http://www.nasaswarmathon.com).
 
