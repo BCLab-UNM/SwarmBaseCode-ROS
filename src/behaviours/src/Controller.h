@@ -22,16 +22,6 @@ public:
   //internal state and data
   virtual Result DoWork() = 0;
 
-  /*
-     * The base UpdataData() method should not be called- it serves as a
-     * reference for the interface each derived Controller must implement.
-     *
-     * Your Controller must define one or more UpdateData methods that
-     * take at least one parameter used in updating its internal state.
-     *
-     * void UpdateData(...) { <Set internal variables> }
-     */
-
   //Returns whether or not an interrupt must be thrown
   virtual bool ShouldInterrupt() = 0;
 
