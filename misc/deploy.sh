@@ -25,14 +25,12 @@ Check()
 {
 	cd ~
 
-	if [ -z "$(ls -A $dirPath/src/ublox/)" ]; then
-  		echo "The ublox submodule is missing."
-  		exit 1
-	fi
-
-	if [ -z "$(ls -A $dirPath/src/apriltags_ros/)" ]; then
-  		echo "The apriltags submodule is missing."
-  		exit 1
+	if [ [-z "$(ls -A $dirPath/src/ublox/)"] || [-z "$(ls -A $dirPath/src/apriltags_ros/)"] ]; then
+		echo "The ublox and/or april tags submodule is missing."
+		cd $dirPath; #Entering directory/local git repo (needed to run git commands)
+		echo "Initiliazing and updating ublox and april tag submodules...";
+		git submodule init;                
+		git submodule update; 
 	fi
 }
 
