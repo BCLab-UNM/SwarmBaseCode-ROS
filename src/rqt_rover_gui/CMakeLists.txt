@@ -32,6 +32,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   ublox_msgs
   ublox_serialization
+  swarmie_msgs
 )
 
 find_package( Qt5 REQUIRED COMPONENTS Widgets Xml )
