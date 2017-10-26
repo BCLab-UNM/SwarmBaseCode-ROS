@@ -313,8 +313,8 @@ You are now set for rapid deployment and development!
 - -R will ask the user for which rovers they wish to connect with and start sending information back to the workstation GUI
 
 ```./deploy.sh -L```
-- -L will give users the ability to compile and package the repository that they are CURRENTLY running the script from, transfer, unpack, and start sending information back to the workstation automatically. This option has a unique option to assist users in rapid development:
-	+ Typing '-RC' recompiles the code base the user is currently using to deploy to a swarmie
+- -L compile and package the repository that they are CURRENTLY running the script from, then ask for target robots to transfer, unpack, the repo in. If changes are made to the local repo they will not take affect as part of the transfer until the script is made aware of the changes. This is done by using the -RC command in place of a target rover id:
+	+ Typing '-RC' recompiles the code base the user is currently using to deploy to a swarmie and repackages it for transfer
 
 ```deploy.sh -G {branch}```
 (where branch is the desired branch you wish to pull)
