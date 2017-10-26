@@ -54,7 +54,8 @@ float heartbeat_publish_interval = 2;
 
 float prev_left = 0;
 float prev_right = 0;
-int max_motor_step = 100;
+int max_motor_step = 1
+;
 
 ros::Time prevDriveCommandUpdateTime;
 
@@ -148,14 +149,16 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float left = (message->linear.x); //target linear velocity in meters per second
   float right = (message->angular.z); //angular error in radians
   
-  if(fabs(prev_left) > max_motor_step)
+  if(fabs(left)-fabs(prev_left) > max_motor_step && prev_left != 0)
   {
     left = prev_left + max_motor_step * (left/fabs(left));
+cout << "left: " << left << endl;
   }
   
-  if(fabs(prev_right) > max_motor_step)
+  if(fabs(prev_right) > max_motor_step && prev_right != 0)
   {
     right = prev_right + max_motor_step * (right/fabs(right));
+cout << "right: " << right << endl;
   }
   
   prev_left = left;
@@ -163,7 +166,7 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
 
   // Cap motor commands at 120. Experimentally determined that high values (tested 180 and 255) can cause 
   // the hardware to fail when the robot moves itself too violently.
-  int max_motor_cmd = 120;
+  int max_motor_cmd = 255;
 
   // Check that the resulting motor commands do not exceed the specified safe maximum value
   if (left > max_motor_cmd)
