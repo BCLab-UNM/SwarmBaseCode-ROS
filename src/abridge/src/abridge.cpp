@@ -52,21 +52,9 @@ unsigned int min_usb_send_delay = 100;
 
 float heartbeat_publish_interval = 2;
 
-
-//PID constants and arrays
-const int histArrayLength = 1000;
-
-float velFF = 0; //velocity feed forward
-int stepV = 0; //keeps track of the point in the evArray for adding new error each update cycle.
-float evArray[histArrayLength]; //history array of previous error for (arraySize/hz) seconds (error Velocity Array)
-float velError[4] = {0,0,0,0}; //contains current velocity error and error 3 steps in the past.
-
-int stepY = 0; //keeps track of the point in the eyArray for adding new error each update cycle.
-float eyArray[histArrayLength]; //history array of previous error for (arraySize/hz) seconds (error Yaw Array)
-float yawError[4] = {0,0,0,0}; //contains current yaw error and error 3 steps in the past.
-
-float prevLin = 0;
-float prevYaw = 0;
+float prev_left = 0;
+float prev_right = 0;
+int max_motor_step = 100;
 
 ros::Time prevDriveCommandUpdateTime;
 
@@ -142,12 +130,6 @@ int main(int argc, char **argv) {
     
     odom.header.frame_id = publishedName+"/odom";
     odom.child_frame_id = publishedName+"/base_link";
-
-    for (int i = 0; i < histArrayLength; i++)
-    {
-    evArray[i] = 0;
-    eyArray[i] = 0;
-    }
     
     prevDriveCommandUpdateTime = ros::Time::now();
 
@@ -165,6 +147,19 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
 
   float left = (message->linear.x); //target linear velocity in meters per second
   float right = (message->angular.z); //angular error in radians
+  
+  if(fabs(prev_left) > max_motor_step)
+  {
+    left = prev_left + max_motor_step * (left/fabs(left));
+  }
+  
+  if(fabs(prev_right) > max_motor_step)
+  {
+    right = prev_right + max_motor_step * (right/fabs(right));
+  }
+  
+  prev_left = left;
+  prev_right = right;
 
   // Cap motor commands at 120. Experimentally determined that high values (tested 180 and 255) can cause 
   // the hardware to fail when the robot moves itself too violently.
