@@ -397,7 +397,7 @@ border: 1px solid white;
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>90</width>
+        <width>131</width>
         <height>20</height>
        </rect>
       </property>
@@ -405,7 +405,7 @@ border: 1px solid white;
        <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>Panning</string>
+       <string>Panning and Zoom</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
