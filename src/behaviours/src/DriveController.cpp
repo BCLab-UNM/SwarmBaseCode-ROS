@@ -118,7 +118,8 @@ Result DriveController::DoWork() {
     result.pd.setPointYaw = waypoints.back().theta;
 
     // goal not yet reached drive while maintaining proper heading.
-    if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
+    if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2
+        && hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y) > waypointTolerance) {
       // drive and turn simultaniously
       result.pd.setPointVel = searchVelocity;
       if (result.PIDMode == FAST_PID){
