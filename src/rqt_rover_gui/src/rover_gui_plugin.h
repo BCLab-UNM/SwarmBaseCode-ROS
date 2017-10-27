@@ -194,7 +194,7 @@ namespace rqt_rover_gui {
     void allStopButtonEventHandler();
     void customWorldButtonEventHandler();
     void customWorldRadioButtonEventHandler(bool marked);
-    void powerlawDistributionRadioButtonEventHandler(bool marked);
+    void customNumCubesRadioButtonEventHandler(bool marked);
     void unboundedRadioButtonEventHandler(bool marked);
 
     void buildSimulationButtonEventHandler();
@@ -219,6 +219,7 @@ namespace rqt_rover_gui {
     map<string,ros::Publisher> waypoint_cmd_publishers;
     ros::Publisher joystick_publisher;
 
+    ros::Publisher arenaDim_publisher;
     // ROS Subscribers
     ros::Subscriber joystick_subscriber;
     map<string,ros::Subscriber> encoder_subscribers;
