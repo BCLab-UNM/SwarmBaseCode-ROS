@@ -43,6 +43,12 @@ Note: if you accidentally ran ```sudo rosdep update``` you can repair the permis
 
 You may request the installation of addition packages on the competition rovers. To do so create a pull request modifying the [preinstalled packages list](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/PreinstalledCompetitionPackages.md) document.
 
+Most systems will already have usb development support installed, but just in case:
+
+```
+ sudo apt install libusb-dev
+```
+
 ##### 2. Install additional ROS packages
 
 We use the [catkin_tools](https://catkin-tools.readthedocs.io/) package to build the SwarmBaseCode-ROS code base:
