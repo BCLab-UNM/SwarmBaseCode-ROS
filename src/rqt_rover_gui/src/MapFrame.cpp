@@ -633,6 +633,16 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
     float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
     float mouse_map_y = ((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y;
 
+    // We must "adjust" the clicked position when "global frame" is selected in the GUI
+    // If we do not do this here, then the rover will NOT move to where a user clicks,
+    //     but to a position offset by the selected rover's global offset.
+    if(map_data->isDisplayingGlobalOffset())
+    {
+      std::pair<float,float> offset = map_data->getGlobalOffsetForRover(rover_currently_selected);
+      mouse_map_x -= offset.first;
+      mouse_map_y -= offset.second;
+    }
+
     emit sendInfoLogMessage("MOX: " + QString::number(map_origin_x) + " map_width: " + QString::number(map_width) + " max_seen_width: " +  QString::number(min_seen_x));
     
     // If click is within eplison of an existing waypoint remove the waypoint

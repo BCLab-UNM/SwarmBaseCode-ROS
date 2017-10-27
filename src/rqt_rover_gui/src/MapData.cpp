@@ -77,30 +77,54 @@ void MapData::addToEKFRoverPath(string rover, float x, float y)
 // Expects the input y to be consistent with the map coordinate system
 int MapData::addToWaypointPath(string rover, float x, float y)
 {
-
   update_mutex.lock();
+
+  float offset_x = rover_global_offsets[rover].first;
+  float offset_y = rover_global_offsets[rover].second;
   int this_id = waypoint_id_counter++; // Get the next waypoint id.
+
+  global_offset_waypoint_path[rover][this_id]=make_tuple(x+offset_x,y+offset_y,false);
   waypoint_path[rover][this_id]=make_tuple(x,y,false);
+
   update_mutex.unlock();
+
   return this_id;
 }
 
 void MapData::removeFromWaypointPath(std::string rover, int id)
 {
   update_mutex.lock();
+
+  global_offset_waypoint_path[rover].erase(id);
   waypoint_path[rover].erase(id);
+
   update_mutex.unlock();
 }
 
 void MapData::reachedWaypoint(int waypoint_id)
 {
   update_mutex.lock();
-  for(auto &rover : waypoint_path)
+
+  if(display_global_offset)
   {
-    map<int, std::tuple<float,float,bool>>::iterator found;
-    if ( (found = rover.second.find(waypoint_id))  != rover.second.end() )
+    for(auto &rover : global_offset_waypoint_path)
     {
-      get<2>(found->second) = true;
+      map<int, std::tuple<float,float,bool>>::iterator found;
+      if ( (found = rover.second.find(waypoint_id))  != rover.second.end() )
+      {
+        get<2>(found->second) = true;
+      }
+    }
+  }
+  else
+  {
+    for(auto &rover : waypoint_path)
+    {
+      map<int, std::tuple<float,float,bool>>::iterator found;
+      if ( (found = rover.second.find(waypoint_id))  != rover.second.end() )
+      {
+        get<2>(found->second) = true;
+      }
     }
   }
    
@@ -140,6 +164,16 @@ void MapData::setGlobalOffsetForRover(string rover, float x, float y)
     rover_global_offsets[rover] = pair<float,float>(x,y);
 }
 
+std::pair<float,float> MapData::getGlobalOffsetForRover(string rover)
+{
+  return rover_global_offsets[rover];
+}
+
+bool MapData::isDisplayingGlobalOffset()
+{
+  return display_global_offset;
+}
+
 void MapData::clear()
 {
     update_mutex.lock();
@@ -153,6 +187,7 @@ void MapData::clear()
     target_locations.clear();
     collection_points.clear();
     waypoint_path.clear();
+    global_offset_waypoint_path.clear();
 
     update_mutex.unlock();
 }
@@ -169,6 +204,8 @@ void MapData::clear(string rover)
     global_offset_gps_rover_path[rover].clear();
     target_locations[rover].clear();
     collection_points[rover].clear();
+    waypoint_path[rover].clear();
+    global_offset_waypoint_path[rover].clear();
 
     ekf_rover_path.erase(rover);
     encoder_rover_path.erase(rover);
@@ -220,6 +257,11 @@ std::vector< std::pair<float,float> >* MapData::getCollectionPoints(std::string 
 }
 
 std::map<int, std::tuple<float,float,bool> >* MapData::getWaypointPath(std::string rover_name) {
+    if(display_global_offset)
+    {
+      return &global_offset_waypoint_path[rover_name];
+    }
+
     return &waypoint_path[rover_name];
 }
 
