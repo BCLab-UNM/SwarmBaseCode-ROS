@@ -140,7 +140,7 @@ DispOpt()
 	if [ "$OPTION" != "-L" ]; then
 		echo "Type '-L' to transfer local code and run on swarmie(s)"
 	elif [ $OPTION == "-L" ]; then
-		echo "Type '-RC' to recompile Source Code"
+                echo "Type '-RC' to recompile Source Code"
 	fi
 
 	echo "Type 'REBOOT {hostname}' to reboot a swarmie"
@@ -204,6 +204,7 @@ if [ -z $OPTION ]; then
 	echo "'-G'[ithub] pulls and transfers workspace to swarmie(s)"
 	echo "'-L'[ocal Files] duplicates current workspace and transfers to swarmie(s)"
 	echo "'-R'[un] to run current code on all swarmie(s)"
+        echo "'-S'[ilent] after option to run and return to terminal without using interface"
 	echo "-------------------------------------------------------------"
 	exit 1
 fi
@@ -213,9 +214,7 @@ fi
 
 while(true); do
 
-echo $1 $2
-
-if [ $2 == "-N" ]; then
+if [ $2 == "-S" ]; then
 
     i=3
 
@@ -298,7 +297,7 @@ if [ $2 == "-N" ]; then
                         sleep 10
                     else
                         #Transfer/Unpack/Run
-                         Transfer
+                        Transfer
                         Unpack_Run
                         sleep 10
                     fi
