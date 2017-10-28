@@ -181,13 +181,15 @@ void MapData::clear()
     ekf_rover_path.clear();
     encoder_rover_path.clear();
     gps_rover_path.clear();
+    waypoint_path.clear();
+
     global_offset_ekf_rover_path.clear();
     global_offset_encoder_rover_path.clear();
     global_offset_gps_rover_path.clear();
+    global_offset_waypoint_path.clear();
+
     target_locations.clear();
     collection_points.clear();
-    waypoint_path.clear();
-    global_offset_waypoint_path.clear();
 
     update_mutex.unlock();
 }
@@ -197,19 +199,27 @@ void MapData::clear(string rover)
     update_mutex.lock();
 
     ekf_rover_path[rover].clear();
-    encoder_rover_path[rover].clear();
-    gps_rover_path[rover].clear();
     global_offset_ekf_rover_path[rover].clear();
+    ekf_rover_path.erase(rover);
+    global_offset_ekf_rover_path.erase(rover);
+
+    encoder_rover_path[rover].clear();
     global_offset_encoder_rover_path[rover].clear();
+    encoder_rover_path.erase(rover);
+    global_offset_encoder_rover_path.erase(rover);
+
+    gps_rover_path[rover].clear();
     global_offset_gps_rover_path[rover].clear();
-    target_locations[rover].clear();
-    collection_points[rover].clear();
+    gps_rover_path.erase(rover);
+    global_offset_gps_rover_path.erase(rover);
+
     waypoint_path[rover].clear();
     global_offset_waypoint_path[rover].clear();
+    waypoint_path.erase(rover);
+    global_offset_waypoint_path.erase(rover);
 
-    ekf_rover_path.erase(rover);
-    encoder_rover_path.erase(rover);
-    gps_rover_path.erase(rover);
+    target_locations[rover].clear();
+    collection_points[rover].clear();
     target_locations.erase(rover);
     collection_points.erase(rover);
 
@@ -263,6 +273,19 @@ std::map<int, std::tuple<float,float,bool> >* MapData::getWaypointPath(std::stri
     }
 
     return &waypoint_path[rover_name];
+}
+
+void MapData::resetAllWaypointPaths()
+{
+    waypoint_path.clear();
+    global_offset_waypoint_path.clear();
+    waypoint_id_counter = 0;
+}
+
+void MapData::resetWaypointPathForSelectedRover(std::string rover)
+{
+   waypoint_path[rover].clear();
+   global_offset_waypoint_path[rover].clear();
 }
 
 // These functions report the maximum and minimum map values seen. This is useful for the GUI when it is calculating the map coordinate system.

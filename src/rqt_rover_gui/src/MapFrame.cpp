@@ -890,6 +890,16 @@ void MapFrame::removeWaypoint( string rover, int id ) {
   }
 }
 
+void MapFrame::resetAllWaypointPaths()
+{
+  map_data->resetAllWaypointPaths();
+}
+
+void MapFrame::resetWaypointPathForSelectedRover(string rover)
+{
+  map_data->resetWaypointPathForSelectedRover(rover);
+}
+
 void MapFrame::receiveWaypointReached(int waypoint_id)
 {
   map_data->reachedWaypoint(waypoint_id);
