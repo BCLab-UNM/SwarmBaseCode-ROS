@@ -624,6 +624,13 @@ void MapFrame::mouseReleaseEvent(QMouseEvent *event)
 
 void MapFrame::mousePressEvent(QMouseEvent *event)
 {
+  std::set<std::string>::iterator it = display_list.find(rover_currently_selected);
+
+  if(it == display_list.end())
+  {
+    emit sendInfoLogMessage("Waypoints Error: a valid rover is not selected!");
+    return;
+  }
 
   float waypoint_click_tolerance = 0.25*(scale/10);
   

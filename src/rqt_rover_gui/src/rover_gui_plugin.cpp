@@ -2929,7 +2929,14 @@ void RoverGUIPlugin::refocusKeyboardEventHandler()
 // Publish the waypoint commands recieved from MapFrame to ROS
 void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float y)
 {
-  
+    std::set<std::string>::iterator it = rover_names.find(selected_rover_name);
+
+    if(it == rover_names.end())
+    {
+      emit sendInfoLogMessage("Waypoints Error: a valid rover is not selected!");
+      return;
+    }
+
     swarmie_msgs::Waypoint msg;
     msg.action = cmd;
     msg.id = id;
