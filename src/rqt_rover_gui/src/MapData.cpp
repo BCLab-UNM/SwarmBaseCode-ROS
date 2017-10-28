@@ -83,7 +83,7 @@ int MapData::addToWaypointPath(string rover, float x, float y)
   float offset_y = rover_global_offsets[rover].second;
   int this_id = waypoint_id_counter++; // Get the next waypoint id.
 
-  global_offset_waypoint_path[rover][this_id]=make_tuple(x+offset_x,y+offset_y,false);
+  global_offset_waypoint_path[rover][this_id]=make_tuple(x+offset_x,y-offset_y,false);
   waypoint_path[rover][this_id]=make_tuple(x,y,false);
 
   update_mutex.unlock();
