@@ -54,8 +54,7 @@ float heartbeat_publish_interval = 2;
 
 float prev_left = 0;
 float prev_right = 0;
-int max_motor_step = 1
-;
+int max_motor_step = 25;
 
 ros::Time prevDriveCommandUpdateTime;
 
@@ -149,15 +148,17 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float left = (message->linear.x); //target linear velocity in meters per second
   float right = (message->angular.z); //angular error in radians
   
-  if(fabs(left)-fabs(prev_left) > max_motor_step && prev_left != 0)
+  cout << "Left: " << left << " Right: " << right << endl;
+
+  if(abs(prev_left - left) > max_motor_step && left != 0 )
   {
-    left = prev_left + max_motor_step * (left/fabs(left));
+    left = prev_left + max_motor_step * (left/abs(left));
 cout << "left: " << left << endl;
   }
   
-  if(fabs(prev_right) > max_motor_step && prev_right != 0)
+  if(abs(prev_right - right) > max_motor_step && right != 0)
   {
-    right = prev_right + max_motor_step * (right/fabs(right));
+    right = prev_right + max_motor_step * (right/abs(right));
 cout << "right: " << right << endl;
   }
   
@@ -172,19 +173,23 @@ cout << "right: " << right << endl;
   if (left > max_motor_cmd)
   {
     left = max_motor_cmd;
+    prev_left = max_motor_cmd;
   }
   else if (left < -max_motor_cmd)
   {
     left = - max_motor_cmd;
+    prev_left = - max_motor_cmd;
   }
 
   if (right > max_motor_cmd)
   {
     right = max_motor_cmd;
+    prev_right = max_motor_cmd;
   }
   else if (right < -max_motor_cmd)
   {
     right = -max_motor_cmd;
+    prev_right = -max_motor_cmd;
   }
 
   int leftInt = left;
