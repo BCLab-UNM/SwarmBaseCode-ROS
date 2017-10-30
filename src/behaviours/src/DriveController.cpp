@@ -127,7 +127,8 @@ Result DriveController::DoWork() {
       }
     }
     // goal is reached but desired heading is still wrong turn only
-    else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance) {
+    else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance
+       && hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y) > waypointTolerance) {
       // rotate but dont drive
       result.pd.setPointVel = 0.0;
       if (result.PIDMode == FAST_PID){
