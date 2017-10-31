@@ -322,6 +322,11 @@ You are now set for rapid deployment and development!
 	+ Typing '-NB' will allow users to get a new branch at anytime
 	+ Typing '-RP' will allow users to re-pull from your current selected github branch
 
+If you want to use the script, and don't want to use the interface, you are able to do so.  Running any option (-R, -L, -G) followed by a -S will trigger a silent mode for the command, running your commands and returning to the terminal immediately afterwards.
+
+EX:  ```./deploy.sh -R -S robot1``` will attempt to connect and run robot1 from the script and return you to the terminal window
+
+
 Feature:
 
 Typing "REBOOT {hostname}" in any option will allow you to reboot the selected rover.
