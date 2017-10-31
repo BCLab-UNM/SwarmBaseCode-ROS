@@ -707,6 +707,12 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
 {
+    //If there are no rovers connected to the GUI, reset the obstacle call count to 0
+    if(ui.rover_list->count() == 0)
+    {
+        obstacle_call_count = 0;
+    }
+
     // Returns rovers that have created a status topic
     set<string>new_rover_names = findConnectedRovers();
 
