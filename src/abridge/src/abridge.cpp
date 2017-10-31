@@ -54,7 +54,7 @@ float heartbeat_publish_interval = 2;
 
 float prev_left = 0;
 float prev_right = 0;
-int max_motor_step = 25;
+int max_motor_step = 15;
 
 ros::Time prevDriveCommandUpdateTime;
 
@@ -148,17 +148,17 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float left = (message->linear.x); //target linear velocity in meters per second
   float right = (message->angular.z); //angular error in radians
   
-  cout << "Left: " << left << " Right: " << right << endl;
+  //cout << "Left: " << left << " Right: " << right << endl;
 
-  if(abs(prev_left - left) > max_motor_step && left != 0 )
+  if(abs(prev_left - left) > max_motor_step)
   {
-    left = prev_left + max_motor_step * (left/abs(left));
+    left = prev_left + max_motor_step * ((left - prev_left)/abs(left-prev_left));
 cout << "left: " << left << endl;
   }
   
-  if(abs(prev_right - right) > max_motor_step && right != 0)
+  if(abs(prev_right - right) > max_motor_step)
   {
-    right = prev_right + max_motor_step * (right/abs(right));
+    right = prev_right + max_motor_step * ((right - prev_right)/abs(right-prev_right));
 cout << "right: " << right << endl;
   }
   
