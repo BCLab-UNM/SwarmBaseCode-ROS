@@ -342,3 +342,73 @@ Once the key has been setup, copy the key from the users machine to each rover y
 ```ssh-copy-id swarmie@{hostname}``` where hostname is the rover's hostname
 
 That's it! You should now have a seamless way to SSH without having to type in passwords each time!
+
+## Behaviours
+
+This section provides an overview of the behaviours package. We
+describe the overall architecture of the package and a few pitfalls
+you may encounter when writing your own behaviours. The behaviours
+package is designed to separate the logic of individual behaviours
+from the details of implementing them on ROS (ie. the messages that
+are actually published). This allows for the possibility of easily
+porting the behavior to a different system without significantly
+rewriting the code. The interface between the abstract behaviours and
+ROS is handled by ROSAdapter which is responsible for sending and
+receiving all ROS messages.
+
+The architecture of the behaviours package is hierarchical, with the
+`ROSAdapter` at the top of the hierarchy. The ROSAdapter interacts
+with the `LogicController` which in turn manages all the individual
+controllers that implement specific behaviours.
+
+### Controller
+
+An abstract class that all behaviours implement. The API for this
+class includes the following functions that every behaviour must
+implement.
+
+* `void Reset()`
+
+  Resets the internal state of the controller.
+
+* `Result DoWork()`
+
+  Determines what action should be taken by the behaviour and returns
+  that action in a `Result` struct. Note that no action is taken in
+  this method, we just determine what needs to be done and pass it
+  back to be executed by the `ROSAdapter`.
+
+* `bool ShouldInterrupt()`
+
+  If the internal state of the controller is such that it must take
+  action this method should return true.
+
+* `bool HasWork()`
+
+  If the controller has work to do (ie. needs to take action in some
+  way) then this method should return true.
+
+* `void ProcessData()`
+
+  Carries out behaviour-specific processing of internal data (or data
+  that has been passed in to the controller such as robot location or
+  other sensor readings).
+
+### ROSAdapter
+
+The main role of `ROSAdapter` is to manage sensor input, passing
+relevant data coming from ROS messages to the logic controller (which
+in turn may pass that data on to individual controllers). Ten times
+per second, ROSAdapter calls `DoWork()` on the logic controller, and
+takes action based on the `Result` returned by that call. Action is
+typically sending a message that will cause the wheels or gripper to
+move. The easiest way to trigger some other action is to have the
+ROSAdapter poll the logic controller at regular intervals to check
+whether some event has occurred (a good example of this is checking
+whether a manual waypoint has been reached).
+
+### Logic Controller
+
+The logic controller manages all the other controllers in the
+behaviours package. There are two finite state machines at its core,
+one for the logic state and one for the process state
