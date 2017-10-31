@@ -118,7 +118,8 @@ Result DriveController::DoWork() {
     result.pd.setPointYaw = waypoints.back().theta;
 
     // goal not yet reached drive while maintaining proper heading.
-    if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
+    if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2
+        && hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y) > waypointTolerance) {
       // drive and turn simultaniously
       result.pd.setPointVel = searchVelocity;
       if (result.PIDMode == FAST_PID){
@@ -126,7 +127,8 @@ Result DriveController::DoWork() {
       }
     }
     // goal is reached but desired heading is still wrong turn only
-    else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance) {
+    else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance
+       && hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y) > waypointTolerance) {
       // rotate but dont drive
       result.pd.setPointVel = 0.0;
       if (result.PIDMode == FAST_PID){
