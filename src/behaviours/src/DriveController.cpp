@@ -136,16 +136,11 @@ Result DriveController::DoWork()
       {
         fastPID(0.0, errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
 
-        std::cout << "LEFT:  " << this->left << ", RIGHT:  " << this->right << std::endl;
-
         const int MIN_TURN_VALUE = 80;
 
         //If wheels get a value less than 80, will cause robot to sit in place
         if(fabs(left) < MIN_TURN_VALUE && fabs(right) < MIN_TURN_VALUE)
         {
-
-            std::cout << "ERROR my speed was too slow, increasing" << std::endl;
-
             //increase left and right values to minimum value, checking signs for negative or positive value
             if(this->left < 0)
             {
@@ -164,8 +159,6 @@ Result DriveController::DoWork()
             {
               this->right = MIN_TURN_VALUE;
             }
-
-            std::cout << "LEFT:  " << this->left << ", RIGHT:  " << this->right << std::endl;
         }
       }
 
