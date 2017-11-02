@@ -413,10 +413,10 @@ described below.
 
 The main role of `ROSAdapter` is to manage sensor input, passing
 relevant data coming from ROS messages to the logic controller (which
-in turn may pass that data on to individual controllers). Ten times
-per second, ROSAdapter calls `DoWork()` on the logic controller, and
-takes action based on the `Result` returned by that call. Taking
-action typically means sending a message that will cause the wheels or
+in turn may pass that data on to individual controllers). ROSAdapter
+calls `LogicController::DoWork()` ten times per second and takes
+action based on the `Result` returned by that call. Taking action
+typically means sending a message that will cause the wheels or
 gripper to move. The easiest way to trigger some other action is to
 have the ROSAdapter poll the logic controller at regular intervals to
 check whether some event has occurred (a good example of this is
@@ -476,7 +476,7 @@ the `ROSAdapter` to the relevant controllers.
 ### List of Controllers
 
 * `DriveController` Tells the robot how to drive. Driving is typically
-  based on waypotints and controlled with a PID controller that
+  based on waypoints and controlled with a PID controller that
   directs the motors based on the current error in the robot's
   orientation and position. The drive controller can also accept
   precision commands that bypass the PID.
