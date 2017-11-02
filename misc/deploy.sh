@@ -25,7 +25,7 @@ Check()
 {
 	cd ~
 
-	if [ [-z "$(ls -A $dirPath/src/ublox/)"] || [-z "$(ls -A $dirPath/src/apriltags_ros/)"] ]; then
+        if [ -z "$(ls -A $dirPath/src/ublox/)" ] || [ -z "$(ls -A $dirPath/src/apriltags_ros/)" ]; then
 		echo "The ublox and/or april tags submodule is missing."
 		cd $dirPath; #Entering directory/local git repo (needed to run git commands)
 		echo "Initiliazing and updating ublox and april tag submodules...";
@@ -123,7 +123,6 @@ Run()
 
 DispOpt()
 {
-	echo "Your network info:  $hostName@$userIP"
 	echo ""
 	echo "Type 'exit' to quit"
 
@@ -141,13 +140,12 @@ DispOpt()
 	if [ "$OPTION" != "-L" ]; then
 		echo "Type '-L' to transfer local code and run on swarmie(s)"
 	elif [ $OPTION == "-L" ]; then
-		echo "Type '-RC' to recompile Source Code"
+                echo "Type '-RC' to recompile Source Code"
 	fi
 
 	echo "Type 'REBOOT {hostname}' to reboot a swarmie"
-
+        echo "Type desired rover name(s) to run"
 	echo "-------------------------------------------------------------"
-	echo ""
 }
 
 SuccessPing()
@@ -190,9 +188,6 @@ Reboot()
 userIP=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1 }')
 hostName=$(hostname)
 
-echo "$dirPath"
-echo "$dirName"
-
 #No Connection
 #-------------------------------------------------------------
 if [ -z "$userIP" ]; then
@@ -209,39 +204,180 @@ if [ -z $OPTION ]; then
 	echo "'-G'[ithub] pulls and transfers workspace to swarmie(s)"
 	echo "'-L'[ocal Files] duplicates current workspace and transfers to swarmie(s)"
 	echo "'-R'[un] to run current code on all swarmie(s)"
+        echo "'-S'[ilent] after option to run and return to terminal without using interface"
 	echo "-------------------------------------------------------------"
 	exit 1
 fi
-
-clear
 
 #check OPTION given
 #------------------------------------------------------------
 
 while(true); do
 
+if [ $2 == "-S" ]; then
+
+    i=3
+
+    if [ $OPTION == "-G" ]; then
+
+        #Get Branch
+        read -e -p "Branch?:  " branch
+
+        Check
+
+        PullGit_Pack &
+        wait
+
+        while [ "${!i}" != "" ]; do
+            roverIP=${!i}
+            roverIP=${roverIP^^}
+
+            if [ $roverIP == "REBOOT" ]; then
+                needsReboot=true
+                i=$((i+1))
+                roverIP=${!i}
+                roverIP=${roverIP^^}
+            fi
+
+            #If rover is on the network
+            ping -q -w2 $roverIP > /dev/null
+            if [ $? -eq 0 ]; then
+
+                    if [ $needsReboot == true ]; then
+                            Reboot
+                            echo ""
+                            Run
+                            needsReboot=false
+                            sleep 10
+                    else
+                            #Transfer/Unpack/Run
+                            Transfer
+                            Unpack_Run
+                            sleep 10
+                    fi
+            #if not on the network
+            else
+                    FailPing
+                    needsReboot=false
+            fi
+
+            i=$((i+1))
+
+        done
+
+    elif [ $OPTION == "-L" ]; then
+
+        Pack &
+        wait
+
+        while [ "${!i}" != "" ]; do
+            roverIP=${!i}
+            roverIP=${roverIP^^}
+
+            if [ $roverIP == "REBOOT" ]; then
+                needsReboot=true
+                i=$((i+1))
+                roverIP=${!i}
+                roverIP=${roverIP^^}
+            fi
+
+            #if we didn't just select the reboot option
+            if [ $roverIP != "REBOOT" ]; then
+
+                #If rover is on the network
+                ping -q -w2 $roverIP > /dev/null
+
+                if [ $? -eq 0 ]; then
+
+                    if [ $needsReboot == true ]; then
+                        Reboot
+                        echo ""
+                        Run
+                        needsReboot=false
+                        sleep 10
+                    else
+                        #Transfer/Unpack/Run
+                        Transfer
+                        Unpack_Run
+                        sleep 10
+                    fi
+
+                #if not on the network
+                else
+                    FailPing
+                    needsReboot=false
+                fi
+            fi
+
+            i=$((i+1))
+
+        done
+
+    elif [ $OPTION == "-R" ]; then
+
+        while [ "${!i}" != "" ]; do
+
+            roverIP=${!i}
+            roverIP=${roverIP^^}
+
+            if [ $roverIP == "REBOOT" ]; then
+                needsReboot=true
+                i=$((i+1))
+                roverIP=${!i}
+                roverIP=${roverIP^^}
+            fi
+
+            ping -q -w2 $roverIP > /dev/null
+
+            #If rover is on the network
+            if [ $? -eq 0 ]; then
+
+                #reboot
+                if [ $needsReboot == true ]; then
+                    Reboot
+                    echo ""
+                    Run
+                    sleep 10
+                    needsReboot=false
+                else
+                    Run
+                    sleep 10
+                fi
+
+            #if not on the network
+            else
+                    FailPing
+                    needsReboot=false
+            fi
+
+            i=$((i+1))
+        done
+    else
+        echo "Not valid option"
+    fi
+
+exit 1
+
 #GitHub Selection
 #------------------------------------------------------------
-if [ $OPTION == "-G" ]; then
+elif [ $OPTION == "-G" ]; then
 
+    clear
 	#if not everything is filled out
 	if [ "$branch" == "" ]; then
 		echo ""
-    		read -p "Branch?:  " branch
+                read -e -p "Branch?:  " branch
 		echo ""
 	fi
 
 	#Tell User Option
 
+        echo "Your network info:  $hostName@$userIP"
 	echo "Retrieving and Transferring Code from GitHub:  "
-
 	echo "dir: $dirPath branch: $branch"
 	echo "-------------------------------------------------------------"
-	echo ""
 
 	Check
-
-	DispOpt
 
 	PullGit_Pack &
 	wait
@@ -251,7 +387,9 @@ if [ $OPTION == "-G" ]; then
 	i=0
 	changeOption=false
 
-		read -p "Rover Name/IP To Start:  " -a arr 
+                DispOpt
+
+                read -p "Option/Rover Name(s):  " -a arr
 
 		size=${#arr[@]}
 
@@ -335,21 +473,19 @@ if [ $OPTION == "-G" ]; then
 
 		i=0
 	done
-fi
 
 #Transfer Local Copy
 #-------------------------------------------------------------
-if [ $OPTION == "-L" ]; then
+elif [ $OPTION == "-L" ]; then
+
+    clear
 
 	Check
 
-	DispOpt
-
+        echo "Your network info:  $hostName@$userIP"
 	echo "Copying and transferring current folder to swarmie(s)"
-
 	echo "dir: $dirPath"
 	echo "-------------------------------------------------------------"
-	echo ""
 
 	Pack &
 	wait
@@ -359,7 +495,9 @@ if [ $OPTION == "-L" ]; then
 	i=0
 	changeOption=false
 
-		read -p "Rover Name/IP To Start:  " -a arr 
+                DispOpt
+
+                read -p "Option/Rover Name(s):  " -a arr
 
 		size=${#arr[@]}
 
@@ -385,8 +523,7 @@ if [ $OPTION == "-L" ]; then
 				break
 			elif [ $roverIP = "-RC" ]; then
 				clear
-				changeOption=true
-				echo ""
+                                changeOption=true
 				echo "-------------------------------------------------------------"
 				echo ""
 				echo "Recompiling Source Code!"
@@ -442,27 +579,27 @@ if [ $OPTION == "-L" ]; then
 
 		i=0
 	done
-fi
 
 #Just Run
 #-------------------------------------------------------------
-if [ $OPTION == "-R" ]; then
+elif [ $OPTION == "-R" ]; then
 
-	DispOpt
+    clear
 
+        echo "Your network info:  $hostName@$userIP"
 	echo "Running current swarmie(s) code"
 	echo "-------------------------------------------------------------"
-	echo ""
 
 	while(true); do
 
 	i=0
 	changeOption=false
 
-		read -p "Rover Name/IP To Start:  " -a arr 
+                DispOpt
 
-		size=${#arr[@]}
-		echo $size
+                read -p "Option/Rover Name(s):  " -a arr
+
+                size=${#arr[@]}
 
 		while [ $i -lt $size ]; do
 
@@ -473,7 +610,7 @@ if [ $OPTION == "-R" ]; then
 			i=$((i+1))
 		
 			#check input
-			if [ "$roverIP" =  "exit" ]; then
+                        if [ "$roverIP" =  "EXIT" ]; then
 				exit 1
 			elif [ "$roverIP" == "-G" ]; then
 				OPTION="-G"
