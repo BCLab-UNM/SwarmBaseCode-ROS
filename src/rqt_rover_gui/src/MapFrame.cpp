@@ -624,6 +624,10 @@ void MapFrame::mouseReleaseEvent(QMouseEvent *event)
 
 void MapFrame::mousePressEvent(QMouseEvent *event)
 {
+  if(! map_data->inManualMode(rover_currently_selected))
+  {
+    return;
+  }
 
   float waypoint_click_tolerance = 0.25*(scale/10);
   
@@ -894,6 +898,16 @@ void MapFrame::receiveCurrentRoverName( QString rover_name )
   {
       popout_mapframe->receiveCurrentRoverName(rover_name);
   }
+}
+
+void MapFrame::enableWaypoints(string rover_name)
+{
+  map_data->setManualMode(rover_name);
+}
+
+void MapFrame::disableWaypoints(string rover_name)
+{
+  map_data->setAutonomousMode(rover_name);
 }
 
 MapFrame::~MapFrame()
