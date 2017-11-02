@@ -133,12 +133,15 @@ float WirelessDiags::calcBitRate() {
   prev_total_bytes = total_bytes;
    
   // Convert string to int
+  string::size_type sz;   // alias of size_t
   long int rx_bytes = 0;
   long int tx_bytes = 0;
-  if (!receive_stat.empty() && !transmit_stat.empty())
+  if (!receive_stat.empty())
   {
-    string::size_type sz;   // alias of size_t
     rx_bytes = stoi(receive_stat,&sz);
+  }
+  if (!transmit_stat.empty())
+  {
     tx_bytes = stoi(transmit_stat,&sz);
   }
 
@@ -264,7 +267,7 @@ WirelessInfo WirelessDiags::getInfo(){
   // We are done so clean up
   close(sockfd);
 
-  calcBitRate();  
+  sigInfo.bandwidthUsed = calcBitRate();  
 
   return sigInfo;
 }
