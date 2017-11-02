@@ -1,17 +1,18 @@
 #include "PID.h"
 
-PID::PID() {
+PID::PID() {   }
 
-}
-
-PID::PID(PIDConfig config){
+PID::PID(PIDConfig config)
+{
   this->config = config;
   integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
 }
 
-float PID::PIDOut(float calculatedError, float setPoint) {
+float PID::PIDOut(float calculatedError, float setPoint)
+{
 
-  if (Error.size() >= config.errorHistLength) {
+  if (Error.size() >= config.errorHistLength)
+  {
     Error.pop_back();
   }
   Error.insert(Error.begin(), calculatedError); //insert new error into vector for history purposes.
@@ -20,13 +21,15 @@ float PID::PIDOut(float calculatedError, float setPoint) {
   float I = 0; //Integral yaw output
   float D = 0; //Derivative yaw output
 
-  if (setPoint != prevSetPoint && config.resetOnSetpoint) {
+  if (setPoint != prevSetPoint && config.resetOnSetpoint)
+  {
     Error.clear();
     integralErrorHistArray.clear();
     prevSetPoint = setPoint;
     step = 0;
     integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
   }
+
   //feed forward
   float FF = config.feedForwardMultiplier * setPoint;
 
@@ -131,6 +134,8 @@ float PID::PIDOut(float calculatedError, float setPoint) {
   {
     PIDOut = config.satLower;
   }
+
+  cout << "PID OUTPUT:  " << PIDOut << endl;
 
   return PIDOut;
 }

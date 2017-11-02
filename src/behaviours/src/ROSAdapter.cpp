@@ -254,7 +254,9 @@ int main(int argc, char **argv) {
 // This function calls the dropOff, pickUp, and search controllers.
 // This block passes the goal location to the proportional-integral-derivative
 // controllers in the abridge package.
-void behaviourStateMachine(const ros::TimerEvent&) {
+void behaviourStateMachine(const ros::TimerEvent&)
+{
+
   std_msgs::String stateMachineMsg;
   
   // time since timerStartTime was set to current time
@@ -262,8 +264,12 @@ void behaviourStateMachine(const ros::TimerEvent&) {
   
   // init code goes here. (code that runs only once at start of
   // auto mode but wont work in main goes here)
-  if (!initilized) {
-    if (timerTimeElapsed > startDelayInSeconds) {
+  if (!initilized)
+  {
+
+    if (timerTimeElapsed > startDelayInSeconds)
+    {
+
       // initialization has run
       initilized = true;
       //TODO: this just sets center to 0 over and over and needs to change
@@ -286,14 +292,18 @@ void behaviourStateMachine(const ros::TimerEvent&) {
       centerLocationOdom.y = centerOdom.y;
       
       startTime = getROSTimeInMilliSecs();
-    } else {
+    }
+
+    else
+    {
       return;
     }
     
   }
 
   // Robot is in automode
-  if (currentMode == 2 || currentMode == 3) {
+  if (currentMode == 2 || currentMode == 3)
+  {
     
     humanTime();
     
@@ -309,14 +319,17 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     bool wait = false;
     
     //if a wait behaviour is thrown sit and do nothing untill logicController is ready
-    if (result.type == behavior) {
-      if (result.b == wait) {
+    if (result.type == behavior)
+    {
+      if (result.b == wait)
+      {
         wait = true;
       }
     }
     
     //do this when wait behaviour happens
-    if (wait) {
+    if (wait)
+    {
       sendDriveCommand(0.0,0.0);
       std_msgs::Float32 angle;
       
@@ -327,17 +340,23 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     }
     
     //normally interpret logic controllers actuator commands and deceminate them over the appropriate ROS topics
-    else {
+    else
+    {
       
       sendDriveCommand(result.pd.left,result.pd.right);
       
+
+      //Alter finger and wrist angle is told to reset with last stored value if currently has -1 value
       std_msgs::Float32 angle;
-      if (result.fingerAngle != -1) {
+      if (result.fingerAngle != -1)
+      {
         angle.data = result.fingerAngle;
         fingerAnglePublish.publish(angle);
         prevFinger = result.fingerAngle;
       }
-      if (result.wristAngle != -1) {
+
+      if (result.wristAngle != -1)
+      {
         angle.data = result.wristAngle;
         wristAnglePublish.publish(angle);
         prevWrist = result.wristAngle;
@@ -348,34 +367,42 @@ void behaviourStateMachine(const ros::TimerEvent&) {
     //logicController.getPublishData(); suggested
     
     
-    //adds a blank space between sets of debugging data to easly tell one tick from the next
+    //adds a blank space between sets of debugging data to easily tell one tick from the next
     cout << endl;
     
   }
   
   // mode is NOT auto
-  else {
+  else
+  {
     humanTime();
+
     logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
+
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
+
     std::vector<int> cleared_waypoints = logicController.GetClearedWaypoints();
+
     for(std::vector<int>::iterator it = cleared_waypoints.begin();
-        it != cleared_waypoints.end(); it++) {
+        it != cleared_waypoints.end(); it++)
+    {
       swarmie_msgs::Waypoint wpt;
       wpt.action = swarmie_msgs::Waypoint::ACTION_REACHED;
       wpt.id = *it;
       waypointFeedbackPublisher.publish(wpt);
     }
     result = logicController.DoWork();
-    if(result.type != behavior || result.b != wait) {
+    if(result.type != behavior || result.b != wait)
+    {
       sendDriveCommand(result.pd.left,result.pd.right);
     }
-    cout << endl;
+    //cout << endl;
   }
 
   // publish state machine string for user, only if it has changed, though
-  if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0) {
+  if (strcmp(stateMachineMsg.data.c_str(), prev_state_machine) != 0)
+  {
     stateMachinePublish.publish(stateMachineMsg);
     sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
   }
@@ -692,5 +719,5 @@ void humanTime() {
     frac = 0;
   }
   
-  cout << "System has been Running for :: " << hoursTime << " : hours " << minutesTime << " : minutes " << timeDiff << "." << frac << " : seconds" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
+  //cout << "System has been Running for :: " << hoursTime << " : hours " << minutesTime << " : minutes " << timeDiff << "." << frac << " : seconds" << endl; //you can remove or comment this out it just gives indication something is happening to the log file
 }
