@@ -363,9 +363,18 @@ controllers that implement specific behaviours.
 
 ### Controller
 
-An abstract class that all behaviours implement. The API for this
-class includes the following functions that every behaviour must
-implement.
+An abstract class that all controllers implement. The swarmies are
+structured as a collection of low level controllers that each perform
+a simple task such as deciding where to go next when searching
+(`SearchController`), or determining whether to turn left or right to
+avoid an obstacle (`ObstacleController`). These low-level behaviours,
+implemented as simple controllers are combined by the logic controller
+into the high-level foraging behavior of the swarmies. To add a new
+behavior to the swarmies you would write a new controller and
+integrate it in to the logic controller through the priority system
+described below.
+
+#### Controller API
 
 * `void Reset()`
 
@@ -412,3 +421,75 @@ whether a manual waypoint has been reached).
 The logic controller manages all the other controllers in the
 behaviours package. There are two finite state machines at its core,
 one for the logic state and one for the process state
+
+The logic state state-machine has three states
+* INTERRUPT
+* WAITING
+* PRECISSION_COMMAND. 
+
+The interrupt state is entered whenever one of the controllers has
+signalled that it has work to do. In the interrupt state The logic
+controller polls all controllers to determine which ones have work and
+calls `DoWork()` on the controller with the controller with the
+highest priority (priority is determined by the current process state
+of the logic controller, discussed below). The next logic state is
+determined by the result returned by that controller. The other two
+states are relatively simple, waiting is used when waiting for the
+drive controller to reach its last waypoint (note that the drive
+controller is not part of the priority system described above, rather
+it is called directly whenever the logic state is waiting). The
+precission state is used when a controller wants to take direct
+controll of the robot's actuators, in this state the result from the
+highest priority controller is passed directly to the drive controller
+do be acted on, this allows for very high precision driving to perform
+tasks such as aligning with a cube when picking it up.
+
+The process state stat-machine determines the priorities of the
+contreollers. There are four states:
+* SEARCHING
+* TARGET_PICKUP
+* DROP_OFF
+* MANUAL
+
+Manual is a special state that is unrechable while the robot is in
+autonomous mode, its only active controller is the manual waypoint
+controller.
+
+The other three states are entered when searching for cubes, picking
+up cubes, and dropping off cubes respectively. Under each state the
+priority of the controllers changes. Check
+`LogicController::ProcessData()` to see the priorities (higher is
+higher priority, -1 is dissabled).
+
+One more important function in the logic controller is
+`LogicController::controllerInterconnect()` which can be used to share
+data between controllers.
+
+The remaining functions on `LogicController` are use to pass data from
+the `ROSAdapter` to the relevant controllers.
+
+### List of Controllers
+
+* `DriveController` Tells the robot how to drive typically based on
+  waypotints and the the output from PID controllers that determine
+  control inputs based on the pose of the swarmie relative to its next
+  waypoint. Can also take precission commands that bypass the PID.
+* `DropOffController` handles dropping off a cube at the center once
+  one has been picked up.
+* `ManualWaypointController` Implemented for testing. Allows us to
+  instruct the swarmie to drive to a particular x,y coordinate. Only
+  operates in manual mode
+* `ObstacleController` handles obstacle avoidance.
+* `PickUpController` handles picking up a cube.
+* `RangeController` prevents the swarmie from leaving a pre-defined
+  foraging range.
+* `SearchController` Implements a correlated random walk as a basic
+  search method.
+  
+### PID
+
+The PID class implements a generic proportional-integral-derivative
+controller that is configured using the `PIDConfig` struct. This
+struct is used to set the gains and the anti-windup parameters of the
+PID. The PID parameters can be tuned by modifying the config structs
+in the drive controller.
