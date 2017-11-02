@@ -415,12 +415,12 @@ The main role of `ROSAdapter` is to manage sensor input, passing
 relevant data coming from ROS messages to the logic controller (which
 in turn may pass that data on to individual controllers). Ten times
 per second, ROSAdapter calls `DoWork()` on the logic controller, and
-takes action based on the `Result` returned by that call. Action is
-typically sending a message that will cause the wheels or gripper to
-move. The easiest way to trigger some other action is to have the
-ROSAdapter poll the logic controller at regular intervals to check
-whether some event has occurred (a good example of this is checking
-whether a manual waypoint has been reached).
+takes action based on the `Result` returned by that call. Taking
+action typically means sending a message that will cause the wheels or
+gripper to move. The easiest way to trigger some other action is to
+have the ROSAdapter poll the logic controller at regular intervals to
+check whether some event has occurred (a good example of this is
+checking whether a manual waypoint has been reached).
 
 ### Logic Controller
 
@@ -431,41 +431,40 @@ one for the logic state and one for the process state
 The logic state state-machine has three states
 * INTERRUPT
 * WAITING
-* PRECISSION_COMMAND. 
+* PRECISION_COMMAND
 
 The interrupt state is entered whenever one of the controllers has
-signalled that it has work to do. In the interrupt state The logic
+signaled that it has work to do. In the interrupt state the logic
 controller polls all controllers to determine which ones have work and
-calls `DoWork()` on the controller with the controller with the
-highest priority (priority is determined by the current process state
-of the logic controller, discussed below). The next logic state is
-determined by the result returned by that controller. The other two
-states are relatively simple, waiting is used when waiting for the
-drive controller to reach its last waypoint (note that the drive
-controller is not part of the priority system described above, rather
-it is called directly whenever the logic state is waiting). The
-precission state is used when a controller wants to take direct
-controll of the robot's actuators, in this state the result from the
-highest priority controller is passed directly to the drive controller
-do be acted on, this allows for very high precision driving to perform
-tasks such as aligning with a cube when picking it up.
+calls `DoWork()` on the controller with highest priority (priority is
+determined by the current process state of the logic controller,
+discussed below). The next logic state is determined by the result
+returned by that controller. The other two states are relatively
+simple. The waiting is used when waiting for the drive controller to
+reach its last waypoint (note that the drive controller is not part of
+the priority system described above, rather it is called directly
+whenever the logic state is waiting). The precision state is used when
+a controller wants to take direct control of the robot's
+actuators. In this state the result from the highest priority
+controller is passed directly to the drive controller do be acted on.
+This allows for very high precision driving to perform tasks such as
+aligning with a cube when picking it up.
 
-The process state stat-machine determines the priorities of the
-contreollers. There are four states:
+The process state state-machine determines the priorities of the
+controllers. There are four states:
 * SEARCHING
 * TARGET_PICKUP
 * DROP_OFF
 * MANUAL
 
-Manual is a special state that is unrechable while the robot is in
-autonomous mode, its only active controller is the manual waypoint
-controller.
-
-The other three states are entered when searching for cubes, picking
-up cubes, and dropping off cubes respectively. Under each state the
-priority of the controllers changes. Check
-`LogicController::ProcessData()` to see the priorities (higher is
-higher priority, -1 is dissabled).
+The states searching, target\_pickup, and drop\_off are entered when
+searching for cubes, picking up cubes, and dropping off cubes
+respectively. Under each state the priority of the controllers
+changes. Check `LogicController::ProcessData()` to see the priorities
+(higher is higher priority, -1 is disabled). The manual state is a
+special state that is unreachable while the robot is in autonomous
+mode. The only active controller in the manual state is the manual
+waypoint controller.
 
 One more important function in the logic controller is
 `LogicController::controllerInterconnect()` which can be used to share
@@ -476,18 +475,19 @@ the `ROSAdapter` to the relevant controllers.
 
 ### List of Controllers
 
-* `DriveController` Tells the robot how to drive typically based on
-  waypotints and the the output from PID controllers that determine
-  control inputs based on the pose of the swarmie relative to its next
-  waypoint. Can also take precission commands that bypass the PID.
-* `DropOffController` handles dropping off a cube at the center once
+* `DriveController` Tells the robot how to drive. Driving is typically
+  based on waypotints and controlled with a PID controller that
+  directs the motors based on the current error in the robot's
+  orientation and position. The drive controller can also accept
+  precision commands that bypass the PID.
+* `DropOffController` Handles dropping off a cube at the center once
   one has been picked up.
 * `ManualWaypointController` Implemented for testing. Allows us to
-  instruct the swarmie to drive to a particular x,y coordinate. Only
-  operates in manual mode
-* `ObstacleController` handles obstacle avoidance.
-* `PickUpController` handles picking up a cube.
-* `RangeController` prevents the swarmie from leaving a pre-defined
+  instruct the swarmie to drive to a particular (x,y) coordinate. Only
+  operates in manual mode.
+* `ObstacleController` Handles obstacle avoidance.
+* `PickUpController` Handles picking up a cube.
+* `RangeController` Prevents the swarmie from leaving a pre-defined
   foraging range.
 * `SearchController` Implements a correlated random walk as a basic
   search method.
