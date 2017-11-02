@@ -1273,6 +1273,9 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     //Hide joystick frame
     ui.joystick_frame->setHidden(true);
+
+    // disable waypoint input in map frame
+    ui.map_frame->disableWaypoints(selected_rover_name);
 }
 
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
@@ -1316,6 +1319,9 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
     
     //Show joystick frame
     ui.joystick_frame->setHidden(false);
+
+    // enable wayoint input in the map frame
+    ui.map_frame->enableWaypoints(selected_rover_name);
 }
 
 void RoverGUIPlugin::allAutonomousButtonEventHandler()

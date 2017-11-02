@@ -63,6 +63,10 @@ public:
     float getMinEncoderX(std::string rover_name);
     float getMinEncoderY(std::string rover_name);
 
+    bool inManualMode(std::string rover_name);
+    void setAutonomousMode(std::string rover_name);
+    void setManualMode(std::string rover_name);
+
     ~MapData();
 
 private:
@@ -100,6 +104,7 @@ private:
     QMutex update_mutex; // To prevent race conditions when the data is being displayed by MapFrame
 
     std::string currently_selected_rover;
+    std::map<std::string, int> rover_mode;
 
     int waypoint_id_counter = 0;
 };
