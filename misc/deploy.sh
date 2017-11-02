@@ -214,7 +214,7 @@ fi
 
 while(true); do
 
-if [ $2 == "-S" ]; then
+if [ "$2" == "-S" ]; then
 
     i=3
 
@@ -671,6 +671,9 @@ elif [ $OPTION == "-R" ]; then
 
 		i=0
 	done
+else
+    echo "Unrecognized command! Please ensure you are typing in your option correctly and try again!"
+    exit 1
 fi
 
 done
