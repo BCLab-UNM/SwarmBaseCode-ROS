@@ -204,6 +204,7 @@ namespace rqt_rover_gui
     ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
 
     ui.tab_widget->setCurrentIndex(0);
+    ui.log_tab->setCurrentIndex(1);
 
     ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
