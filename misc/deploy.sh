@@ -297,9 +297,11 @@ if [ "$2" == "-S" ]; then
                         sleep 10
                     else
                         #Transfer/Unpack/Run
+                        cd ~
                         Transfer
                         Unpack_Run
                         sleep 10
+                        cd -
                     fi
 
                 #if not on the network
