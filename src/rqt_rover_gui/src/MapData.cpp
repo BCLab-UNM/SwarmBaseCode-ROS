@@ -105,26 +105,27 @@ void MapData::reachedWaypoint(int waypoint_id)
 {
   update_mutex.lock();
 
-  if(display_global_offset)
+  // Update the reached waypoint in both the normal waypoint path AND the global
+  // waypoint path. We must update both to prevent incorrect color display for
+  // reached waypoints when switching back and forth between the global frame.
+
+  for (auto &rover : global_offset_waypoint_path)
   {
-    for(auto &rover : global_offset_waypoint_path)
+    map<int, std::tuple<float,float,bool>>::iterator found;
+
+    if ((found = rover.second.find(waypoint_id)) != rover.second.end())
     {
-      map<int, std::tuple<float,float,bool>>::iterator found;
-      if ( (found = rover.second.find(waypoint_id))  != rover.second.end() )
-      {
-        get<2>(found->second) = true;
-      }
+      get<2>(found->second) = true;
     }
   }
-  else
+
+  for (auto &rover : waypoint_path)
   {
-    for(auto &rover : waypoint_path)
+    map<int, std::tuple<float,float,bool>>::iterator found;
+
+    if ((found = rover.second.find(waypoint_id)) != rover.second.end())
     {
-      map<int, std::tuple<float,float,bool>>::iterator found;
-      if ( (found = rover.second.find(waypoint_id))  != rover.second.end() )
-      {
-        get<2>(found->second) = true;
-      }
+      get<2>(found->second) = true;
     }
   }
    
