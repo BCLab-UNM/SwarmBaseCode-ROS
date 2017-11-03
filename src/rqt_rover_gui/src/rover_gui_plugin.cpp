@@ -1,6 +1,6 @@
 // Author: Matthew Fricke
 // E-mail: matthew@fricke.co.uk
-// Date: 9-16-205
+// Date: 9-16-2015
 // Purpose: implementation of a simple graphical front end for the UNM-NASA Swarmathon rovers.
 // License: GPL3
 
@@ -205,9 +205,14 @@ namespace rqt_rover_gui
     // Make the custom rover number combo box look greyed out to begin with
     ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
 
+
     ui.number_of_tags_combobox->setEnabled(false);
     ui.number_of_tags_combobox->setStyleSheet("color: grey; border:1px solid grey;");
     ui.tab_widget->setCurrentIndex(1);
+
+    
+    ui.log_tab->setCurrentIndex(1);
+
 
     ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
@@ -711,6 +716,12 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
 void RoverGUIPlugin::pollRoversTimerEventHandler()
 {
+    //If there are no rovers connected to the GUI, reset the obstacle call count to 0
+    if(ui.rover_list->count() == 0)
+    {
+        obstacle_call_count = 0;
+    }
+
     // Returns rovers that have created a status topic
     set<string>new_rover_names = findConnectedRovers();
 
@@ -1277,6 +1288,9 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     //Hide joystick frame
     ui.joystick_frame->setHidden(true);
+
+    // disable waypoint input in map frame
+    ui.map_frame->disableWaypoints(selected_rover_name);
 }
 
 void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
@@ -1320,6 +1334,9 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
     
     //Show joystick frame
     ui.joystick_frame->setHidden(false);
+
+    // enable wayoint input in the map frame
+    ui.map_frame->enableWaypoints(selected_rover_name);
 }
 
 void RoverGUIPlugin::allAutonomousButtonEventHandler()

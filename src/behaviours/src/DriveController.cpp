@@ -16,120 +16,195 @@ DriveController::DriveController() {
 
 DriveController::~DriveController() {}
 
-void DriveController::Reset() {
+void DriveController::Reset()
+{
   waypoints.clear();
-  if (stateMachineState == STATE_MACHINE_ROTATE || stateMachineState == STATE_MACHINE_SKID_STEER) {
+
+  if (stateMachineState == STATE_MACHINE_ROTATE || stateMachineState == STATE_MACHINE_SKID_STEER)
+  {
     stateMachineState = STATE_MACHINE_WAYPOINTS;
   }
 }
 
-Result DriveController::DoWork() {
+Result DriveController::DoWork()
+{
 
-  if(result.type == behavior) {
-    if(result.b == noChange) {
+  if(result.type == behavior)
+  {
+    if(result.b == noChange)
+    {
       //if drive controller gets a no change command it is allowed to continue its previouse action
       //normally this will be to follow waypoints but it is not specified as such.
-    } else if(result.b == wait) {
+    }
+
+    else if(result.b == wait)
+    {
       //do nothing till told otherwise
       left = 0.0;
       right = 0.0;
       stateMachineState = STATE_MACHINE_WAITING;
-
     }
-  } else if(result.type == precisionDriving) {
+
+  }
+
+  else if(result.type == precisionDriving)
+  {
 
     //interpret input result as a precision driving command
     stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
 
-  } else if(result.type == waypoint) {
+  }
+
+  else if(result.type == waypoint)
+  {
     //interpret input result as new waypoints to add into the queue
     ProcessData();
 
   }
 
-  switch(stateMachineState) {
-
+  switch(stateMachineState)
+  {
 
   //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
   //This should be d one as little as possible. I Suggest to Use timeouts to set control bools false.
   //Then only call INTERUPT if bool switches to true.
-  case STATE_MACHINE_PRECISION_DRIVING: {
+  case STATE_MACHINE_PRECISION_DRIVING:
+  {
 
     ProcessData();
     break;
   }
 
+
+  case STATE_MACHINE_WAYPOINTS:
+  {
+
     //Handles route planning and navigation as well as makeing sure all waypoints are valid.
-  case STATE_MACHINE_WAYPOINTS: {
 
     bool tooClose = true;
-    while (!waypoints.empty() && tooClose) {
-      if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance) {
+    while (!waypoints.empty() && tooClose)
+    {
+      if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance)
+      {
         waypoints.pop_back();
       }
-      else {
+      else
+      {
         tooClose = false;
       }
     }
-    if (waypoints.empty()) {
+    if (waypoints.empty())
+    {
       stateMachineState = STATE_MACHINE_WAITING;
       result.type = behavior;
       interupt = true;
       return result;
     }
-    else {
+    else
+    {
       stateMachineState = STATE_MACHINE_ROTATE;
       //fall through on purpose
     }
-
-
   }
+
+  case STATE_MACHINE_ROTATE:
+  {
+
     // Calculate angle between currentLocation.theta and waypoints.front().theta
     // Rotate left or right depending on sign of angle
     // Stay in this state until angle is minimized
-  case STATE_MACHINE_ROTATE: {
 
     waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
+
     // Calculate the diffrence between current and desired heading in radians.
     float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
+    cout << "ROTATING, ERROR:  " << errorYaw << endl;
+
     result.pd.setPointVel = 0.0;
     result.pd.setPointYaw = waypoints.back().theta;
+
+    //Calculate absolute value of angle
+
+    float abs_error = fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta));
+
     // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
-    if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > rotateOnlyAngleTolerance) {
+    if (abs_error > rotateOnlyAngleTolerance)
+    {
       // rotate but dont drive.
-      if (result.PIDMode == FAST_PID) {
-        fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
+      if (result.PIDMode == FAST_PID)
+      {
+        fastPID(0.0, errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
+
+        const int MIN_TURN_VALUE = 80;
+
+        //If wheels get a value less than 80, will cause robot to sit in place
+        if(fabs(left) < MIN_TURN_VALUE && fabs(right) < MIN_TURN_VALUE)
+        {
+            //increase left and right values to minimum value, checking signs for negative or positive value
+            if(this->left < 0)
+            {
+              this->left = MIN_TURN_VALUE * -1;
+            }
+            else
+            {
+              this->left = MIN_TURN_VALUE;
+            }
+
+            if(this->right < 0)
+            {
+              this->right = MIN_TURN_VALUE * -1;
+            }
+            else
+            {
+              this->right = MIN_TURN_VALUE;
+            }
+        }
       }
+
+
       break;
-    } else {
-      // move to differential drive step
+    }
+    else
+    {
+
+      //move to differential drive step
       stateMachineState = STATE_MACHINE_SKID_STEER;
+
       //fall through on purpose.
     }
   }
-    // Calculate angle between currentLocation.x/y and waypoints.back().x/y
-    // Drive forward
-    // Stay in this state until angle is at least PI/2
-  case STATE_MACHINE_SKID_STEER: {
+
+  case STATE_MACHINE_SKID_STEER:
+  {
+      // Calculate angle between currentLocation.x/y and waypoints.back().x/y
+      // Drive forward
+      // Stay in this state until angle is at least PI/2
+
     // calculate the distance between current and desired heading in radians
     float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
 
     result.pd.setPointYaw = waypoints.back().theta;
 
     // goal not yet reached drive while maintaining proper heading.
-    if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2) {
+    if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x))) < M_PI_2
+        && hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y) > waypointTolerance)
+    {
       // drive and turn simultaniously
       result.pd.setPointVel = searchVelocity;
-      if (result.PIDMode == FAST_PID){
+      if (result.PIDMode == FAST_PID)
+      {
         fastPID(searchVelocity - linearVelocity,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
       }
     }
     // goal is reached but desired heading is still wrong turn only
-    else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance) {
+    else if (fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta)) > finalRotationTolerance
+       && hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y) > waypointTolerance)
+    {
       // rotate but dont drive
       result.pd.setPointVel = 0.0;
-      if (result.PIDMode == FAST_PID){
+      if (result.PIDMode == FAST_PID)
+      {
         fastPID(0.0,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
       }
     }
@@ -145,34 +220,38 @@ Result DriveController::DoWork() {
     break;
   }
 
-  default: {
+  default:
+  {
     break;
   }
 
 
   }
 
+  //package data for left and right values into result struct for use in ROSAdapter
   result.pd.right = right;
   result.pd.left = left;
 
+  //return modified struct
   return result;
 
 }
 
-bool DriveController::ShouldInterrupt() {
+bool DriveController::ShouldInterrupt()
+{
 
-  if (interupt) {
+  if (interupt)
+  {
     interupt = false;
     return true;
   }
-  else {
+  else
+  {
     return false;
   }
 }
 
-bool DriveController::HasWork() {
-
-}
+bool DriveController::HasWork() {   }
 
 
 
@@ -191,7 +270,8 @@ void DriveController::ProcessData()
       stateMachineState = STATE_MACHINE_WAYPOINTS;
     }
   }
-  else if (result.type == precisionDriving) {
+  else if (result.type == precisionDriving)
+  {
 
     if (result.PIDMode == FAST_PID){
       float vel = result.pd.cmdVel -linearVelocity;
@@ -213,7 +293,8 @@ void DriveController::ProcessData()
 }
 
 
-void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw) {
+void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw)
+{
 
   float velOut = fastVelPID.PIDOut(errorVel, setPointVel);
   float yawOut = fastYawPID.PIDOut(errorYaw, setPointYaw);
