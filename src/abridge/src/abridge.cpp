@@ -54,7 +54,7 @@ float heartbeat_publish_interval = 2;
 
 float prev_left = 0;
 float prev_right = 0;
-int max_motor_step = 15;
+int max_motor_step = 75;
 
 ros::Time prevDriveCommandUpdateTime;
 
@@ -148,18 +148,26 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
   float left = (message->linear.x); //target linear velocity in meters per second
   float right = (message->angular.z); //angular error in radians
   
-  //cout << "Left: " << left << " Right: " << right << endl;
+  ///TODO: replace below with a variable motor step size based upon a delta time.
+  if (mode == 1)
+  {
+      max_motor_step = 15;
+  }
+  else
+  {
+      max_motor_step = 75;
+  }
 
+  //steps the motor power up or down by a max ammount per tick, this prevents commanding a speed change that is too large at any one time step
+  //this prevents or limits the potential for overcurrent situations.
   if(abs(prev_left - left) > max_motor_step)
   {
     left = prev_left + max_motor_step * ((left - prev_left)/abs(left-prev_left));
-cout << "left: " << left << endl;
   }
   
   if(abs(prev_right - right) > max_motor_step)
   {
     right = prev_right + max_motor_step * ((right - prev_right)/abs(right-prev_right));
-cout << "right: " << right << endl;
   }
   
   prev_left = left;
