@@ -43,7 +43,6 @@ public:
   void sonarRightTimestampUpdate(const sensor_msgs::Range::ConstPtr& message);
   void abridgeNode(std_msgs::String msg);
   void sbridgeNode(std_msgs::String msg);
-  void obstacleNode(std_msgs::String msg);
   void behaviourNode(std_msgs::String msg);
   void ubloxNode(const sensor_msgs::NavSatFixConstPtr& message);
   
@@ -77,7 +76,6 @@ private:
 
   void checkAbridge();
   void checkSbridge();
-  void checkObstacle();
   void checkBehaviour();
   void checkUblox();
     
@@ -108,7 +106,6 @@ private:
   ros::Subscriber sonarRightSubscribe;
   ros::Subscriber abdridgeNodeSubscribe;
   ros::Subscriber sbdridgeNodeSubscribe;
-  ros::Subscriber obstacleNodeSubscribe;
   ros::Subscriber behaviourNodeSubscribe;
   ros::Subscriber ubloxNodeSubscribe;
   
@@ -135,7 +132,6 @@ private:
   bool sonarRightConnected = false;
   bool abridgeRunning = true;
   bool sbridgeRunning = true;
-  bool obstacleRunning = true;
   bool behaviourRunning = true;
   bool ubloxRunning = true;
 
@@ -149,7 +145,6 @@ private:
   ros::Time sonarRightTimestamp;
   ros::Time abridgeNodeTimestamp;
   ros::Time sbridgeNodeTimestamp;
-  ros::Time obstacleNodeTimestamp;
   ros::Time behaviourNodeTimestamp;
   ros::Time ubloxNodeTimestamp;
 

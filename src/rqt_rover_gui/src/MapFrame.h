@@ -84,7 +84,10 @@ namespace rqt_rover_gui
       // Calculate scale and transform to keep all data in the map frame
       // Excludes manual trasform
       void setAutoTransform();
- 
+
+      void enableWaypoints(std::string rover);
+      void disableWaypoints(std::string rover);
+
       // Show a copy of the map in its own resizable window
       void popout();
 
@@ -183,7 +186,12 @@ namespace rqt_rover_gui
       float max_seen_height = -std::numeric_limits<float>::max();
 
       std::string rover_currently_selected; // This is the rover selected in the main GUI.
-      
+
+      enum mode {
+        AUTONOMOUS,
+        MANUAL
+      };
+      std::map<std::string, bool> rover_mode;
   };
 
 }

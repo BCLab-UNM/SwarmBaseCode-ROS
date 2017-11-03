@@ -191,6 +191,8 @@ void MapData::clear()
 
     target_locations.clear();
     collection_points.clear();
+    waypoint_path.clear();
+    rover_mode.clear();
 
     update_mutex.unlock();
 }
@@ -223,6 +225,7 @@ void MapData::clear(string rover)
     collection_points[rover].clear();
     target_locations.erase(rover);
     collection_points.erase(rover);
+    rover_mode.erase(rover);
 
     update_mutex.unlock();
 }
@@ -408,6 +411,25 @@ float MapData::getMinEncoderY(string rover_name)
     }
 
     return min_encoder_seen_y[rover_name];
+}
+
+bool MapData::inManualMode(string rover_name)
+{
+   return rover_mode[rover_name] == 0;
+}
+
+void MapData::setAutonomousMode(string rover_name)
+{
+   update_mutex.lock();
+   rover_mode[rover_name] = 1;
+   update_mutex.unlock();
+}
+
+void MapData::setManualMode(string rover_name)
+{
+   update_mutex.lock();
+   rover_mode[rover_name] = 0;
+   update_mutex.unlock();
 }
 
 void MapData::lock()

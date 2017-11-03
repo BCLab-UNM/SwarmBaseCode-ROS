@@ -43,6 +43,12 @@ Note: if you accidentally ran ```sudo rosdep update``` you can repair the permis
 
 You may request the installation of addition packages on the competition rovers. To do so create a pull request modifying the [preinstalled packages list](https://github.com/BCLab-UNM/Swarmathon-Docs/blob/master/PreinstalledCompetitionPackages.md) document.
 
+Most systems will already have usb development support installed, but just in case:
+
+```
+ sudo apt install libusb-dev
+```
+
 ##### 2. Install additional ROS packages
 
 We use the [catkin_tools](https://catkin-tools.readthedocs.io/) package to build the SwarmBaseCode-ROS code base:
@@ -322,6 +328,10 @@ You are now set for rapid deployment and development!
 	+ Typing '-NB' will allow users to get a new branch at anytime
 	+ Typing '-RP' will allow users to re-pull from your current selected github branch
 
+If you want to use the script, and don't want to use the interface, you are able to do so.  Running any option (-R, -L, -G) followed by a -S will trigger a silent mode for the command, running your commands and returning to the terminal that the script was called from immediately after all operations are performed.
+
+EX:  ```./deploy.sh -R -S robot1``` will attempt to connect and run robot1 and then return to the current terminal without opening the interface.
+
 Feature:
 
 Typing "REBOOT {hostname}" in any option will allow you to reboot the selected rover.
@@ -342,3 +352,154 @@ Once the key has been setup, copy the key from the users machine to each rover y
 ```ssh-copy-id swarmie@{hostname}``` where hostname is the rover's hostname
 
 That's it! You should now have a seamless way to SSH without having to type in passwords each time!
+
+## Behaviours
+
+This section provides an overview of the behaviours package. We
+describe the overall architecture of the package and a few pitfalls
+you may encounter when writing your own behaviours. The behaviours
+package is designed to separate the logic of individual behaviours
+from the details of implementing them on ROS (ie. the messages that
+are actually published). This allows for the possibility of easily
+porting the behavior to a different system without significantly
+rewriting the code. The interface between the abstract behaviours and
+ROS is handled by ROSAdapter which is responsible for sending and
+receiving all ROS messages.
+
+The architecture of the behaviours package is hierarchical, with the
+`ROSAdapter` at the top of the hierarchy. The ROSAdapter interacts
+with the `LogicController` which in turn manages all the individual
+controllers that implement specific behaviours.
+
+### Controller
+
+An abstract class that all controllers implement. The swarmies are
+structured as a collection of low level controllers that each perform
+a simple task such as deciding where to go next when searching
+(`SearchController`), or determining whether to turn left or right to
+avoid an obstacle (`ObstacleController`). These low-level behaviours,
+implemented as simple controllers are combined by the logic controller
+into the high-level foraging behavior of the swarmies. To add a new
+behavior to the swarmies you would write a new controller and
+integrate it in to the logic controller through the priority system
+described below.
+
+#### Controller API
+
+* `void Reset()`
+
+  Resets the internal state of the controller.
+
+* `Result DoWork()`
+
+  Determines what action should be taken by the behaviour and returns
+  that action in a `Result` struct. Note that no action is taken in
+  this method, we just determine what needs to be done and pass it
+  back to be executed by the `ROSAdapter`.
+
+* `bool ShouldInterrupt()`
+
+  If the internal state of the controller is such that it must take
+  action this method should return true.
+
+* `bool HasWork()`
+
+  If the controller has work to do (ie. needs to take action in some
+  way) then this method should return true.
+
+* `void ProcessData()`
+
+  Carries out behaviour-specific processing of internal data (or data
+  that has been passed in to the controller such as robot location or
+  other sensor readings).
+
+### ROSAdapter
+
+The main role of `ROSAdapter` is to manage sensor input, passing
+relevant data coming from ROS messages to the logic controller (which
+in turn may pass that data on to individual controllers). ROSAdapter
+calls `LogicController::DoWork()` ten times per second and takes
+action based on the `Result` returned by that call. Taking action
+typically means sending a message that will cause the wheels or
+gripper to move. The easiest way to trigger some other action is to
+have the ROSAdapter poll the logic controller at regular intervals to
+check whether some event has occurred (a good example of this is
+checking whether a manual waypoint has been reached).
+
+### Logic Controller
+
+The logic controller manages all the other controllers in the
+behaviours package. There are two finite state machines at its core,
+one for the logic state and one for the process state
+
+The logic state state-machine has three states
+* INTERRUPT
+* WAITING
+* PRECISION_COMMAND
+
+The interrupt state is entered whenever one of the controllers has
+signaled that it has work to do. In the interrupt state the logic
+controller polls all controllers to determine which ones have work and
+calls `DoWork()` on the controller with highest priority (priority is
+determined by the current process state of the logic controller,
+discussed below). The next logic state is determined by the result
+returned by that controller. The other two states are relatively
+simple. The waiting is used when waiting for the drive controller to
+reach its last waypoint (note that the drive controller is not part of
+the priority system described above, rather it is called directly
+whenever the logic state is waiting). The precision state is used when
+a controller wants to take direct control of the robot's
+actuators. In this state the result from the highest priority
+controller is passed directly to the drive controller do be acted on.
+This allows for very high precision driving to perform tasks such as
+aligning with a cube when picking it up.
+
+The process state state-machine determines the priorities of the
+controllers. There are four states:
+* SEARCHING
+* TARGET_PICKUP
+* DROP_OFF
+* MANUAL
+
+The states searching, target\_pickup, and drop\_off are entered when
+searching for cubes, picking up cubes, and dropping off cubes
+respectively. Under each state the priority of the controllers
+changes. Check `LogicController::ProcessData()` to see the priorities
+(higher is higher priority, -1 is disabled). The manual state is a
+special state that is unreachable while the robot is in autonomous
+mode. The only active controller in the manual state is the manual
+waypoint controller.
+
+One more important function in the logic controller is
+`LogicController::controllerInterconnect()` which can be used to share
+data between controllers.
+
+The remaining functions on `LogicController` are use to pass data from
+the `ROSAdapter` to the relevant controllers.
+
+### List of Controllers
+
+* `DriveController` Tells the robot how to drive. Driving is typically
+  based on waypoints and controlled with a PID controller that
+  directs the motors based on the current error in the robot's
+  orientation and position. The drive controller can also accept
+  precision commands that bypass the PID.
+* `DropOffController` Handles dropping off a cube at the center once
+  one has been picked up.
+* `ManualWaypointController` Implemented for testing. Allows us to
+  instruct the swarmie to drive to a particular (x,y) coordinate. Only
+  operates in manual mode.
+* `ObstacleController` Handles obstacle avoidance.
+* `PickUpController` Handles picking up a cube.
+* `RangeController` Prevents the swarmie from leaving a pre-defined
+  foraging range.
+* `SearchController` Implements a correlated random walk as a basic
+  search method.
+  
+### PID
+
+The PID class implements a generic proportional-integral-derivative
+controller that is configured using the `PIDConfig` struct. This
+struct is used to set the gains and the anti-windup parameters of the
+PID. The PID parameters can be tuned by modifying the config structs
+in the drive controller.

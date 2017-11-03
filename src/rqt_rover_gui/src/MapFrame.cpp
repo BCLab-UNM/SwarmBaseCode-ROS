@@ -626,9 +626,15 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
 {
   std::set<std::string>::iterator it = display_list.find(rover_currently_selected);
 
+  // Failure condition: a valid rover is not selected.
   if(it == display_list.end())
   {
     emit sendInfoLogMessage("Waypoints Error: a valid rover is not selected!");
+    return;
+  }
+  // Failure condition: don't accept waypoints for rovers in autonomous mode
+  else if(! map_data->inManualMode(rover_currently_selected))
+  {
     return;
   }
 
@@ -921,6 +927,16 @@ void MapFrame::receiveCurrentRoverName( QString rover_name )
   {
       popout_mapframe->receiveCurrentRoverName(rover_name);
   }
+}
+
+void MapFrame::enableWaypoints(string rover_name)
+{
+  map_data->setManualMode(rover_name);
+}
+
+void MapFrame::disableWaypoints(string rover_name)
+{
+  map_data->setAutonomousMode(rover_name);
 }
 
 MapFrame::~MapFrame()
