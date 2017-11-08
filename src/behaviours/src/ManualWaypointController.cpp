@@ -9,6 +9,8 @@ ManualWaypointController::~ManualWaypointController() {}
 
 void ManualWaypointController::Reset() {
   waypoints.clear();
+  num_waypoints = 0;
+  cleared_waypoints.clear();
 }
 
 bool ManualWaypointController::HasWork() {
