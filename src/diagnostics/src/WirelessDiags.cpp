@@ -134,8 +134,16 @@ float WirelessDiags::calcBitRate() {
    
   // Convert string to int
   string::size_type sz;   // alias of size_t
-  long int rx_bytes = stoi(receive_stat,&sz);
-  long int tx_bytes = stoi(transmit_stat,&sz);
+  long int rx_bytes = 0;
+  long int tx_bytes = 0;
+  if (!receive_stat.empty())
+  {
+    rx_bytes = stoi(receive_stat,&sz);
+  }
+  if (!transmit_stat.empty())
+  {
+    tx_bytes = stoi(transmit_stat,&sz);
+  }
 
   // Get the total bytes transmitted and recevied. This is the total bandwidth used.
   total_bytes = rx_bytes + tx_bytes;
