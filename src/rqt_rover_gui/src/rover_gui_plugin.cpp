@@ -208,7 +208,7 @@ namespace rqt_rover_gui
 
     ui.number_of_tags_combobox->setEnabled(false);
     ui.number_of_tags_combobox->setStyleSheet("color: grey; border:1px solid grey;");
-    ui.tab_widget->setCurrentIndex(1);
+    ui.tab_widget->setCurrentIndex(0);
 
     ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
