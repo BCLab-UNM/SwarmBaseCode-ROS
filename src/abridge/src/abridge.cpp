@@ -52,21 +52,9 @@ unsigned int min_usb_send_delay = 100;
 
 float heartbeat_publish_interval = 2;
 
-
-//PID constants and arrays
-const int histArrayLength = 1000;
-
-float velFF = 0; //velocity feed forward
-int stepV = 0; //keeps track of the point in the evArray for adding new error each update cycle.
-float evArray[histArrayLength]; //history array of previous error for (arraySize/hz) seconds (error Velocity Array)
-float velError[4] = {0,0,0,0}; //contains current velocity error and error 3 steps in the past.
-
-int stepY = 0; //keeps track of the point in the eyArray for adding new error each update cycle.
-float eyArray[histArrayLength]; //history array of previous error for (arraySize/hz) seconds (error Yaw Array)
-float yawError[4] = {0,0,0,0}; //contains current yaw error and error 3 steps in the past.
-
-float prevLin = 0;
-float prevYaw = 0;
+float prev_left = 0;
+float prev_right = 0;
+int max_motor_step = 75;
 
 ros::Time prevDriveCommandUpdateTime;
 
@@ -142,12 +130,6 @@ int main(int argc, char **argv) {
     
     odom.header.frame_id = publishedName+"/odom";
     odom.child_frame_id = publishedName+"/base_link";
-
-    for (int i = 0; i < histArrayLength; i++)
-    {
-    evArray[i] = 0;
-    eyArray[i] = 0;
-    }
     
     prevDriveCommandUpdateTime = ros::Time::now();
 
@@ -165,28 +147,57 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
 
   float left = (message->linear.x); //target linear velocity in meters per second
   float right = (message->angular.z); //angular error in radians
+  
+  ///TODO: replace below with a variable motor step size based upon a delta time.
+  if (mode == 1)
+  {
+      max_motor_step = 15;
+  }
+  else
+  {
+      max_motor_step = 75;
+  }
+
+  //steps the motor power up or down by a max ammount per tick, this prevents commanding a speed change that is too large at any one time step
+  //this prevents or limits the potential for overcurrent situations.
+  if(abs(prev_left - left) > max_motor_step)
+  {
+    left = prev_left + max_motor_step * ((left - prev_left)/abs(left-prev_left));
+  }
+  
+  if(abs(prev_right - right) > max_motor_step)
+  {
+    right = prev_right + max_motor_step * ((right - prev_right)/abs(right-prev_right));
+  }
+  
+  prev_left = left;
+  prev_right = right;
 
   // Cap motor commands at 120. Experimentally determined that high values (tested 180 and 255) can cause 
   // the hardware to fail when the robot moves itself too violently.
-  int max_motor_cmd = 120;
+  int max_motor_cmd = 255;
 
   // Check that the resulting motor commands do not exceed the specified safe maximum value
   if (left > max_motor_cmd)
   {
     left = max_motor_cmd;
+    prev_left = max_motor_cmd;
   }
   else if (left < -max_motor_cmd)
   {
     left = - max_motor_cmd;
+    prev_left = - max_motor_cmd;
   }
 
   if (right > max_motor_cmd)
   {
     right = max_motor_cmd;
+    prev_right = max_motor_cmd;
   }
   else if (right < -max_motor_cmd)
   {
     right = -max_motor_cmd;
+    prev_right = -max_motor_cmd;
   }
 
   int leftInt = left;
