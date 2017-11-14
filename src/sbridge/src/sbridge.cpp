@@ -24,7 +24,7 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     double right = (message->angular.z);
     
     float max_turn_rate = 4.5; //radians per second
-    float max_linear_velocity = 0.6; // meters per second
+    float max_linear_velocity = 0.65; // meters per second
 
     float turn = 0;
     float forward = 0;
@@ -33,7 +33,7 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     float angularVel = (right-left)/2;
 
     turn = angularVel/55;
-    forward = linearVel/425;
+    forward = linearVel/390;
     if (forward >= 150){
       forward -= (abs(turn)/5);
     }
