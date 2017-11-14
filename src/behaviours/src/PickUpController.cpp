@@ -227,7 +227,7 @@ Result PickUpController::DoWork()
     // If we don't see any blocks or cubes turn towards the location of the last cube we saw.
     // I.E., try to re-aquire the last cube we saw.
 
-    float grasp_time_begin = 1.1;
+    float grasp_time_begin = 1.5;
     float raise_time_begin = 2.0;
     float lower_gripper_time_begin = 4.0;
     float target_reaquire_begin= 4.2;
