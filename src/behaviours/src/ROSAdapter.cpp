@@ -109,7 +109,7 @@ long int startTime = 0;
 float minutesTime = 0;
 float hoursTime = 0;
 
-float drift_tolerance = 1.2; // meters
+float drift_tolerance = 5; // meters
 
 Result result;
 
@@ -660,7 +660,8 @@ void transformMapCentertoOdom()
   geometry_msgs::PoseStamped odomPose;
   string x = "";
   
-  try { //attempt to get the transform of the center point in map frame to odom frame.
+  try
+  { //attempt to get the transform of the center point in map frame to odom frame.
     tfListener->waitForTransform(publishedName + "/map", publishedName + "/odom", ros::Time::now(), ros::Duration(1.0));
     tfListener->transformPose(publishedName + "/odom", mapPose, odomPose);
   }
