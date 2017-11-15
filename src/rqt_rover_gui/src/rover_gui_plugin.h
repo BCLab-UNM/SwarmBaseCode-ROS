@@ -124,7 +124,6 @@ namespace rqt_rover_gui {
     void infoLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
     void diagLogMessageEventHandler(const ros::MessageEvent<std_msgs::String const>& event);
 
-
     void addModelToGazebo();
     QString addPowerLawTargets();
     QString addUniformTargets();
