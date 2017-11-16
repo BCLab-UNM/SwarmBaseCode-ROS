@@ -422,6 +422,7 @@ void MapData::setAutonomousMode(string rover_name)
 {
    update_mutex.lock();
    rover_mode[rover_name] = 1;
+   resetWaypointPathForSelectedRover(rover_name);
    update_mutex.unlock();
 }
 
