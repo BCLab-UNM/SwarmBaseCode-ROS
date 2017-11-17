@@ -21,7 +21,9 @@ public:
   void setIgnoreCenterSonar();
   void setCurrentTimeInMilliSecs( long int time );
   void setTargetHeld ();
-  void setTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false;}}
+
+  // Checks if a target is held and if so resets the state of the obestacle controller otherwise does nothing
+  void setTargetHeldClear();
   bool getShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
