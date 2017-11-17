@@ -21,8 +21,11 @@ public:
   void setIgnoreCenterSonar();
   void setCurrentTimeInMilliSecs( long int time );
   void setTargetHeld ();
-  void setTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false;}}
-  bool getShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
+  void setTargetHeldClear();
+
+  //obstacle controller is running driveController needs to clear its waypoints
+  //gets asked by logic controller in controller interconnect
+  bool getShouldClearWaypoints();
 
 protected:
 

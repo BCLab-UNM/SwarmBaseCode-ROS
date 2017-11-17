@@ -17,38 +17,38 @@ void ObstacleController::Reset() {
 
 // Avoid crashing into objects detected by the ultraound
 void ObstacleController::avoidObstacle() {
-  
-    //obstacle on right side
-    if (right < 0.8 || center < 0.8 || left < 0.8) {
-      result.type = precisionDriving;
 
-      result.pd.cmdAngular = -K_angular;
+  //obstacle on right side
+  if (right < 0.8 || center < 0.8 || left < 0.8) {
+    result.type = precisionDriving;
 
-      result.pd.setPointVel = 0.0;
-      result.pd.cmdVel = 0.0;
-      result.pd.setPointYaw = 0;
-    }
+    result.pd.cmdAngular = -K_angular;
+
+    result.pd.setPointVel = 0.0;
+    result.pd.cmdVel = 0.0;
+    result.pd.setPointYaw = 0;
+  }
 }
 
 // A collection zone was seen in front of the rover and we are not carrying a target
 // so avoid running over the collection zone and possibly pushing cubes out.
 void ObstacleController::avoidCollectionZone() {
-  
-    result.type = precisionDriving;
 
-    result.pd.cmdVel = 0.0;
+  result.type = precisionDriving;
 
-    // Decide which side of the rover sees the most april tags and turn away
-    // from that side
-    if(count_left_collection_zone_tags < count_right_collection_zone_tags) {
-      result.pd.cmdAngular = K_angular;
-    } else {
-      result.pd.cmdAngular = -K_angular;
-    }
+  result.pd.cmdVel = 0.0;
 
-    result.pd.setPointVel = 0.0;
-    result.pd.cmdVel = 0.0;
-    result.pd.setPointYaw = 0;
+  // Decide which side of the rover sees the most april tags and turn away
+  // from that side
+  if(count_left_collection_zone_tags < count_right_collection_zone_tags) {
+    result.pd.cmdAngular = K_angular;
+  } else {
+    result.pd.cmdAngular = -K_angular;
+  }
+
+  result.pd.setPointVel = 0.0;
+  result.pd.cmdVel = 0.0;
+  result.pd.setPointYaw = 0;
 }
 
 
@@ -114,7 +114,7 @@ void ObstacleController::ProcessData() {
   //Process sonar info
   if(ignore_center_sonar){
     if(center > reactivate_center_sonar_threshold){
-      ignore_center_sonar = false;
+      //ignore_center_sonar = false; //look at sonar again beacuse center ultrasound has gone long
     }
     else{
       center = 3;
@@ -163,7 +163,7 @@ void ObstacleController::setTagData(vector<Tag> tags){
     for (int i = 0; i < tags.size(); i++) {
       if (tags[i].getID() == 256) {
 
-	collection_zone_seen = checkForCollectionZoneTags( tags );
+        collection_zone_seen = checkForCollectionZoneTags( tags );
         timeSinceTags = current_time;
       }
     }
@@ -172,20 +172,20 @@ void ObstacleController::setTagData(vector<Tag> tags){
 
 bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags ) {
 
-  for ( auto & tag : tags ) { 
+  for ( auto & tag : tags ) {
 
     // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle. If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle. This allows the robot to leave the collection zone after dropping off a target.
-    if ( tag.calcYaw() > 0 ) 
-      {
-	// checks if tag is on the right or left side of the image
-	if (tag.getPositionX() + camera_offset_correction > 0) {
-	  count_right_collection_zone_tags++;
-	  
-	} else {
-	  count_left_collection_zone_tags++;
-	}
+    if ( tag.calcYaw() > 0 )
+    {
+      // checks if tag is on the right or left side of the image
+      if (tag.getPositionX() + camera_offset_correction > 0) {
+        count_right_collection_zone_tags++;
+
+      } else {
+        count_left_collection_zone_tags++;
       }
-    
+    }
+
   }
 
 
@@ -225,7 +225,7 @@ bool ObstacleController::HasWork() {
 
 //ignore center ultrasound
 void ObstacleController::setIgnoreCenterSonar(){
-  ignore_center_sonar = true; 
+  ignore_center_sonar = true;
 }
 
 void ObstacleController::setCurrentTimeInMilliSecs( long int time )
@@ -233,7 +233,8 @@ void ObstacleController::setCurrentTimeInMilliSecs( long int time )
   current_time = time;
 }
 
-void ObstacleController::setTargetHeld() {
+void ObstacleController::setTargetHeld()
+{
   targetHeld = true;
 
 
@@ -243,4 +244,22 @@ void ObstacleController::setTargetHeld() {
     obstacleDetected = false;
     previousTargetState = true;
   }
+}
+
+void ObstacleController::setTargetHeldClear()
+{
+  if (targetHeld)
+  {
+    Reset();
+    targetHeld = false;
+    previousTargetState = false;
+    ignore_center_sonar = false;
+  }
+}
+
+void ObstacleController::getShouldClearWaypoints()
+{
+  bool tmp = clearWaypoints;
+  clearWaypoints = false;
+  return tmp;
 }
