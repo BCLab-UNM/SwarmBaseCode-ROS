@@ -244,3 +244,14 @@ void ObstacleController::setTargetHeld() {
     previousTargetState = true;
   }
 }
+
+void ObstacleController::setTargetHeldClear()
+{
+  if (targetHeld)
+  {
+    Reset();
+    targetHeld = false;
+    previousTargetState = false;
+    ignore_center_sonar = false;
+  }
+}
