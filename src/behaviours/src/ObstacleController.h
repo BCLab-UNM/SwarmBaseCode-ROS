@@ -21,7 +21,7 @@ public:
   void setIgnoreCenterSonar();
   void setCurrentTimeInMilliSecs( long int time );
   void setTargetHeld ();
-  void setTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false;}}
+  void setTargetHeldClear() {if (targetHeld) {Reset(); targetHeld = false; previousTargetState = false; ignore_center_sonar = false;}}
   bool getShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:

@@ -114,7 +114,7 @@ void ObstacleController::ProcessData() {
   //Process sonar info
   if(ignore_center_sonar){
     if(center > reactivate_center_sonar_threshold){
-      ignore_center_sonar = false;
+      //ignore_center_sonar = false; //look at sonar again beacuse center ultrasound has gone long
     }
     else{
       center = 3;
