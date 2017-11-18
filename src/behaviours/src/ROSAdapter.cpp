@@ -109,7 +109,7 @@ long int startTime = 0;
 float minutesTime = 0;
 float hoursTime = 0;
 
-float drift_tolerance = 5; // meters
+float drift_tolerance = 0.5; // meters
 
 Result result;
 
@@ -133,7 +133,7 @@ ros::Publisher waypointFeedbackPublisher;
 
 // Subscribers
 ros::Subscriber joySubscriber;
-ros::Subscriber modeSubscriber;
+ros::Subscriber modeSubscriber; 
 ros::Subscriber targetSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
@@ -150,7 +150,7 @@ time_t timerStartTime;
 
 // An initial delay to allow the rover to gather enough position data to 
 // average its location.
-unsigned int startDelayInSeconds = 15;
+unsigned int startDelayInSeconds = 30;
 float timerTimeElapsed = 0;
 
 //Transforms
