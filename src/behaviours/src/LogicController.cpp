@@ -374,6 +374,7 @@ void LogicController::SetModeAuto() {
   if(processState == PROCESS_STATE_MANUAL) {
     // only do something if we are in manual mode
     this->Reset();
+    manualWaypointController.Reset();
   }
 }
 void LogicController::SetModeManual()

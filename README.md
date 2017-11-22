@@ -87,24 +87,35 @@ sudo apt install git
 
 ##### 5. Install SwarmBaseCode-ROS
 
-1. Clone this GitHub repository to your home directory (~), renaming the repo so ROS and catkin can properly identify it (you can name the target directory whatever you like):
+1a. To update your existing repository using the base code (your competition repository name will have been provided to you):
+
+```
+cd YourRepositoryName
+git remote add SwarmBaseCode https://github.com/BCLab-UNM/SwarmBaseCode-ROS
+git pull SwarmBaseCode
+```
+
+#### OR
+
+If you just want a clean copy of the base code then:
+
+1b. Clone this GitHub repository to your home directory (~), renaming the repo so ROS and catkin can properly identify it (you can name the target directory whatever you like):
 
   ```
   cd ~
   git clone https://github.com/BCLab-UNM/SwarmBaseCode-ROS.git SwarmBaseCode-ROS
+  cd SwarmBaseCode-ROS
   ```
 
-2. Change your current working directory to the root directory of the downloaded repo.
 
-
-3. Set up [ublox](http://wiki.ros.org/ublox) GPS submodule and April Tag library:
+2. Set up [ublox](http://wiki.ros.org/ublox) GPS submodule and April Tag library:
 
   ```
   git submodule init
   git submodule update
   ```
 
-4. Compile SwarmBaseCode-ROS as a ROS catkin workspace:
+3. Compile SwarmBaseCode-ROS as a ROS catkin workspace:
  
   Make sure bash is aware of the location of the ROS environment:
   ```

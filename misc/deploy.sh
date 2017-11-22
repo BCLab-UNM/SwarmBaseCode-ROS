@@ -50,7 +50,7 @@ PullGit_Pack()
 				{
 					cd -;
 					echo 'Packing up the repository... ';
-					tar czf $dirName.tgz $dirPath;
+					tar czhf $dirName.tgz $dirPath;
 					exit 1;
 				}
 				read stuff;
@@ -75,7 +75,7 @@ Pack()
 			{ 
 				cd ~;
 				echo 'Packing up the repository... ';
-				tar czf $dirName.tgz $dirName;
+				tar czhf $dirName.tgz $dirName;
 				exit 0;
 			}
 			read stuff
@@ -297,9 +297,11 @@ if [ "$2" == "-S" ]; then
                         sleep 10
                     else
                         #Transfer/Unpack/Run
+                        cd ~
                         Transfer
                         Unpack_Run
                         sleep 10
+                        cd -
                     fi
 
                 #if not on the network
