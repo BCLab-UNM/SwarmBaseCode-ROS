@@ -126,9 +126,9 @@ namespace rqt_rover_gui {
 
 
     void addModelToGazebo();
-    QString addPowerLawTargets();
-    QString addUniformTargets();
-    QString addClusteredTargets();
+    QString addPowerLawTargets(QString number_of_tags);
+    QString addUniformTargets(QString number_of_tags);
+    QString addClusteredTargets(QString number_of_tags);
     QString addFinalsWalls();
     QString addPrelimsWalls();
 

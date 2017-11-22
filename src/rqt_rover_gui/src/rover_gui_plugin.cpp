@@ -1670,6 +1670,22 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         emit sendInfoLogMessage("A gazebo server simulation process is already running. Restart the Swarmathon GUI to clear.");
         return;
     }
+    
+    QString number_of_tags = ui.number_of_tags_combobox->currentText();
+    cout<<"number_of_tags.toInt()="<<number_of_tags.toInt()<<endl;
+    if(number_of_tags.toInt() > 256){
+      QMessageBox msgBox;
+      msgBox.setWindowTitle("Warning");
+      msgBox.setText("The number of targets is large, it may take more than 30 minutes to complete. Do you want to continue?");
+      msgBox.setStandardButtons(QMessageBox::Yes);
+      msgBox.addButton(QMessageBox::No);
+      msgBox.setDefaultButton(QMessageBox::No);
+      if(msgBox.exec() == QMessageBox::No){
+        clearSimulationButtonEventHandler();
+        return;
+      }
+    }
+    
 
     QProcess* sim_server_process = sim_mgr.startGazeboServer();
     connect(sim_server_process, SIGNAL(finished(int)), this, SLOT(gazeboServerFinishedEventHandler()));
@@ -1871,19 +1887,19 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if (ui.powerlaw_distribution_radio_button->isChecked())
     {
        emit sendInfoLogMessage("Adding powerlaw distribution of targets...");
-       return_msg = addPowerLawTargets();
+       return_msg = addPowerLawTargets(number_of_tags);
        emit sendInfoLogMessage(return_msg);
     }
     else if (ui.uniform_distribution_radio_button->isChecked())
     {
        emit sendInfoLogMessage("Adding uniform distribution of targets...");
-       return_msg = addUniformTargets();
+       return_msg = addUniformTargets(number_of_tags);
        emit sendInfoLogMessage(return_msg);
     }
     else if (ui.clustered_distribution_radio_button->isChecked())
     {
        emit sendInfoLogMessage("Adding clustered distribution of targets...");
-       return_msg = addClusteredTargets();
+       return_msg = addClusteredTargets(number_of_tags);
        emit sendInfoLogMessage(return_msg);
     }
 
@@ -1924,15 +1940,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
 {
-    if (!sim_mgr.isGazeboServerRunning())
-    {
-        emit sendInfoLogMessage("Simulation is not running.");
-
-        return;
-    }
-
-    emit sendInfoLogMessage("Ending simulation...");
-
+	emit sendInfoLogMessage("Ending simulation...");
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Shutting Down Rovers");
     progress_dialog.setCancelButton(NULL); // no cancel button
@@ -1958,7 +1966,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Unsubscribe from topics
 
     emit sendInfoLogMessage("Shutting down subscribers...");
-
     for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) 
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -2019,7 +2026,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     camera_subscriber.shutdown();
 
     emit sendInfoLogMessage("Shutting down publishers...");
-
+    
     for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -2142,13 +2149,24 @@ QString RoverGUIPlugin::stopROSJoyNode()
     }
 }
 
-QString RoverGUIPlugin::addUniformTargets()
+QString RoverGUIPlugin::addUniformTargets(QString number_of_tags)
 {
-    QString number_of_tags = ui.number_of_tags_combobox->currentText();
+    
 
+    /*QMessageBox msgBox;
+    msgBox.setText("Test");
+    msgBox.setWindowModality(Qt::NonModal);
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | 
+                               QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    */
+    
     QProgressDialog progress_dialog;
+    //QPushButton *button;
     progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets");
     progress_dialog.setCancelButton(NULL); // no cancel button
+    //progress_dialog.setCancelButtonText("Cancel"); 
     progress_dialog.setWindowModality(Qt::ApplicationModal);
     progress_dialog.resize(500, 50);
     progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -2189,9 +2207,9 @@ QString RoverGUIPlugin::addUniformTargets()
     return output;
 }
 
-QString RoverGUIPlugin::addClusteredTargets()
+QString RoverGUIPlugin::addClusteredTargets(QString number_of_tags)
 {
-    QString number_of_tags = ui.number_of_tags_combobox->currentText();
+    //QString number_of_tags = ui.number_of_tags_combobox->currentText();
 
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets into " + QString::number(number_of_tags.toInt()/64) + " Clusters (64 targets each)");
@@ -2248,9 +2266,9 @@ QString RoverGUIPlugin::addClusteredTargets()
     return output;
 }
 
-QString RoverGUIPlugin::addPowerLawTargets()
+QString RoverGUIPlugin::addPowerLawTargets(QString number_of_tags)
 {
-	QString number_of_tags = ui.number_of_tags_combobox->currentText();
+	//QString number_of_tags = ui.number_of_tags_combobox->currentText();
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets into Power Law pattern");
     progress_dialog.setCancelButton(NULL); // no cancel button

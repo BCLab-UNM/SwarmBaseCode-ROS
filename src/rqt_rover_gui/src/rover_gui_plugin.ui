@@ -1231,37 +1231,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <item>
        <property name="text">
-        <string>1280</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1024</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>512</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>256</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>128</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>64</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>32</string>
+        <string>0</string>
        </property>
       </item>
       <item>
@@ -1271,7 +1241,37 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </item>
       <item>
        <property name="text">
-        <string>0</string>
+        <string>32</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>64</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>128</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>256</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>512</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1024</string>
+       </property>
+      </item>
+     <item>
+       <property name="text">
+        <string>1280</string>
        </property>
       </item>
      </widget>
