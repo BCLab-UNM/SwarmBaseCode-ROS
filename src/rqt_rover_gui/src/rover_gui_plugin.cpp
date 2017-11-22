@@ -1678,7 +1678,6 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     }
     
     QString number_of_tags = ui.number_of_tags_combobox->currentText();
-    cout<<"number_of_tags.toInt()="<<number_of_tags.toInt()<<endl;
     if(number_of_tags.toInt() > 256){
       QMessageBox msgBox;
       msgBox.setWindowTitle("Warning");
