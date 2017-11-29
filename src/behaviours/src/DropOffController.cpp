@@ -1,27 +1,32 @@
+//This file deals with the rover's ability to drop off cubes
+// to the center collection disk
+
 #include "DropOffController.h"
 
 DropOffController::DropOffController() {
 
   reachedCollectionPoint = false;
-
+  //The result object is from the Result struct (see Result.h for more information)
   result.type = behavior;
+  //The b is of the BehaviorTrigger enum
   result.b = wait;
   result.wristAngle = 0.7;
   result.reset = false;
   interrupt = false;
 
   circularCenterSearching = false;
-  spinner = 0;
+  spinner = 0; //float
   centerApproach = false;
   seenEnoughCenterTags = false;
   prevCount = 0;
 
+  //Number of tags viewed
   countLeft = 0;
   countRight = 0;
 
   isPrecisionDriving = false;
   startWaypoint = false;
-  timerTimeElapsed = -1;
+  timerTimeElapsed = -1; //float
 
 }
 
@@ -31,8 +36,8 @@ DropOffController::~DropOffController() {
 
 Result DropOffController::DoWork() {
 
-  cout << "8" << endl;
-
+  //cout << "8" << endl; //Debugging statement
+  //Getting the total tag count from the left and the right side of the rover
   int count = countLeft + countRight;
 
   if(timerTimeElapsed > -1) {
@@ -45,7 +50,7 @@ Result DropOffController::DoWork() {
   //to resart our search.
   if(reachedCollectionPoint)
   {
-    cout << "2" << endl;
+    //cout << "2" << endl; //Debugging statement
     if (timerTimeElapsed >= 5)
     {
       if (finalInterrupt)
@@ -58,7 +63,7 @@ Result DropOffController::DoWork() {
       else
       {
         finalInterrupt = true;
-        cout << "1" << endl;
+        //cout << "1" << endl; //Debugging statement
       }
     }
     else if (timerTimeElapsed >= 0.1)
@@ -76,6 +81,7 @@ Result DropOffController::DoWork() {
     return result;
   }
 
+  //Calculates the shortest distance to the center location from the current location
   double distanceToCenter = hypot(this->centerLocation.x - this->currentLocation.x, this->centerLocation.y - this->currentLocation.y);
 
   //check to see if we are driving to the center location or if we need to drive in a circle and look.
@@ -135,8 +141,9 @@ Result DropOffController::DoWork() {
   if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
   {
 
-    cout << "9" << endl;
+    //cout << "9" << endl; //Debugging statement
     centerSeen = true;
+
 
     if (first_center && isPrecisionDriving)
     {
@@ -219,7 +226,7 @@ Result DropOffController::DoWork() {
     float timeSinceSeeingEnoughCenterTags = elapsed/1e3; // Convert from milliseconds to seconds
     if (timeSinceSeeingEnoughCenterTags > lostCenterCutoff)
     {
-      cout << "4" << endl;
+      //cout << "4" << endl;
       //go back to drive to center base location instead of drop off attempt
       reachedCollectionPoint = false;
       seenEnoughCenterTags = false;
@@ -256,6 +263,7 @@ Result DropOffController::DoWork() {
   return result;
 }
 
+//Reset to default values
 void DropOffController::Reset() {
   result.type = behavior;
   result.b = wait;
@@ -284,9 +292,10 @@ void DropOffController::Reset() {
   targetHeld = false;
   startWaypoint = false;
   first_center = true;
-  cout << "6" << endl;
+  //cout << "6" << endl;
 
 }
+
 
 void DropOffController::SetTargetData(vector<Tag> tags) {
   countRight = 0;
@@ -314,14 +323,17 @@ void DropOffController::SetTargetData(vector<Tag> tags) {
 
 }
 
+//Calculates the number of tags seen on the left and the right side of the rover
 void DropOffController::ProcessData() {
+  //If there are tags seen
   if((countLeft + countRight) > 0) {
-    isPrecisionDriving = true;
+      isPrecisionDriving = true;
   } else {
-    startWaypoint = true;
+      startWaypoint = true;
   }
 }
 
+//
 bool DropOffController::ShouldInterrupt() {
   ProcessData();
   if (startWaypoint && !interrupt) {
@@ -338,9 +350,12 @@ bool DropOffController::ShouldInterrupt() {
   }
 }
 
+//
 bool DropOffController::HasWork() {
-
+  //If the timer has started
   if(timerTimeElapsed > -1) {
+    //Calcuate the elapsed time from the current time and the time since
+    //it dropped a target (cube) to the center collection disk
     long int elapsed = current_time - returnTimer;
     timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
   }
@@ -352,26 +367,35 @@ bool DropOffController::HasWork() {
   return ((startWaypoint || isPrecisionDriving));
 }
 
+//
 bool DropOffController::IsChangingMode() {
   return isPrecisionDriving;
 }
 
+//Setter function to set the center location (the collection disk)
+//Of the Point class (x, y, theta)
 void DropOffController::SetCenterLocation(Point center) {
   centerLocation = center;
 }
 
+//Setter function to set the current location of the Point class (x, y, theta)
 void DropOffController::SetCurrentLocation(Point current) {
   currentLocation = current;
 }
 
+//Setter function to set the variable to true if a target (cube) has been picked up
+//And that it is currently holding the target (cube)
 void DropOffController::SetTargetPickedUp() {
   targetHeld = true;
 }
 
+//Setter function to stop the ultrasound from being blocked
+//In other words, to block the ultrasound or not
 void DropOffController::SetBlockBlockingUltrasound(bool blockBlock) {
   targetHeld = targetHeld || blockBlock;
 }
 
+//Setter function to set the current time (in milliseconds)
 void DropOffController::SetCurrentTimeInMilliSecs( long int time )
 {
   current_time = time;
