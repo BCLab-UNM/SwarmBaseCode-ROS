@@ -1,8 +1,15 @@
-//This file deals with the rover's ability to drop off cubes
-// to the center collection disk
+//This file deals with the rover's ability to drop off cubes to the center collection disk
+//There are only two forms of driving: precision driving and waypoints
+//Precision Driving == any controller (drive, pickup, dropoff, obstacle)
+//continously feeding data into the feedback loop needed for drive controls
+//has more precise control over rover's movements, more accurate of less than 1cm
+
+//Waypoint Driving == drive controller feeding one data point (waypoint coordinates)
+//with an accuracy of at least 15cm
 
 #include "DropOffController.h"
 
+//Constructor to set initial values
 DropOffController::DropOffController() {
 
   reachedCollectionPoint = false;
@@ -30,18 +37,22 @@ DropOffController::DropOffController() {
 
 }
 
+//Destructor
 DropOffController::~DropOffController() {
 
 }
 
+//
 Result DropOffController::DoWork() {
 
   //cout << "8" << endl; //Debugging statement
   //Getting the total tag count from the left and the right side of the rover
   int count = countLeft + countRight;
 
+  //If the timer has started
   if(timerTimeElapsed > -1) {
-
+    //Calcuate the elapsed time from the current time and the time since
+    //it dropped a target (cube) to the center collection disk
     long int elapsed = current_time - returnTimer;
     timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
   }
@@ -296,7 +307,7 @@ void DropOffController::Reset() {
 
 }
 
-
+//Individually calculates and sets the number of tags seen on the right and the left of the rover
 void DropOffController::SetTargetData(vector<Tag> tags) {
   countRight = 0;
   countLeft = 0;
@@ -323,7 +334,8 @@ void DropOffController::SetTargetData(vector<Tag> tags) {
 
 }
 
-//Calculates the number of tags seen on the left and the right side of the rover
+//Sets the driving mode (precision or waypoint) depending on the
+//number of tags seen on the left and the right side of the rover
 void DropOffController::ProcessData() {
   //If there are tags seen
   if((countLeft + countRight) > 0) {
@@ -335,6 +347,7 @@ void DropOffController::ProcessData() {
 
 //
 bool DropOffController::ShouldInterrupt() {
+  //Determine the driving mode (precision or waypoint)
   ProcessData();
   if (startWaypoint && !interrupt) {
     interrupt = true;
@@ -367,7 +380,7 @@ bool DropOffController::HasWork() {
   return ((startWaypoint || isPrecisionDriving));
 }
 
-//
+//Checking function to see if the driving mode (precision or waypoint) has been changed
 bool DropOffController::IsChangingMode() {
   return isPrecisionDriving;
 }
