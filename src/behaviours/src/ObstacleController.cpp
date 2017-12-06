@@ -172,7 +172,7 @@ void ObstacleController::setTagData(vector<Tag> tags){
 
   // this loop is to get the number of center tags
   if (!targetHeld) {
-    for (int i = 0; i < tags.size(); i++) { //redudant for loop
+    for (int i = 0; i < tags.size(); i++) { //redundant for loop
       if (tags[i].getID() == 256) {
 
 	collection_zone_seen = checkForCollectionZoneTags( tags );
