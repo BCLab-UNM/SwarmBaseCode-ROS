@@ -18,7 +18,7 @@ Diagnostics::Diagnostics(std::string name) {
 
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
-  diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 10);
+  diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 1);
   fingerAngleSubscribe = nodeHandle.subscribe(publishedName + "/fingerAngle/prev_cmd", 10, &Diagnostics::fingerTimestampUpdate, this);
   wristAngleSubscribe = nodeHandle.subscribe(publishedName + "/fingerAngle/prev_cmd", 10, &Diagnostics::wristTimestampUpdate, this);
   imuSubscribe = nodeHandle.subscribe(publishedName + "/imu", 10, &Diagnostics::imuTimestampUpdate, this);
