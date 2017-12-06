@@ -35,7 +35,7 @@ Result DriveController::DoWork()
   {
     if(result.b == noChange)
     {
-      //if drive controller gets a no change command it is allowed to continue its previouse action
+      //if drive controller gets a no change command it is allowed to continue its previous action
       //normally this will be to follow waypoints but it is not specified as such.
     }
 
@@ -68,7 +68,7 @@ Result DriveController::DoWork()
   {
 
   //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
-  //This should be d one as little as possible. I Suggest to Use timeouts to set control bools false.
+  //This should be d one as little as possible. I suggest using timeouts to set control bools to false.
   //Then only call INTERUPT if bool switches to true.
   case STATE_MACHINE_PRECISION_DRIVING:
   {
@@ -81,7 +81,7 @@ Result DriveController::DoWork()
   case STATE_MACHINE_WAYPOINTS:
   {
 
-    //Handles route planning and navigation as well as makeing sure all waypoints are valid.
+    //Handles route planning and navigation as well as making sure all waypoints are valid.
 
     bool tooClose = true;
     //while we have waypoints and they are tooClose to drive to
@@ -100,7 +100,7 @@ Result DriveController::DoWork()
       }
     }
     
-    //if we are out of waypoints interupt and return to logic controller
+    //if we are out of waypoints then interupt and return to logic controller
     if (waypoints.empty())
     {
       stateMachineState = STATE_MACHINE_WAITING;
