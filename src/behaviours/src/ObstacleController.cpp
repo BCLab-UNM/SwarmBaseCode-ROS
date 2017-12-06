@@ -5,7 +5,7 @@ ObstacleController::ObstacleController()
   obstacleAvoided = true;
   obstacleDetected = false;
   obstacleInterrupt = false;
-  result.PIDMode = CONST_PID; //use the const PID to turn at a constand speed
+  result.PIDMode = CONST_PID; //use the const PID to turn at a constant speed
 }
 
 
