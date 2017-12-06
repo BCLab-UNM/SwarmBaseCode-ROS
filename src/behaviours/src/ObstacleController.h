@@ -24,6 +24,7 @@ public:
 
   // Checks if a target is held and if so resets the state of the obestacle controller otherwise does nothing
   void setTargetHeldClear();
+  //Asked by logiccontroller to determine if drive controller should have its waypoints cleared
   bool getShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
 protected:
@@ -42,10 +43,10 @@ private:
   // and are those AprilTags oriented towards or away from the camera.
   bool checkForCollectionZoneTags( vector<Tag> );
   
-  const float K_angular = 1.0; //radians a second
-  const float reactivate_center_sonar_threshold = 0.8;
-  const int targetCountPivot = 6;
-  const float obstacleDistancePivot = 0.2526;
+  const float K_angular = 1.0; //radians a second turn rate to avoid obstacles
+  const float reactivate_center_sonar_threshold = 0.8; //reactive center sonar if it goes back above this distance, assuming it is deactivated
+  const int targetCountPivot = 6; ///unused variable
+  const float obstacleDistancePivot = 0.2526; ///unused variable
   const float triggerDistance = 0.8;
 
   /*
@@ -53,14 +54,14 @@ private:
      */
 
 
-  bool obstacleInterrupt;
-  bool obstacleDetected;
-  bool obstacleAvoided;
-  bool clearWaypoints = false;
+  bool obstacleInterrupt; //records if obstacle has interupted
+  bool obstacleDetected;  //records if an obstacle has been detected
+  bool obstacleAvoided; //record if an obstacke has been avoided
+  bool clearWaypoints = false;  //record if drivecontrollers waypoints should be cleared
 
-  float left = 0;
-  float center = 0;
-  float right = 0;
+  float left = 0; //distance on left ultrasound
+  float center = 0; //distance on center ultrasound
+  float right = 0; //distance on right ultrasound
 
   unsigned int count_left_collection_zone_tags;
   unsigned int count_right_collection_zone_tags;
