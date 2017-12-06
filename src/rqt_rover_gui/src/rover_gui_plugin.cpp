@@ -160,8 +160,10 @@ namespace rqt_rover_gui
 
     connect(ui.custom_world_path_button, SIGNAL(pressed()), this, SLOT(customWorldButtonEventHandler()));
     connect(ui.custom_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customWorldRadioButtonEventHandler(bool)));
-    connect(ui.powerlaw_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(powerlawDistributionRadioButtonEventHandler(bool)));
+    connect(ui.powerlaw_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customNumCubesRadioButtonEventHandler(bool)));
     connect(ui.unbounded_radio_button, SIGNAL(toggled(bool)), this, SLOT(unboundedRadioButtonEventHandler(bool)));
+    connect(ui.uniform_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customNumCubesRadioButtonEventHandler(bool)));
+    connect(ui.clustered_distribution_radio_button, SIGNAL(toggled(bool)), this, SLOT(customNumCubesRadioButtonEventHandler(bool)));
     connect(ui.override_num_rovers_checkbox, SIGNAL(toggled(bool)), this, SLOT(overrideNumRoversCheckboxToggledEventHandler(bool)));
     connect(ui.create_savable_world_checkbox, SIGNAL(toggled(bool)), this, SLOT(createSavableWorldCheckboxToggledEventHandler(bool)));
 
@@ -203,8 +205,10 @@ namespace rqt_rover_gui
     // Make the custom rover number combo box look greyed out to begin with
     ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
 
+
+    ui.number_of_tags_combobox->setEnabled(false);
+    ui.number_of_tags_combobox->setStyleSheet("color: grey; border:1px solid grey;");
     ui.tab_widget->setCurrentIndex(0);
-    ui.log_tab->setCurrentIndex(1);
 
     ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
@@ -1476,7 +1480,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
         }
     }
 
-    // Experiment Timer END
+    //Experiment Timer END
 }
 
 double RoverGUIPlugin::getHours(double seconds) {
@@ -1596,6 +1600,20 @@ void RoverGUIPlugin::customWorldButtonEventHandler()
     ui.custom_world_path->setText(fi.baseName());
 }
 
+void RoverGUIPlugin::customNumCubesRadioButtonEventHandler(bool toggled)
+{
+	ui.number_of_tags_combobox->setEnabled(toggled);
+	if(toggled)
+	{
+	  ui.number_of_tags_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
+	}
+	else
+	{
+	  ui.number_of_tags_combobox->setStyleSheet("color: grey; border:2px solid grey;");
+	}
+	
+}
+
 // Enable or disable custom distributions
 void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
 {
@@ -1622,25 +1640,6 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
     }
 }
 
-// Currently, we cannot use the power law distribution with custon numbers of cubes.
-// I.E., we always use 256 tags, so disable the option to change the number of cubes when
-// generating a power law distribution. If we add dynamic power law distribution generation
-// in the future this block can be removed.
-void RoverGUIPlugin::powerlawDistributionRadioButtonEventHandler(bool toggled)
-{
-    ui.number_of_tags_combobox->setEnabled(!toggled);
-
-    if(!toggled)
-    {
-        ui.number_of_tags_label->setStyleSheet("color: white;");
-        ui.number_of_tags_combobox->setStyleSheet("color: white; border:2px solid white; padding: 1px 0px 1px 3px");
-    }
-    else
-    {
-        ui.number_of_tags_label->setStyleSheet("color: grey;");
-        ui.number_of_tags_combobox->setStyleSheet("color: grey; border:2px solid grey; padding: 1px 0px 1px 3px");
-    }
-}
 
 void RoverGUIPlugin::unboundedRadioButtonEventHandler(bool toggled)
 {
@@ -1677,6 +1676,21 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         emit sendInfoLogMessage("A gazebo server simulation process is already running. Restart the Swarmathon GUI to clear.");
         return;
     }
+    
+    QString number_of_tags = ui.number_of_tags_combobox->currentText();
+    if(number_of_tags.toInt() > 256){
+      QMessageBox msgBox;
+      msgBox.setWindowTitle("Warning");
+      msgBox.setText("The number of targets is large, it may take more than 30 minutes to complete. Do you want to continue?");
+      msgBox.setStandardButtons(QMessageBox::Yes);
+      msgBox.addButton(QMessageBox::No);
+      msgBox.setDefaultButton(QMessageBox::No);
+      if(msgBox.exec() == QMessageBox::No){
+        clearSimulationButtonEventHandler();
+        return;
+      }
+    }
+    
 
     QProcess* sim_server_process = sim_mgr.startGazeboServer();
     connect(sim_server_process, SIGNAL(finished(int)), this, SLOT(gazeboServerFinishedEventHandler()));
@@ -1745,7 +1759,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if(!ui.create_savable_world_checkbox->isChecked())
     {
         int n_rovers_created = 0;
-        int n_rovers = 3;
+        int n_rovers = 0;
         if (ui.final_radio_button->isChecked()) n_rovers = 6;
 
         // If the user chose to override the number of rovers to add to the simulation read the selected value
@@ -1878,19 +1892,19 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if (ui.powerlaw_distribution_radio_button->isChecked())
     {
        emit sendInfoLogMessage("Adding powerlaw distribution of targets...");
-       return_msg = addPowerLawTargets();
+       return_msg = addPowerLawTargets(number_of_tags);
        emit sendInfoLogMessage(return_msg);
     }
     else if (ui.uniform_distribution_radio_button->isChecked())
     {
        emit sendInfoLogMessage("Adding uniform distribution of targets...");
-       return_msg = addUniformTargets();
+       return_msg = addUniformTargets(number_of_tags);
        emit sendInfoLogMessage(return_msg);
     }
     else if (ui.clustered_distribution_radio_button->isChecked())
     {
        emit sendInfoLogMessage("Adding clustered distribution of targets...");
-       return_msg = addClusteredTargets();
+       return_msg = addClusteredTargets(number_of_tags);
        emit sendInfoLogMessage(return_msg);
     }
 
@@ -1931,15 +1945,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
 
 void RoverGUIPlugin::clearSimulationButtonEventHandler()
 {
-    if (!sim_mgr.isGazeboServerRunning())
-    {
-        emit sendInfoLogMessage("Simulation is not running.");
-
-        return;
-    }
-
-    emit sendInfoLogMessage("Ending simulation...");
-
+	emit sendInfoLogMessage("Ending simulation...");
     QProgressDialog progress_dialog;
     progress_dialog.setWindowTitle("Shutting Down Rovers");
     progress_dialog.setCancelButton(NULL); // no cancel button
@@ -1965,7 +1971,6 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     // Unsubscribe from topics
 
     emit sendInfoLogMessage("Shutting down subscribers...");
-
     for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) 
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -2026,7 +2031,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     camera_subscriber.shutdown();
 
     emit sendInfoLogMessage("Shutting down publishers...");
-
+    
     for (map<string,ros::Publisher>::iterator it=control_mode_publishers.begin(); it!=control_mode_publishers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -2152,13 +2157,24 @@ QString RoverGUIPlugin::stopROSJoyNode()
     }
 }
 
-QString RoverGUIPlugin::addUniformTargets()
+QString RoverGUIPlugin::addUniformTargets(QString number_of_tags)
 {
-    QString number_of_tags = ui.number_of_tags_combobox->currentText();
+    
 
+    /*QMessageBox msgBox;
+    msgBox.setText("Test");
+    msgBox.setWindowModality(Qt::NonModal);
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | 
+                               QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    */
+    
     QProgressDialog progress_dialog;
+    //QPushButton *button;
     progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets");
     progress_dialog.setCancelButton(NULL); // no cancel button
+    //progress_dialog.setCancelButtonText("Cancel"); 
     progress_dialog.setWindowModality(Qt::ApplicationModal);
     progress_dialog.resize(500, 50);
     progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -2181,9 +2197,10 @@ QString RoverGUIPlugin::addUniformTargets()
     {
         do
         {
-            emit sendInfoLogMessage("Tried to place target "+QString::number(0)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y) + "...");
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
+	    emit sendInfoLogMessage("Tried to place target "+QString::number(0)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y) + "...");
+
         }
         while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
 
@@ -2198,44 +2215,12 @@ QString RoverGUIPlugin::addUniformTargets()
     return output;
 }
 
-QString RoverGUIPlugin::addClusteredTargets()
+QString RoverGUIPlugin::addClusteredTargets(QString number_of_tags)
 {
-    QString number_of_tags = ui.number_of_tags_combobox->currentText();
-    int cluster_length = 0;
-    int cluster_width = 0;
-
-    switch(number_of_tags.toInt())
-    {
-        case 256:
-            cluster_length = 8;
-            cluster_width = 8;
-            break;
-        case 128:
-            cluster_length = 8;
-            cluster_width = 4;
-            break;
-        case 64:
-            cluster_length = 4;
-            cluster_width = 4;
-            break;
-        case 32:
-            cluster_length = 4;
-            cluster_width = 2;
-            break;
-        case 16:
-            cluster_length = 2;
-            cluster_width = 2;
-            break;
-        case 0:
-            cluster_length = 0;
-            cluster_width = 0;
-        default:
-            cluster_length = 1;
-            cluster_width = 1;
-    }
+    //QString number_of_tags = ui.number_of_tags_combobox->currentText();
 
     QProgressDialog progress_dialog;
-    progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets into four " + QString::number(cluster_length) + " x " + QString::number(cluster_width) + " clusters");
+    progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets into " + QString::number(number_of_tags.toInt()/64) + " Clusters (64 targets each)");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
     progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -2247,15 +2232,14 @@ QString RoverGUIPlugin::addClusteredTargets()
     float proposed_x, proposed_x2;
     float proposed_y, proposed_y2;
 
-    float target_cluster_clearance = target_cluster_size_1_clearance * ((cluster_length > cluster_width) ? (cluster_length) : (cluster_width));
-    float d = arena_dim/2.0-(barrier_clearance+target_cluster_clearance);
+    float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_64_clearance);
     int cube_index = 0;
 
     progress_dialog.setValue(0.0);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-    // Four piles
-    for (int i = 0; i < 4; i++)
+    //(number_of_tags/64) piles of 64
+    for (int i = 0; i < number_of_tags.toInt()/64; i++)
     {
         do
         {
@@ -2263,18 +2247,19 @@ QString RoverGUIPlugin::addClusteredTargets()
             proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
             proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
         }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_clearance));
+        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
 
-        proposed_y2 = proposed_y - (target_cluster_size_1_clearance * cluster_length);
 
-        for(int j = 0; j < cluster_length; j++) {
-            proposed_x2 = proposed_x - (target_cluster_size_1_clearance * cluster_width);
+        proposed_y2 = proposed_y - (target_cluster_size_1_clearance * 8);
 
-            for(int k = 0; k < cluster_width; k++) {
+        for(int j = 0; j < 8; j++) {
+            proposed_x2 = proposed_x - (target_cluster_size_1_clearance * 8);
+
+            for(int k = 0; k < 8; k++) {
                 output += sim_mgr.addModel(QString("at")+QString::number(0),  QString("at")+QString::number(cube_index), proposed_x2, proposed_y2, 0, target_cluster_size_1_clearance);
                 proposed_x2 += target_cluster_size_1_clearance;
                 cube_index++;
-                progress_dialog.setValue(cube_index*100.0f/256);
+                progress_dialog.setValue(cube_index*100.0f/number_of_tags.toInt());
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             }
 
@@ -2284,15 +2269,16 @@ QString RoverGUIPlugin::addClusteredTargets()
         emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
     }
 
-    emit sendInfoLogMessage("Placed four " + QString::number(cluster_length) + " x " + QString::number(cluster_width) + " clusters of targets");
+    emit sendInfoLogMessage("Placed " + QString::number(number_of_tags.toInt()/64) + " clusters of 64 targets");
 
     return output;
 }
 
-QString RoverGUIPlugin::addPowerLawTargets()
+QString RoverGUIPlugin::addPowerLawTargets(QString number_of_tags)
 {
+	//QString number_of_tags = ui.number_of_tags_combobox->currentText();
     QProgressDialog progress_dialog;
-    progress_dialog.setWindowTitle("Placing 256 Targets into 85 Clusters (Power Law pattern)");
+    progress_dialog.setWindowTitle("Placing " + number_of_tags + " Targets into Power Law pattern");
     progress_dialog.setCancelButton(NULL); // no cancel button
     progress_dialog.setWindowModality(Qt::ApplicationModal);
     progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -2300,128 +2286,102 @@ QString RoverGUIPlugin::addPowerLawTargets()
     progress_dialog.show();
 
 
-    float total_number_of_clusters = 85;
+    //float total_number_of_clusters = 85;
     float clusters_placed = 0;
     int cube_index = 0;
+    int maxTrials      = 200;
+    int trialCount     = 0;
+    int powerLawLength = 1;
+    int FoodCount =0;
+    int foodPlaced = 0;
+    int priorPowerRank =0;
+    int PowerRank =0;
+    int power4 =0;
+    int diffFoodCount =0;
+    int singleClusterCount =0;
+    int otherClusterCount =0; 
+    int modDiff =0;
+    int target_cluster_size_clearance;
+    vector<int> clusterNums;
+	vector<int> clusterWidths; 
 
     QString output = "";
 
     float proposed_x, proposed_x2;
     float proposed_y, proposed_y2;
 
-    float d = arena_dim/2.0-(barrier_clearance+target_cluster_size_64_clearance);
+    float d;
 
     progress_dialog.setValue(0.0);
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
-    // One pile of 64
-    do
-    {
-        emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-        proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
-        proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
+    while (FoodCount < number_of_tags.toInt()){
+        priorPowerRank++;
+        power4 = pow (4.0, priorPowerRank);
+        FoodCount = power4 + priorPowerRank * power4;
     }
-    while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_64_clearance));
-
-    proposed_y2 = proposed_y - (target_cluster_size_1_clearance * 8);
-
-    for(int j = 0; j < 8; j++) {
-        proposed_x2 = proposed_x - (target_cluster_size_1_clearance * 8);
-
-        for(int k = 0; k < 8; k++) {
-            output += sim_mgr.addModel(QString("at")+QString::number(0),  QString("at")+QString::number(cube_index), proposed_x2, proposed_y2, 0, target_cluster_size_1_clearance);
-            proposed_x2 += target_cluster_size_1_clearance;
-            cube_index++;
-            progress_dialog.setValue(cube_index*100.0f/256);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        }
-
-        proposed_y2 += target_cluster_size_1_clearance;
+    PowerRank = priorPowerRank + 1;
+    diffFoodCount = FoodCount - number_of_tags.toInt();
+    modDiff = diffFoodCount % PowerRank;
+    
+    if (number_of_tags.toInt() % PowerRank == 0){
+        singleClusterCount = number_of_tags.toInt() / PowerRank;
+        otherClusterCount = singleClusterCount;
     }
+    else {
+        otherClusterCount = number_of_tags.toInt() / PowerRank + 1;
+        singleClusterCount = otherClusterCount - modDiff;
+    }
+    
+    for(int i = 0; i < PowerRank; i++) {
+		clusterNums.push_back(powerLawLength * powerLawLength);
+		powerLawLength *= 2;
+	}
 
-    emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
-    d = arena_dim/2.0-(barrier_clearance+target_cluster_size_16_clearance);
-
-    // Four piles of 16
-    for (int i = 0; i < 4; i++)
-    {
-        do
-        {
-            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
-            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
-            emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-        }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_16_clearance));
-
-        proposed_y2 = proposed_y - (target_cluster_size_1_clearance * 4);
-
-        for(int j = 0; j < 4; j++) {
-            proposed_x2 = proposed_x - (target_cluster_size_1_clearance * 4);
-
-            for(int k = 0; k < 4; k++) {
-                output += sim_mgr.addModel(QString("at")+QString::number(0),  QString("at")+QString::number(cube_index), proposed_x2, proposed_y2, 0, target_cluster_size_1_clearance);
+	for(int i = 0; i < PowerRank; i++) {
+		powerLawLength /= 2;
+		clusterWidths.push_back(powerLawLength);
+	}
+    
+    for(int h = 0; h < clusterNums.size(); h++) {
+	  for(int i = 0; i < clusterNums[h]; i++) {
+		  target_cluster_size_clearance = 0.1*clusterWidths[h];
+		  d = arena_dim/2.0-(barrier_clearance+ target_cluster_size_clearance);
+		  
+		  do
+          {
+           proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
+           proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
+          }
+          while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_clearance));
+          
+          emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
+          clusters_placed++;             
+		   
+		  proposed_y2 = proposed_y - target_cluster_size_clearance;
+		   
+          for(int j = 0; j < clusterWidths[h]; j++) {
+			  proposed_x2 = proposed_x - target_cluster_size_clearance;
+		      for(int k = 0; k < clusterWidths[h]; k++) { 
+			    output += sim_mgr.addModel(QString("at")+QString::number(0),  QString("at")+QString::number(cube_index), proposed_x2, proposed_y2, 0, target_cluster_size_1_clearance);
                 proposed_x2 += target_cluster_size_1_clearance;
                 cube_index++;
-                progress_dialog.setValue(cube_index*100.0f/256);
+                progress_dialog.setValue(cube_index*100.0f/number_of_tags.toInt());
                 qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            }
-
-            proposed_y2 += target_cluster_size_1_clearance;
-        }
-
-        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
-    }
-
-    d = arena_dim/2.0-(barrier_clearance+target_cluster_size_4_clearance);
-
-    // Sixteen piles of 4
-    for (int i = 0; i < 16; i++)
-    {
-        do
-        {
-            emit sendInfoLogMessage("Tried to place cluster "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
-            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
-        }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_4_clearance));
-
-        proposed_y2 = proposed_y - (target_cluster_size_1_clearance * 2);
-
-        for(int j = 0; j < 2; j++) {
-            proposed_x2 = proposed_x - (target_cluster_size_1_clearance * 2);
-
-            for(int k = 0; k < 2; k++) {
-                output += sim_mgr.addModel(QString("at")+QString::number(0),  QString("at")+QString::number(cube_index), proposed_x2, proposed_y2, 0, target_cluster_size_1_clearance);
-                proposed_x2 += target_cluster_size_1_clearance;
-                cube_index++;
-                progress_dialog.setValue(cube_index*100.0f/256);
-                qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-            }
-
-            proposed_y2 += target_cluster_size_1_clearance;
-        }
-
-        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
-    }
-
-    d = arena_dim/2.0-(barrier_clearance+target_cluster_size_1_clearance);
-
-    // Sixty-four piles of 1 (using tags 192 through 255 to avoid duplication with piles above)
-    for (int i = 192; i < 256; i++)
-    {
-        do
-        {
-            emit sendInfoLogMessage("Tried to place target "+QString::number(clusters_placed)+" at " + QString::number(proposed_x) + " " + QString::number(proposed_y));
-            proposed_x = d - ((float) rand()) / RAND_MAX*2*d;
-            proposed_y = d - ((float) rand()) / RAND_MAX*2*d;
-        }
-        while (sim_mgr.isLocationOccupied(proposed_x, proposed_y, target_cluster_size_1_clearance));
-
-        progress_dialog.setValue(i*100.0f/256);
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
-        output+= sim_mgr.addModel(QString("at")+QString::number(0), QString("at")+QString::number(i), proposed_x, proposed_y, 0, target_cluster_size_1_clearance);
-    }
+            
+            
+			    foodPlaced++;
+			    if (foodPlaced == singleClusterCount + h * otherClusterCount) break;
+		      }
+               proposed_y2 += target_cluster_size_1_clearance;
+               
+		      if (foodPlaced == singleClusterCount + h * otherClusterCount) break;
+	      }
+		  emit sendInfoLogMessage("<font color=green>Succeeded.</font>");
+		  
+		  if (foodPlaced == singleClusterCount + h * otherClusterCount) break;
+	  }
+	}
 
     return output;
 }

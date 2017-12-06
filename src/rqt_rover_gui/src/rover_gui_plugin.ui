@@ -1231,22 +1231,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </property>
       <item>
        <property name="text">
-        <string>256</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>128</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>64</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>32</string>
+        <string>0</string>
        </property>
       </item>
       <item>
@@ -1256,7 +1241,37 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
       </item>
       <item>
        <property name="text">
-        <string>0</string>
+        <string>32</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>64</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>128</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>256</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>512</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1024</string>
+       </property>
+      </item>
+     <item>
+       <property name="text">
+        <string>1280</string>
        </property>
       </item>
      </widget>
@@ -1279,25 +1294,6 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="number_of_tags_label_2">
-      <property name="geometry">
-       <rect>
-        <x>280</x>
-        <y>80</y>
-        <width>231</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;*not available for Power Law or Custom World&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-      </property>
-     </widget>
      <zorder>round_type_button_group</zorder>
      <zorder>target_distribution_group_box</zorder>
      <zorder>custom_world_path_button</zorder>
@@ -1310,7 +1306,6 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
      <zorder>simulation_timer_label</zorder>
      <zorder>create_savable_world_checkbox</zorder>
      <zorder>number_of_tags_label</zorder>
-     <zorder>number_of_tags_label_2</zorder>
      <zorder>number_of_tags_combobox</zorder>
     </widget>
     <widget class="QLabel" name="label_7">
