@@ -5,7 +5,7 @@ ObstacleController::ObstacleController()
   obstacleAvoided = true;
   obstacleDetected = false;
   obstacleInterrupt = false;
-  result.PIDMode = CONST_PID; //use the const PID to turn at a constand speed
+  result.PIDMode = CONST_PID; //use the const PID to turn at a constant speed
 }
 
 
@@ -264,7 +264,7 @@ void ObstacleController::setTargetHeld() {
 
 void ObstacleController::setTargetHeldClear()
 {
-  //adjust current state on transition from cube held to not cube helf
+  //adjust current state on transition from cube held to cube not held
   if (targetHeld)
   {
     Reset();
