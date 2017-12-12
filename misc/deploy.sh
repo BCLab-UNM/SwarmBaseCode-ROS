@@ -114,7 +114,7 @@ Run()
 	#ssh and run script from rover --WORKS
 	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$roverIP\007';
 		ssh -t swarmie@$roverIP 'echo 'Running $roverIP';
-		cd SwarmBaseCode-ROS/misc;
+    cd $dirName/misc;
 		./rover_onboard_node_launch.sh $hostName;
 		exit 1;
 		exit 1;
