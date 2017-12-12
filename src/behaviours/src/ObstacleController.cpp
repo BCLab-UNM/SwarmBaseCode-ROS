@@ -172,7 +172,7 @@ void ObstacleController::setTagData(vector<Tag> tags){
 
   // this loop is to get the number of center tags
   if (!targetHeld) {
-    for (int i = 0; i < tags.size(); i++) { //redudant for loop
+    for (int i = 0; i < tags.size(); i++) { //redundant for loop
       if (tags[i].getID() == 256) {
 
 	collection_zone_seen = checkForCollectionZoneTags( tags );
@@ -264,7 +264,7 @@ void ObstacleController::setTargetHeld() {
 
 void ObstacleController::setTargetHeldClear()
 {
-  //adjust current state on transition from cube held to not cube helf
+  //adjust current state on transition from cube held to cube not held
   if (targetHeld)
   {
     Reset();

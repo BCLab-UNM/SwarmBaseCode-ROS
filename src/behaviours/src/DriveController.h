@@ -24,13 +24,15 @@ private:
 
   Result result;
 
-  float left;
-  float right;
+  //MAX PWM is 255
+  //abridge currently limits MAX to 120 to prevent overcurrent draw
+  float left; //left wheels PWM value
+  float right; //right wheels PWM value
 
-  bool interupt = false;
+  bool interupt = false; //hold if interupt has occured yet
 
   float rotateOnlyAngleTolerance = 0.05;  //May be too low?
-  float finalRotationTolerance = 0.1;
+  float finalRotationTolerance = 0.1; //dead code not used
   const float waypointTolerance = 0.15; //15 cm tolerance.
 
   //0.65 MAX value
@@ -62,6 +64,8 @@ private:
   void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
   void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
 
+  //each PID movement paradigm needs at minimum two PIDs to acheive good robot motion.
+  //one PID is for linear movement and the second for rotational movements
   PID fastVelPID;
   PID fastYawPID;
 
