@@ -371,7 +371,7 @@ PIDConfig DriveController::fastVelConfig()
   config.alwaysIntegral = true; //should the integral alway be on or only when there is error
   config.resetOnSetpoint = true; //reset the integral and error history whent he setpoint changes
   config.feedForwardMultiplier = 610; //gives 127 pwm at 0.4 commandedspeed  ORIG:320
-  config.integralDeadZone = 0.01; //set the integral dead zone, preventd integral from growing or shrinking do to noise
+  config.integralDeadZone = 0.01; //set the integral dead zone, prevented integral from growing or shrinking do to noise
   config.integralErrorHistoryLength = 10000; //how many time ticks should error history should be stored for integration
   config.integralMax = config.satUpper/2; //what is the limit of the integral output for the PID
   config.derivativeAlpha = 0.7; //dead code not used
