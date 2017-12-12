@@ -129,6 +129,8 @@ ros::Publisher wristAnglePublish;
 ros::Publisher infoLogPublisher;
 ros::Publisher driveControlPublish;
 ros::Publisher heartbeatPublisher;
+// Publishes swarmie_msgs::Waypoint messages on "/<robot>/waypooints"
+// to indicate when waypoints have been reached.
 ros::Publisher waypointFeedbackPublisher;
 
 // Subscribers
@@ -138,6 +140,8 @@ ros::Subscriber targetSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
 ros::Subscriber virtualFenceSubscriber;
+// manualWaypointSubscriber listens on "/<robot>/waypoints/cmd" for
+// swarmie_msgs::Waypoint messages.
 ros::Subscriber manualWaypointSubscriber;
 
 // Timers
@@ -382,6 +386,8 @@ void behaviourStateMachine(const ros::TimerEvent&)
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
 
+    // poll the logicController to get the waypoints that have been
+    // reached.
     std::vector<int> cleared_waypoints = logicController.GetClearedWaypoints();
 
     for(std::vector<int>::iterator it = cleared_waypoints.begin();
@@ -395,9 +401,12 @@ void behaviourStateMachine(const ros::TimerEvent&)
     result = logicController.DoWork();
     if(result.type != behavior || result.b != wait)
     {
+      // if the logic controller requested that the robot drive, then
+      // drive. Otherwise there are no manual waypoints and the robot
+      // should sit idle. (ie. only drive according to joystick
+      // input).
       sendDriveCommand(result.pd.left,result.pd.right);
     }
-    //cout << endl;
   }
 
   // publish state machine string for user, only if it has changed, though

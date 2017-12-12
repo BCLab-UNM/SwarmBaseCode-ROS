@@ -226,6 +226,7 @@ void LogicController::ProcessData()
     };
   }
   else if (processState == PROCESS_STATE_MANUAL) {
+    // under manual control only the manual waypoint controller is active
     prioritizedControllers = {
       PrioritizedController{-1, (Controller*)(&searchController)},
       PrioritizedController{-1, (Controller*)(&obstacleController)},
