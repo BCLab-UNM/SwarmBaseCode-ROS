@@ -431,7 +431,14 @@ void sendDriveCommand(double left, double right)
  *************************/
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
-  
+
+  // Don't pass April tag data to the logic controller if the robot is not in autonomous mode.
+  // This is to make sure autonomous behaviours are not triggered while the rover is in manual mode. 
+  if(currentMode == 0 || currentMode == 1) 
+  { 
+    return; 
+  }
+
   if (message->detections.size() > 0) {
     vector<Tag> tags;
 
