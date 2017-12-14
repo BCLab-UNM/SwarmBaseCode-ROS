@@ -1,8 +1,8 @@
-// Driver for the diagnostics module. Provides an start point for the OS.
-// This driver's only job is to instantiate the Diagnostics class, handle ROS initialization,
-// allow ROS to handle events (spin), and determine the name to publish under (command line
-// argument or, if none, the hostname).
-//  
+// Application entry point for Diagnostics node:
+//   -instantiates the diagnostics classes
+//   -ROS initializations
+//   -process ROS events
+//   -determine the name to publish under from command line argument or hostname
 
 #include "Diagnostics.h"
 #include <string>
@@ -11,8 +11,7 @@
 
 using namespace std;
 
-// OS Signal Handler
-void sigintEventHandler(int signal);
+void sigintEventHandler(int signal); // Ubuntu signal handler
 
 int main(int argc, char** argv) {
 
@@ -30,7 +29,7 @@ int main(int argc, char** argv) {
     cout << "No Name Selected. Default is: " << publishedName << endl;
   }
   
-  // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
+  // Declare no signal handler so we can catch SIGINT ourselves and shutdown the node
   ros::init(argc, argv, (publishedName + "_DIAGNOSTICS"), ros::init_options::NoSigintHandler);
     
   Diagnostics diags(publishedName);
@@ -46,3 +45,4 @@ void sigintEventHandler(int sig) {
   // All the default sigint handler does is call shutdown()
   ros::shutdown();
 }
+
