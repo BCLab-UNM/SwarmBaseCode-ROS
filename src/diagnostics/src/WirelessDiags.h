@@ -1,10 +1,10 @@
 #ifndef WirelessDiags_h
 #define WirelessDiags_h
 
-#include <string> // wireless device interface name
-#include <sys/time.h> // gettimeofday and timeval
+#include <string> 
+#include <sys/time.h>
 
-//struct to hold collected information
+// Wifi device status data structure
 struct WirelessInfo {
   char mac[18];
   char ssid[33];
@@ -21,33 +21,33 @@ public:
 
   WirelessDiags();
   
-  // Sets the name of the interface
-  // about which to provide information
-  // returns the name of the wireless interface
+  // Get and set wifi device network id
   std::string setInterface();
 
+  // Get wifi device status information
   WirelessInfo getInfo();
   
 private:
 
-
-  // We don't want to try and get info about a network interface that doesn't exist
+  // Determine if wifi device is enabled and active
   bool isInterfaceUp(std::string name);
 
+  // Find the first wifi device listed in ubuntu system files
   std::string findWirelessInterface();
 
-  // checks if a network interface is wireless or not
+  // Is network interface type wireless
   bool isWireless(const char* name);
+
+  // Calculate bitrate using the number of bytes sent and received
   float calcBitRate();
 
+  // Network id
   std::string interfaceName;
 
-  // State needed to keep track of
-  // the number of bytes sent between calcBitRate calls
-
+  // Times and bytes sent/recieved (used to calculate bit rate)
   long int prev_total_bytes = 0;
   long int total_bytes = 0;
-  struct timeval prev_time; // The wall time of the last call to calcBitRate;
+  struct timeval prev_time;
 };
 
 #endif // WirelessDiags_h
