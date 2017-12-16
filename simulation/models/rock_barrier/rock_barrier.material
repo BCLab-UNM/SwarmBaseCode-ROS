@@ -1,0 +1,15 @@
+material rock_barrier/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      transparent_sorting on
+
+      texture_unit
+      {
+        texture rock_barrier.png
+      }
+    }
+  }
+}
