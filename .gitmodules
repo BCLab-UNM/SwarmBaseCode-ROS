@@ -3,7 +3,8 @@
 	url = https://github.com/KumarRobotics/ublox.git
 [submodule "src/apriltags_ros"]
 	path = src/apriltags_ros
-	url = https://github.com/RIVeR-Lab/apriltags_ros.git
+	url = https://github.com/BCLab-UNM/apriltags_ros.git
+	branch = kinetic-master
 [submodule "src/usb_cam"]
 	path = src/usb_cam
 	url = https://github.com/bosch-ros-pkg/usb_cam.git
