@@ -97,7 +97,7 @@ private:
   // Search connected USB devices for a matching device
   bool checkUSBDeviceExists(uint16_t, uint16_t);
   
-  // Accessor to roscpp's intefor creating subscribers, publishers
+  // Accessor to roscpp's inteface for creating subscribers, publishers
   ros::NodeHandle nodeHandle;
   
   // Diagnostics publisher - rover status error/info
