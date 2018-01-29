@@ -150,7 +150,7 @@ void PickUpController::ProcessData()
     result.reset = true;
     targetHeld = true;
   }
-  //Lower wrist and open fingers if no locked targt -- this is the
+  //Lower wrist and open fingers if no locked target -- this is the
   //case if the robot lost tracking, or missed the cube when
   //attempting to pick it up.
   else if (!lockTarget)
