@@ -150,7 +150,7 @@ void PickUpController::ProcessData()
     result.reset = true;
     targetHeld = true;
   }
-  //Lower wrist and open fingures if no locked targt -- this is the
+  //Lower wrist and open fingers if no locked targt -- this is the
   //case if the robot lost tracking, or missed the cube when
   //attempting to pick it up.
   else if (!lockTarget)
@@ -182,7 +182,7 @@ bool PickUpController::ShouldInterrupt(){
   }
   else if (!targetFound && interupted)
   {
-    // had a cube in sight but lost it, interruput again to release control
+    // had a cube in sight but lost it, interrupt again to release control
     interupted = false;
     has_control = false;
     return true;

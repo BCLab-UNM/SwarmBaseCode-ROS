@@ -13,7 +13,7 @@ public:
   void Reset() override;
   Result DoWork() override;
 
-  // Give the controller a list of visible apris tags.
+  // Give the controller a list of visible april tags.
   void SetTagData(vector<Tag> tags);
   bool ShouldInterrupt() override;
   bool HasWork() override;
