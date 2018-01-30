@@ -1,6 +1,5 @@
-//This PID.cpp file controls the proportional, intergral, and derivative terms for moving the rover at certain speeds (slow during cube pickup, normal during cube search)
-
-
+//This PID.cpp file controls the proportional, intergral, and derivative terms
+//Used for moving the rover at certain speeds (slow during cube pickup, normal during cube search)
 #include "PID.h"
 
 //Constructor
@@ -14,11 +13,11 @@ PID::PID(PIDConfig config)
   integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
 }
 
-
 float PID::PIDOut(float calculatedError, float setPoint)
 {
 
   //cout << "ErrorSize:  " << Error.size() << endl;
+
   //The Error variable is a vector of floats
   //If the Error vector is greater than the length of the error history length
   if (Error.size() >= config.errorHistLength)
