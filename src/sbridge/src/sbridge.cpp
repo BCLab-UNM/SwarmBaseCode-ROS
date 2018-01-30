@@ -1,4 +1,5 @@
 //This file handles communication between the gazebo simulation and the rover
+
 //Since the simulation cannot get data from the real rovers, this package converts
 //the behavior package data into readable data for the gazebo simulation to understand
 #include "sbridge.h"
@@ -45,7 +46,8 @@ sbridge::sbridge(std::string publishedName) {
 
 }
 
-//Command Handler PWM (pulse with modulation) values to linear values
+//Command Handler
+//PWM (pulse with modulation) values to linear values
 void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     //Gets and sets the linear PWM value
     double left = (message->linear.x);
@@ -53,40 +55,46 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     double right = (message->angular.z);
     
     //Set max values
-    float max_turn_rate = 4.5; //Radians per second
-    float max_linear_velocity = 0.65; //Meters per second
+    float max_turn_rate = 4.5; //radians per second
+    float max_linear_velocity = 0.65; //meters per second
 
     //Temperary Variables to store the velocity values
-    float turn = 0; //Angular
-    float forward = 0; //Linear
+    //Angular
+    float turn = 0;
+    //Linear
+    float forward = 0;
     
-    //
     float linearVel = (left + right)/2;
     float angularVel = (right-left)/2;
 
     //Converts the PWM values to velocity values
-    turn = angularVel/55; //Necessary arbitrary conversion value
-    forward = linearVel/390; //Necessary arbitrary conversion value
+    //Necessary arbitrary conversion value
+    turn = angularVel/55;
+    //Necessary arbitrary conversion value
+    forward = linearVel/390;
 
     //If the rover is moving forward and turning at the same time, it will not have enough power to carry out
     //each of those at it's full values, so we need to lower this value so the PIDs can compensate for both
     //the linear and angular velocity
     if (forward >= 150){
-      forward -= (abs(turn)/5); //Lower forward velocity value by necessary arbitrary conversion value
+      //Lower forward velocity value by necessary arbitrary conversion value
+      forward -= (abs(turn)/5);
     }
 
     //If the linear velocity (PWM value) is moving in the forward direction (value is greater than or equal to 0),
     //but forward (velocity) gets converted to a non-positive value (for reverse movement)
     if (linearVel >= 0 && forward <= 0)
     {
-      forward = 0; //Do not move (set forward velocity to 0)
+      //Do not move (set forward velocity to 0)
+      forward = 0;
     }
 
     //If the linear velocity (PWM value) is moving in the reverse direction (value is greater than or equal to 0),
     //but the foward (velocity) variable gets converted to a non-negative value (for forwards movement)
     if (linearVel <= 0 && forward >= 0)
     {
-      forward = 0; //Do not move (set forward velocity to 0)
+      //Do not move (set forward velocity to 0)
+      forward = 0;
     }
 
     //If the absolute value of the forward value (float) is greater than or equal to the max_linear_velocity
@@ -99,10 +107,14 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     }
 
     //Sets the converted (PWM to velocity) values into the variable that the simulation can read
-    velocity.linear.x = forward, //Linear velocity
-            velocity.angular.z = turn; //Angular velocity
-    skidsteerPublish.publish(velocity); //Publish velocity information to rotary wheel movement
+    //Linear velocity
+    velocity.linear.x = forward,
+            //Angular velocity
+            velocity.angular.z = turn;
+    //Publish velocity information to rotary wheel movement
+    skidsteerPublish.publish(velocity);
 }
+
 
 void sbridge::publishHeartBeatTimerEventHandler(const ros::TimerEvent& event) {
     std_msgs::String msg;
