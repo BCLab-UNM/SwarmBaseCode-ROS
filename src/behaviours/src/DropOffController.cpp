@@ -52,12 +52,11 @@ Result DropOffController::DoWork() {
     // Calcuate the elapsed time from the current time and the time since
     // it dropped a target (cube) to the center collection disk
     long int elapsed = current_time - returnTimer;
-    // Convert from milliseconds to seconds
-    timerTimeElapsed = elapsed/1e3;
+    timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
   }
 
-  // If we are in the routine for exiting the circle once we have dropped a block off and reseting all our flags
-  // to resart our search.
+  //if we are in the routine for exiting the circle once we have dropped a block off and reseting all our flags
+  //to resart our search.
   if(reachedCollectionPoint)
   {
     //cout << "2" << endl; //Debugging statement
@@ -81,8 +80,8 @@ Result DropOffController::DoWork() {
       isPrecisionDriving = true;
       result.type = precisionDriving;
 
-      result.fingerAngle = M_PI_2; // Open fingers
-      result.wristAngle = 0; // Raise wrist
+      result.fingerAngle = M_PI_2; //open fingers
+      result.wristAngle = 0; //raise wrist
 
       result.pd.cmdVel = -0.3;
       result.pd.cmdAngularError = 0.0;
@@ -94,7 +93,7 @@ Result DropOffController::DoWork() {
   // Calculates the shortest distance to the center location from the current location
   double distanceToCenter = hypot(this->centerLocation.x - this->currentLocation.x, this->centerLocation.y - this->currentLocation.y);
 
-  // Check to see if we are driving to the center location or if we need to drive in a circle and look.
+  //check to see if we are driving to the center location or if we need to drive in a circle and look.
   if (distanceToCenter > collectionPointVisualDistance && !circularCenterSearching && (count == 0)) {
     // Sets driving mode to waypoint
     result.type = waypoint;
@@ -112,12 +111,12 @@ Result DropOffController::DoWork() {
     return result;
 
   }
-  else if (timerTimeElapsed >= 2)// Spin search for center
+  else if (timerTimeElapsed >= 2)//spin search for center
   {
     Point nextSpinPoint;
 
-    // Sets a goal that is 60cm from the centerLocation and spinner
-    // Radians counterclockwise from being purly along the x-axis.
+    //sets a goal that is 60cm from the centerLocation and spinner
+    //radians counterclockwise from being purly along the x-axis.
     nextSpinPoint.x = centerLocation.x + (initialSpinSize + spinSizeIncrease) * cos(spinner);
     nextSpinPoint.y = centerLocation.y + (initialSpinSize + spinSizeIncrease) * sin(spinner);
     nextSpinPoint.theta = atan2(nextSpinPoint.y - currentLocation.y, nextSpinPoint.x - currentLocation.x);
@@ -126,15 +125,15 @@ Result DropOffController::DoWork() {
     result.wpts.waypoints.clear();
     result.wpts.waypoints.push_back(nextSpinPoint);
 
-    spinner += 45*(M_PI/180); // Add 45 degrees in radians to spinner.
+    spinner += 45*(M_PI/180); //add 45 degrees in radians to spinner.
     if (spinner > 2*M_PI) {
       spinner -= 2*M_PI;
     }
     spinSizeIncrease += spinSizeIncrement/8;
     circularCenterSearching = true;
-    // Safety flag to prevent us trying to drive back to the
-    // Center since we have a block with us and the above point is
-    // Greater than collectionPointVisualDistance from the center.
+    //safety flag to prevent us trying to drive back to the
+    //center since we have a block with us and the above point is
+    //greater than collectionPointVisualDistance from the center.
 
     returnTimer = current_time;
     timerTimeElapsed = 0;
@@ -145,14 +144,14 @@ Result DropOffController::DoWork() {
   bool right = (countRight > 0);
   bool centerSeen = (right || left);
 
-  // Reset lastCenterTagThresholdTime timout timer to current time
+  //reset lastCenterTagThresholdTime timout timer to current time
   if ((!centerApproach && !seenEnoughCenterTags) || (count > 0 && !seenEnoughCenterTags)) {
 
     lastCenterTagThresholdTime = current_time;
 
   }
 
-  if (count > 0 || seenEnoughCenterTags || prevCount > 0) // If we have a target and the center is located drive towards it.
+  if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
   {
 
     //cout << "9" << endl; //Debugging statement
@@ -169,26 +168,26 @@ Result DropOffController::DoWork() {
     }
     isPrecisionDriving = true;
 
-    if (seenEnoughCenterTags) // If we have seen enough tags
+    if (seenEnoughCenterTags) //if we have seen enough tags
     {
-      if ((countLeft-5) > countRight) // And there are too many on the left
+      if ((countLeft-5) > countRight) //and there are too many on the left
       {
-        right = false; // Then we say none on the right to cause us to turn right
+        right = false; //then we say none on the right to cause us to turn right
       }
       else if ((countRight-5) > countLeft)
       {
-        left = false; // Or left in this case
+        left = false; //or left in this case
       }
     }
 
     float turnDirection = 1;
-    // Reverse tag rejection when we have seen enough tags that we are on a
-    // Trajectory in to the square we dont want to follow an edge.
+    //reverse tag rejection when we have seen enough tags that we are on a
+    //trajectory in to the square we dont want to follow an edge.
     if (seenEnoughCenterTags) turnDirection = -3;
 
     result.type = precisionDriving;
 
-    // Otherwise turn till tags on both sides of image then drive straight
+    //otherwise turn till tags on both sides of image then drive straight
     if (left && right) {
       result.pd.cmdVel = searchVelocity;
       result.pd.cmdAngularError = 0.0;
@@ -207,7 +206,7 @@ Result DropOffController::DoWork() {
       result.pd.cmdAngularError = 0.0;
     }
 
-    // Must see greater than this many tags before assuming we are driving into the center and not along an edge.
+    //must see greater than this many tags before assuming we are driving into the center and not along an edge.
     if (count > centerTagThreshold)
     {
       seenEnoughCenterTags = true; //we have driven far enough forward to be in and aligned with the circle.
@@ -217,11 +216,11 @@ Result DropOffController::DoWork() {
     {
       lastCenterTagThresholdTime = current_time;
     }
-    // Time since we dropped below countGuard tags
+    //time since we dropped below countGuard tags
     long int elapsed = current_time - lastCenterTagThresholdTime;
     float timeSinceSeeingEnoughCenterTags = elapsed/1e3; // Convert from milliseconds to seconds
 
-    // We have driven far enough forward to have passed over the circle.
+    //we have driven far enough forward to have passed over the circle.
     if (count < 1 && seenEnoughCenterTags && timeSinceSeeingEnoughCenterTags > dropDelay) {
       centerSeen = false;
     }
@@ -232,8 +231,8 @@ Result DropOffController::DoWork() {
     countRight = 0;
   }
 
-  // Was on approach to center and did not seenEnoughCenterTags
-  // for lostCenterCutoff seconds so reset.
+  //was on approach to center and did not seenEnoughCenterTags
+  //for lostCenterCutoff seconds so reset.
   else if (centerApproach) {
 
     long int elapsed = current_time - lastCenterTagThresholdTime;
@@ -241,7 +240,7 @@ Result DropOffController::DoWork() {
     if (timeSinceSeeingEnoughCenterTags > lostCenterCutoff)
     {
       //cout << "4" << endl;
-      // Go back to drive to center base location instead of drop off attempt
+      //go back to drive to center base location instead of drop off attempt
       reachedCollectionPoint = false;
       seenEnoughCenterTags = false;
       centerApproach = false;
@@ -296,7 +295,7 @@ void DropOffController::Reset() {
   countRight = 0;
 
 
-  // Reset flags
+  //reset flags
   reachedCollectionPoint = false;
   seenEnoughCenterTags = false;
   circularCenterSearching = false;
@@ -316,14 +315,14 @@ void DropOffController::SetTargetData(vector<Tag> tags) {
   countLeft = 0;
 
   if(targetHeld) {
-    // If a target is detected and we are looking for center tags
+    // if a target is detected and we are looking for center tags
     if (tags.size() > 0 && !reachedCollectionPoint) {
 
-      // This loop is to get the number of center tags
+      // this loop is to get the number of center tags
       for (int i = 0; i < tags.size(); i++) {
         if (tags[i].getID() == 256) {
 
-          // Checks if tag is on the right or left side of the image
+          // checks if tag is on the right or left side of the image
           if (tags[i].getPositionX() + cameraOffsetCorrection > 0) {
             countRight++;
 
@@ -342,9 +341,9 @@ void DropOffController::SetTargetData(vector<Tag> tags) {
 void DropOffController::ProcessData() {
   // If there are tags seen
   if((countLeft + countRight) > 0) {
-      isPrecisionDriving = true;
+    isPrecisionDriving = true;
   } else {
-      startWaypoint = true;
+    startWaypoint = true;
   }
 }
 
