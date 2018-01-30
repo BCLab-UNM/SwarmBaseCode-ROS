@@ -10,6 +10,7 @@ sbridge::sbridge(std::string publishedName) {
     //Create a new node that will communicate with ROS
     ros::NodeHandle sNH;
 
+
     //Create a drive control subscriber
     //publishedName + '/driveControl" == the topic to subscribe to
     //10 == the incoming message queue size
@@ -41,7 +42,6 @@ sbridge::sbridge(std::string publishedName) {
     //this == callback to class method second parameter
     publish_heartbeat_timer = sNH.createTimer(ros::Duration(heartbeat_publish_interval), &sbridge::publishHeartBeatTimerEventHandler, this);
 
-    //Log information
     ROS_INFO("constructor");
 
 }
@@ -56,14 +56,14 @@ void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
     
     //Set max values
     float max_turn_rate = 4.5; //radians per second
-    float max_linear_velocity = 0.65; //meters per second
+    float max_linear_velocity = 0.65; // meters per second
 
     //Temperary Variables to store the velocity values
     //Angular
     float turn = 0;
     //Linear
     float forward = 0;
-    
+
     float linearVel = (left + right)/2;
     float angularVel = (right-left)/2;
 
@@ -121,6 +121,7 @@ void sbridge::publishHeartBeatTimerEventHandler(const ros::TimerEvent& event) {
     msg.data = "";
     //Publish the heartbeat message
     heartbeatPublisher.publish(msg);
+
     //Log information for the timer in seconds and nanoseconds
     ROS_INFO("%ds, %dnsec", event.last_real.sec, event.last_real.nsec);
 }
