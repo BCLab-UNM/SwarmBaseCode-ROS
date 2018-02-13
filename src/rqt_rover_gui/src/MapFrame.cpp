@@ -455,7 +455,20 @@ void MapFrame::paintEvent(QPaintEvent* event) {
 
     if(!display_unique_rover_colors) painter.setPen(green);
 
-    if (display_encoder_data) painter.drawPath(scaled_encoder_rover_path);
+    if (display_encoder_data) {
+       painter.drawPath(scaled_encoder_rover_path);
+       std::pair<float, float> odom_point = map_data->getEncoderPath(rover_to_display)->back();
+       float o_x = map_origin_x+((odom_point.first-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+       float o_y = map_origin_y+((odom_point.second-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+       QPen old_pen = painter.pen();
+       QPen pen;
+       pen.setWidth(10);
+       pen.setColor(old_pen.color());
+       pen.setCapStyle(Qt::RoundCap);
+       painter.setPen(pen);
+       painter.drawPoint(QPoint(o_x,o_y));
+       painter.setPen(old_pen);
+    }
 
     painter.setPen(red);
     QPoint* point_array = &scaled_collection_points[0];
