@@ -169,7 +169,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message);				//for detecting w
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);	//receives and stores April Tag Data using the TAG class
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);			//receives and stores ODOM information
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);				//receives and stores GPS information
-void virtualFenceHandler(const std_msgs::Float32MultiArray& message);			//Used to set an invisibly boundary for robots to keep them from traveling outside specific bounds
+void virtualFenceHandler(const std_msgs::Float32MultiArray& message);			//Used to set an invisible boundary for robots to keep them from traveling outside specific bounds
 void manualWaypointHandler(const swarmie_msgs::Waypoint& message);			//Receives a waypoint (from GUI) and sets the coordinates
 void behaviourStateMachine(const ros::TimerEvent&);					//Upper most state machine, calls logic controller to perform all actions
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);			//Publishes "ONLINE" when rover is successfully connected
