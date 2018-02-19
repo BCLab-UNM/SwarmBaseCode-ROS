@@ -149,7 +149,7 @@ ros::Timer stateMachineTimer;
 ros::Timer publish_status_timer;
 ros::Timer publish_heartbeat_timer;
 
-// records time for delays in sequanced actions, 1 second resolution.
+// records time for delays in sequenced actions, 1 second resolution.
 time_t timerStartTime;
 
 // An initial delay to allow the rover to gather enough position data to 
