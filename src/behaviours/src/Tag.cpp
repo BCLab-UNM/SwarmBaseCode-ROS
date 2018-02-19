@@ -43,27 +43,27 @@ Tag::Tag(const Tag &that) {
   this->setID( that.id );
 }
 
-int Tag::getID() const {
+int Tag::getID() const {	//returns april tag ID
   return id;
 }
 
-void Tag::setID( int id) {
+void Tag::setID( int id) {	//sets april tag ID
   this->id = id;
 }
 
-tuple<float, float, float> Tag::getPosition() const {
+tuple<float, float, float> Tag::getPosition() const {	//returns a position with X, Y, and Z coordinates
   return position;
 }
 
-void Tag::setPosition( tuple<float, float, float> position ) {
+void Tag::setPosition( tuple<float, float, float> position ) {	//sets X, Y, Z coordinates of tag
   this->position = position;
 }
 
-quaternion<float> Tag::getOrientation() const {
+quaternion<float> Tag::getOrientation() const {	//returns tags orientation
   return orientation;
 }
 
-void Tag::setOrientation( quaternion<float> orientation ) {
+void Tag::setOrientation( quaternion<float> orientation ) {	//sets tags orientation
   this->orientation = orientation;
 }
 
@@ -141,7 +141,7 @@ tuple<float, float, float> Tag::calcRollPitchYaw() const {
   return make_tuple(roll, pitch, yaw);
 }
 
-float Tag::calcYaw() const {
+float Tag::calcYaw() const {	//returns a yaw value helpful for determining the angle at which the tag is being viewed
 
   float x = getOrientationX();
   float y = getOrientationY();
@@ -161,7 +161,7 @@ float Tag::calcPitch() const {
   return asin(-2.0f*(x*z - w*y));
 }
 
-float Tag::calcRoll() const {
+float Tag::calcRoll() const { 
 
   float x = getOrientationX();
   float y = getOrientationY();

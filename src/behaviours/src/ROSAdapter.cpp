@@ -389,7 +389,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
     // publish current state for the operator to see
     stateMachineMsg.data = "WAITING";
 
-    // poll the logicController to get the waypoints that have been
+    // ask the logicController to get the waypoints that have been
     // reached.
     std::vector<int> cleared_waypoints = logicController.GetClearedWaypoints();
 
@@ -401,7 +401,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
       wpt.id = *it;
       waypointFeedbackPublisher.publish(wpt);
     }
-    result = logicController.DoWork();
+    result = logicController.DoWork();	//ask logic controller to run
     if(result.type != behavior || result.b != wait)
     {
       // if the logic controller requested that the robot drive, then
