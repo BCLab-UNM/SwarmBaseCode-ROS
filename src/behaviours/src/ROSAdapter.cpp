@@ -78,7 +78,7 @@ void resultHandler();	// Not Used
 
 
 Point updateCenterLocation();		//calls transformMapCenterToOdom, returns a center location in ODOM frame
-void transformMapCentertoOdom();	//checks ODOMs perceived idea of where the center is with a stored GPS center coordinate and ajusts ODOM center value to account for drift
+void transformMapCentertoOdom();	//checks ODOMs perceived idea of where the center is with a stored GPS center coordinate and adjusts ODOM center value to account for drift
 
 
 // Numeric Variables for rover positioning
@@ -87,7 +87,7 @@ geometry_msgs::Pose2D currentLocationMap;	//current location using GPS
 geometry_msgs::Pose2D currentLocationAverage;	//an average of the robots current location
 
 geometry_msgs::Pose2D centerLocation;		//??
-geometry_msgs::Pose2D centerLocationMap;	//A gps point of the center location, used to help reduce drift from odom
+geometry_msgs::Pose2D centerLocationMap;	//A GPS point of the center location, used to help reduce drift from ODOM
 geometry_msgs::Pose2D centerLocationOdom;	//The centers location based on ODOM
 geometry_msgs::Pose2D centerLocationMapRef;	//??
 
@@ -100,8 +100,8 @@ const float waypointTolerance = 0.1; 		//10 cm tolerance.
 // used for calling code once but not in main
 bool initilized = false;	//switched to true after running through state machine the first time, initializes base values
 
-float linearVelocity = 0;	//forward speed, POS = forward, NEG = backward
-float angularVelocity = 0;	//turning speed, POS = left, NEG = right
+float linearVelocity = 0;	//forward speed, POSITIVE = forward, NEGATIVE = backward
+float angularVelocity = 0;	//turning speed, POSITIVE = left, NEGATIVE = right
 
 float prevWrist = 0;	//last wrist angle
 float prevFinger = 0;	//last finger angle
