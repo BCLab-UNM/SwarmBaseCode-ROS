@@ -1,7 +1,8 @@
 #include "SearchController.h"
 #include <angles/angles.h>
 
-SearchController::SearchController() {
+SearchController::SearchController()
+{
   rng = new random_numbers::RandomNumberGenerator();
   currentLocation.x = 0;
   currentLocation.y = 0;
@@ -14,6 +15,7 @@ SearchController::SearchController() {
 
   result.fingerAngle = M_PI/2;
   result.wristAngle = M_PI/4;
+  distance = 1;
 }
 
 void SearchController::Reset() {
@@ -23,52 +25,51 @@ void SearchController::Reset() {
 /**
  * This code implements a basic random walk search.
  */
-Result SearchController::DoWork() {
+Result SearchController::DoWork()
+{
+  result.type = waypoint;
+  Point  searchLocation;
 
-  if (!result.wpts.waypoints.empty()) {
-    if (hypot(result.wpts.waypoints[0].x-currentLocation.x, result.wpts.waypoints[0].y-currentLocation.y) < 0.15) {
-      attemptCount = 0;
-    }
-  }
-
-  if (attemptCount > 0 && attemptCount < 5) {
-    attemptCount++;
-    if (succesfullPickup) {
-      succesfullPickup = false;
-      attemptCount = 1;
-    }
-    return result;
-  }
-  else if (attemptCount >= 5 || attemptCount == 0) 
+  if(!seenTags)
   {
-    attemptCount = 1;
-
-
-    result.type = waypoint;
-    Point  searchLocation;
-
-    //select new position 50 cm from current location
-    if (first_waypoint)
-    {
-      first_waypoint = false;
-      searchLocation.theta = currentLocation.theta + M_PI;
-      searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
-      searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
-    }
-    else
-    {
-      //select new heading from Gaussian distribution around current heading
-      searchLocation.theta = rng->gaussian(currentLocation.theta, 0.785398); //45 degrees in radians
-      searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
-      searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
-    }
-
-    result.wpts.waypoints.clear();
-    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
-    
-    return result;
+    distance++;
   }
 
+  searchLocation.x = 0;
+  searchLocation.y = 0;
+
+  searchLocation.x = centerLocation.x + ((distance * 0.5) * cos(searchLocation.theta));
+  searchLocation.y = centerLocation.y + ((distance * 0.5) * sin(searchLocation.theta));
+
+  cout << "driving forward .5 meters" << endl;
+
+  if(distance >= 10)
+  {
+    searchLocation = centerLocation;
+    distance = 1;
+  }
+
+  /*
+  //select new position 50 cm from current location
+  if (first_waypoint)
+  {
+    first_waypoint = false;
+    searchLocation.theta = currentLocation.theta + M_PI;
+    searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+    searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+  }
+  else
+  {
+    //select new heading from Gaussian distribution around current heading
+    searchLocation.theta = rng->gaussian(currentLocation.theta, 0.785398); //45 degrees in radians
+    searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+    searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+  }
+*/
+  result.wpts.waypoints.clear();
+  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+  return result;
 }
 
 void SearchController::SetCenterLocation(Point centerLocation) {
