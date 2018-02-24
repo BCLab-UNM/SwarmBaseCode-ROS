@@ -28,27 +28,38 @@ void SearchController::Reset() {
 Result SearchController::DoWork()
 {
   result.type = waypoint;
-  Point  searchLocation;
+  Point searchLocation;
 
-  if(!seenTags)
+  if(!targetFound)
   {
     distance++;
+
+    searchLocation.x = centerLocation.x + ((distance * 0.5) * cos(searchLocation.theta));
+    searchLocation.y = centerLocation.y + ((distance * 0.5) * sin(searchLocation.theta));
+
+    //store searchLocation into clusterLocation in case rover finds a cluster
+    clusterLocation = searchLocation;
+
+    cout << "driving forward .5 meters" << endl;
+  }
+  else
+  {
+    searchLocation = clusterLocation;
+
+    cout << "driving back to cluster" << endl;
   }
 
-  searchLocation.x = 0;
-  searchLocation.y = 0;
-
-  searchLocation.x = centerLocation.x + ((distance * 0.5) * cos(searchLocation.theta));
-  searchLocation.y = centerLocation.y + ((distance * 0.5) * sin(searchLocation.theta));
-
-  cout << "driving forward .5 meters" << endl;
-
+  //For Testing in SIM currently checking center location
+  /*
   if(distance >= 10)
   {
     searchLocation = centerLocation;
     distance = 1;
-  }
 
+    cout << "driving back to center";
+
+  }
+  */
   /*
   //select new position 50 cm from current location
   if (first_waypoint)

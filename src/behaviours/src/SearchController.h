@@ -27,6 +27,9 @@ public:
   void SetCenterLocation(Point centerLocation);
   void SetSuccesfullPickup();
 
+  bool GetTargetFound(){ targetFound; }
+  bool SetTargetFound(bool val){ targetFound = val; }
+
 protected:
 
   void ProcessData();
@@ -36,7 +39,7 @@ private:
   random_numbers::RandomNumberGenerator* rng;
   Point currentLocation;
   Point centerLocation;
-  Point searchLocation;
+  Point clusterLocation;
   int attemptCount = 0;
   //struct for returning data to ROS adapter
   Result result;
@@ -45,7 +48,7 @@ private:
   // Flag to allow special behaviour for the first waypoint
   bool first_waypoint = true;
   bool succesfullPickup = false;
-  bool seenTags = false;
+  bool targetFound;
   int distance;
 };
 

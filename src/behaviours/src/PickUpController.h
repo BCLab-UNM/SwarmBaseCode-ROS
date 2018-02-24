@@ -33,6 +33,8 @@ public:
 
   void SetCurrentTimeInMilliSecs( long int time );
 
+  bool GetTargetFound(){ return targetFound; }
+
 protected:
 
   void ProcessData();

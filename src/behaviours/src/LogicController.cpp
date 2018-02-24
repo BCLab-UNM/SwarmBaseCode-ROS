@@ -253,6 +253,11 @@ bool LogicController::HasWork()
 
 void LogicController::controllerInterconnect() 
 {
+  //If see a tag tell search controller
+  if(pickUpController.GetTargetFound() && !searchController.GetTargetFound())
+  {
+    searchController.SetTargetFound(true);
+  }
 
   if (processState == PROCCESS_STATE_SEARCHING) 
   {
