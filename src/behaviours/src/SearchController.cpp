@@ -30,23 +30,44 @@ Result SearchController::DoWork()
   result.type = waypoint;
   Point searchLocation;
 
-  if(!targetFound)
+  if(!targetFound) //If we haven't found a tag yet
   {
     distance++;
 
-    searchLocation.x = centerLocation.x + ((distance * 0.5) * cos(searchLocation.theta));
-    searchLocation.y = centerLocation.y + ((distance * 0.5) * sin(searchLocation.theta));
+    searchLocation.x = centerLocation.x + ((distance * 0.5));
+    searchLocation.y = centerLocation.y + ((distance * 0.5));
 
     //store searchLocation into clusterLocation in case rover finds a cluster
     clusterLocation = searchLocation;
 
     cout << "driving forward .5 meters" << endl;
   }
-  else
+  else //If we have found a tag and are going back to finding other tags
   {
-    searchLocation = clusterLocation;
 
-    cout << "driving back to cluster" << endl;
+    //NEED CALCULATION
+    float clusterDistance = 0;      //current distance from cluster and robot
+    float distanceVariance = 0.2;   //error allowed between cluster and robot
+
+    //if not within a specific distance of cluster, go to cluster
+    if(clusterDistance > distanceVariance)
+    {
+      searchLocation = clusterLocation;
+
+      cout << "driving back to cluster" << endl;
+    }
+
+    //if near cluster search around for more cubes...
+    else
+    {
+      //Search around cluster aimlessly
+      searchLocation.theta = rng->gaussian(currentLocation.theta, M_PI);
+      searchLocation.x = clusterLocation.x + (0.5) * cos(searchLocation.theta);
+      searchLocation.y = clusterLocation.y + (0.5) * sin(searchLocation.theta);
+
+      cout << "Searching around cluster for tags" << endl;
+    }
+
   }
 
   //For Testing in SIM currently checking center location
