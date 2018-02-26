@@ -1,7 +1,7 @@
 Swarmathon-Arduino
 ==============
 
-This repository is an Arduino microcontroller library for the Swarmie robots used in the [NASA Swarmathon](http://www.nasaswarmathon.com), a national swarm robotics competition created by the [University of New Mexico](http://www.unm.edu/). This particular library is an interface to the [Swarmathon-ROS](https://github.com/BCLab-UNM/Swarmathon-ROS) controller framework that facilitates the opertion of lower-level functionality onboard the physical robot, including brushed DC motors, integrated quadrature encoders, a 10-axis IMU (inertial measurement unit), and ultrasonic distance sensors.
+This directory contains an Arduino microcontroller library for the Swarmie robots used in the [NASA Swarmathon](http://www.nasaswarmathon.com), a national swarm robotics competition created by the [University of New Mexico](http://www.unm.edu/). This particular library is an interface to the [Swarmathon-ROS](https://github.com/BCLab-UNM/Swarmathon-ROS) controller framework that facilitates the opertion of lower-level functionality onboard the physical robot, including brushed DC motors, integrated quadrature encoders, a 10-axis IMU (inertial measurement unit), and ultrasonic distance sensors.
 
 For information on setting up the Arduino IDE and programming Arduino microcontrollers, please consult [Getting Started with Arduino](https://www.arduino.cc/en/Guide/HomePage). Aside from the IDE, no other plugins or tools are required to begin using this libra*ry.
 
@@ -17,27 +17,20 @@ After installing the Arduino IDE, run the application and open the Arduino IDE P
 
 ## Setup
 
-1. Clone this GitHub repository to your home directory (~):
-
-  ```
-  cd ~
-  git clone https://github.com/BCLab-UNM/Swarmathon-Arduino.git 
-  ```
-
-2. To set up the Arduino IDE to communicate with the Swarmie's [Pololu A-Star microcontroller](https://www.pololu.com/product/3104), which runs an Arduino-compatible bootloader, first set the board type under "Select > Board" to "Arduino Leonardo".
+1. To set up the Arduino IDE to communicate with the Swarmie's [Pololu A-Star microcontroller](https://www.pololu.com/product/3104), which runs an Arduino-compatible bootloader, first set the board type under "Select > Board" to "Arduino Leonardo".
 
   ![Arduino IDE Board Type](https://github.com/BCLab-UNM/Swarmathon-Arduino/blob/master/readmeImages/ArduinoIDEBoardType.png)
 
-3. Ensure that the A-Star is plugged into your PC (not the Swarmie's NUC), then select the proper serial port under "Select > Port". Your port number will most likely differ from the one shown in the screenshot below, but you should still see "Arduino Leonardo" next to the correct port.
+2. Ensure that the A-Star is plugged into your PC (not the Swarmie's NUC), then select the proper serial port under "Select > Port". Your port number will most likely differ from the one shown in the screenshot below, but you should still see "Arduino Leonardo" next to the correct port.
 
   ![Arduino IDE Serial Port](https://github.com/BCLab-UNM/Swarmathon-Arduino/blob/master/readmeImages/ArduinoIDESerialPort.png)
 
-4. If you haven't loaded it already, open the Swarmathon_Arduino.ino sketch under "File > Open" by navigating to your Swarmathon-Arduino directory.
+3. If you haven't loaded it already, open the Swarmathon_Arduino.ino sketch under "File > Open" by navigating to your Swarmathon-Arduino directory.
 
   ![Arduino IDE Open Sketch](https://github.com/BCLab-UNM/Swarmathon-Arduino/blob/master/readmeImages/ArduinoIDEOpenSketch.png)
   ![Arduino IDE Open Sketch2](https://github.com/BCLab-UNM/Swarmathon-Arduino/blob/master/readmeImages/ArduinoIDEOpenSketch2.png)
 
-5. Upload the sketch to the A-Star by clicking on the "Upload" button, a right arrow in the upper-left corner of the Arduino IDE.
+4. Upload the sketch to the A-Star by clicking on the "Upload" button, a right arrow in the upper-left corner of the Arduino IDE.
 
   ![Arduino IDE Upload Sketch](https://github.com/BCLab-UNM/Swarmathon-Arduino/blob/master/readmeImages/ArduinoIDEUploadSketch.png)
 
