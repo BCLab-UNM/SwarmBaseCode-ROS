@@ -12,7 +12,7 @@ LSM303 lsm303;
 ros::NodeHandle_<ArduinoHardware, 2, 2, 125, 125> nh;
 
 std_msgs::Int32MultiArray imu_msg;
-long int imu_data[9];
+long int imu_data[8];
 ros::Publisher imu_pub("/imu_raw", &imu_msg);
 
 void setup()
@@ -20,13 +20,13 @@ void setup()
   nh.initNode();
 
   imu_msg.data = (long int *) &imu_data;
-  imu_msg.data_length = 9;
+  imu_msg.data_length = 8;
   nh.advertise(imu_pub);
   nh.spinOnce();
 
   Wire.begin();
   
-  /* Initialise the sensor */
+  /* Initialize the sensor */
   if(iicScan() > 0) {
     lsm303.init();
     lsm303.enableDefault();
@@ -38,9 +38,19 @@ void setup()
 
     // Set the mag data rate to 50Hz
     ctrl5 &= ~0b00011100;
-    ctrl5 |= ~0b00010000;
-    
+    ctrl5 |=  0b00010000;
+
     lsm303.writeReg(0x24, ctrl5);
+
+    // Set the acc data rate to 50Hz
+    byte ctrl1 = lsm303.readReg(0x20);
+    ctrl1 &= ~0b11110000;
+    ctrl1 |=  0b01010000;
+
+    // Enable BDU - Synchronized conversion. 
+    ctrl1 |= 0b00001000;
+
+    lsm303.writeReg(0x20, ctrl1);
   }
 }
 
@@ -77,7 +87,6 @@ void loop()
     imu_data[5] = acc.z;
     imu_data[6] = temp_lo;
     imu_data[7] = temp_hi;
-    imu_data[8] = lsm303.readReg(0x24);
     imu_pub.publish(&imu_msg);
   }
 
