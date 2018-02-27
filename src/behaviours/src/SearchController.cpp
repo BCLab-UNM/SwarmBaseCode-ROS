@@ -15,7 +15,6 @@ SearchController::SearchController()
 
   result.fingerAngle = M_PI/2;
   result.wristAngle = M_PI/4;
-  distance = 1;
 }
 
 void SearchController::Reset() {
@@ -32,10 +31,13 @@ Result SearchController::DoWork()
 
   if(!targetFound) //If we haven't found a tag yet
   {
-    distance++;
+    distance = distance + 0.5;
 
-    searchLocation.x = centerLocation.x + ((distance * 0.5));
-    searchLocation.y = centerLocation.y + ((distance * 0.5));
+    searchLocation.theta = currentLocation.theta;
+    searchLocation.x = centerLocation.x + (distance * cos(centerLocation.theta));
+    searchLocation.y = centerLocation.y + (distance * sin(centerLocation.theta));
+
+    cout << "Distance from center is going to be: " << distance << endl;
 
     //store searchLocation into clusterLocation in case rover finds a cluster
     clusterLocation = searchLocation;
@@ -45,12 +47,13 @@ Result SearchController::DoWork()
   else //If we have found a tag and are going back to finding other tags
   {
 
-    //NEED CALCULATION
-    float clusterDistance = 0;      //current distance from cluster and robot
-    float distanceVariance = 0.2;   //error allowed between cluster and robot
+    float clusterDistance = hypot(currentLocation.x - clusterLocation.x, currentLocation.y - clusterLocation.y);      //current distance from cluster and robot
+    float distanceTolerance = 0.35;   //error allowed between cluster and robot
+
+    cout << "Cluster Distance:  " << clusterDistance << endl;
 
     //if not within a specific distance of cluster, go to cluster
-    if(clusterDistance > distanceVariance)
+    if(clusterDistance > distanceTolerance)
     {
       searchLocation = clusterLocation;
 
