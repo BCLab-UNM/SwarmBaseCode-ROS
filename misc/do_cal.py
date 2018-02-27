@@ -43,7 +43,7 @@ def callback(data):
     if mag[2] > z_max :
         z_max = mag[2]
 
-    logfile.write('{}, {}, {}, {}, {}, {}, {}, {}, {}\n'.format(*data.data))
+    logfile.write('{}, {}, {}, {}, {}, {}, {}, {}\n'.format(*data.data))
 
 def listener():
     rospy.init_node('CALIBRATE')
