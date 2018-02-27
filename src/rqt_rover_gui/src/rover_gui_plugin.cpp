@@ -1836,7 +1836,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         /* In this case, the yaw is the value that turns rover "left" and "right" */
         float rover_yaw[8] =
         {
-           0.000, //  0.00 * PI
+           3.14159, //  0.00 * PI
            1.571, //  0.50 * PI
           -3.142, // -1.00 * PI
           -1.571, // -0.50 * PI

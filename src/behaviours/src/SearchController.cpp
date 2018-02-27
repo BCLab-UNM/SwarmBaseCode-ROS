@@ -34,8 +34,8 @@ Result SearchController::DoWork()
     distance = distance + 0.5;
 
     searchLocation.theta = currentLocation.theta;
-    searchLocation.x = centerLocation.x + (distance * cos(centerLocation.theta));
-    searchLocation.y = centerLocation.y + (distance * sin(centerLocation.theta));
+    searchLocation.x = centerLocation.x - (distance * cos(centerLocation.theta));
+    searchLocation.y = centerLocation.y - (distance * sin(centerLocation.theta));
 
     cout << "Distance from center is going to be: " << distance << endl;
 

@@ -49,7 +49,7 @@ private:
   bool first_waypoint = true;
   bool succesfullPickup = false;
   bool targetFound;
-  float distance = 0;
+  float distance = 1.0;
 };
 
 #endif /* SEARCH_CONTROLLER */
