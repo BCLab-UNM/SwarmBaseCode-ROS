@@ -2020,385 +2020,405 @@
       <pose frame=''>-2.56874 -0.068519 0.025 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>58707 448000000</sim_time>
-      <real_time>122 621745707</real_time>
-      <wall_time>1519777347 264964434</wall_time>
-      <iterations>3144059</iterations>
-      <model name='Barrier Final Round'>
-        <pose frame=''>2.18476 -0.075313 0 0 0 -3.12143</pose>
-        <scale>1 0.131806 1</scale>
+      <sim_time>78254 651000000</sim_time>
+      <real_time>228 979231332</real_time>
+      <wall_time>1519779223 426628447</wall_time>
+      <iterations>6811264</iterations>
+      <model name='Barrier Final Round_clone_0_clone'>
+        <pose frame=''>-3.8068 1.36293 0 0 0 -1.57363</pose>
+        <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>2.18476 -0.075313 0 0 0 -3.12143</pose>
+          <pose frame=''>-3.8068 1.36293 0 0 0 -1.57363</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <model name='Barrier Final Round_clone'>
-        <pose frame=''>-1.9385 1.45901 0 0 0 -1.57363</pose>
+      <model name='Barrier Final Round_clone_0_clone_clone'>
+        <pose frame=''>-3.76777 -1.70477 0 0 0 -1.57363</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-1.9385 1.45901 0 0 0 -1.57363</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Barrier Final Round_clone_0'>
-        <pose frame=''>-1.87528 -1.59498 0 0 0 -1.57363</pose>
-        <scale>1 1 1</scale>
-        <link name='link'>
-          <pose frame=''>-1.87528 -1.59498 0 0 0 -1.57363</pose>
+          <pose frame=''>-3.76777 -1.70477 0 0 0 -1.57363</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='Barrier Final Round_clone_1'>
-        <pose frame=''>-6.02053 -0.070908 0 0 0 -3.12143</pose>
+        <pose frame=''>-9.76452 -0.15529 0 0 0 -3.12143</pose>
+        <scale>1 1.0241 1</scale>
+        <link name='link'>
+          <pose frame=''>-9.76452 -0.15529 0 0 0 -3.12143</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='Barrier Final Round_clone_1_clone_0'>
+        <pose frame=''>2.20217 -0.186693 -0.000399 0 0 -3.12143</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-6.02053 -0.070908 0 0 0 -3.12143</pose>
+          <pose frame=''>2.20217 -0.186693 -0.000399 0 0 -3.12143</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0'>
-        <pose frame=''>-3.33819 -0.293563 0.024993 2.9e-05 2.9e-05 -0.043979</pose>
+        <pose frame=''>-9.16149 -0.187463 0.024992 -2.9e-05 -2.9e-05 -0.04398</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.33819 -0.293563 0.024993 2.9e-05 2.9e-05 -0.043979</pose>
+          <pose frame=''>-9.16149 -0.187463 0.024992 -2.9e-05 -2.9e-05 -0.04398</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -0.098 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone'>
-        <pose frame=''>-3.51895 0.254856 0.025 0 0 -0.007828</pose>
+        <pose frame=''>-9.44283 0.100952 0.025 0 0 -0.007828</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.51895 0.254856 0.025 0 0 -0.007828</pose>
+          <pose frame=''>-9.44283 0.100952 0.025 0 0 -0.007828</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_0'>
-        <pose frame=''>-3.78152 0.316484 0.025 0 0 -0.007842</pose>
+        <pose frame=''>-9.44298 -0.361066 0.025 0 0 -0.007842</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.78152 0.316484 0.025 0 0 -0.007842</pose>
+          <pose frame=''>-9.44298 -0.361066 0.025 0 0 -0.007842</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_1'>
-        <pose frame=''>-3.51635 0.002063 0.025 0 0 -8.7e-05</pose>
+        <pose frame=''>-9.30946 0.386055 0.025 0 0 -8.7e-05</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.51635 0.002063 0.025 0 0 -8.7e-05</pose>
+          <pose frame=''>-9.30946 0.386055 0.025 0 0 -8.7e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_10'>
-        <pose frame=''>-3.46868 -0.151472 0.025 0 -0 0</pose>
+        <pose frame=''>-9.30642 -0.361124 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.46868 -0.151472 0.025 0 -0 0</pose>
+          <pose frame=''>-9.30642 -0.361124 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_11'>
-        <pose frame=''>-3.64892 -0.037977 0.025 0 -0 0</pose>
+        <pose frame=''>-9.59298 0.21411 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.64892 -0.037977 0.025 0 -0 0</pose>
+          <pose frame=''>-9.59298 0.21411 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_12'>
-        <pose frame=''>-3.65026 0.048549 0.025 0 -0 0</pose>
+        <pose frame=''>-9.43785 -0.191913 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.65026 0.048549 0.025 0 -0 0</pose>
+          <pose frame=''>-9.43785 -0.191913 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_13'>
-        <pose frame=''>-3.65357 0.138685 0.025 0 -0 0</pose>
+        <pose frame=''>-9.44904 -0.079288 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.65357 0.138685 0.025 0 -0 0</pose>
+          <pose frame=''>-9.44904 -0.079288 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_14'>
-        <pose frame=''>-3.72672 -0.052495 0.025 0 -0 0</pose>
+        <pose frame=''>-9.61272 -0.362801 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.72672 -0.052495 0.025 0 -0 0</pose>
+          <pose frame=''>-9.61272 -0.362801 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_15'>
-        <pose frame=''>-3.37012 -0.159851 0.025 0 -0 0</pose>
+        <pose frame=''>-9.1465 0.014164 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.37012 -0.159851 0.025 0 -0 0</pose>
+          <pose frame=''>-9.1465 0.014164 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_16'>
-        <pose frame=''>-3.36193 -0.225134 0.025 0 -0 0</pose>
+        <pose frame=''>-9.16102 -0.089122 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.36193 -0.225134 0.025 0 -0 0</pose>
+          <pose frame=''>-9.16102 -0.089122 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_17'>
-        <pose frame=''>-3.39767 0.13163 0.025 0 0 -0.003158</pose>
+        <pose frame=''>-9.30354 -0.194253 0.025 0 0 -0.003158</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.39767 0.13163 0.025 0 0 -0.003158</pose>
+          <pose frame=''>-9.30354 -0.194253 0.025 0 0 -0.003158</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_18'>
-        <pose frame=''>-3.39466 0.063243 0.025 0 0 -0.003212</pose>
+        <pose frame=''>-9.30602 -0.077791 0.025 0 0 -0.003212</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.39466 0.063243 0.025 0 0 -0.003212</pose>
+          <pose frame=''>-9.30602 -0.077791 0.025 0 0 -0.003212</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_19'>
-        <pose frame=''>-3.77149 0.243229 0.025 0 -0 0</pose>
+        <pose frame=''>-9.59599 0.309765 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.77149 0.243229 0.025 0 -0 0</pose>
+          <pose frame=''>-9.59599 0.309765 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_2'>
-        <pose frame=''>-3.39761 0.221158 0.025 0 0 -0.043988</pose>
+        <pose frame=''>-9.46961 0.401419 0.025 0 0 -0.043988</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.39761 0.221158 0.025 0 0 -0.043988</pose>
+          <pose frame=''>-9.46961 0.401419 0.025 0 0 -0.043988</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_20'>
-        <pose frame=''>-3.65562 0.227624 0.025 0 -0 0</pose>
+        <pose frame=''>-9.44478 0.003549 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.65562 0.227624 0.025 0 -0 0</pose>
+          <pose frame=''>-9.44478 0.003549 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_21'>
-        <pose frame=''>-3.45225 -0.223479 0.025 0 0 -6.5e-05</pose>
+        <pose frame=''>-9.1699 0.207578 0.025 0 0 -6.5e-05</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.45225 -0.223479 0.025 0 0 -6.5e-05</pose>
+          <pose frame=''>-9.1699 0.207578 0.025 0 0 -6.5e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_22'>
-        <pose frame=''>-3.54494 -0.286753 0.025 0 0 -6.5e-05</pose>
+        <pose frame=''>-9.29447 -0.285497 0.025 0 0 -6.5e-05</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.54494 -0.286753 0.025 0 0 -6.5e-05</pose>
+          <pose frame=''>-9.29447 -0.285497 0.025 0 0 -6.5e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_23'>
-        <pose frame=''>-3.66231 -0.284543 0.025 0 -0 0</pose>
+        <pose frame=''>-9.59882 -0.277594 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.66231 -0.284543 0.025 0 -0 0</pose>
+          <pose frame=''>-9.59882 -0.277594 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_24'>
-        <pose frame=''>-3.43433 -0.285636 0.024997 2.9e-05 -2.9e-05 4e-06</pose>
+        <pose frame=''>-9.16868 0.116118 0.025 0 -0 5e-06</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.43433 -0.285636 0.024997 2.9e-05 -2.9e-05 4e-06</pose>
+          <pose frame=''>-9.16868 0.116118 0.025 0 -0 5e-06</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 -9.8 0 -0 0</acceleration>
-          <wrench>0 0 -0.098 0 -0 0</wrench>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_25'>
-        <pose frame=''>-3.6518 0.304685 0.025 0 -0 0</pose>
+        <pose frame=''>-9.44754 -0.282397 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.6518 0.304685 0.025 0 -0 0</pose>
+          <pose frame=''>-9.44754 -0.282397 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_26'>
-        <pose frame=''>-3.38615 -0.081331 0.025 0 -0 0</pose>
+        <pose frame=''>-9.18792 0.299239 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.38615 -0.081331 0.025 0 -0 0</pose>
+          <pose frame=''>-9.18792 0.299239 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_27'>
-        <pose frame=''>-3.38732 0.002047 0.025 0 -0 0</pose>
+        <pose frame=''>-9.18801 0.391077 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.38732 0.002047 0.025 0 -0 0</pose>
+          <pose frame=''>-9.18801 0.391077 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_28'>
-        <pose frame=''>-3.76649 0.161439 0.025 0 -0 0</pose>
+        <pose frame=''>-9.59943 0.124514 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.76649 0.161439 0.025 0 -0 0</pose>
+          <pose frame=''>-9.59943 0.124514 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_29'>
-        <pose frame=''>-3.53326 -0.05826 0.024991 -4e-06 -2e-06 -8e-05</pose>
+        <pose frame=''>-9.31489 0.301241 0.024997 -2.9e-05 -2.9e-05 -8.3e-05</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.53326 -0.05826 0.024991 -4e-06 -2e-06 -8e-05</pose>
+          <pose frame=''>-9.31489 0.301241 0.024997 -2.9e-05 -2.9e-05 -8.3e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -0.098 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_3'>
-        <pose frame=''>-3.56102 -0.214871 0.025 0 -0 0</pose>
+        <pose frame=''>-9.29716 0.017074 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.56102 -0.214871 0.025 0 -0 0</pose>
+          <pose frame=''>-9.29716 0.017074 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_30'>
-        <pose frame=''>-3.76364 0.095908 0.025 0 -0 0</pose>
+        <pose frame=''>-9.59749 0.416807 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.76364 0.095908 0.025 0 -0 0</pose>
+          <pose frame=''>-9.59749 0.416807 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_31'>
-        <pose frame=''>-3.75274 0.020027 0.025 0 -0 0</pose>
+        <pose frame=''>-9.61438 0.01756 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.75274 0.020027 0.025 0 -0 0</pose>
+          <pose frame=''>-9.61438 0.01756 0.025 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='at0_clone_32'>
+        <pose frame=''>-9.16042 -0.276608 0.025 0 0 -0.043979</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>-9.16042 -0.276608 0.025 0 0 -0.043979</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='at0_clone_33'>
+        <pose frame=''>-9.1682 -0.36527 0.025 0 0 -0.043979</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>-9.1682 -0.36527 0.025 0 0 -0.043979</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_4'>
-        <pose frame=''>-3.6995 -0.131 0.025 0 -0 0</pose>
+        <pose frame=''>-9.61258 -0.078194 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.6995 -0.131 0.025 0 -0 0</pose>
+          <pose frame=''>-9.61258 -0.078194 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_5'>
-        <pose frame=''>-3.58495 -0.139446 0.025 0 -0 0</pose>
+        <pose frame=''>-9.28887 0.19817 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.58495 -0.139446 0.025 0 -0 0</pose>
+          <pose frame=''>-9.28887 0.19817 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_6'>
-        <pose frame=''>-3.51466 0.077664 0.025 0 0 -0.004499</pose>
+        <pose frame=''>-9.45318 0.301941 0.025 0 0 -0.004499</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.51466 0.077664 0.025 0 0 -0.004499</pose>
+          <pose frame=''>-9.45318 0.301941 0.025 0 0 -0.004499</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_7'>
-        <pose frame=''>-3.51798 0.15577 0.025 0 0 -0.004502</pose>
+        <pose frame=''>-9.43335 0.194752 0.025 0 0 -0.004502</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.51798 0.15577 0.025 0 0 -0.004502</pose>
+          <pose frame=''>-9.43335 0.194752 0.025 0 0 -0.004502</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_8'>
-        <pose frame=''>-3.48326 -0.098926 0.024991 -1e-05 1e-06 -0.000143</pose>
+        <pose frame=''>-9.29073 0.109529 0.024995 -1.4e-05 3.2e-05 -0.00014</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.48326 -0.098926 0.024991 -1e-05 1e-06 -0.000143</pose>
+          <pose frame=''>-9.29073 0.109529 0.024995 -1.4e-05 3.2e-05 -0.00014</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -9.8 0 -0 0</acceleration>
           <wrench>0 0 -0.098 0 -0 0</wrench>
         </link>
       </model>
       <model name='at0_clone_9'>
-        <pose frame=''>-3.67 -0.210266 0.025 0 -0 0</pose>
+        <pose frame=''>-9.6075 -0.182973 0.025 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-3.67 -0.210266 0.025 0 -0 0</pose>
+          <pose frame=''>-9.6075 -0.182973 0.025 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -2420,185 +2440,11 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>-1.51369 -1.23884 0.782742 0 0.275643 2.35619</pose>
+        <pose frame=''>4.20772 -2.38138 1.84436 -0 0.691643 2.5162</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
-    <model name='Barrier Final Round'>
-      <static>1</static>
-      <link name='link'>
-        <inertial>
-          <mass>1</mass>
-          <inertia>
-            <ixx>0.083</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>0</iyy>
-            <iyz>0</iyz>
-            <izz>0.083</izz>
-          </inertia>
-        </inertial>
-        <collision name='collision'>
-          <geometry>
-            <box>
-              <size>0.05 23.1 0.33</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='visual'>
-          <geometry>
-            <box>
-              <size>0.05 23.1 0.33</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>255 131 0 1</ambient>
-            <diffuse>255 131 0 1</diffuse>
-            <specular>0.1 0.1 0.1 1</specular>
-            <emissive>0 0 0 0</emissive>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
-      <pose frame=''>-0.319092 -0.488512 0 0 -0 0</pose>
-    </model>
-    <model name='Barrier Final Round_clone'>
-      <static>1</static>
-      <link name='link'>
-        <inertial>
-          <mass>1</mass>
-          <inertia>
-            <ixx>0.083</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>0</iyy>
-            <iyz>0</iyz>
-            <izz>0.083</izz>
-          </inertia>
-        </inertial>
-        <collision name='collision'>
-          <geometry>
-            <box>
-              <size>0.05 8.21889 0.33</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='visual'>
-          <geometry>
-            <box>
-              <size>0.05 8.21889 0.33</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>255 131 0 1</ambient>
-            <diffuse>255 131 0 1</diffuse>
-            <specular>0.1 0.1 0.1 1</specular>
-            <emissive>0 0 0 0</emissive>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
-      <pose frame=''>0.977285 -0.235901 0 0 0 -1.57363</pose>
-    </model>
-    <model name='Barrier Final Round_clone_0'>
-      <static>1</static>
-      <link name='link'>
-        <inertial>
-          <mass>1</mass>
-          <inertia>
-            <ixx>0.083</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>0</iyy>
-            <iyz>0</iyz>
-            <izz>0.083</izz>
-          </inertia>
-        </inertial>
-        <collision name='collision'>
-          <geometry>
-            <box>
-              <size>0.05 8.21889 0.33</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='visual'>
-          <geometry>
-            <box>
-              <size>0.05 8.21889 0.33</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>255 131 0 1</ambient>
-            <diffuse>255 131 0 1</diffuse>
-            <specular>0.1 0.1 0.1 1</specular>
-            <emissive>0 0 0 0</emissive>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
-      <pose frame=''>-1.09635 -1.93801 0 0 0 -1.57363</pose>
-    </model>
     <model name='Barrier Final Round_clone_1'>
       <static>1</static>
       <link name='link'>
@@ -2656,6 +2502,294 @@
         <gravity>1</gravity>
       </link>
       <pose frame=''>-5.98501 -0.460309 0 0 0 -3.12143</pose>
+    </model>
+    <model name='Barrier Final Round_clone_0_clone'>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.05 11.9631 0.33</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.05 11.9631 0.33</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>255 131 0 1</ambient>
+            <diffuse>255 131 0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>0 0 0 0</emissive>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>-3.8086 1.33324 0 0 0 -1.57363</pose>
+    </model>
+    <model name='at0_clone_32'>
+      <static>0</static>
+      <link name='link'>
+        <inertial>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>4e-05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>4e-05</iyy>
+            <iyz>0</iyz>
+            <izz>4e-05</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://at0/materials/scripts</uri>
+              <uri>model://at0/materials/textures</uri>
+              <name>at0/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.8</mu>
+                <mu2>0.7</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>-9.1361 -0.291988 0.025 0 0 -0.043979</pose>
+    </model>
+    <model name='at0_clone_33'>
+      <static>0</static>
+      <link name='link'>
+        <inertial>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>4e-05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>4e-05</iyy>
+            <iyz>0</iyz>
+            <izz>4e-05</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://at0/materials/scripts</uri>
+              <uri>model://at0/materials/textures</uri>
+              <name>at0/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.8</mu>
+                <mu2>0.7</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>-9.1682 -0.36527 0.025 0 0 -0.043979</pose>
+    </model>
+    <model name='Barrier Final Round_clone_0_clone_clone'>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.05 11.9631 0.33</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.05 11.9631 0.33</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>255 131 0 1</ambient>
+            <diffuse>255 131 0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>0 0 0 0</emissive>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>-3.06647 -2.32815 0 0 0 -1.57363</pose>
+    </model>
+    <model name='Barrier Final Round_clone_1_clone_0'>
+      <static>1</static>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.083</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0.083</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.05 3.11809 0.33</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.05 3.11809 0.33</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>255 131 0 1</ambient>
+            <diffuse>255 131 0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>0 0 0 0</emissive>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>3.83208 0.863736 0 0 0 -3.12143</pose>
     </model>
   </world>
 </sdf>
