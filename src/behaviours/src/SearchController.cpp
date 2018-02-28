@@ -31,31 +31,64 @@ Result SearchController::DoWork()
 
   if(!targetFound) //If we haven't found a tag yet
   {
-    distance = distance + 0.5;
 
-    searchLocation.theta = currentLocation.theta;
-    searchLocation.x = centerLocation.x - (distance * cos(centerLocation.theta));
-    searchLocation.y = centerLocation.y - (distance * sin(centerLocation.theta));
+    if(first_waypoint)
+    {
+      first_waypoint = false;
+      initialHeading = angles::normalize_angle_positive(currentLocation.theta);
+    }
+
+    if(obstSeen && obstacleCalls > 4)
+    {
+      searchLocation = clusterLocation;
+      obstacleCalls = 0;
+    }
+    else if(!obstSeen)
+    {
+      distance = distance + 0.5;
+      obstacleCalls = 0;
+    }
+    else
+    {
+      obstSeen = false;
+    }
+
+    searchLocation.x = currentLocation.x + (0.5 * cos(initialHeading));
+    searchLocation.y = currentLocation.y + (0.5 * sin(initialHeading));
 
     cout << "Distance from center is going to be: " << distance << endl;
 
-    //store searchLocation into clusterLocation in case rover finds a cluster
-    clusterLocation = searchLocation;
+    //store clusterLocation in case rover finds a cluster
+    clusterLocation.x = centerLocation.x + (distance * cos(initialHeading));
+    clusterLocation.y = centerLocation.y + (distance * sin(initialHeading));
 
     cout << "driving forward .5 meters" << endl;
   }
   else //If we have found a tag and are going back to finding other tags
   {
+    if(!obstSeen && obstacleCalls > 0)
+    {
+      obstacleCalls = 0;
+    }
+
+    //recalc cluster location
+    float normalizedCurrentTheta = angles::normalize_angle_positive(currentLocation.theta);
+
+    clusterLocation.x = centerLocation.x + (distance * cos(initialHeading));
+    clusterLocation.y = centerLocation.y + (distance * sin(initialHeading));
+
+    searchLocation.theta = atan2(clusterLocation.y - currentLocation.y, clusterLocation.x - currentLocation.x);
 
     float clusterDistance = hypot(currentLocation.x - clusterLocation.x, currentLocation.y - clusterLocation.y);      //current distance from cluster and robot
-    float distanceTolerance = 0.35;   //error allowed between cluster and robot
+    float distanceTolerance = 0.10;   //error allowed between cluster and robot
 
     cout << "Cluster Distance:  " << clusterDistance << endl;
 
     //if not within a specific distance of cluster, go to cluster
     if(clusterDistance > distanceTolerance)
     {
-      searchLocation = clusterLocation;
+      searchLocation.x = clusterLocation.x;
+      searchLocation.y = clusterLocation.y;
 
       cout << "driving back to cluster" << endl;
     }
@@ -63,10 +96,15 @@ Result SearchController::DoWork()
     //if near cluster search around for more cubes...
     else
     {
+      if(!obstSeen && obstacleCalls > 0)
+      {
+        obstacleCalls = 0;
+      }
+
       //Search around cluster aimlessly
       searchLocation.theta = rng->gaussian(currentLocation.theta, M_PI);
-      searchLocation.x = clusterLocation.x + (1) * cos(searchLocation.theta);
-      searchLocation.y = clusterLocation.y + (1) * sin(searchLocation.theta);
+      searchLocation.x = clusterLocation.x + (.5) * cos(searchLocation.theta);
+      searchLocation.y = clusterLocation.y + (.5) * sin(searchLocation.theta);
 
       cout << "Searching around cluster for tags" << endl;
     }

@@ -40,7 +40,7 @@ public:
 
   void SetAprilTags(vector<Tag> tags);
   void SetSonarData(float left, float center, float right);
-  void SetPositionData(Point currentLocation);
+  void SetPositionData(Point currentLocationlalalalalaalala);
   void SetMapPositionData(Point currentLocationMap);
   void SetVelocityData(float linearVelocity, float angularVelocity);
   void SetMapVelocityData(float linearVelocity, float angularVelocity);
@@ -85,6 +85,7 @@ public:
   // allowed range.
   void setVirtualFenceOn( RangeShape* range );
   void setVirtualFenceOff( );
+  void clearObstacles();
 
 protected:
   void ProcessData();
@@ -116,6 +117,9 @@ private:
   DriveController driveController;
   RangeController range_controller;
   ManualWaypointController manualWaypointController;
+
+  Point centerLocation;
+  Point currentLocation;
 
   std::vector<PrioritizedController> prioritizedControllers;
   priority_queue<PrioritizedController> control_queue;

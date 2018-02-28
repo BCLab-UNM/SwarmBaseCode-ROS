@@ -251,16 +251,38 @@ bool LogicController::HasWork()
 }
 
 
+void LogicController::clearObstacles()
+{
+    obstacleController.Reset();
+}
+
 void LogicController::controllerInterconnect() 
 {
+
+  if(pickUpController.clusterSeen)
+  {
+    float distance = hypot(currentLocation.x - centerLocation.x, currentLocation.y - centerLocation.y);
+    searchController.SetDistance(distance);
+  }
+
   //If see a tag tell search controller
   if(pickUpController.GetTargetFound() && !searchController.GetTargetFound())
   {
     searchController.SetTargetFound(true);
   }
 
+  if(obstacleController.getObstacleDetected() && !searchController.GetTargetFound())
+  {
+      searchController.SetObstSeen(true);
+  }
+
   if (processState == PROCCESS_STATE_SEARCHING) 
   {
+
+    if(obstacleController.obstacleAvoided)
+    {
+        searchController.obstacleCalls++;
+    }
 
     //obstacle needs to know if the center ultrasound should be ignored
     if(pickUpController.GetIgnoreCenter()) 
@@ -274,13 +296,15 @@ void LogicController::controllerInterconnect()
       dropOffController.SetTargetPickedUp();
       obstacleController.setTargetHeld();
       searchController.SetSuccesfullPickup();
+      cout << "Telling obstacle controller to ignore last obstacle call" << endl;
     }
   }
 
   //ask if drop off has released the target from the claws yet
-  if (!dropOffController.HasTarget()) 
+  if (!dropOffController.HasTarget())
   {
     obstacleController.setTargetHeldClear();
+    //cout << "I am running this all the time for no reason" << endl;
   }
 
   //obstacle controller is running driveController needs to clear its waypoints
@@ -292,8 +316,9 @@ void LogicController::controllerInterconnect()
 }
 
 // Recieves position in the world inertial frame (should rename to SetOdomPositionData)
-void LogicController::SetPositionData(Point currentLocation) 
+void LogicController::SetPositionData(Point currentLocationODOM)
 {
+  currentLocation = currentLocationODOM;
   searchController.SetCurrentLocation(currentLocation);
   dropOffController.SetCurrentLocation(currentLocation);
   obstacleController.setCurrentLocation(currentLocation);
@@ -333,6 +358,7 @@ void LogicController::SetSonarData(float left, float center, float right)
 // Called once by RosAdapter in guarded init
 void LogicController::SetCenterLocationOdom(Point centerLocationOdom) 
 {
+  centerLocation = centerLocationOdom;
   searchController.SetCenterLocation(centerLocationOdom);
   dropOffController.SetCenterLocation(centerLocationOdom);
 }

@@ -99,6 +99,7 @@ const float waypointTolerance = 0.1; //10 cm tolerance.
 
 // used for calling code once but not in main
 bool initilized = false;
+bool first_autonomous = true;
 
 float linearVelocity = 0;
 float angularVelocity = 0;
@@ -253,7 +254,6 @@ int main(int argc, char **argv) {
   return EXIT_SUCCESS;
 }
 
-
 // This is the top-most logic control block organised as a state machine.
 // This function calls the dropOff, pickUp, and search controllers.
 // This block passes the goal location to the proportional-integral-derivative
@@ -261,6 +261,10 @@ int main(int argc, char **argv) {
 void behaviourStateMachine(const ros::TimerEvent&)
 {
 
+  if(!first_autonomous)
+  {
+    first_autonomous = true;
+  }
   std_msgs::String stateMachineMsg;
   
   // time since timerStartTime was set to current time
@@ -308,7 +312,12 @@ void behaviourStateMachine(const ros::TimerEvent&)
   // Robot is in automode
   if (currentMode == 2 || currentMode == 3)
   {
-    
+    if(first_autonomous)
+    {
+        logicController.clearObstacles();
+        first_autonomous = false;
+    }
+
     humanTime();
     
     //update the time used by all the controllers
@@ -372,7 +381,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
     
     
     //adds a blank space between sets of debugging data to easily tell one tick from the next
-    cout << endl;
+    //cout << endl;
     
   }
   
@@ -439,10 +448,14 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
     return; 
   }
 
-  if (message->detections.size() > 0) {
+  bool centerSeen = false;
+
+  if (message->detections.size() > 0)
+  {
     vector<Tag> tags;
 
-    for (int i = 0; i < message->detections.size(); i++) {
+    for (int i = 0; i < message->detections.size(); i++)
+    {
 
       // Package up the ROS AprilTag data into our own type that does not rely on ROS.
       Tag loc;
@@ -460,9 +473,19 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 							    tagPose.pose.orientation.z,
 							    tagPose.pose.orientation.w ) );
       tags.push_back(loc);
+
+      if(loc.getID() == 256)
+      {
+          centerSeen = true;
+      }
     }
     
     logicController.SetAprilTags(tags);
+  }
+
+  if(centerSeen)
+  {
+      centerLocationOdom = currentLocation;
   }
   
 }
@@ -704,11 +727,11 @@ void transformMapCentertoOdom()
   
   float diff = hypot(xdiff, ydiff);
   
-  if (diff > drift_tolerance)
-  {
-    centerLocationOdom.x += xdiff/diff;
-    centerLocationOdom.y += ydiff/diff;
-  }
+  //if (diff > drift_tolerance)
+  //{
+  //  centerLocationOdom.x += xdiff/diff;
+  //  centerLocationOdom.y += ydiff/diff;
+  //}
   
   //cout << "center x diff : " << centerLocationMapRef.x - centerLocationOdom.x << " center y diff : " << centerLocationMapRef.y - centerLocationOdom.y << endl;
   //cout << hypot(centerLocationMapRef.x - centerLocationOdom.x, centerLocationMapRef.y - centerLocationOdom.y) << endl;

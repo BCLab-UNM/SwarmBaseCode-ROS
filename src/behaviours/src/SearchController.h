@@ -26,9 +26,12 @@ public:
   void SetCurrentLocation(Point currentLocation);
   void SetCenterLocation(Point centerLocation);
   void SetSuccesfullPickup();
+  void SetDistance(float f) { distance = f; }
 
   bool GetTargetFound(){ targetFound; }
   bool SetTargetFound(bool val){ targetFound = val; }
+  void SetObstSeen(bool b) { obstSeen = b; }
+  int obstacleCalls = 0;
 
 protected:
 
@@ -44,12 +47,14 @@ private:
   //struct for returning data to ROS adapter
   Result result;
 
+  float initialHeading = 0;
   // Search state
   // Flag to allow special behaviour for the first waypoint
   bool first_waypoint = true;
   bool succesfullPickup = false;
   bool targetFound;
-  float distance = 1.0;
+  float distance = 0.0;
+  bool obstSeen = false;
 };
 
 #endif /* SEARCH_CONTROLLER */

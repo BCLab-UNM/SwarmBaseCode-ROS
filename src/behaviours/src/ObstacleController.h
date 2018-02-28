@@ -21,12 +21,16 @@ public:
   void setIgnoreCenterSonar();
   void setCurrentTimeInMilliSecs( long int time );
   void setTargetHeld ();
+  bool getObstacleDetected() { return obstacleDetected; }
+  int getObstacleCounter() { return obstacleCounter; }
+  void obstacleCounterReset() { obstacleCounter = 0; }
 
   // Checks if a target is held and if so resets the state of the obestacle controller otherwise does nothing
   void setTargetHeldClear();
   //Asked by logiccontroller to determine if drive controller should have its waypoints cleared
   bool getShouldClearWaypoints() {bool tmp = clearWaypoints; clearWaypoints = false; return tmp;}
 
+    bool obstacleAvoided; //record if an obstacke has been avoided
 protected:
 
   void ProcessData();
@@ -47,7 +51,7 @@ private:
   const float reactivate_center_sonar_threshold = 0.8; //reactive center sonar if it goes back above this distance, assuming it is deactivated
   const int targetCountPivot = 6; ///unused variable
   const float obstacleDistancePivot = 0.2526; ///unused variable
-  const float triggerDistance = 0.55;
+  const float triggerDistance = 0.35;
 
   /*
      * Member variables
@@ -56,7 +60,7 @@ private:
 
   bool obstacleInterrupt; //records if obstacle has interupted
   bool obstacleDetected;  //records if an obstacle has been detected
-  bool obstacleAvoided; //record if an obstacke has been avoided
+
   bool clearWaypoints = false;  //record if drivecontrollers waypoints should be cleared
 
   float left = 0; //distance on left ultrasound
@@ -74,6 +78,8 @@ private:
   long int current_time;
   long int timeSinceTags;
   long int delay;
+
+  int obstacleCounter;
 
   bool targetHeld = false;
   bool previousTargetState = false;

@@ -6,6 +6,7 @@ ObstacleController::ObstacleController()
   obstacleDetected = false;
   obstacleInterrupt = false;
   result.PIDMode = CONST_PID; //use the const PID to turn at a constant speed
+  obstacleCounter = 0;
 }
 
 
@@ -58,11 +59,12 @@ void ObstacleController::avoidObstacle() {
 
 // A collection zone was seen in front of the rover and we are not carrying a target
 // so avoid running over the collection zone and possibly pushing cubes out.
-void ObstacleController::avoidCollectionZone() {
+void ObstacleController::avoidCollectionZone()
+{
   
     result.type = precisionDriving;
 
-    result.pd.cmdVel = 0.0;
+/*    result.pd.cmdVel = 0.0;
 
     // Decide which side of the rover sees the most april tags and turn away
     // from that side
@@ -75,11 +77,18 @@ void ObstacleController::avoidCollectionZone() {
     result.pd.setPointVel = 0.0;
     result.pd.cmdVel = 0.0;
     result.pd.setPointYaw = 0;
+    */
+
+    result.pd.setPointVel = 0.0;
+    result.pd.cmdVel = -0.2;
+    result.pd.setPointYaw = 0;
 }
 
 
-Result ObstacleController::DoWork() {
+Result ObstacleController::DoWork()
+{
 
+  obstacleCounter++;
   clearWaypoints = true;
   set_waypoint = true;
   result.PIDMode = CONST_PID;
@@ -93,7 +102,8 @@ Result ObstacleController::DoWork() {
   }
 
   //if an obstacle has been avoided
-  if (can_set_waypoint) {
+  if (can_set_waypoint)
+  {
 
     can_set_waypoint = false; //only one waypoint is set
     set_waypoint = false;
@@ -102,8 +112,8 @@ Result ObstacleController::DoWork() {
     result.type = waypoint; 
     result.PIDMode = FAST_PID; //use fast pid for waypoints
     Point forward;            //waypoint is directly ahead of current heading
-    forward.x = currentLocation.x + (0.5 * cos(currentLocation.theta));
-    forward.y = currentLocation.y + (0.5 * sin(currentLocation.theta));
+    forward.x = currentLocation.x + (0.25 * cos(currentLocation.theta + M_PI));
+    forward.y = currentLocation.y + (0.25 * sin(currentLocation.theta + M_PI));
     result.wpts.waypoints.clear();
     result.wpts.waypoints.push_back(forward);
   }

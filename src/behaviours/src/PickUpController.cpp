@@ -25,9 +25,11 @@ PickUpController::~PickUpController() { /*Destructor*/  }
 void PickUpController::SetTagData(vector<Tag> tags)
 {
 
+  clusterSeen = false;
+
   if (tags.size() > 0)
   {
-
+    targetsSeen = 0;
     nTargetsSeen = tags.size();
 
     //we saw a target, set target_timer
@@ -42,6 +44,7 @@ void PickUpController::SetTagData(vector<Tag> tags)
 
       if (tags[i].getID() == 0)
       {
+        targetsSeen++;
 
         targetFound = true;
 
@@ -64,12 +67,17 @@ void PickUpController::SetTagData(vector<Tag> tags)
 
           if (has_control)
           {
-            cout << "pickup reset return interupt free" << endl;
+            //cout << "pickup reset return interupt free" << endl;
             release_control = true;
           }
 
           return;
         }
+      }
+
+      if(targetsSeen > 4)
+      {
+          clusterSeen = true;
       }
     }
 
@@ -97,7 +105,7 @@ void PickUpController::SetTagData(vector<Tag> tags)
 
     blockYawError = atan((tags[target].getPositionX() + cameraOffsetCorrection)/blockDistance)*1.05; //angle to block from bottom center of chassis on the horizontal.
 
-    cout << "blockYawError TAGDATA:  " << blockYawError << endl;
+    //cout << "blockYawError TAGDATA:  " << blockYawError << endl;
 
   }
 
@@ -145,10 +153,13 @@ void PickUpController::ProcessData()
   // return to the center.
   if (blockDistanceFromCamera < 0.14 && Td < 3.9)
   {
+    backup = true;
+  }
+  else if(targetHeld)
+  {
     result.type = behavior;
     result.b = nextProcess;
     result.reset = true;
-    targetHeld = true;
   }
   //Lower wrist and open fingers if no locked target -- this is the
   //case if the robot lost tracking, or missed the cube when
@@ -198,7 +209,37 @@ Result PickUpController::DoWork()
 
   has_control = true;
 
-  if (!targetHeld)
+  if(backup)
+  {
+
+      if(first_backup)
+      {
+        millTimer = current_time;
+        first_backup = false;
+      }
+
+      //difference between current time and millisecond time
+      long int Tdifference = current_time - millTimer;
+
+      // converts from a millisecond difference to a second difference
+      // Td = [T]ime [D]ifference IN SECONDS
+      float Td = Tdifference/1e3;
+
+      if(Td > 4)
+      {
+        targetHeld = true;
+      }
+      else
+      {
+        result.pd.cmdVel = -0.15;
+        result.pd.cmdAngularError= 0.0;
+        result.fingerAngle = 0;
+        result.wristAngle = 0;
+        return result;
+      }
+  }
+
+  else if (!targetHeld)
   {
     //threshold distance to be from the target block before attempting pickup
     float targetDistance = 0.15; //meters
@@ -373,6 +414,8 @@ void PickUpController::Reset() {
   targetFound = false;
   interupted = false;
   targetHeld = false;
+  first_backup = true;
+  backup = false;
 
   result.pd.cmdVel = 0;
   result.pd.cmdAngularError= 0;

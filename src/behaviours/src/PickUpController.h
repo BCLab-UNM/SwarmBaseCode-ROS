@@ -34,6 +34,7 @@ public:
   void SetCurrentTimeInMilliSecs( long int time );
 
   bool GetTargetFound(){ return targetFound; }
+  bool clusterSeen = false;
 
 protected:
 
@@ -47,12 +48,16 @@ private:
 
   bool targetFound;
   bool targetHeld;
+  bool backup = false;
+  bool first_backup = true;
 
   // Failsafe state. No legitimate behavior state. If in this state for too long return to searching as default behavior.
   bool timeOut;
   int nTargetsSeen;
   long int millTimer;
   long int target_timer;
+
+  int targetsSeen = 0;
 
   //yaw error to target block
   double blockYawError;
