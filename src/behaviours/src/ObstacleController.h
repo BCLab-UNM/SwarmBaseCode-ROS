@@ -93,7 +93,7 @@ private:
   bool can_set_waypoint = false;
 
   float camera_offset_correction = 0.020; //meters;
-
+  int numTargets = 0;
   bool cluster_seen = false;
 };
 

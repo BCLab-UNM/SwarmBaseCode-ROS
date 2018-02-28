@@ -20,7 +20,8 @@ void ObstacleController::Reset() {
 }
 
 // Avoid crashing into objects detected by the ultraound
-void ObstacleController::avoidObstacle() {
+void ObstacleController::avoidObstacle()
+{
   
     //always turn left to avoid obstacles
     if (right < triggerDistance || center < triggerDistance || left < triggerDistance)
@@ -176,8 +177,11 @@ void ObstacleController::ProcessData() {
   //if any sonar is below the trigger distance set physical obstacle true
   if (left < triggerDistance || right < triggerDistance || center < triggerDistance)
   {
-    phys = true;
-    timeSinceTags = current_time;
+    if(numTargets < 2)
+    {
+      phys = true;
+      timeSinceTags = current_time;
+    }
   }
 
   //if physical obstacle or collection zone visible
@@ -214,7 +218,7 @@ void ObstacleController::setTagData(vector<Tag> tags)
 bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags )
 {
 
-  int numTargets = 0;
+  numTargets = 0;
   int targets_indicating_cluster = 10;
 
   cluster_seen = false;
@@ -257,7 +261,8 @@ bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags )
 }
 
 //obstacle controller should inrerupt is based upon the transition from not seeing and obstacle to seeing an obstacle
-bool ObstacleController::ShouldInterrupt() {
+bool ObstacleController::ShouldInterrupt()
+{
 
   //if we see and obstacle and havent thrown an interrupt yet
   if(obstacleDetected && !obstacleInterrupt)
