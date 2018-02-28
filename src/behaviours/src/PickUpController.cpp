@@ -25,7 +25,9 @@ PickUpController::~PickUpController() { /*Destructor*/  }
 void PickUpController::SetTagData(vector<Tag> tags)
 {
 
-  clusterSeen = false;
+  cluster_seen = false;
+
+  int targets_indicating_cluster = 10;
 
   if (tags.size() > 0)
   {
@@ -75,9 +77,9 @@ void PickUpController::SetTagData(vector<Tag> tags)
         }
       }
 
-      if(targetsSeen > 4)
+      if(targetsSeen > targets_indicating_cluster)
       {
-          clusterSeen = true;
+          cluster_seen = true;
       }
     }
 

@@ -259,10 +259,16 @@ void LogicController::clearObstacles()
 void LogicController::controllerInterconnect() 
 {
 
-  if(pickUpController.clusterSeen)
+  if(pickUpController.GetClusterSeen() || obstacleController.GetClusterSeen())
   {
-    float distance = hypot(currentLocation.x - centerLocation.x, currentLocation.y - centerLocation.y);
+    float distance = hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y);
+    cout << "Telling searchController new distance to cluster is:  " << distance << endl;
     searchController.SetDistance(distance);
+    searchController.SetClusterLocation();
+  }
+  else
+  {
+    searchController.ResetClusterAVG();
   }
 
   //If see a tag tell search controller

@@ -26,18 +26,23 @@ public:
   void SetCurrentLocation(Point currentLocation);
   void SetCenterLocation(Point centerLocation);
   void SetSuccesfullPickup();
-  void SetDistance(float f) { distance = f; }
+  float cluster_offset = 0.8;
+  void SetDistance(float f) { distance = f + cluster_offset; }
 
   bool GetTargetFound(){ targetFound; }
   bool SetTargetFound(bool val){ targetFound = val; }
   void SetObstSeen(bool b) { obstSeen = b; }
   int obstacleCalls = 0;
+  void SetClusterLocation();
+  void ResetClusterAVG();
 
 protected:
 
   void ProcessData();
 
 private:
+
+  vector<Point> clusterAVG;
 
   random_numbers::RandomNumberGenerator* rng;
   Point currentLocation;

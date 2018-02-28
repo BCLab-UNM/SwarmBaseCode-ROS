@@ -122,6 +122,9 @@ char host[128];
 string publishedName;
 char prev_state_machine[128];
 
+vector<Point> currentLocations;
+Point currentLoc;
+
 // Publishers
 ros::Publisher stateMachinePublish;
 ros::Publisher status_publisher;
@@ -324,7 +327,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
     logicController.SetCurrentTimeInMilliSecs( getROSTimeInMilliSecs() );
     
     //update center location
-    logicController.SetCenterLocationOdom( updateCenterLocation() );
+    //logicController.SetCenterLocationOdom( updateCenterLocation() );
     
     //ask logic controller for the next set of actuator commands
     result = logicController.DoWork();
@@ -477,6 +480,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
       if(loc.getID() == 256)
       {
           centerSeen = true;
+          currentLocations.push_back(currentLoc);
       }
     }
     
@@ -485,7 +489,29 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
   if(centerSeen)
   {
-      centerLocationOdom = currentLocation;
+    int size = currentLocations.size();
+
+    float avgX = currentLocations[0].x;
+    float avgY = currentLocations[0].y;
+
+    for(int i = 1; i < size; i++)
+    {
+      avgX += currentLocations[i].x;
+      avgY += currentLocations[i].y;
+    }
+
+    avgX = avgX/size;
+    avgY = avgY/size;
+
+    Point center;
+
+    center.x = avgX;
+    center.y = avgY;
+    logicController.SetCenterLocationOdom(center);
+  }
+  else
+  {
+    currentLocations.clear();
   }
   
 }
@@ -738,7 +764,8 @@ void transformMapCentertoOdom()
           
 }
 
-void humanTime() {
+void humanTime()
+{
   
   float timeDiff = (getROSTimeInMilliSecs()-startTime)/1e3;
   if (timeDiff >= 60) {

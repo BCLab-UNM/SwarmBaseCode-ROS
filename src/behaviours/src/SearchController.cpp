@@ -59,10 +59,10 @@ Result SearchController::DoWork()
     cout << "Distance from center is going to be: " << distance << endl;
 
     //store clusterLocation in case rover finds a cluster
-    clusterLocation.x = centerLocation.x + (distance * cos(initialHeading));
-    clusterLocation.y = centerLocation.y + (distance * sin(initialHeading));
+    clusterLocation.x = centerLocation.x + ((distance + cluster_offset)  * cos(initialHeading));
+    clusterLocation.y = centerLocation.y + ((distance + cluster_offset) * sin(initialHeading));
 
-    cout << "driving forward .5 meters" << endl;
+    cout << "Cluster X:  " << clusterLocation.x << ", Cluster Y:  " << clusterLocation.y <<  endl;
   }
   else //If we have found a tag and are going back to finding other tags
   {
@@ -70,14 +70,6 @@ Result SearchController::DoWork()
     {
       obstacleCalls = 0;
     }
-
-    //recalc cluster location
-    float normalizedCurrentTheta = angles::normalize_angle_positive(currentLocation.theta);
-
-    clusterLocation.x = centerLocation.x + (distance * cos(initialHeading));
-    clusterLocation.y = centerLocation.y + (distance * sin(initialHeading));
-
-    searchLocation.theta = atan2(clusterLocation.y - currentLocation.y, clusterLocation.x - currentLocation.x);
 
     float clusterDistance = hypot(currentLocation.x - clusterLocation.x, currentLocation.y - clusterLocation.y);      //current distance from cluster and robot
     float distanceTolerance = 0.10;   //error allowed between cluster and robot
@@ -145,18 +137,29 @@ Result SearchController::DoWork()
   return result;
 }
 
-void SearchController::SetCenterLocation(Point centerLocation) {
-  
+void SearchController::SetCenterLocation(Point centerLocation)
+{
+  float cluster_diff_theta = atan2(centerLocation.x - clusterLocation.x, centerLocation.y - clusterLocation.y);
+
+  float offset = -1.3;
+
+  centerLocation.x = centerLocation.x + (offset * cos(cluster_diff_theta));
+  centerLocation.y = centerLocation.y + (offset * sin(cluster_diff_theta));
+
   float diffX = this->centerLocation.x - centerLocation.x;
   float diffY = this->centerLocation.y - centerLocation.y;
   this->centerLocation = centerLocation;
   
   if (!result.wpts.waypoints.empty())
   {
-  result.wpts.waypoints.back().x -= diffX;
-  result.wpts.waypoints.back().y -= diffY;
+    clusterLocation.x -= diffX;
+    clusterLocation.y -= diffY;
+//    result.wpts.waypoints.back().x -= diffX;
+//    result.wpts.waypoints.back().y -= diffY;
   }
-  
+
+  cout << "(SetCenterLocation)Cluster X:  " << clusterLocation.x << ", Cluster Y:  " << clusterLocation.y <<  endl;
+  cout << "(SetCenterLocation)Center X:  " << centerLocation.x << ", Center Y:  " << centerLocation.y << endl;
 }
 
 void SearchController::SetCurrentLocation(Point currentLocation) {
@@ -181,3 +184,37 @@ void SearchController::SetSuccesfullPickup() {
 }
 
 
+void SearchController::SetClusterLocation()
+{
+
+  clusterAVG.push_back(currentLocation);
+
+  int size = clusterAVG.size();
+
+  float avgX;
+  float avgY;
+  float avgTheta;
+
+  for(int i = 0; i < size; i++)
+  {
+    avgX += clusterAVG[i].x;
+    //cout << "ClusterAVG[" << i << "].x= " << clusterAVG[i].x << endl;
+    avgY += clusterAVG[i].y;
+    cout << "ClusterAVG[" << i << "].y= " << clusterAVG[i].y << endl;
+    avgTheta = clusterAVG[i].theta;
+  }
+
+  clusterLocation.x = avgX/size;
+  clusterLocation.y = avgY/size;
+  clusterLocation.theta = avgTheta/size;
+
+  clusterLocation.x = clusterLocation.x + (cluster_offset * cos(clusterLocation.theta));
+  clusterLocation.y = clusterLocation.y + (cluster_offset * sin(clusterLocation.theta));
+
+  cout << "(SetClusterLocation)Cluster X:  " << clusterLocation.x << ", Cluster Y:  " << clusterLocation.y <<  endl;
+}
+
+void SearchController::ResetClusterAVG()
+{
+  clusterAVG.clear();
+}

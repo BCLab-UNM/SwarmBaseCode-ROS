@@ -198,43 +198,58 @@ void ObstacleController::ProcessData() {
 // Added relative pose information so we know whether the
 // top of the AprilTag is pointing towards the rover or away.
 // If the top of the tags are away from the rover then treat them as obstacles. 
-void ObstacleController::setTagData(vector<Tag> tags){
+void ObstacleController::setTagData(vector<Tag> tags)
+{
   collection_zone_seen = false;
   count_left_collection_zone_tags = 0;
   count_right_collection_zone_tags = 0;
 
-  // this loop is to get the number of center tags
-  if (!targetHeld) {
-    for (int i = 0; i < tags.size(); i++) { //redundant for loop
-      if (tags[i].getID() == 256) {
-
-	collection_zone_seen = checkForCollectionZoneTags( tags );
-        timeSinceTags = current_time;
-      }
-    }
+  if (!targetHeld)
+  {
+    collection_zone_seen = checkForCollectionZoneTags( tags );
+    timeSinceTags = current_time;
   }
 }
 
-bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags ) {
+bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags )
+{
 
-  for ( auto & tag : tags ) { 
+  int numTargets = 0;
+  int targets_indicating_cluster = 10;
 
-    // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle. 
-    //If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle. 
-    //This allows the robot to leave the collection zone after dropping off a target.
-    if ( tag.calcYaw() > 0 ) 
+  cluster_seen = false;
+
+  for ( auto & tag : tags )
+  {
+    if (tag.getID() == 256)
+    {
+      // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle.
+      //If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle.
+      //This allows the robot to leave the collection zone after dropping off a target.
+      if ( tag.calcYaw() > 0 )
       {
-	// checks if tag is on the right or left side of the image
-	if (tag.getPositionX() + camera_offset_correction > 0) {
-	  count_right_collection_zone_tags++;
-	  
-	} else {
-	  count_left_collection_zone_tags++;
-	}
+        // checks if tag is on the right or left side of the image
+        if (tag.getPositionX() + camera_offset_correction > 0)
+        {
+          count_right_collection_zone_tags++;
+        }
+        else
+        {
+          count_left_collection_zone_tags++;
+        }
       }
-    
+    }
+
+    if(tag.getID() == 0)
+    {
+      numTargets++;
+    }
   }
 
+  if(numTargets > targets_indicating_cluster)
+  {
+    cluster_seen = true;
+  }
 
   // Did any tags indicate that the robot is inside the collection zone?
   return count_left_collection_zone_tags + count_right_collection_zone_tags > 0;

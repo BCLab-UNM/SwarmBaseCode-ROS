@@ -34,7 +34,7 @@ public:
   void SetCurrentTimeInMilliSecs( long int time );
 
   bool GetTargetFound(){ return targetFound; }
-  bool clusterSeen = false;
+  bool GetClusterSeen(){ return cluster_seen; }
 
 protected:
 
@@ -58,6 +58,7 @@ private:
   long int target_timer;
 
   int targetsSeen = 0;
+  bool cluster_seen = false;
 
   //yaw error to target block
   double blockYawError;

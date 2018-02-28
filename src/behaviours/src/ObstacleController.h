@@ -25,6 +25,8 @@ public:
   int getObstacleCounter() { return obstacleCounter; }
   void obstacleCounterReset() { obstacleCounter = 0; }
 
+  bool GetClusterSeen() { return cluster_seen; }
+
   // Checks if a target is held and if so resets the state of the obestacle controller otherwise does nothing
   void setTargetHeldClear();
   //Asked by logiccontroller to determine if drive controller should have its waypoints cleared
@@ -91,6 +93,8 @@ private:
   bool can_set_waypoint = false;
 
   float camera_offset_correction = 0.020; //meters;
+
+  bool cluster_seen = false;
 };
 
 #endif // OBSTACLECONTOLLER_H
