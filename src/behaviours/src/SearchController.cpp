@@ -65,8 +65,8 @@ Result SearchController::DoWork()
     {
       //Search around cluster aimlessly
       searchLocation.theta = rng->gaussian(currentLocation.theta, M_PI);
-      searchLocation.x = clusterLocation.x + (0.5) * cos(searchLocation.theta);
-      searchLocation.y = clusterLocation.y + (0.5) * sin(searchLocation.theta);
+      searchLocation.x = clusterLocation.x + (1) * cos(searchLocation.theta);
+      searchLocation.y = clusterLocation.y + (1) * sin(searchLocation.theta);
 
       cout << "Searching around cluster for tags" << endl;
     }

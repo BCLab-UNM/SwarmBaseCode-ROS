@@ -22,14 +22,37 @@ void ObstacleController::Reset() {
 void ObstacleController::avoidObstacle() {
   
     //always turn left to avoid obstacles
-    if (right < 0.8 || center < 0.8 || left < 0.8) {
+    if (right < triggerDistance || center < triggerDistance || left < triggerDistance)
+    {
+
       result.type = precisionDriving;
 
-      result.pd.cmdAngular = -K_angular;
-
-      result.pd.setPointVel = 0.0;
-      result.pd.cmdVel = 0.0;
-      result.pd.setPointYaw = 0;
+      //obstacle on right
+      if(right < center && right < left)
+      {
+        result.pd.cmdAngular = K_angular;
+        result.pd.cmdVel = 0.0;
+      }
+      //obstacle on left
+      else if(left < center && left < right)
+      {
+          result.pd.cmdAngular = -K_angular;
+          result.pd.cmdVel = 0.0;
+      }
+      //obstacle in front
+      else if(center < left && center < right && center > .15)
+      {
+          result.pd.cmdAngular = 0.0;
+          result.pd.cmdVel = -K_angular;
+      }
+      //all other cases
+      else
+      {
+          result.pd.cmdAngular = 0.0;
+          result.pd.cmdVel = -K_angular;
+      }
+        result.pd.setPointVel = 0.0;
+        result.pd.setPointYaw = 0;
     }
 }
 
