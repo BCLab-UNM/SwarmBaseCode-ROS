@@ -195,13 +195,17 @@ void SearchController::SetClusterLocation()
   float avgY;
   float avgTheta;
 
-  for(int i = 0; i < size; i++)
+  avgX = clusterAVG[0].x;
+  avgY = clusterAVG[0].y;
+  avgTheta = clusterAVG[0].theta;
+
+  for(int i = 1; i < size; i++)
   {
     avgX += clusterAVG[i].x;
     //cout << "ClusterAVG[" << i << "].x= " << clusterAVG[i].x << endl;
     avgY += clusterAVG[i].y;
     cout << "ClusterAVG[" << i << "].y= " << clusterAVG[i].y << endl;
-    avgTheta = clusterAVG[i].theta;
+    avgTheta += clusterAVG[i].theta;
   }
 
   clusterLocation.x = avgX/size;
