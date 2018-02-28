@@ -31,7 +31,7 @@ DropOffController::~DropOffController() {
 
 Result DropOffController::DoWork() {
 
-  cout << "8" << endl;
+  //cout << "8" << endl;
 
   int count = countLeft + countRight;
 
@@ -45,7 +45,7 @@ Result DropOffController::DoWork() {
   //to resart our search.
   if(reachedCollectionPoint)
   {
-    cout << "2" << endl;
+    //cout << "2" << endl;
     if (timerTimeElapsed >= 5)
     {
       if (finalInterrupt)
@@ -58,7 +58,7 @@ Result DropOffController::DoWork() {
       else
       {
         finalInterrupt = true;
-        cout << "1" << endl;
+        //cout << "1" << endl;
       }
     }
     else if (timerTimeElapsed >= 0.1)
@@ -135,7 +135,7 @@ Result DropOffController::DoWork() {
   if (count > 0 || seenEnoughCenterTags || prevCount > 0) //if we have a target and the center is located drive towards it.
   {
 
-    cout << "9" << endl;
+    //cout << "9" << endl;
     centerSeen = true;
 
     if (first_center && isPrecisionDriving)
@@ -213,13 +213,15 @@ Result DropOffController::DoWork() {
 
   //was on approach to center and did not seenEnoughCenterTags
   //for lostCenterCutoff seconds so reset.
-  else if (centerApproach) {
+  else if (centerApproach)
+  {
 
     long int elapsed = current_time - lastCenterTagThresholdTime;
     float timeSinceSeeingEnoughCenterTags = elapsed/1e3; // Convert from milliseconds to seconds
+
     if (timeSinceSeeingEnoughCenterTags > lostCenterCutoff)
     {
-      cout << "4" << endl;
+      //cout << "4" << endl;
       //go back to drive to center base location instead of drop off attempt
       reachedCollectionPoint = false;
       seenEnoughCenterTags = false;
@@ -284,7 +286,7 @@ void DropOffController::Reset() {
   targetHeld = false;
   startWaypoint = false;
   first_center = true;
-  cout << "6" << endl;
+  //cout << "6" << endl;
 
 }
 
@@ -340,7 +342,8 @@ bool DropOffController::ShouldInterrupt() {
 
 bool DropOffController::HasWork() {
 
-  if(timerTimeElapsed > -1) {
+  if(timerTimeElapsed > -1)
+  {
     long int elapsed = current_time - returnTimer;
     timerTimeElapsed = elapsed/1e3; // Convert from milliseconds to seconds
   }
