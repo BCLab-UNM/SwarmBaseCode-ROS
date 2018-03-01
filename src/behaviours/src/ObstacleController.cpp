@@ -22,7 +22,7 @@ void ObstacleController::Reset() {
 // Avoid crashing into objects detected by the ultraound
 void ObstacleController::avoidObstacle()
 {
-  
+
     //always turn left to avoid obstacles
     if (right < triggerDistance || center < triggerDistance || left < triggerDistance)
     {
@@ -62,7 +62,7 @@ void ObstacleController::avoidObstacle()
 // so avoid running over the collection zone and possibly pushing cubes out.
 void ObstacleController::avoidCollectionZone()
 {
-  
+
     result.type = precisionDriving;
 
 /*    result.pd.cmdVel = 0.0;
@@ -110,7 +110,7 @@ Result ObstacleController::DoWork()
     set_waypoint = false;
     clearWaypoints = false;
 
-    result.type = waypoint; 
+    result.type = waypoint;
     result.PIDMode = FAST_PID; //use fast pid for waypoints
     Point forward;            //waypoint is directly ahead of current heading
     forward.x = currentLocation.x + (0.25 * cos(currentLocation.theta + M_PI));
@@ -153,7 +153,7 @@ void ObstacleController::ProcessData() {
 
   //If we are ignoring the center sonar
   if(ignore_center_sonar){
-    //If the center distance is longer than the reactivation threshold 
+    //If the center distance is longer than the reactivation threshold
     if(center > reactivate_center_sonar_threshold){
       //currently do not re-enable the center sonar instead ignore it till the block is dropped off
       //ignore_center_sonar = false; //look at sonar again beacuse center ultrasound has gone long
@@ -201,7 +201,7 @@ void ObstacleController::ProcessData() {
 // the collection zone
 // Added relative pose information so we know whether the
 // top of the AprilTag is pointing towards the rover or away.
-// If the top of the tags are away from the rover then treat them as obstacles. 
+// If the top of the tags are away from the rover then treat them as obstacles.
 void ObstacleController::setTagData(vector<Tag> tags)
 {
   collection_zone_seen = false;
@@ -295,7 +295,7 @@ bool ObstacleController::HasWork() {
 
 //ignore center ultrasound
 void ObstacleController::setIgnoreCenterSonar(){
-  ignore_center_sonar = true; 
+  ignore_center_sonar = true;
 }
 
 void ObstacleController::setCurrentTimeInMilliSecs( long int time )
@@ -318,11 +318,8 @@ void ObstacleController::setTargetHeld() {
 void ObstacleController::setTargetHeldClear()
 {
   //adjust current state on transition from cube held to cube not held
-  if (targetHeld)
-  {
     Reset();
     targetHeld = false;
     previousTargetState = false;
     ignore_center_sonar = false;
-  }
 }

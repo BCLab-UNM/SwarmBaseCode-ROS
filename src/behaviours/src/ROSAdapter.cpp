@@ -264,10 +264,6 @@ int main(int argc, char **argv) {
 void behaviourStateMachine(const ros::TimerEvent&)
 {
 
-  if(!first_autonomous)
-  {
-    first_autonomous = true;
-  }
   std_msgs::String stateMachineMsg;
   
   // time since timerStartTime was set to current time
@@ -426,6 +422,11 @@ void behaviourStateMachine(const ros::TimerEvent&)
   {
     stateMachinePublish.publish(stateMachineMsg);
     sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
+  }
+
+  if(!first_autonomous)
+  {
+    first_autonomous = true;
   }
 }
 

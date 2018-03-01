@@ -297,7 +297,7 @@ void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel
   int right = velOut + yawOut; //left and right are the same for vel output but opposite for yaw output
 
   //prevent combine output from going over tihs value
-  int sat = 180; 
+  int sat = 90;
   if (left  >  sat) {left  =  sat;}
   if (left  < -sat) {left  = -sat;}
   if (right >  sat) {right =  sat;}
@@ -316,7 +316,7 @@ void DriveController::slowPID(float errorVel,float errorYaw, float setPointVel, 
   int left = velOut - yawOut;
   int right = velOut + yawOut;
 
-  int sat = 180;
+  int sat = 120;
   if (left  >  sat) {left  =  sat;}
   if (left  < -sat) {left  = -sat;}
   if (right >  sat) {right =  sat;}
@@ -337,7 +337,7 @@ void DriveController::constPID(float erroVel,float constAngularError, float setP
   int left = velOut - yawOut;
   int right = velOut + yawOut;
 
-  int sat = 180;
+  int sat = 90;
   if (left  >  sat) {left  =  sat;}
   if (left  < -sat) {left  = -sat;}
   if (right >  sat) {right =  sat;}
