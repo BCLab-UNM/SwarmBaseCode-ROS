@@ -306,6 +306,14 @@ void LogicController::controllerInterconnect()
     }
   }
 
+  if (processState == PROCCESS_STATE_DROP_OFF)
+  {
+    if(dropOffController.GetCenterLocation().x != searchController.GetCenterLocation().x || dropOffController.GetCenterLocation().y != searchController.GetCenterLocation().y)
+    {
+      dropOffController.SetCenterLocation(searchController.GetCenterLocation());
+    }
+  }
+
   //ask if drop off has released the target from the claws yet
   if (!dropOffController.HasTarget())
   {

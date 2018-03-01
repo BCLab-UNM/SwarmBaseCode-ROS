@@ -141,7 +141,7 @@ void SearchController::SetCenterLocation(Point centerLocation)
 {
   float cluster_diff_theta = atan2(centerLocation.y - clusterLocation.y, centerLocation.x - clusterLocation.x);
 
-  float offset = 1.3;
+  float offset = 4;
 
   centerLocation.x = centerLocation.x + (offset * cos(cluster_diff_theta));
   centerLocation.y = centerLocation.y + (offset * sin(cluster_diff_theta));

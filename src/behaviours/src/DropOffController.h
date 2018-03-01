@@ -31,6 +31,8 @@ public:
 
   void SetCurrentTimeInMilliSecs( long int time );
 
+  Point GetCenterLocation(){ return centerLocation; }
+
 private:
 
   void ProcessData();

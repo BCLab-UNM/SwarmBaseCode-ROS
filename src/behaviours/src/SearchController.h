@@ -36,6 +36,8 @@ public:
   void SetClusterLocation();
   void ResetClusterAVG();
 
+  Point GetCenterLocation() { return centerLocation; }
+
 protected:
 
   void ProcessData();
