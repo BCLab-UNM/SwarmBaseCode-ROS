@@ -1,11 +1,12 @@
 import signal
 import sys
+import os
 
 import rospy
 from std_msgs.msg import Int32MultiArray
 
-logfile = open('../KSC_extended_calibration.csv', 'w')
-calfile = open('../KSC.cal', 'w')
+logfile = open(os.path.join(os.path.expanduser('~'), 'KSC_extended_calibration.csv'), 'w')
+calfile = open(os.path.join(os.path.expanduser('~'), 'KSC.cal'), 'w')
 x_min = sys.maxint
 y_min = x_min
 z_min = x_min
