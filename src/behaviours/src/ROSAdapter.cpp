@@ -74,7 +74,7 @@ void openFingers(); 	// Open fingers to 90 degrees
 void closeFingers();	// Close fingers to 0 degrees
 void raiseWrist();  	// Return wrist back to 0 degrees
 void lowerWrist();  	// Lower wrist to 50 degrees
-void resultHandler();	// Not Used
+void resultHandler();	// Not Used/Dead Code, prototype has no definition
 
 
 Point updateCenterLocation();		//calls transformMapCenterToOdom, returns a center location in ODOM frame
@@ -86,10 +86,10 @@ geometry_msgs::Pose2D currentLocation;		//current location using ODOM
 geometry_msgs::Pose2D currentLocationMap;	//current location using GPS
 geometry_msgs::Pose2D currentLocationAverage;	//an average of the robots current location
 
-geometry_msgs::Pose2D centerLocation;		//??
+geometry_msgs::Pose2D centerLocation;		//Not used, dead code
 geometry_msgs::Pose2D centerLocationMap;	//A GPS point of the center location, used to help reduce drift from ODOM
 geometry_msgs::Pose2D centerLocationOdom;	//The centers location based on ODOM
-geometry_msgs::Pose2D centerLocationMapRef;	//??
+geometry_msgs::Pose2D centerLocationMapRef;	//Variable used in TransformMapCenterToOdom, can be moved to make it local instead of global
 
 int currentMode = 0;
 const float behaviourLoopTimeStep = 0.1; 	//time between the behaviour loop calls
@@ -371,7 +371,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
     }
     
     //publishHandeling here
-    //logicController.getPublishData(); suggested	//???
+    //logicController.getPublishData(); //Not Currently Implemented, used to get data from logic controller and publish to the appropriate ROS Topic; Suggested
     
     
     //adds a blank space between sets of debugging data to easily tell one tick from the next
