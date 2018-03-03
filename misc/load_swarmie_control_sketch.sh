@@ -32,7 +32,6 @@ fi
 
 echo "Build sketch and upload to arduino leonardo..."
 arduino_port=$(./get_arduino_port.sh)
-echo "port = $arduino_port"
 leo_cmd="--upload $arduino_sketch"
 leo_pref="--preserve-temp-files"
 leo_pref="$leo_pref --pref serial.port=$arduino_port"

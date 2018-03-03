@@ -102,7 +102,7 @@ Unpack_Run()
 		echo 'Starting ROS nodes on swarmie at $roverIP with master at $hostName';
 		sleep 2;
 		cd $dirName/misc/;
-		./rover_onboard_node_launch.sh $hostName;
+                ./rover_onboard_node_launch.sh $hostName $calFile;
 		exit 1;
 		/bin/bash;' exec $SHELL"
 		
@@ -228,8 +228,8 @@ if [ "$2" == "-S" ]; then
 
         PullGit_Pack &
         wait
-
-        while [ "${!i}" != "" ]; do
+        calFile=${@: -1}
+        while [ $i != $# ]; do
             roverIP=${!i}
             roverIP=${roverIP^^}
 
@@ -271,6 +271,7 @@ if [ "$2" == "-S" ]; then
         Pack &
         wait
 	calFile=${@: -1}
+        echo $calFile
         while [ $i != $# ]; do
             roverIP=${!i}
             roverIP=${roverIP^^}
@@ -383,7 +384,7 @@ elif [ $OPTION == "-G" ]; then
 
 	PullGit_Pack &
 	wait
-
+        read -p "Calibration File Name:  " calFile
 	while(true); do
 
 	i=0
@@ -491,7 +492,7 @@ elif [ $OPTION == "-L" ]; then
 
 	Pack &
 	wait
-
+        read -p "Calibration File Name:  " calFile
 	while(true); do
 
 	i=0
