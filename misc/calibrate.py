@@ -1,12 +1,16 @@
+#!/usr/bin/python
 import signal
 import sys
 import os
 
 import rospy
 from std_msgs.msg import Int32MultiArray
+if len(sys.argv) != 2:
+    print ('Usage: calibrate.py location')
+    sys.exit(1)
 
-logfile = open(os.path.join(os.path.expanduser('~'), 'KSC_extended_calibration.csv'), 'w')
-calfile = open(os.path.join(os.path.expanduser('~'), 'KSC.cal'), 'w')
+logfile = open(os.path.join(os.path.expanduser('~'), str(sys.argv[1]) + '_extended_calibration.csv'), 'w')
+calfile = open(os.path.join(os.path.expanduser('~'), str(sys.argv[1]) + '.cal'), 'w')
 x_min = sys.maxint
 y_min = x_min
 z_min = x_min
@@ -16,11 +20,11 @@ z_max = x_max
 
 def handle_exit(signal, frame) :
     global logfile, calfile, x_min, y_min, z_min, x_max, y_max, z_max
-    print ('\nSaving KSC.cal.')
+    print ('\nSaving ' + str(sys.argv[1])+ '.cal.')
     calfile.write('min: {{ {}, {}, {} }} max: {{ {}, {}, {} }}\n'.format(x_min, y_min, z_min, x_max, y_max, z_max))
     calfile.close()
 
-    print ('Closing KSC_extended_calibration.csv.')
+    print ('Saving ' + str(sys.argv[1]) + '_extended_calibration.csv.')
     logfile.close()
     
     sys.exit(0)

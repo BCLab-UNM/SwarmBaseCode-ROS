@@ -5,7 +5,7 @@
 #-------------------------READ THIS----------------------------#
 #If you have changed your rovers password you MUST edit this variable with the correct password to 
 #allow the reboot feature to work correctly!!
-roverPass="KSC-2018"
+roverPass="2018@KSC"
 #--------------------------------------------------------------#
 
 OPTION=$1
@@ -13,6 +13,7 @@ branch=$2
 roverIP=""
 branch=""
 needsReboot=false
+calFile=""
 
 cd ..
 dirPath="$(pwd)"
@@ -115,7 +116,7 @@ Run()
 	gnome-terminal --tab -x bash -c "echo -n -e '\033]0;$roverIP\007';
 		ssh -t swarmie@$roverIP 'echo 'Running $roverIP';
     cd $dirName/misc;
-		./rover_onboard_node_launch.sh $hostName;
+		./rover_onboard_node_launch.sh $hostName $calFile;
 		exit 1;
 		exit 1;
 		/bin/bash;' exec $SHELL"
@@ -269,8 +270,8 @@ if [ "$2" == "-S" ]; then
 
         Pack &
         wait
-
-        while [ "${!i}" != "" ]; do
+	calFile=${@: -1}
+        while [ $i != $# ]; do
             roverIP=${!i}
             roverIP=${roverIP^^}
 
@@ -316,9 +317,8 @@ if [ "$2" == "-S" ]; then
         done
 
     elif [ $OPTION == "-R" ]; then
-
-        while [ "${!i}" != "" ]; do
-
+	calFile=${@: -1}
+        while [ $i != $# ]; do
             roverIP=${!i}
             roverIP=${roverIP^^}
 
@@ -592,6 +592,7 @@ elif [ $OPTION == "-R" ]; then
 	echo "Running current swarmie(s) code"
 	echo "-------------------------------------------------------------"
 
+	read -p "Calibration File Name:  " calFile
 	while(true); do
 
 	i=0
@@ -602,6 +603,7 @@ elif [ $OPTION == "-R" ]; then
                 read -p "Option/Rover Name(s):  " -a arr
 
                 size=${#arr[@]}
+
 
 		while [ $i -lt $size ]; do
 
