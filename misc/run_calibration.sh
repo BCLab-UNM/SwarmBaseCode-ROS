@@ -24,6 +24,8 @@ rosrun rosserial_python serial_node.py _baud:=9600 $arduino_port &
 sleep 1
 
 echo "Starting Calibration"
+echo "Press Ctrl+C (^C) when finished..."
+
 python calibrate.py $1
 pkill roscore
 exit 0
