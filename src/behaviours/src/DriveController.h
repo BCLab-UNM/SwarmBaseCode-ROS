@@ -31,7 +31,7 @@ private:
 
   bool interupt = false; //hold if interupt has occured yet
 
-  float rotateOnlyAngleTolerance = 0.35;
+  float rotateOnlyAngleTolerance = 0.174;
   float finalRotationTolerance = 0.1; //dead code not used
   const float waypointTolerance = 0.10; //15 cm tolerance.
 

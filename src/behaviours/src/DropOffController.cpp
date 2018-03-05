@@ -84,6 +84,7 @@ Result DropOffController::DoWork() {
     result.type = waypoint;
     result.wpts.waypoints.clear();
     result.wpts.waypoints.push_back(this->centerLocation);
+    cout << "(Drop OFF)Center X:  " << centerLocation.x << ", Center Y:  " << centerLocation.y << endl;
     startWaypoint = false;
     isPrecisionDriving = false;
 

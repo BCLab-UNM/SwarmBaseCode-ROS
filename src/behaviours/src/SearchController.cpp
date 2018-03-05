@@ -60,9 +60,11 @@ Result SearchController::DoWork()
 
     //store clusterLocation in case rover finds a cluster
     clusterLocation.x = centerLocation.x + ((distance + cluster_offset)  * cos(initialHeading));
-    clusterLocation.y = centerLocation.y + ((distance + cluster_offset) * sin(initialHeading));
+    clusterLocation.y = centerLocation.y + 0.8 + ((distance + cluster_offset) * sin(initialHeading));
 
     cout << "Cluster X:  " << clusterLocation.x << ", Cluster Y:  " << clusterLocation.y <<  endl;
+
+    cout << "(SetCenterLocation)Center X:  " << centerLocation.x << ", Center Y:  " << centerLocation.y << endl;
   }
   else //If we have found a tag and are going back to finding other tags
   {
@@ -139,12 +141,16 @@ Result SearchController::DoWork()
 
 void SearchController::SetCenterLocation(Point centerLocation)
 {
-  float cluster_diff_theta = atan2(centerLocation.y - clusterLocation.y, centerLocation.x - clusterLocation.x);
+  if(targetFound)
+  {
+   // float cluster_diff_theta = atan2(centerLocation.y - clusterLocation.y, centerLocation.x - clusterLocation.x);
 
-  float offset = 0.8;
+   // float offset = 2.5;
 
-  centerLocation.x = centerLocation.x + (offset * cos(cluster_diff_theta));
-  centerLocation.y = centerLocation.y + (offset * sin(cluster_diff_theta));
+    //centerLocation.x = centerLocation.x + (offset * cos(cluster_diff_theta));
+    //centerLocation.y = centerLocation.y + (offset * sin(cluster_diff_theta));
+     // centerLocation.x -= 1;
+  }
 
   float diffX = this->centerLocation.x - centerLocation.x;
   float diffY = this->centerLocation.y - centerLocation.y;
@@ -152,14 +158,17 @@ void SearchController::SetCenterLocation(Point centerLocation)
   
   if (!result.wpts.waypoints.empty())
   {
-    clusterLocation.x -= diffX;
-    clusterLocation.y -= diffY;
+  //  clusterLocation.x -= diffX;
+ //   clusterLocation.y -= diffY;
 //    result.wpts.waypoints.back().x -= diffX;
 //    result.wpts.waypoints.back().y -= diffY;
   }
 
+  //this->centerLocation.x -= 1.5;
+  //this->centerLocation.y -= 0.5;
   cout << "(SetCenterLocation)Cluster X:  " << clusterLocation.x << ", Cluster Y:  " << clusterLocation.y <<  endl;
   cout << "(SetCenterLocation)Center X:  " << centerLocation.x << ", Center Y:  " << centerLocation.y << endl;
+  this->centerLocation.x -= 0.25;
 }
 
 void SearchController::SetCurrentLocation(Point currentLocation) {

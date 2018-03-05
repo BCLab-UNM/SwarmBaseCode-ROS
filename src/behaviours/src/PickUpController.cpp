@@ -234,7 +234,7 @@ Result PickUpController::DoWork()
       else
       {
         result.pd.cmdVel = -0.15;
-        result.pd.cmdAngularError= 0.0;
+        result.pd.cmdAngularError= -0.1;
         result.fingerAngle = 0;
         result.wristAngle = 0;
         return result;
@@ -377,7 +377,7 @@ Result PickUpController::DoWork()
     //if enough time has passed enter a recovery state to re-attempt a pickup
     else if (Td > lower_gripper_time_begin && timeOut)
     {
-      result.pd.cmdVel = -0.15;
+      result.pd.cmdVel = 0.15;
       result.pd.cmdAngularError= 0.0;
       //set gripper to open and down
       result.fingerAngle = M_PI_2;

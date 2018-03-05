@@ -13,7 +13,8 @@ LogicController::LogicController() {
 
 LogicController::~LogicController() {}
 
-void LogicController::Reset() {
+void LogicController::Reset()
+{
 
     std::cout << "LogicController.Reset()" << std::endl;
     logicState = LOGIC_STATE_INTERRUPT;
@@ -236,7 +237,7 @@ void LogicController::ProcessData()
     {
         prioritizedControllers = {
             PrioritizedController{0, (Controller*)(&searchController)},
-            PrioritizedController{10, (Controller*)(&obstacleController)},
+            PrioritizedController{-1, (Controller*)(&obstacleController)},
             PrioritizedController{15, (Controller*)(&pickUpController)},
             PrioritizedController{5, (Controller*)(&range_controller)},
             PrioritizedController{-1, (Controller*)(&dropOffController)},
@@ -249,7 +250,7 @@ void LogicController::ProcessData()
     {
         prioritizedControllers = {
             PrioritizedController{-1, (Controller*)(&searchController)},
-            PrioritizedController{15, (Controller*)(&obstacleController)},
+            PrioritizedController{-1, (Controller*)(&obstacleController)},
             PrioritizedController{-1, (Controller*)(&pickUpController)},
             PrioritizedController{10, (Controller*)(&range_controller)},
             PrioritizedController{1, (Controller*)(&dropOffController)},
@@ -334,6 +335,12 @@ void LogicController::controllerInterconnect()
         searchController.SetObstSeen(true);
     }
 
+    if(dropOffController.GetCenterLocation().x != searchController.GetCenterLocation().x || dropOffController.GetCenterLocation().y != searchController.GetCenterLocation().y)
+    {
+        dropOffController.SetCenterLocation(searchController.GetCenterLocation());
+        cout << "updating dropoff's idea of center" << endl;
+    }
+
     if (processState == PROCCESS_STATE_SEARCHING)
     {
 
@@ -355,14 +362,6 @@ void LogicController::controllerInterconnect()
             obstacleController.setTargetHeld();
             searchController.SetSuccesfullPickup();
             cout << "Telling obstacle controller to ignore last obstacle call" << endl;
-        }
-    }
-
-    if (processState == PROCCESS_STATE_DROP_OFF)
-    {
-        if(dropOffController.GetCenterLocation().x != searchController.GetCenterLocation().x || dropOffController.GetCenterLocation().y != searchController.GetCenterLocation().y)
-        {
-            dropOffController.SetCenterLocation(searchController.GetCenterLocation());
         }
     }
 

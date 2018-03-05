@@ -158,7 +158,7 @@ time_t timerStartTime;
 
 // An initial delay to allow the rover to gather enough position data to 
 // average its location.
-unsigned int startDelayInSeconds = 30;
+unsigned int startDelayInSeconds = 10;
 float timerTimeElapsed = 0;
 
 //Transforms
@@ -286,6 +286,8 @@ void behaviourStateMachine(const ros::TimerEvent&)
       centerOdom.theta = centerLocation.theta;
       logicController.SetCenterLocationOdom(centerOdom);
       
+      cout << "current theta ROS:ADAPTER " << currentLocation.theta << endl;
+
       Point centerMap;
       centerMap.x = currentLocationMap.x - (1.3 * cos(currentLocationMap.theta));
       centerMap.y = currentLocationMap.y - (1.3 * sin(currentLocationMap.theta));
@@ -313,7 +315,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
   {
     if(first_autonomous)
     {
-        logicController.clearObstacles();
+        logicController.Reset();
         first_autonomous = false;
     }
 
@@ -422,11 +424,6 @@ void behaviourStateMachine(const ros::TimerEvent&)
   {
     stateMachinePublish.publish(stateMachineMsg);
     sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
-  }
-
-  if(!first_autonomous)
-  {
-    first_autonomous = true;
   }
 }
 

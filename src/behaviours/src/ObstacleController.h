@@ -95,6 +95,9 @@ private:
   float camera_offset_correction = 0.020; //meters;
   int numTargets = 0;
   bool cluster_seen = false;
+  bool first_obstacle = true;
+
+  int obst_counter = 0;
 };
 
 #endif // OBSTACLECONTOLLER_H
