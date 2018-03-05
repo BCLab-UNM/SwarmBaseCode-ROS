@@ -62,6 +62,10 @@ Our simulated and physical Swarmies use existing ROS plugins, external to this r
 ```
 sudo apt install ros-kinetic-robot-localization
 ```
+The ROS USB camera package:
+```
+sudo apt install ros-kinetic-usb-cam
+```
 
 ##### 3. Install additional Gazebo plugins
 
