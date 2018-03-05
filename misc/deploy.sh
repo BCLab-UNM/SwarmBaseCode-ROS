@@ -1,13 +1,6 @@
 #!/bin/bash
 #This script has been added to aid in rapid development and deployment of multiple robots!
 
-
-#-------------------------READ THIS----------------------------#
-#If you have changed your rovers password you MUST edit this variable with the correct password to 
-#allow the reboot feature to work correctly!!
-roverPass="2018@KSC"
-#--------------------------------------------------------------#
-
 OPTION=$1
 branch=$2
 roverIP=""
@@ -168,7 +161,7 @@ Reboot()
 {
 	info="Rebooting $roverIP and Reconnecting..."
 	echo "$info"
-	ssh -t swarmie@$roverIP "echo $roverPass | sudo -S reboot now; exit 1;"
+  ssh -t swarmie@$roverIP "sudo reboot now; exit 1;"
 	sleep 5
 	{
 		while(true); do
