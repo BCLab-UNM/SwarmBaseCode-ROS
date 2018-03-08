@@ -17,9 +17,9 @@ export GAZEBO_PLUGIN_PATH="../build/gazebo_plugins"
 
 #Point to ROS master on the network
 echo "point to ROS master on the network"
-if [ -z "$1" ]
+if [ -z "$2" ]
 then
-    echo "Error: ROS_MASTER_URI hostname was not provided"
+    echo "Usage: ./rover_onboard_node_launch.sh master_hostname calibration_location"
     exit 1
 else
     export ROS_MASTER_URI=http://$1:11311
@@ -52,6 +52,9 @@ findDevicePath() {
 
 
 #Startup ROS packages/processes
+echo "Loading calibration data and swarmie_control sketch"
+./load_swarmie_control_sketch.sh $2
+
 echo "rosrun tf static_transform_publisher"
 nohup > logs/$HOSTNAME"_transform_log.txt" rosrun tf static_transform_publisher __name:=$HOSTNAME\_BASE2CAM 0.12 -0.03 0.195 -1.57 0 -2.22 /$HOSTNAME/base_link /$HOSTNAME/camera_link 100 &
 echo "rosrun video_stream_opencv"
