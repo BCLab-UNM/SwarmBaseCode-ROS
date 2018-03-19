@@ -2,9 +2,9 @@
 
 #include <string>
 #include <usb.h>
-#include <sys/stat.h> 
-#include <std_msgs/String.h>
-#include <ctime> 
+#include <sys/stat.h> // To check if a file exists 
+#include <std_msgs/String.h> // For creating ROS string messages
+#include <ctime> // For time()
 
 using namespace std;
 using namespace gazebo;

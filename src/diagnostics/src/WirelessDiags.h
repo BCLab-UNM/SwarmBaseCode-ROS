@@ -1,8 +1,8 @@
 #ifndef WirelessDiags_h
 #define WirelessDiags_h
 
-#include <string> 
-#include <sys/time.h>
+#include <string>  // Wireless device interface name
+#include <sys/time.h> // gettimeofday and timeval
 
 // Wifi device status data structure
 struct WirelessInfo {

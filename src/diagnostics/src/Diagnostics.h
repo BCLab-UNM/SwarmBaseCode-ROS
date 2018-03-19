@@ -16,7 +16,7 @@
 #include <sensor_msgs/NavSatFix.h>
 
 #include "WirelessDiags.h"
-
+// The following multiarray headers are for the diagnostics data publisher
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
 #include "std_msgs/Float32MultiArray.h"
@@ -30,8 +30,8 @@ public:
   Diagnostics(std::string);
   ~Diagnostics();
 
-  // Publish rover status error/info. Displayed in tabs (bottom left of the gui)
-  void publishWarningLogMessage(std::string); // NOTE: NOT USED
+  // Publish rover status error/info displayed in the GUI
+  void publishWarningLogMessage(std::string); // Dead code not used
   void publishErrorLogMessage(std::string);
   void publishInfoLogMessage(std::string);
 
@@ -48,7 +48,7 @@ public:
   void behaviourNode(std_msgs::String msg);
   void ubloxNode(const sensor_msgs::NavSatFixConstPtr& message);
   
-  // Publish wifi signal quality (!simulation). Displayed next to rover name (top right gui)
+  // Publish wifi signal quality (Note: not in simulation) displayed in the GUI 
   void publishDiagnosticData();
 
   // Subscriber handler that collects simulation times to determine simulation rate.

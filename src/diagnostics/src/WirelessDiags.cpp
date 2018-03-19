@@ -1,17 +1,17 @@
 #include "WirelessDiags.h"
 
 #include <linux/types.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdexcept>
-#include <linux/wireless.h>
-#include <sys/ioctl.h>
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include <arpa/inet.h>
-#include <ifaddrs.h>
+#include <sys/socket.h> // For sockets
+#include <fcntl.h> // For socket open
+#include <unistd.h> // For socket close
+#include <stdexcept> // For runtime_error
+#include <linux/wireless.h> // For wifi stats 
+#include <sys/ioctl.h> // For communication with the kernel
+#include <iostream> // For reading system info
+#include <fstream> // "
+#include <cstring> // For memset
+#include <arpa/inet.h> // For IPPROTO_IP
+#include <ifaddrs.h> // For network interface struct
 
 using namespace std;
 
@@ -195,7 +195,7 @@ WirelessInfo WirelessDiags::getInfo(){
     sigInfo.noise=((iw_statistics *)req.u.data.pointer)->qual.noise;
   }
 
-  //SIOCGIWESSID for ssid
+  // SIOCGIWESSID for ssid
   char buffer[32];
   memset(buffer, 0, 32);
   req.u.essid.pointer = buffer;
