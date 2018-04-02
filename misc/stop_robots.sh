@@ -11,9 +11,9 @@ warn()
 
 connected()
 {
-    if [ -z `rosnode list | grep "$1"` ]
+    if [ -z "`rosnode list | grep -i "^/$1"`" ]
     then
-        warn()
+        warn $1
     else
         proceed="y"
     fi
@@ -22,7 +22,7 @@ connected()
 for robot in $@
 do
     connected $robot
-    if [ $proceed == "y" ]
+    if [ "$proceed" = "y" ]
     then
         ssh swarmie@$robot 'sudo reboot'
     fi
