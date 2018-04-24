@@ -16,7 +16,6 @@
 #include <sensor_msgs/NavSatFix.h>
 
 #include "WirelessDiags.h"
-
 // The following multiarray headers are for the diagnostics data publisher
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
@@ -30,10 +29,13 @@ class Diagnostics {
 public:
   Diagnostics(std::string);
   ~Diagnostics();
-  void publishWarningLogMessage(std::string);
+
+  // Publish rover status error/info displayed in the GUI
+  void publishWarningLogMessage(std::string); // Dead code not used
   void publishErrorLogMessage(std::string);
   void publishInfoLogMessage(std::string);
-  
+
+  // Subscriber handlers that record timestamp of last successfully published message
   void fingerTimestampUpdate(const geometry_msgs::QuaternionStamped::ConstPtr& message);
   void wristTimestampUpdate(const geometry_msgs::QuaternionStamped::ConstPtr& message);
   void imuTimestampUpdate(const sensor_msgs::Imu::ConstPtr& message);
@@ -46,57 +48,67 @@ public:
   void behaviourNode(std_msgs::String msg);
   void ubloxNode(const sensor_msgs::NavSatFixConstPtr& message);
   
-  // This function sends an array of floats
-  // corresponding to predefined diagnostic values 
-  // to be displayed in the GUI
-  // For example, the wireless signal quality.
+  // Publish wifi signal quality (Note: not in simulation) displayed in the GUI 
   void publishDiagnosticData();
 
+  // Subscriber handler that collects simulation times to determine simulation rate.
   void simWorldStatsEventHandler(ConstWorldStatisticsPtr &msg);
   
+  // Return the current time in this timezone in "WeekDay Month Day hr:mni:sec year" format (thread-safe)
   std::string getHumanFriendlyTime();
   
 private:
 
-  // These functions are called on a timer and check for problems with the sensors
+  // Timer event handler that publishes diagnostics every sensorCheckInterval (IMU, GPS, sonar, camera, gripper, odom)
   void sensorCheckTimerEventHandler(const ros::TimerEvent&);
+  
+  // Timer event handler that publishes diagnostics every sensorCheckInterval (simulation times)
   void simCheckTimerEventHandler(const ros::TimerEvent&);
+  
+  // Timer event handler that publishes diagnostics every sensorCheckInterval (abridge/sbridge, ublox)
   void nodeCheckTimerEventHandler(const ros::TimerEvent&);
   
-
-  // Get the rate the simulation is running for simulated rovers
+  // Timer event handler method helpers 
   float checkSimRate();
-  
   void checkIMU();
   void checkGPS();
   void checkSonar();
   void checkCamera();
   void checkGripper();
   void checkOdometry();
-
   void checkAbridge();
   void checkSbridge();
   void checkBehaviour();
   void checkUblox();
-    
+
+  // Check that a U-Blox device exists in the connected USB devices list
   bool checkGPSExists();
+
+  // Check that a Logitec c170 device exists in the connected USB devices list
   bool checkCameraExists();
 
 
   // This function checks the rover published name against the simulated rover model files.
   // If the name of this rover does not appear in the models then assume we are a
   // simulated rover. Being a simulated rover means that certain diagnostic checks will
-  // be bypassed.
+  // be bypassed. (a temporary hack)
   bool checkIfSimulatedRover();
   
-  // Takes the vendor and device IDs and searches the USB busses for a match
+  // Search connected USB devices for a matching device
   bool checkUSBDeviceExists(uint16_t, uint16_t);
   
+  // Accessor to roscpp's inteface for creating subscribers, publishers
   ros::NodeHandle nodeHandle;
+  
+  // Diagnostics publisher - rover status error/info
   ros::Publisher diagLogPublisher;
+
+  // Diagnostics publisher - wireless quality or simulation rate
   ros::Publisher diagnosticDataPublisher;
+
   std::string publishedName;
 
+  // Subscribers to sensors, gripper, odom, abridge/sbridge published messages
   ros::Subscriber fingerAngleSubscribe;
   ros::Subscriber wristAngleSubscribe;
   ros::Subscriber imuSubscribe;
@@ -135,7 +147,7 @@ private:
   bool behaviourRunning = true;
   bool ubloxRunning = true;
 
-  //time last message was received
+  // Record time stamp of the last message received
   ros::Time fingersTimestamp;
   ros::Time wristTimestamp;
   ros::Time imuTimestamp;

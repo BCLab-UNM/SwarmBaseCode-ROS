@@ -21,7 +21,6 @@ WirelessDiags::WirelessDiags() {
 
 }
 
-// Sets the diagnostics to use the first wireless interfact found
 string WirelessDiags::setInterface() {
 
   string name = findWirelessInterface();
@@ -36,7 +35,6 @@ string WirelessDiags::setInterface() {
 }
 
 
-// Check if the interface we were told to use exists
 bool WirelessDiags::isInterfaceUp(string name) {
     struct ifreq ifr;
     int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_IP);
@@ -80,39 +78,32 @@ string WirelessDiags::findWirelessInterface() {
     return wirelessName;
 }
 
-// Code to check whether a network interface is wireless or not.
 bool WirelessDiags::isWireless(const char* name) {
   int sock = -1;
   struct iwreq pwrq;
   memset(&pwrq, 0, sizeof(pwrq));
   strncpy(pwrq.ifr_name, name, IFNAMSIZ);
-
-  // Try to open a socket to the interface
   sock = socket(AF_INET, SOCK_STREAM, 0);
 
   bool wireless = false;
   
-  // Check if wireless by asking for verfification
-  // of wireless extensions (the SIOCGIWNAME directive)
+  // Check if wireless by verifying wireless extensions (the SIOCGIWNAME directive)
   if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1) wireless =  true;
 
   close(sock);
   return wireless;
 }
 
-// Helper function to read the number of bytes sent and received over time to calculate
-// the current bitrate
 float WirelessDiags::calcBitRate() {
 
-  // Path to the linux provided stats. These files are pointers to memory locations
-  // and are not on disk.
+  // Path to the linux provided stats (these files are pointers to memory locations and are not on disk)
   string receive_bytes_stat_path = "/sys/class/net/"+interfaceName+"/statistics/rx_bytes";
   string transmit_bytes_stat_path = "/sys/class/net/"+interfaceName+"/statistics/tx_bytes";
 
   // Open, read and close the bytes received and bytes sent file pointers. 
   ifstream receive_bytes_stat, transmit_bytes_stat;
 
-  // Throw an exception if there was a problem
+  // Set exceptions
   receive_bytes_stat.exceptions( std::ifstream::failbit | std::ifstream::badbit );
   transmit_bytes_stat.exceptions( std::ifstream::failbit | std::ifstream::badbit );
   
@@ -128,12 +119,10 @@ float WirelessDiags::calcBitRate() {
   getline(transmit_bytes_stat,transmit_stat);
   transmit_bytes_stat.close();
 
-  // Remember the total bytes transmitted so we can take the difference 
-  // between recordings at each time interval.
+  // Remember the total bytes transmitted to measure difference between samplings
   prev_total_bytes = total_bytes;
    
-  // Convert string to int
-  string::size_type sz;   // alias of size_t
+  string::size_type sz;
   long int rx_bytes = 0;
   long int tx_bytes = 0;
   if (!receive_stat.empty())
@@ -148,32 +137,26 @@ float WirelessDiags::calcBitRate() {
   // Get the total bytes transmitted and recevied. This is the total bandwidth used.
   total_bytes = rx_bytes + tx_bytes;
 
-  // If we haven't set the value of the previous reading skip. This will never be zero since it is the number of
-  // bytes sent and received since boot. 
+  // If we haven't set the value of the previous reading return 
   if (prev_total_bytes == 0) return 0;
    
   // Get the bytes transmitted and received as a function of time.
   // This assumes the function is called using the sensor check function.
-  // Perhaps this function should keep track of the time elapsed itself?
-
+  // (perhaps this function should keep track of the time elapsed itself?)
   struct timeval now;
   gettimeofday(&now, NULL);
         
-  // compute the elapsed time in seconds with millisecond resolution
+  // Compute the elapsed time in seconds with millisecond resolution
   double elapsedTime = (now.tv_sec - prev_time.tv_sec) * 1000.0;      // sec to ms
   elapsedTime += (now.tv_usec - prev_time.tv_usec) / 1000.0;   // us to ms
+  elapsedTime /= 1000; // ms to secs
 
-  // Now convert milliseconds to seconds
-  elapsedTime /= 1000;
-
-  // Remember when this was called so we can calculate the delay next
-  // time it is called
+  // Remember time so we can calculate the delay next call
   prev_time = now; 
   
   float byte_rate = byte_rate = (total_bytes - prev_total_bytes)*1.0f/elapsedTime;
-   
-  // Rate in B/s
-  return byte_rate;
+
+  return byte_rate; // Bits/sec
 }
 
 WirelessInfo WirelessDiags::getInfo(){
@@ -203,71 +186,62 @@ WirelessInfo WirelessDiags::getInfo(){
   // Use IOCTL to request the wireless stats. If -1 there was an error.
   if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
     string errorMsg = "WirelessDiags::getInfo(): error getting wireless statistics. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
-
-    // Throw an error
     throw runtime_error(errorMsg);
     return sigInfo;
   }
   else if(((iw_statistics *)req.u.data.pointer)->qual.updated & IW_QUAL_DBM){
-    // Opened the socket so read the data
     sigInfo.level = ((iw_statistics *)req.u.data.pointer)->qual.level - 256;
     sigInfo.quality=((iw_statistics *)req.u.data.pointer)->qual.qual;
     sigInfo.noise=((iw_statistics *)req.u.data.pointer)->qual.noise;
   }
 
-  //SIOCGIWESSID for ssid
+  // SIOCGIWESSID for ssid
   char buffer[32];
   memset(buffer, 0, 32);
   req.u.essid.pointer = buffer;
   req.u.essid.length = 32;
 
-  //this will gather the SSID of the connected network
+  // Get the SSID of the connected network
   if(ioctl(sockfd, SIOCGIWESSID, &req) == -1){
-    // There was an error throw an exception
     string errorMsg = "WirelessDiags::getInfo(): error getting network ESSID. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
     throw runtime_error(errorMsg);
   }
   else {
-    // Opened the socket so read the data
     memcpy(&sigInfo.ssid, req.u.essid.pointer, req.u.essid.length);
     memset(&sigInfo.ssid[req.u.essid.length],0,1);
   }
 
-  //SIOCGIWRATE for bits/sec (convert to mbit)
-  int bitrate=-1;
+  int bitrate=-1; // SIOCGIWRATE for bits/sec (convert to mbit)
   
-  //this will get the claimed bitrate of the link
+  // Get bitrate of the link
   if(ioctl(sockfd, SIOCGIWRATE, &req) == -1){
-    // There was an error throw an exception
     string errorMsg = "WirelessDiags::getInfo(): error getting transmission rate. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
     throw runtime_error(errorMsg);
   } else {
-    // Opened the socket so read the data
     memcpy(&bitrate, &req.u.bitrate, sizeof(int));
     sigInfo.bandwidthAvailable=bitrate/1000000;
   }
 
-  //SIOCGIFHWADDR for mac addr
-  ifreq req2;
-  strcpy(req2.ifr_name, interfaceName.c_str());
 
-  //this will get the mac address of the interface
+  // Get device mac address
+  ifreq req2; //SIOCGIFHWADDR for mac addr
+  strcpy(req2.ifr_name, interfaceName.c_str());
   if(ioctl(sockfd, SIOCGIFHWADDR, &req2) == -1){
-    // There was an error throw an exception
     string errorMsg = "WirelessDiags::getInfo(): error getting MAC address. Unable to open ioctl socket for " + interfaceName + ": "+ string(strerror(errno));
     throw runtime_error(errorMsg);
   } else{
-    // Opened the socket so read the data
     sprintf(sigInfo.mac, "%.2X", (unsigned char)req2.ifr_hwaddr.sa_data[0]);
     for(int s=1; s<6; s++){
       sprintf(sigInfo.mac+strlen(sigInfo.mac), ":%.2X", (unsigned char)req2.ifr_hwaddr.sa_data[s]);
     }
   }
 
-  // We are done so clean up
+  // Close socket 
   close(sockfd);
 
+  // Calculate bit rate
   sigInfo.bandwidthUsed = calcBitRate();  
 
   return sigInfo;
 }
+

@@ -2,7 +2,7 @@
 
 #include <string>
 #include <usb.h>
-#include <sys/stat.h> // To check if a file exists
+#include <sys/stat.h> // To check if a file exists 
 #include <std_msgs/String.h> // For creating ROS string messages
 #include <ctime> // For time()
 
@@ -11,11 +11,13 @@ using namespace gazebo;
 
 Diagnostics::Diagnostics(std::string name) {
 
+  // Initialize constants
   node_heartbeat_timeout = 5.0;
   device_heartbeat_timeout = 2.0;
   diagnostics_start_time = ros::Time::now();
   node_start_delay = 20;
 
+  // Initialize publishers and subscribers
   this->publishedName = name;
   diagLogPublisher = nodeHandle.advertise<std_msgs::String>("/diagsLog", 1, true);
   diagnosticDataPublisher  = nodeHandle.advertise<std_msgs::Float32MultiArray>("/"+publishedName+"/diagnostics", 1);
@@ -36,31 +38,24 @@ Diagnostics::Diagnostics(std::string name) {
   prevSimTime = common::Time(0.0);
   simRate = 0.0f;
 
-  // Setup sensor check timers
+  // Initialize timer event handlers
   sensorCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::sensorCheckTimerEventHandler, this);
-
-  // Setup Node check timer
   nodeCheckTimer = nodeHandle.createTimer(ros::Duration(nodeCheckInterval), &Diagnostics::nodeCheckTimerEventHandler, this);
-  
   simCheckTimer = nodeHandle.createTimer(ros::Duration(sensorCheckInterval), &Diagnostics::simCheckTimerEventHandler, this);
 
+  // Initialize simulation members that process gazebo messages from the world stats topic
   if ( checkIfSimulatedRover() ) {
-    // For processing gazebo messages from the world stats topic.
-    // Used to gather information for simulated rovers
 
-    // Create fake argv and argc for the gazebo setup
+    // Create Gazebo node and init
     char  arg0[] = "diagnostics";
     char* argv[] = { &arg0[0], NULL };
     int   argc   = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
     gazebo::client::setup(argc, argv);
-
-    // Create Gazebo node and init
     gazebo::transport::NodePtr newNode(new gazebo::transport::Node());
     gazeboNode = newNode;
     gazeboNode->Init();
     string worldStatsTopic = "/gazebo/default/world_stats";
     worldStatsSubscriber = gazeboNode->Subscribe(worldStatsTopic, &Diagnostics::simWorldStatsEventHandler, this);
- 
     simulated = true;
     publishInfoLogMessage("Diagnostic Package Started. Simulated Rover.");
   } else {
@@ -79,9 +74,6 @@ Diagnostics::Diagnostics(std::string name) {
 void Diagnostics::publishDiagnosticData() {
   if (!simulated) {
   WirelessInfo info;
-
-  // Get info about the wireless interface
-  // Catch and display an error if there was an exception
   try {
     info = wirelessDiags.getInfo();
   } catch( exception &e ){
@@ -93,13 +85,12 @@ void Diagnostics::publishDiagnosticData() {
   rosMsg.data.clear();
   rosMsg.data.push_back(info.quality);
   rosMsg.data.push_back(info.bandwidthUsed);
-  rosMsg.data.push_back(-1); // Sim update rate
+  rosMsg.data.push_back(-1);
   diagnosticDataPublisher.publish(rosMsg);  
   }
 }
 
 void Diagnostics::publishErrorLogMessage(std::string msg) {
-
   std_msgs::String ros_msg;
   ros_msg.data = "<font color=Red size=3>" + publishedName+" ("+getHumanFriendlyTime()+"): " + msg + "</font>";
   diagLogPublisher.publish(ros_msg);
@@ -162,8 +153,6 @@ void Diagnostics::ubloxNode(const sensor_msgs::NavSatFix::ConstPtr& message) {
     ubloxNodeTimestamp = ros::Time::now();
 }
 
-// Return the current time in this timezone in "WeekDay Month Day hr:mni:sec year" format.
-// We use this instead of asctime or ctime because it is thread safe
 string Diagnostics::getHumanFriendlyTime() {
    time_t t = std::time(NULL);
    char humanReadableStr[100];
@@ -171,12 +160,9 @@ string Diagnostics::getHumanFriendlyTime() {
    if (strftime(humanReadableStr, sizeof(humanReadableStr), "%A %c", localtime(&t)))
      return humanReadableStr;
    else
-     return ""; // There was a problem getting the time. Return the empty string.
-   
+     return "";
 }
 
-// sensor check timeout handler. This function is triggered periodically and calls the
-// sensor check functions.
 void Diagnostics::sensorCheckTimerEventHandler(const ros::TimerEvent& event) {
 
   if (!simulated) {
@@ -227,8 +213,6 @@ float Diagnostics::checkSimRate() {
 }
 
 void Diagnostics::checkIMU() {
-  // Example
-  //publishWarningLogMessage("IMU Warning");
     if (ros::Time::now() - imuTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!imuConnected) {
 			imuConnected = true;
@@ -242,42 +226,30 @@ void Diagnostics::checkIMU() {
 }
 
 void Diagnostics::checkGPS() {
-  // Example
-  //publishWarningLogMessage("GPS Warning");
-
-  // Check that a U-Blox device exists in the connected USB devices list
-
   if ( checkGPSExists() ) {
     // Notify the GUI only if reconnected after being previously disconnected
     if (!GPSConnected) publishInfoLogMessage("GPS reconnected");
     GPSConnected = true;
   } else { 
-    if (GPSConnected) // Guard against repeating the error.
+    if (GPSConnected) // Guard against repeating the error
       publishErrorLogMessage("GPS is not connected");
     GPSConnected = false;
   }
 }
 
 void Diagnostics::checkCamera() {
-    // Example
-  //publishWarningLogMessage("Camera Warning");
-
-  // Check that a Logitec c170 device exists in the connected USB devices list
   if ( checkCameraExists() ) {
     // Notify the GUI only if reconnected after being previously disconnected
     if (!cameraConnected) publishInfoLogMessage("Camera reconnected");
     cameraConnected = true;
   } else {
-    if (cameraConnected)
-    publishErrorLogMessage("Camera not connected");
+    if (cameraConnected) // Guard against repeating the error
+      publishErrorLogMessage("Camera not connected");
     cameraConnected = false;
   }
 }
 
 void Diagnostics::checkSonar() {
-  //Example
-  //publishErrorLogMessage("Sonar Error");
-
     if (ros::Time::now() - sonarLeftTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!sonarLeftConnected) {
 			sonarLeftConnected = true;
@@ -313,9 +285,6 @@ void Diagnostics::checkSonar() {
 }
 
 void Diagnostics::checkGripper() {
-	// Example
-	//publishWarningLogMessage("Gripper Warning");
-
     if (ros::Time::now() - fingersTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!fingersConnected) {
 			fingersConnected = true;
@@ -340,9 +309,6 @@ void Diagnostics::checkGripper() {
 }
 
 void Diagnostics::checkOdometry() {
-	// Example
-	//publishWarningLogMessage("Odometry Warning");
-
     if (ros::Time::now() - odometryTimestamp <= ros::Duration(device_heartbeat_timeout)) {
 		if (!odometryConnected) {
 			odometryConnected = true;
@@ -411,27 +377,18 @@ void Diagnostics::checkUblox() {
     }
 }
 
-// Check if the U-Blox GPS is connected
-// ID_VENDOR = 0x1546
-// ID_PRODUCT = 0x01a6
 bool Diagnostics::checkGPSExists(){
   uint16_t GPSVendorID = 0x1546;
   uint16_t GPSProductID = 0x01a6;
   return checkUSBDeviceExists( GPSVendorID, GPSProductID );
 }
 
-// Check if the Logitech c170 camera is connected
-// ID_VENDOR = 0x046d
-// ID_PRODUCT = 0x082b
 bool Diagnostics::checkCameraExists(){
   uint16_t cameraVendorID = 0x046d;
   uint16_t cameraProductID = 0x082b;
   return checkUSBDeviceExists( cameraVendorID, cameraProductID );
 }
 
-
-// Search through the connected USB devices for one that matches the
-// specified vendorID and productID
 bool Diagnostics::checkUSBDeviceExists(uint16_t vendorID, uint16_t productID){
   
   struct usb_bus *bus;
@@ -440,7 +397,7 @@ bool Diagnostics::checkUSBDeviceExists(uint16_t vendorID, uint16_t productID){
   usb_find_busses();
   usb_find_devices();
 
-  // Iterate through busses and devices
+  // Iterate through each bus and device
   for (bus = usb_busses; bus; bus = bus->next)
     for (dev = bus->devices; dev; dev = dev->next)
       if ( dev->descriptor.idVendor == vendorID && dev->descriptor.idProduct == productID )
@@ -467,8 +424,6 @@ void Diagnostics::simWorldStatsEventHandler(ConstWorldStatisticsPtr &msg) {
   simRate = (deltaSimTime.Double())/(deltaRealTime.Double());
 }
 
-// Check whether a rover model file exists with the same name as this rover name
-// if not then we should be a physcial rover. Need a better method.
 bool Diagnostics::checkIfSimulatedRover() {
   struct stat buffer;
   const char *model_path_env = "GAZEBO_MODEL_PATH";
