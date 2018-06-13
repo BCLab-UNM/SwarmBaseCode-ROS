@@ -16,7 +16,7 @@ sbridge::sbridge(std::string publishedName) {
     // 10 == the incoming message queue size
     // &sbridge::cmdHandler ==  callback to class method first parameter
     // this == calllback to class method second parameter
-    driveControlSubscriber = sNH.subscribe((publishedName + "/driveControl"), 10, &sbridge::cmdHandler, this);
+    driveControlSubscriber = sNH.subscribe((publishedName + "/driveControl/cmd"), 10, &sbridge::cmdHandler, this);
 
     // Create a heatbeat publisher to show that the node is still alive and running
     // publishedName + "/sbridge/heartbeat" == topic to publish to
@@ -48,11 +48,11 @@ sbridge::sbridge(std::string publishedName) {
 
 // Command Handler
 // PWM (pulse with modulation) values to linear values
-void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message) {
+void sbridge::cmdHandler(const swarmie_msgs::Skid::ConstPtr& message) {
     // Gets and sets the linear PWM value
-    double left = (message->linear.x);
+    double left = (message->left);
     // Gets and sets the angular PWM value
-    double right = (message->angular.z);
+    double right = (message->right);
     
     // Set max values
     float max_turn_rate = 4.5; // radians per second

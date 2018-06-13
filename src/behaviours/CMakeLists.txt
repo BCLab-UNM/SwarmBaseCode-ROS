@@ -24,17 +24,22 @@ include_directories(
 
 add_executable(
   behaviours
-  src/Tag.cpp
-  src/ObstacleController.cpp 
-  src/PickUpController.cpp
-  src/DropOffController.cpp
-  src/SearchController.cpp
-  src/ROSAdapter.cpp
-  src/PID.cpp
-  src/DriveController.cpp
-  src/RangeController.cpp
-  src/LogicController.cpp
-  src/ManualWaypointController.cpp
+  src/Behavior.cpp
+  src/BehaviorManager.cpp
+  src/RobotInterface.cpp
+  src/ObstacleBehavior.cpp
+  src/StraightLineBehavior.cpp
+#  src/Tag.cpp
+#  src/ObstacleController.cpp 
+#  src/PickUpController.cpp
+#  src/DropOffController.cpp
+#  src/SearchController.cpp
+#  src/ROSAdapter.cpp
+#  src/PID.cpp
+#  src/DriveController.cpp
+#  src/RangeController.cpp
+#  src/LogicController.cpp
+#  src/ManualWaypointController.cpp
 )
 
 add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})

@@ -13,6 +13,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/Range.h>
 #include <std_msgs/UInt8.h>
+#include <swarmie_msgs/Skid.h>
 
 //Package include
 #include <usbSerial.h>
@@ -20,7 +21,7 @@
 using namespace std;
 
 //aBridge functions
-void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message);
+void driveCommandHandler(const swarmie_msgs::Skid& message);
 void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void serialActivityTimer(const ros::TimerEvent& e);
@@ -160,11 +161,11 @@ int main(int argc, char **argv) {
 //and produces a command output for the left and right motors of the robot.
 //See the following paper for description of PID controllers.
 //Bennett, Stuart (November 1984). "Nicholas Minorsky and the automatic steering of ships". IEEE Control Systems Magazine. 4 (4): 10–15. doi:10.1109/MCS.1984.1104827. ISSN 0272-1708.
-void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message) {
+void driveCommandHandler(const swarmie_msgs::Skid& message) {
    
 
-  float left = (message->linear.x); //target linear velocity in meters per second
-  float right = (message->angular.z); //angular error in radians
+  float left = (message.left); //target linear velocity in meters per second
+  float right = (message.right); //angular error in radians
 
   // Cap motor commands at 120. Experimentally determined that high values (tested 180 and 255) can cause 
   // the hardware to fail when the robot moves itself too violently.
