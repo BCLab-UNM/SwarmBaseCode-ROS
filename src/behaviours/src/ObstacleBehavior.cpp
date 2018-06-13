@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#define DRIVE_MAX 512
+
 ObstacleBehavior::ObstacleBehavior(std::string name) :
    _nh(),
    _left(0),
@@ -17,10 +19,17 @@ Action ObstacleBehavior::GetAction()
 {
    Action reaction = _llAction;
 
-   reaction.drive.left  = 1/pow(0.5 - _left, 4);
-   reaction.drive.right = 1/pow(0.5 - _right, 4);
+   if(_left > 0.6)
+     reaction.drive.left  = 1/pow(0.6 - _left, 4);
+   else
+     reaction.drive.left = DRIVE_MAX;
 
-   if(_center < 0.5) {
+   if(_right > 0.6)
+     reaction.drive.right = 1/pow(0.6 - _right, 4);
+   else
+     reaction.drive.right = DRIVE_MAX;
+
+   if(_center < 0.8) {
       if(_left < _right)
       {
          reaction.drive.right = -reaction.drive.right;

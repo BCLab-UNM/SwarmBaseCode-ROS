@@ -15,7 +15,8 @@ void StraightLineBehavior::OdometryHandler(const nav_msgs::Odometry::ConstPtr& m
 Action StraightLineBehavior::GetAction()
 {
    Action reaction = _llAction;
-   if(_llAction.drive.left < 100 && _llAction.drive.right < 100)
+   if(_llAction.drive.left < 75 && _llAction.drive.right < 75
+      && _llAction.drive.right >= 0 && _llAction.drive.left >= 0)
    {
       reaction.drive.left += 100;
       reaction.drive.right += 100;
