@@ -21,7 +21,7 @@
 using namespace std;
 
 //aBridge functions
-void driveCommandHandler(const swarmie_msgs::Skid& message);
+void driveCommandHandler(const swarmie_msgs::Skid::ConstPtr& message);
 void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void serialActivityTimer(const ros::TimerEvent& e);
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
     infoLogPublisher = aNH.advertise<std_msgs::String>("/infoLog", 1, true);
     heartbeatPublisher = aNH.advertise<std_msgs::String>((publishedName + "/abridge/heartbeat"), 1, true);
     
-    driveControlSubscriber = aNH.subscribe((publishedName + "/driveControl"), 10, driveCommandHandler);
+    driveControlSubscriber = aNH.subscribe((publishedName + "/driveControl/cmd"), 10, driveCommandHandler);
     fingerAngleSubscriber = aNH.subscribe((publishedName + "/fingerAngle/cmd"), 1, fingerAngleHandler);
     wristAngleSubscriber = aNH.subscribe((publishedName + "/wristAngle/cmd"), 1, wristAngleHandler);
     modeSubscriber = aNH.subscribe((publishedName + "/mode"), 1, modeHandler);
@@ -161,11 +161,11 @@ int main(int argc, char **argv) {
 //and produces a command output for the left and right motors of the robot.
 //See the following paper for description of PID controllers.
 //Bennett, Stuart (November 1984). "Nicholas Minorsky and the automatic steering of ships". IEEE Control Systems Magazine. 4 (4): 10–15. doi:10.1109/MCS.1984.1104827. ISSN 0272-1708.
-void driveCommandHandler(const swarmie_msgs::Skid& message) {
+void driveCommandHandler(const swarmie_msgs::Skid::ConstPtr& message) {
    
 
-  float left = (message.left); //target linear velocity in meters per second
-  float right = (message.right); //angular error in radians
+  float left = (message->left); //target linear velocity in meters per second
+  float right = (message->right); //angular error in radians
 
   // Cap motor commands at 120. Experimentally determined that high values (tested 180 and 255) can cause 
   // the hardware to fail when the robot moves itself too violently.
