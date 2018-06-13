@@ -1,7 +1,6 @@
 #include "StraightLineBehavior.hpp"
 
 StraightLineBehavior::StraightLineBehavior(std::string name) :
-   _nh(),
    _heading_set(false)
 {
    _odomSubscriber = _nh.subscribe(name + "/odom/filtered", 1, &StraightLineBehavior::OdometryHandler, this);

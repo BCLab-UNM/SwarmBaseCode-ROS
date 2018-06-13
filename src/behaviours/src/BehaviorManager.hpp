@@ -11,6 +11,7 @@ class Behavior
 {
 protected:
    Action _llAction;
+   ros::NodeHandle _nh;
 public:
    Behavior();
    virtual ~Behavior();

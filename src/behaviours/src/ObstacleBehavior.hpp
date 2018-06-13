@@ -9,8 +9,6 @@
 class ObstacleBehavior : public Behavior
 {
 private:
-   ros::NodeHandle _nh;
-   
    double _left;
    double _right;
    double _center;

@@ -5,7 +5,6 @@
 #define DRIVE_MAX 512
 
 ObstacleBehavior::ObstacleBehavior(std::string name) :
-   _nh(),
    _left(0),
    _right(0),
    _center(0)

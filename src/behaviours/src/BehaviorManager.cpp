@@ -2,7 +2,8 @@
 
 #include <unistd.h>
 
-Behavior::Behavior()
+Behavior::Behavior() :
+   _nh()
 {
    _llAction.drive.left  = 0.0;
    _llAction.drive.right = 0.0;

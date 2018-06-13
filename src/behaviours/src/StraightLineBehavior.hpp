@@ -12,7 +12,6 @@
 class StraightLineBehavior : public Behavior
 {
 private:
-   ros::NodeHandle _nh;
    ros::Subscriber _odomSubscriber;
 
    bool   _heading_set;
