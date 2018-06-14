@@ -9,6 +9,7 @@
 #include "ObstacleBehavior.hpp"
 #include "StraightLineBehavior.hpp"
 #include "AvoidNest.hpp"
+#include "AlignToCube.hpp"
 
 #define CAMERA_OFFSET 0.02
 #define CAMERA_HEIGHT 0.195
@@ -58,10 +59,12 @@ int main(int argc, char **argv)
    ObstacleBehavior     obstacle(name);
    StraightLineBehavior driveStraight(name);
    AvoidNest            avoidNest(name, CAMERA_OFFSET, CAMERA_HEIGHT);
+   AlignToCube          align(name, CAMERA_OFFSET);
 
    manager.RegisterBehavior(&obstacle);
    manager.RegisterBehavior(&driveStraight);
    manager.RegisterBehavior(&avoidNest);
+   manager.RegisterBehavior(&align);
 
    ros::Rate r(30); // 30 Hz
    while(ros::ok())

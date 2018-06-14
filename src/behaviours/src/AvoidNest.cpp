@@ -22,6 +22,10 @@ void AvoidNest::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr
    _tooClose = false;
    for(auto tag : message->detections)
    {
+      if(tag.id == 0)
+      {
+         continue; // skip blocks
+      }
       if(tag.pose.pose.position.x + _cameraOffset > 0)
       {
          _tagsRight++;
