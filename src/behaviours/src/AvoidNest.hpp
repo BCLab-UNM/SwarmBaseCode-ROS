@@ -9,19 +9,22 @@
 class AvoidNest : public Behavior
 {
 private:
-   int _tagsLeft;
-   int _tagsRight;
+   int    _tagsLeft;
+   int    _tagsRight;
    double _cameraOffset;
-   bool _persist;
-   bool _tooClose;
+   double _cameraHeight;
+   bool   _persist;
+   bool   _tooClose;
    Action _savedAction;
 
    ros::Subscriber _tagSubscriber;
-   ros::Timer _persistenceTimer;
-   void PersistenceCallback(const ros::TimerEvent& event);
-   void TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+   ros::Timer      _persistenceTimer;
+
+   void   PersistenceCallback(const ros::TimerEvent& event);
+   void   TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+   double HorizontalDistance(double y, double x, double z);
 public:
-   AvoidNest(std::string name, double cameraOffset);
+   AvoidNest(std::string name, double cameraOffset, double cameraHeight);
    ~AvoidNest() {}
    
    Action GetAction() override;

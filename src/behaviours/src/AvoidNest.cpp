@@ -1,19 +1,18 @@
 #include "AvoidNest.hpp"
 #include <cmath>
 
-#define CAMERA_HEIGHT 0.195
-
-AvoidNest::AvoidNest(std::string name, double cameraOffset) :
+AvoidNest::AvoidNest(std::string name, double cameraOffset, double cameraHeight) :
    _cameraOffset(cameraOffset),
+   _cameraHeight(cameraHeight),
    _persist(false)   
 {
    _tagSubscriber = _nh.subscribe(name + "/targets", 1, &AvoidNest::TagHandler, this);
 }
 
-double horizontalDistance(double x, double y, double z)
+double AvoidNest::HorizontalDistance(double x, double y, double z)
 {
    double distanceFromCamera = hypot(hypot(x, y), z);
-   return sqrt(distanceFromCamera*distanceFromCamera - CAMERA_HEIGHT*CAMERA_HEIGHT);
+   return sqrt(distanceFromCamera*distanceFromCamera - _cameraHeight*_cameraHeight);
 }
 
 void AvoidNest::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
@@ -32,7 +31,7 @@ void AvoidNest::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr
          _tagsLeft++;
       }
       auto tagPos = tag.pose.pose.position;
-      if(horizontalDistance(tagPos.x, tagPos.y, tagPos.z) <= 0.2)
+      if(HorizontalDistance(tagPos.x, tagPos.y, tagPos.z) <= 0.2)
       {
          _tooClose = true;
       }
@@ -77,5 +76,6 @@ Action AvoidNest::GetAction()
       _savedAction = reaction;
       _persistenceTimer = _nh.createTimer(ros::Duration(1.2), &AvoidNest::PersistenceCallback, this, true);
    }
+
    return reaction;
 }

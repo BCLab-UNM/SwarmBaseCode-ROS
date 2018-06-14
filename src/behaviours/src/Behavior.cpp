@@ -3,13 +3,29 @@
  */
 
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 
 #include "BehaviorManager.hpp"
 #include "ObstacleBehavior.hpp"
 #include "StraightLineBehavior.hpp"
 #include "AvoidNest.hpp"
 
-#define DEFAULT_RATE 0.05
+#define CAMERA_OFFSET 0.02
+#define CAMERA_HEIGHT 0.195
+
+void heartbeatHandler(ros::Publisher& heartbeatPublisher, const ros::TimerEvent& event)
+{
+   std_msgs::String msg;
+   msg.data = "";
+   heartbeatPublisher.publish(msg);
+}
+
+void statusHandler(ros::Publisher& statusPublisher, const ros::TimerEvent& event)
+{
+   std_msgs::String msg;
+   msg.data = "subsumption2";
+   statusPublisher.publish(msg);
+}
 
 int main(int argc, char **argv)
 {
@@ -27,14 +43,24 @@ int main(int argc, char **argv)
    }
    
    ros::init(argc, argv, name + "_BEHAVIOUR");
+   ros::NodeHandle nh;
+
+   ros::Publisher heartbeatPublisher = nh.advertise<std_msgs::String>(name + "/behaviour/heartbeat", 1, true);
+   ros::Timer heartbeatTimer = nh.createTimer(ros::Duration(2),
+                                              boost::bind(&heartbeatHandler, heartbeatPublisher, _1));
+   ros::Publisher statusPublisher = nh.advertise<std_msgs::String>(name + "/status", 1, true);
+   ros::Timer statusTimer = nh.createTimer(ros::Duration(2),
+                                           boost::bind(&statusHandler, statusPublisher, _1));
 
    RobotInterface robot(name);
    BehaviorManager manager;
-   ObstacleBehavior obstacle(name);
-   manager.RegisterBehavior(&obstacle);
+
+   ObstacleBehavior     obstacle(name);
    StraightLineBehavior driveStraight(name);
+   AvoidNest            avoidNest(name, CAMERA_OFFSET, CAMERA_HEIGHT);
+
+   manager.RegisterBehavior(&obstacle);
    manager.RegisterBehavior(&driveStraight);
-   AvoidNest avoidNest(name, 0.02); // 0.02 is the offset of the camera from the center of the robot
    manager.RegisterBehavior(&avoidNest);
 
    ros::Rate r(30); // 30 Hz
