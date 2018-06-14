@@ -23,8 +23,6 @@ void RobotInterface::DoAction(Action a)
    skid.left = a.drive.left;
    skid.right = a.drive.right;
 
-   std::cout << "doing action" << std::endl;
-   
    _gripPublisher.publish(finger);
    _wristPublisher.publish(wrist);
    _drivePublisher.publish(skid);

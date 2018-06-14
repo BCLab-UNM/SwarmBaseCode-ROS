@@ -29,6 +29,7 @@ add_executable(
   src/RobotInterface.cpp
   src/ObstacleBehavior.cpp
   src/StraightLineBehavior.cpp
+  src/AvoidNest.cpp
 #  src/Tag.cpp
 #  src/ObstacleController.cpp 
 #  src/PickUpController.cpp
@@ -49,3 +50,4 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
+catkin_add_gtest(test test/test.cpp)

@@ -33,18 +33,15 @@ public:
 class BehaviorManager
 {
 public:
-   BehaviorManager(double period, std::string name);
+   BehaviorManager();
    ~BehaviorManager();
 
-   void DeclareBehavior(Behavior* b);
-private:
-   ros::NodeHandle _nh;
-   std::vector<Behavior*> _behaviors;
-   ros::Timer _timer;
-   Behavior *_base_behavior;
-   RobotInterface _robot;
+   void RegisterBehavior(Behavior* b);
+   Action NextAction();
 
-   void DoStuff(const ros::TimerEvent&);
+private:
+   std::vector<Behavior*> _behaviors;
+   Behavior *_base_behavior;
 };
 
 #endif // _BEHAVIOR_MANAGER_HPP

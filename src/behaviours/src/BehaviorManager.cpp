@@ -14,10 +14,8 @@ Behavior::Behavior() :
 
 Behavior::~Behavior() {}
 
-BehaviorManager::BehaviorManager(double period, std::string name) :
-   _nh(),
-   _behaviors(),
-   _robot(name)
+BehaviorManager::BehaviorManager() :
+   _behaviors()
 {
    Action do_nothing_action;
    do_nothing_action.drive.left = 0.0;
@@ -28,8 +26,6 @@ BehaviorManager::BehaviorManager(double period, std::string name) :
    // Create the lowest level action which lowers and opens the
    // gripper and does not move.
    _base_behavior = new Constant(do_nothing_action);
-
-   _timer = _nh.createTimer(ros::Duration(period), &BehaviorManager::DoStuff, this);
 }
 
 BehaviorManager::~BehaviorManager()
@@ -37,12 +33,12 @@ BehaviorManager::~BehaviorManager()
    delete _base_behavior;
 }
 
-void BehaviorManager::DeclareBehavior(Behavior* b)
+void BehaviorManager::RegisterBehavior(Behavior* b)
 {
    _behaviors.push_back(b);
 }
 
-void BehaviorManager::DoStuff(const ros::TimerEvent& event)
+Action BehaviorManager::NextAction()
 {
    // No need to spin, the main() function will call ros::spin() once
    // everything is set up.
@@ -50,14 +46,12 @@ void BehaviorManager::DoStuff(const ros::TimerEvent& event)
    
    Action nextAction = _base_behavior->GetAction();
 
-   std::cout << "timer triggered" << std::endl;
-   std::cout << "numlayers: " << _behaviors.size() << std::endl;
    for(int level = 0; level < _behaviors.size(); level++)
    {
       _behaviors[level]->SetLowerLevelAction(nextAction);
       nextAction = _behaviors[level]->GetAction();
    }
 
-   _robot.DoAction(nextAction);
+   return nextAction;
 }
 

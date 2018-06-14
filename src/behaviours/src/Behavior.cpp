@@ -7,6 +7,7 @@
 #include "BehaviorManager.hpp"
 #include "ObstacleBehavior.hpp"
 #include "StraightLineBehavior.hpp"
+#include "AvoidNest.hpp"
 
 #define DEFAULT_RATE 0.05
 
@@ -27,11 +28,21 @@ int main(int argc, char **argv)
    
    ros::init(argc, argv, name + "_BEHAVIOUR");
 
-   BehaviorManager manager(DEFAULT_RATE, name);
+   RobotInterface robot(name);
+   BehaviorManager manager;
    ObstacleBehavior obstacle(name);
-   manager.DeclareBehavior(&obstacle);
+   manager.RegisterBehavior(&obstacle);
    StraightLineBehavior driveStraight(name);
-   manager.DeclareBehavior(&driveStraight);
+   manager.RegisterBehavior(&driveStraight);
+   AvoidNest avoidNest(name, 0.02); // 0.02 is the offset of the camera from the center of the robot
+   manager.RegisterBehavior(&avoidNest);
 
-   ros::spin();
+   ros::Rate r(30); // 30 Hz
+   while(ros::ok())
+   {
+      ros::spinOnce();
+      Action action = manager.NextAction();
+      robot.DoAction(action);
+      r.sleep();
+   }
 }
