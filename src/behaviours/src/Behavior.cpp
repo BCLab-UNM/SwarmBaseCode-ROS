@@ -10,8 +10,9 @@
 #include "StraightLineBehavior.hpp"
 #include "AvoidNest.hpp"
 #include "AlignToCube.hpp"
+#include "PickUpCube.hpp"
 
-#define CAMERA_OFFSET 0.02
+#define CAMERA_OFFSET (-0.02)
 #define CAMERA_HEIGHT 0.195
 
 void heartbeatHandler(ros::Publisher& heartbeatPublisher, const ros::TimerEvent& event)
@@ -60,11 +61,13 @@ int main(int argc, char **argv)
    StraightLineBehavior driveStraight(name);
    AvoidNest            avoidNest(name, CAMERA_OFFSET, CAMERA_HEIGHT);
    AlignToCube          align(name, CAMERA_OFFSET);
+   PickUpCube           pickup(name, CAMERA_OFFSET, CAMERA_HEIGHT);
 
    manager.RegisterBehavior(&obstacle);
    manager.RegisterBehavior(&driveStraight);
    manager.RegisterBehavior(&avoidNest);
    manager.RegisterBehavior(&align);
+   manager.RegisterBehavior(&pickup);
 
    ros::Rate r(30); // 30 Hz
    while(ros::ok())

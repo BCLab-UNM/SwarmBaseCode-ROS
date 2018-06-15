@@ -9,6 +9,8 @@ private:
    double _cameraOffset;
    double _distanceToTag;
 
+   double _integral;
+
    ros::Subscriber _tagSubscriber;
 
    void TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);

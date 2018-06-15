@@ -31,6 +31,7 @@ add_executable(
   src/StraightLineBehavior.cpp
   src/AvoidNest.cpp
   src/AlignToCube.cpp
+  src/PickUpCube.cpp
 #  src/Tag.cpp
 #  src/ObstacleController.cpp 
 #  src/PickUpController.cpp

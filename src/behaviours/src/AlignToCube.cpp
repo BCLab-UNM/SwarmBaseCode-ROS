@@ -1,31 +1,34 @@
 #include "AlignToCube.hpp"
 
-#include <cmath>
-
 #define MAX_TURN 100
 
 void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
 {
-   double minimum_distance = 0;
+   bool target_detected;
+   double minimum_distance = 100;
    double distance = 0;
    for(auto tag : message->detections)
    {
       if(tag.id != 0) continue;
-
+      target_detected = true;
       double d = tag.pose.pose.position.x - _cameraOffset;
-      if(abs(d) < minimum_distance)
+      if(fabs(d) < minimum_distance)
       {
-         minimum_distance = abs(d);
+         minimum_distance = fabs(d);
          distance = d;
       }
    }
 
-   _distanceToTag = distance;
+   if(target_detected)
+      _distanceToTag = distance;
+   else
+      _distanceToTag = 0;
 }
 
 AlignToCube::AlignToCube(std::string name, double cameraOffset) :
    _cameraOffset(cameraOffset),
-   _distanceToTag(0)
+   _distanceToTag(0),
+   _integral(0)
 {
    _tagSubscriber = _nh.subscribe(name + "/targets", 1, &AlignToCube::TagHandler, this);
 }
@@ -34,13 +37,18 @@ Action AlignToCube::GetAction()
 {
    Action reaction = _llAction;
 
-   if(abs(_distanceToTag) > 0.0001) // arbitrary small value
+   if(fabs(_distanceToTag) > 0.005)
    {
-      // set a turn speed proportionally to the misalignment
-      reaction.drive.left = 5 * _distanceToTag * MAX_TURN;
-      reaction.drive.right = -5 * _distanceToTag * MAX_TURN;
+      // set a turn speed proportionally to the misalignment + an integral term (a PI controller)
+      reaction.drive.left = _distanceToTag * 500 + 10 * _integral;
+      reaction.drive.right = -(_distanceToTag * 500 + 10 * _integral);
+      _integral += _distanceToTag;
    }
-   
+   else
+   {
+      _integral = 0;
+   }
+
    return reaction;
 }
 
