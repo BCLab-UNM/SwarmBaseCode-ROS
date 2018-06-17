@@ -8,6 +8,7 @@ class AlignToCube : public Behavior
 private:
    double _cameraOffset;
    double _distanceToTag;
+   double _linearDistance;
 
    double _integral;
 

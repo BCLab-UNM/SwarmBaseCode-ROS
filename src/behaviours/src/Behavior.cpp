@@ -62,13 +62,16 @@ int main(int argc, char **argv)
    AvoidNest            avoidNest(name, CAMERA_OFFSET, CAMERA_HEIGHT);
    AlignToCube          align(name, CAMERA_OFFSET);
    PickUpCube           pickup(name, CAMERA_OFFSET, CAMERA_HEIGHT);
+   ObstacleBehavior     obstacle2(name);
+
+   pickup.SetRecheckInterval(240);
 
    manager.RegisterBehavior(&obstacle);
    manager.RegisterBehavior(&driveStraight);
    manager.RegisterBehavior(&avoidNest);
    manager.RegisterBehavior(&align);
    manager.RegisterBehavior(&pickup);
-
+ 
    ros::Rate r(30); // 30 Hz
    while(ros::ok())
    {

@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 
-enum class WristControl   { UP,   DOWN   };
+enum class WristControl   { UP, DOWN, DOWN_2_3 };
 enum class GripperControl { OPEN, CLOSED };
 
 struct DriveControl

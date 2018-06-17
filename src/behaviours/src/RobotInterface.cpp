@@ -18,7 +18,18 @@ void RobotInterface::DoAction(Action a)
    std_msgs::Float32 finger;
    finger.data = (a.grip == GripperControl::OPEN ? GRIP_OPEN_ANGLE : GRIP_CLOSED_ANGLE);
    std_msgs::Float32 wrist;
-   wrist.data = (a.wrist == WristControl::UP ? WRIST_UP_ANGLE : WRIST_DOWN_ANGLE);
+   if(a.wrist == WristControl::UP)
+   {
+      wrist.data = WRIST_UP_ANGLE;
+   }
+   else if(a.wrist == WristControl::DOWN)
+   {
+      wrist.data = WRIST_DOWN_ANGLE;
+   }
+   else if(a.wrist == WristControl::DOWN_2_3)
+   {
+      wrist.data = 0.666666 * WRIST_DOWN_ANGLE;
+   }
    swarmie_msgs::Skid skid;
    skid.left = a.drive.left;
    skid.right = a.drive.right;

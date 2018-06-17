@@ -4,23 +4,86 @@
 PickUpCube::PickUpCube(std::string name, double cameraOffset, double cameraHeight) :
    _cameraHeight(cameraHeight),
    _cameraOffset(cameraOffset),
-   _state(Wait),
-   _allowReset(true)
+   _state(NotHolding),
+   _allowReset(true),
+   _distanceToTarget(OUT_OF_RANGE)
 {
    _tagSubscriber = _nh.subscribe(name + "/targets", 1, &PickUpCube::TagHandler, this);
    _pickupTimer = _nh.createTimer(ros::Duration(0), &PickUpCube::PickupTimeout, this, true);
+   _pickupTimer.stop();
+   _checkTimer  = _nh.createTimer(ros::Duration(4), &PickUpCube::CheckTimeout, this, true);
+   _checkTimer.stop();
+   _recheckTimer = _nh.createTimer(ros::Duration(30), &PickUpCube::RecheckHandler, this);
+   _centerSonar = _nh.subscribe(name + "/sonarCenter", 1, &PickUpCube::SonarHandler, this);
+}
+
+void PickUpCube::SetRecheckInterval(double t)
+{
+   _recheckTimer.stop();
+   _recheckTimer.setPeriod(ros::Duration(t), true);
+   _recheckTimer.start();
+}
+
+void PickUpCube::SonarHandler(const sensor_msgs::Range& message)
+{
+   _centerRange = message.range;
+}
+
+void PickUpCube::CheckTimeout(const ros::TimerEvent& event)
+{
+   std::cout << "in check timeout" << std::endl;
+   // only transition if we meant to check.
+   if(_state != Checking && _state != Rechecking) return;
+   
+   if(_centerRange < 0.12 || _distanceToTarget < 0.14)
+   {
+      _state = Holding;
+      _recheckTimer.start();
+   }
+   else
+   {
+      _state = NotHolding;
+   }
+}
+
+void PickUpCube::RecheckHandler(const ros::TimerEvent& event)
+{
+   if(_state == Holding)
+   {
+      _checkTimer.stop();
+      _checkTimer.setPeriod(ros::Duration(3), true);
+      std::cout << "Holding -> Checking" << std::endl;
+      _state = Rechecking;
+      _checkTimer.start();
+   }
 }
 
 void PickUpCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
 {
+   _distanceToTarget = OUT_OF_RANGE;
+
    for(auto tag : message->detections)
    {
       if(tag.id != 0) continue;
 
-      if(Aligned(tag.pose.pose.position)
-         && Distance(tag.pose.pose.position) < PICKUP_DISTANCE)
+      auto p = tag.pose.pose.position;
+
+      switch(_state)
       {
-         _state = LastInch;
+      case NotHolding:
+         if(Aligned(p) && Distance(p) < PICKUP_DISTANCE)
+         {
+            _state = LastInch;
+         }
+         break;
+      case Checking:
+         if(p.x - _cameraOffset < 0.01)
+         {
+            _distanceToTarget = hypot(hypot(p.x, p.y), p.z);
+         }
+         break;
+      default:
+         break;
       }
    }
 }
@@ -37,8 +100,11 @@ void PickUpCube::PickupTimeout(const ros::TimerEvent& event)
       _state = Raise;
       break;
    case Raise:
-   default:
-      _state = Wait;
+      _checkTimer.stop();
+      _checkTimer.setPeriod(ros::Duration(3), true);
+      std::cout << "Raise -> Checking" << std::endl;
+      _state = Checking;
+      _checkTimer.start();
       break;
    }
 }
@@ -78,11 +144,13 @@ Action PickUpCube::GetAction()
    switch(_state)
    {
    case LastInch:
-      reaction.drive.left = 120;
-      reaction.drive.right = 120;
-      ResetTimer(0.2);         
+      std::cout << "in LastInch" << std::endl;
+      reaction.drive.left = 40;
+      reaction.drive.right = 40;
+      ResetTimer(0.5);
       break;
    case Grip:
+      std::cout << "in Grip" << std::endl;
       reaction.drive.left = 0;
       reaction.drive.right = 0;
       reaction.grip = GripperControl::CLOSED;
@@ -90,13 +158,28 @@ Action PickUpCube::GetAction()
       ResetTimer(1.5);
       break;
    case Raise:
+      std::cout << "in Raise" << std::endl;
       reaction.drive.left = 0;
       reaction.drive.right = 0;
       reaction.grip = GripperControl::CLOSED;
       reaction.wrist = WristControl::UP;
-      ResetTimer(3);
+      ResetTimer(2);
+      break;
+   case Holding:
+      std::cout << "in Holding" << std::endl;
+      reaction.grip = GripperControl::CLOSED;
+      reaction.wrist = WristControl::DOWN_2_3;
+      break;
+   case Checking:
+      std::cout << "in Checking" << std::endl;
+      reaction.drive.left = 0;
+      reaction.drive.right = 0;
+   case Rechecking:
+      reaction.grip = GripperControl::CLOSED;
+      reaction.wrist = WristControl::UP;
       break;
    default:
+      std::cout << "in Wait" << std::endl;
       break;
    }
 
