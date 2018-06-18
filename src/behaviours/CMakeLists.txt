@@ -19,19 +19,23 @@ catkin_package(
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
+)
+
+add_library(behavior
+    src/BehaviorManager.cpp
+    src/RobotInterface.cpp
+    src/ObstacleBehavior.cpp
+    src/StraightLineBehavior.cpp
+    src/AvoidNest.cpp
+    src/AlignToCube.cpp
+    src/PickUpCube.cpp    
 )
 
 add_executable(
   behaviours
   src/Behavior.cpp
-  src/BehaviorManager.cpp
-  src/RobotInterface.cpp
-  src/ObstacleBehavior.cpp
-  src/StraightLineBehavior.cpp
-  src/AvoidNest.cpp
-  src/AlignToCube.cpp
-  src/PickUpCube.cpp
 #  src/Tag.cpp
 #  src/ObstacleController.cpp 
 #  src/PickUpController.cpp
@@ -49,7 +53,9 @@ add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(
   behaviours
+  behavior
   ${catkin_LIBRARIES}
 )
 
-catkin_add_gtest(test test/test.cpp)
+catkin_add_gtest(behaviour_test test/test.cpp)
+target_link_libraries(behaviour_test behavior ${catkin_LIBRARIES})
