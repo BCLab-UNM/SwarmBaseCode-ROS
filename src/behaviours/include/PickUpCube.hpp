@@ -13,7 +13,7 @@ class PickUpCube : public Behavior
 private:
    enum State { LastInch, Grip, Raise, Holding, Rechecking, Checking, NotHolding } _state;
    
-   const double PICKUP_DISTANCE = 0.1;
+   const double PICKUP_DISTANCE = 0.2;
    const double OUT_OF_RANGE    = 100;
 
    ros::Subscriber _tagSubscriber;
