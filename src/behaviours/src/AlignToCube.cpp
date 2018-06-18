@@ -42,9 +42,15 @@ void AlignToCube::Update()
    if(fabs(_distanceToTag) > 0.005)
    {
       // set a turn speed proportionally to the misalignment + an integral term (a PI controller)
-      _action.drive.left = (_linearDistance * 100) + _distanceToTag * 500 + 10 * _integral;
-      _action.drive.right = (_linearDistance * 100) - (_distanceToTag * 500 + 10 * _integral);
+      _action.drive.left = (_linearDistance * 80) + _distanceToTag * 100 + 10 * _integral;
+      _action.drive.right = (_linearDistance * 80) - (_distanceToTag * 100 + 10 * _integral);
       _integral += _distanceToTag;
+   }
+   else if(_linearDistance != 0)
+   {
+      _integral = 0;
+      _action.drive.left = (_linearDistance * 80);
+      _action.drive.right = (_linearDistance * 80);
    }
    else
    {

@@ -147,7 +147,7 @@ void PickUpCube::Update()
       std::cout << "in LastInch" << std::endl;
       _action.drive.left = 40;
       _action.drive.right = 40;
-      ResetTimer(0.5);
+      ResetTimer(0.7);
       break;
    case Grip:
       std::cout << "in Grip" << std::endl;
