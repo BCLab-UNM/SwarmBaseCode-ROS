@@ -7,6 +7,7 @@ void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstP
    bool target_detected;
    double minimum_distance = 100;
    double distance = 0;
+   double linearDistance = 0;
    for(auto tag : message->detections)
    {
       if(tag.id != 0) continue;
@@ -16,14 +17,19 @@ void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstP
       {
          minimum_distance = fabs(d);
          distance = d;
-         _linearDistance = hypot(hypot(tag.pose.pose.position.x, tag.pose.pose.position.y), tag.pose.pose.position.z);
+         linearDistance = hypot(hypot(tag.pose.pose.position.x, tag.pose.pose.position.y), tag.pose.pose.position.z);
       }
    }
 
-   if(target_detected)
+   if(target_detected) {
+      _linearDistance = linearDistance;
       _distanceToTag = distance;
+   }
    else
+   {
       _distanceToTag = 0;
+      _linearDistance = 0;
+   }
 }
 
 AlignToCube::AlignToCube(std::string name, double cameraOffset) :
