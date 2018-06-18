@@ -10,7 +10,13 @@ void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstP
    double linearDistance = 0;
    for(auto tag : message->detections)
    {
-      if(tag.id != 0) continue;
+      if(tag.id != 0)
+      {
+         // If we can detect a nest tag then igore any other detections.
+         _distanceToTag = 0;
+         _linearDistance = 0;
+         return;
+      }
       target_detected = true;
       double d = tag.pose.pose.position.x - _cameraOffset;
       if(fabs(d) < minimum_distance)
