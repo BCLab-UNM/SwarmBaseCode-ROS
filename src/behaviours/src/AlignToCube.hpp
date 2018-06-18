@@ -20,5 +20,5 @@ public:
    AlignToCube(std::string name, double cameraOffset);
    ~AlignToCube() {}
 
-   Action GetAction() override;
+   void Update() override;
 };

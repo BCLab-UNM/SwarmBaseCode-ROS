@@ -35,22 +35,19 @@ AlignToCube::AlignToCube(std::string name, double cameraOffset) :
    _tagSubscriber = _nh.subscribe(name + "/targets", 1, &AlignToCube::TagHandler, this);
 }
 
-Action AlignToCube::GetAction()
+void AlignToCube::Update()
 {
-   Action reaction = _llAction;
+   _action = _llAction;
 
    if(fabs(_distanceToTag) > 0.005)
    {
       // set a turn speed proportionally to the misalignment + an integral term (a PI controller)
-      reaction.drive.left = (_linearDistance * 100) + _distanceToTag * 500 + 10 * _integral;
-      reaction.drive.right = (_linearDistance * 100) - (_distanceToTag * 500 + 10 * _integral);
+      _action.drive.left = (_linearDistance * 100) + _distanceToTag * 500 + 10 * _integral;
+      _action.drive.right = (_linearDistance * 100) - (_distanceToTag * 500 + 10 * _integral);
       _integral += _distanceToTag;
    }
    else
    {
       _integral = 0;
    }
-
-   return reaction;
 }
-

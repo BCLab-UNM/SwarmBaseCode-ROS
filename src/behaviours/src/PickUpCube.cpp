@@ -137,51 +137,50 @@ void PickUpCube::ResetTimer(double duration)
    _pickupTimer.start();
 }
 
-Action PickUpCube::GetAction()
+void PickUpCube::Update()
 {
-   Action reaction = _llAction;
+   _action = _llAction;
 
    switch(_state)
    {
    case LastInch:
       std::cout << "in LastInch" << std::endl;
-      reaction.drive.left = 40;
-      reaction.drive.right = 40;
+      _action.drive.left = 40;
+      _action.drive.right = 40;
       ResetTimer(0.5);
       break;
    case Grip:
       std::cout << "in Grip" << std::endl;
-      reaction.drive.left = 0;
-      reaction.drive.right = 0;
-      reaction.grip = GripperControl::CLOSED;
-      reaction.wrist = WristControl::DOWN;
+      _action.drive.left = 0;
+      _action.drive.right = 0;
+      _action.grip = GripperControl::CLOSED;
+      _action.wrist = WristControl::DOWN;
       ResetTimer(1.5);
       break;
    case Raise:
       std::cout << "in Raise" << std::endl;
-      reaction.drive.left = 0;
-      reaction.drive.right = 0;
-      reaction.grip = GripperControl::CLOSED;
-      reaction.wrist = WristControl::UP;
+      _action.drive.left = 0;
+      _action.drive.right = 0;
+      _action.grip = GripperControl::CLOSED;
+      _action.wrist = WristControl::UP;
       ResetTimer(2);
       break;
    case Holding:
       std::cout << "in Holding" << std::endl;
-      reaction.grip = GripperControl::CLOSED;
-      reaction.wrist = WristControl::DOWN_2_3;
+      _action = _subsumedBehavior->GetAction();
+      _action.grip = GripperControl::CLOSED;
+      _action.wrist = WristControl::DOWN_2_3;
       break;
    case Checking:
       std::cout << "in Checking" << std::endl;
-      reaction.drive.left = 0;
-      reaction.drive.right = 0;
+      _action.drive.left = 0;
+      _action.drive.right = 0;
    case Rechecking:
-      reaction.grip = GripperControl::CLOSED;
-      reaction.wrist = WristControl::UP;
+      _action.grip = GripperControl::CLOSED;
+      _action.wrist = WristControl::UP;
       break;
    default:
       std::cout << "in Wait" << std::endl;
       break;
    }
-
-   return reaction;
 }

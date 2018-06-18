@@ -14,30 +14,28 @@ ObstacleBehavior::ObstacleBehavior(std::string name) :
    _centerSubscriber = _nh.subscribe(name + "/sonarCenter", 1, &ObstacleBehavior::CenterSonarCallback, this);
 }
 
-Action ObstacleBehavior::GetAction()
+void ObstacleBehavior::Update()
 {
-   Action reaction = _llAction;
+   _action = _llAction;
 
    if(_left > 0.6)
-     reaction.drive.left  = 1/pow(0.6 - _left, 4);
+     _action.drive.left  = 1/pow(0.6 - _left, 4);
    else
-     reaction.drive.left = DRIVE_MAX;
+     _action.drive.left = DRIVE_MAX;
 
    if(_right > 0.6)
-     reaction.drive.right = 1/pow(0.6 - _right, 4);
+     _action.drive.right = 1/pow(0.6 - _right, 4);
    else
-     reaction.drive.right = DRIVE_MAX;
+     _action.drive.right = DRIVE_MAX;
 
    if(_center < 0.8) {
       if(_left < _right)
       {
-         reaction.drive.right = -reaction.drive.right;
+         _action.drive.right = -_action.drive.right;
       }
       else
       {
-         reaction.drive.left = -reaction.drive.left;
+         _action.drive.left = -_action.drive.left;
       }
    }
-
-   return reaction;
 }

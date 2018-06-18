@@ -41,7 +41,7 @@ public:
    PickUpCube(std::string name, double cameraOffset, double cameraHeight);
    ~PickUpCube() {}
    
-   Action GetAction() override;
+   void Update() override;
    void SetRecheckInterval(double t);
 };
 

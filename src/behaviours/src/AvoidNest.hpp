@@ -26,9 +26,8 @@ private:
 public:
    AvoidNest(std::string name, double cameraOffset, double cameraHeight);
    ~AvoidNest() {}
-   
-   Action GetAction() override;
-   
+
+   void Update() override;
 };
 
 #endif // _AVOID_NEST_HPP

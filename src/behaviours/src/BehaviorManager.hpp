@@ -11,23 +11,27 @@ class Behavior
 {
 protected:
    Action _llAction;
+   Action _action;
    ros::NodeHandle _nh;
+   Behavior* _subsumedBehavior;
+   Action GetSubsumedAction();
 public:
    Behavior();
    virtual ~Behavior();
    
-   virtual Action GetAction() { return _llAction; };
+   Action GetAction() const { return _action; }
+   virtual void Update() { _action = _llAction; }
+
    void SetLowerLevelAction(Action a) { _llAction = a; }
+   void Subsumes(Behavior* b) { _subsumedBehavior = b; }
 };
 
 class Constant : public Behavior
 {
-private:
-   Action _constAction;
 public:
-   Constant(Action a) { _constAction = a; }
+   Constant(Action a) { _action = a; }
    ~Constant() {}
-   Action GetAction() override { return _constAction; }
+   void Update() override { /* Don't do anything */ }
 };
 
 class BehaviorManager

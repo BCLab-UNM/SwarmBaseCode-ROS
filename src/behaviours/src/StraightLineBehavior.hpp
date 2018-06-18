@@ -22,7 +22,7 @@ public:
    StraightLineBehavior(std::string name);
    ~StraightLineBehavior() {}
 
-   Action GetAction() override;
+   void Update() override;
 };
 
 #endif // _STRAIGHT_LINE_BEHAVIOR_HPP

@@ -47,39 +47,36 @@ void AvoidNest::PersistenceCallback(const ros::TimerEvent& event)
    _persist = false;
 }
 
-Action AvoidNest::GetAction()
+void AvoidNest::Update()
 {
-   Action reaction = _llAction;
-
+   _action = _llAction;
+   
    if(_persist)
    {
-      return _savedAction;
+      _action = _savedAction;
    }
 
    if(_tooClose)
    {
-      reaction.drive.left = -100;
-      reaction.drive.right = -100;
-      return reaction;
+      _action.drive.left = -100;
+      _action.drive.right = -100;
    }
 
    if(_tagsLeft > 0 || _tagsRight > 0)
    {
       if(_tagsLeft > _tagsRight)
       {
-         reaction.drive.left = 100;
-         reaction.drive.right = -100;
+         _action.drive.left = 100;
+         _action.drive.right = -100;
       }
       else
       {
-         reaction.drive.left = -100;
-         reaction.drive.right = 100;
+         _action.drive.left = -100;
+         _action.drive.right = 100;
       }
 
       _persist = true;
-      _savedAction = reaction;
+      _savedAction = _action;
       _persistenceTimer = _nh.createTimer(ros::Duration(1.2), &AvoidNest::PersistenceCallback, this, true);
-   }
-
-   return reaction;
+   }   
 }

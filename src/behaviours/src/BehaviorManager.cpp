@@ -49,6 +49,7 @@ Action BehaviorManager::NextAction()
    for(int level = 0; level < _behaviors.size(); level++)
    {
       _behaviors[level]->SetLowerLevelAction(nextAction);
+      _behaviors[level]->Update();
       nextAction = _behaviors[level]->GetAction();
    }
 

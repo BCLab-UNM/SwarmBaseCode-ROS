@@ -11,14 +11,13 @@ void StraightLineBehavior::OdometryHandler(const nav_msgs::Odometry::ConstPtr& m
    // The idea is that this can be a PID to maintain a straigt line. For now just drive.
 }
 
-Action StraightLineBehavior::GetAction()
+void StraightLineBehavior::Update()
 {
-   Action reaction = _llAction;
+   _action = _llAction;
    if(_llAction.drive.left < 75 && _llAction.drive.right < 75
       && _llAction.drive.right >= 0 && _llAction.drive.left >= 0)
    {
-      reaction.drive.left += 100;
-      reaction.drive.right += 100;
+      _action.drive.left += 100;
+      _action.drive.right += 100;
    }
-   return reaction;
 }

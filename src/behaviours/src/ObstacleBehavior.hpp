@@ -24,8 +24,8 @@ private:
 public:
    ObstacleBehavior(std::string name);
    ~ObstacleBehavior() {}
-   
-   Action GetAction() override;
+
+   void Update() override;
 };
 
 #endif // _OBSTACLE_BEHAVIOR_HPP

@@ -62,8 +62,10 @@ int main(int argc, char **argv)
    AvoidNest            avoidNest(name, CAMERA_OFFSET, CAMERA_HEIGHT);
    AlignToCube          align(name, CAMERA_OFFSET);
    PickUpCube           pickup(name, CAMERA_OFFSET, CAMERA_HEIGHT);
-   ObstacleBehavior     obstacle2(name);
 
+   // TODO: Implement Update() and GetAction() everywhere.
+   // TODO: implement subsumption in all classes, esp. pickup
+   pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(240);
 
    manager.RegisterBehavior(&obstacle);
