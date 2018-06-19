@@ -1,6 +1,7 @@
 /**
  * The main function for the behavior node
  */
+#include <memory>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -55,16 +56,15 @@ int main(int argc, char **argv)
                                            boost::bind(&statusHandler, statusPublisher, _1));
 
    RobotInterface robot(name);
+   SwarmieSensors sensors(name);
    BehaviorManager manager;
 
-   ObstacleBehavior     obstacle(name);
-   StraightLineBehavior driveStraight(name);
-   AvoidNest            avoidNest(name, CAMERA_OFFSET, CAMERA_HEIGHT);
-   AlignToCube          align(name, CAMERA_OFFSET);
-   PickUpCube           pickup(name, CAMERA_OFFSET, CAMERA_HEIGHT);
+   ObstacleBehavior     obstacle(&sensors);
+   StraightLineBehavior driveStraight;
+   AvoidNest            avoidNest(&sensors);
+   AlignToCube          align(&sensors);
+   PickUpCube           pickup(&sensors);
 
-   // TODO: Implement Update() and GetAction() everywhere.
-   // TODO: implement subsumption in all classes, esp. pickup
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(240);
 

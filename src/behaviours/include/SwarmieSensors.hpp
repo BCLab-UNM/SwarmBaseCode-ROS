@@ -1,6 +1,11 @@
+#ifndef _SWARMIE_SENSORS_HPP
+#define _SWARMIE_SENSORS_HPP
+
 #include <ros/ros.h>
 #include <sensor_msgs/Range.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
+#include <boost/math/quaternion.hpp>
+#include <cmath> // atan2
 
 class Tag
 {
@@ -9,17 +14,23 @@ private:
    double _x;
    double _y;
    double _z;
-   double _yaw;
+   boost::math::quaternion<double> _orientation;
+
+   const double CAMERA_HEIGHT = 0.195;
+   const double CAMERA_OFFSET = 0.023;
 public:
-   Tag(int id, double x, double y, double z, double yaw);
+   Tag(int id, double x, double y, double z, boost::math::quaternion<double> orientation);
    ~Tag() {}
    
-   double GetAlignment(double offset) const;
-   double GetDistance(double offset, double height) const;
+   double Alignment() const;
+   double Distance() const;
+   double HorizontalDistance() const;
    double GetX() const { return _x; }
    double GetY() const { return _y; }
    double GetZ() const { return _z; }
-   double GetYaw() const { return _yaw; }
+   boost::math::quaternion<double> GetOrientation() const { return _orientation; }
+   double GetYaw() const;
+   int    GetId() const { return _id; }
 };
 
 class SwarmieSensors
@@ -30,9 +41,6 @@ private:
    ros::Subscriber _rightSubscriber;
    ros::Subscriber _centerSubscriber;
    ros::Subscriber _tagSubscriber;
-
-   const double CAMERA_OFFSET = -0.023;
-   const double CAMERA_HEIGHT = 0.195;
    
    double _leftSonar;
    double _rightSonar;
@@ -53,3 +61,5 @@ public:
    double GetCenterSonar() const { return _centerSonar; }
    const std::vector<Tag> GetTags() const { return _detections; }
 };
+
+#endif // _SWARMIE_SENSORS_HPP

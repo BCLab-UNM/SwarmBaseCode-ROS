@@ -7,6 +7,7 @@
 #include <sensor_msgs/Range.h>
 
 #include "BehaviorManager.hpp"
+#include "SwarmieSensors.hpp"
 
 class PickUpCube : public Behavior
 {
@@ -14,10 +15,9 @@ private:
    enum State { LastInch, Grip, Raise, Holding, Rechecking, Checking, NotHolding } _state;
    
    const double PICKUP_DISTANCE = 0.2;
+   const double ALIGNMENT_THRESHOLD = 0.005;
    const double OUT_OF_RANGE    = 100;
 
-   ros::Subscriber _tagSubscriber;
-   ros::Subscriber _centerSonar;
    ros::Timer      _pickupTimer;
    ros::Timer      _checkTimer;
    ros::Timer      _recheckTimer;
@@ -28,17 +28,14 @@ private:
    double _distanceToTarget;
    double _centerRange;
 
-   void   TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tags);
-   void   SonarHandler(const sensor_msgs::Range& message);
-   void   PickupTimeout(const ros::TimerEvent& event);
-   void   CheckTimeout(const ros::TimerEvent& event);
-   void   RecheckHandler(const ros::TimerEvent& event);
-   void   ResetTimer(double time);
-   bool   Aligned(const geometry_msgs::Point p);
-   double Distance(const geometry_msgs::Point p);
+   void ProcessTags();
+   void PickupTimeout(const ros::TimerEvent& event);
+   void CheckTimeout(const ros::TimerEvent& event);
+   void RecheckHandler(const ros::TimerEvent& event);
+   void ResetTimer(double time);
 
 public:
-   PickUpCube(std::string name, double cameraOffset, double cameraHeight);
+   PickUpCube(const SwarmieSensors* sensors);
    ~PickUpCube() {}
    
    void Update() override;

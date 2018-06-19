@@ -6,18 +6,15 @@
 class AlignToCube : public Behavior
 {
 private:
-   double _cameraOffset;
    double _distanceToTag;
    double _linearDistance;
 
    double _integral;
 
-   ros::Subscriber _tagSubscriber;
-
-   void TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
+   void ProcessTags();
 
 public:
-   AlignToCube(std::string name, double cameraOffset);
+   AlignToCube(const SwarmieSensors* sensors);
    ~AlignToCube() {}
 
    void Update() override;

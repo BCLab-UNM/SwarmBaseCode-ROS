@@ -8,21 +8,8 @@
 
 class ObstacleBehavior : public Behavior
 {
-private:
-   double _left;
-   double _right;
-   double _center;
-
-   ros::Subscriber _leftSubscriber;
-   ros::Subscriber _rightSubscriber;
-   ros::Subscriber _centerSubscriber;
-   
-   void LeftSonarCallback(  const sensor_msgs::Range& range) { std::cout << "update Left: " << _left << std::endl; _left   = range.range; }
-   void RightSonarCallback( const sensor_msgs::Range& range) { _right  = range.range; }
-   void CenterSonarCallback(const sensor_msgs::Range& range) { _center = range.range; }
-
 public:
-   ObstacleBehavior(std::string name);
+   ObstacleBehavior(const SwarmieSensors* sensors);
    ~ObstacleBehavior() {}
 
    void Update() override;

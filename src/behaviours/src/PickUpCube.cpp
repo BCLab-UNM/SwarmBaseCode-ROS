@@ -1,20 +1,18 @@
 #include "PickUpCube.hpp"
 #include "RobotInterface.hpp"
 
-PickUpCube::PickUpCube(std::string name, double cameraOffset, double cameraHeight) :
-   _cameraHeight(cameraHeight),
-   _cameraOffset(cameraOffset),
+PickUpCube::PickUpCube(const SwarmieSensors* sensors) :
+   Behavior(sensors),
    _state(NotHolding),
    _allowReset(true),
    _distanceToTarget(OUT_OF_RANGE)
 {
-   _tagSubscriber = _nh.subscribe(name + "/targets", 1, &PickUpCube::TagHandler, this);
    _pickupTimer = _nh.createTimer(ros::Duration(0), &PickUpCube::PickupTimeout, this, true);
    _pickupTimer.stop();
    _checkTimer  = _nh.createTimer(ros::Duration(4), &PickUpCube::CheckTimeout, this, true);
    _checkTimer.stop();
    _recheckTimer = _nh.createTimer(ros::Duration(30), &PickUpCube::RecheckHandler, this);
-   _centerSonar = _nh.subscribe(name + "/sonarCenter", 1, &PickUpCube::SonarHandler, this);
+   _recheckTimer.stop();
 }
 
 void PickUpCube::SetRecheckInterval(double t)
@@ -24,18 +22,13 @@ void PickUpCube::SetRecheckInterval(double t)
    _recheckTimer.start();
 }
 
-void PickUpCube::SonarHandler(const sensor_msgs::Range& message)
-{
-   _centerRange = message.range;
-}
-
 void PickUpCube::CheckTimeout(const ros::TimerEvent& event)
 {
    std::cout << "in check timeout" << std::endl;
    // only transition if we meant to check.
    if(_state != Checking && _state != Rechecking) return;
    
-   if(_centerRange < 0.12 || _distanceToTarget < 0.14)
+   if(_sensors->GetCenterSonar() < 0.12 || _distanceToTarget < 0.14)
    {
       _state = Holding;
       _recheckTimer.start();
@@ -58,28 +51,27 @@ void PickUpCube::RecheckHandler(const ros::TimerEvent& event)
    }
 }
 
-void PickUpCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
+void PickUpCube::ProcessTags()
 {
    _distanceToTarget = OUT_OF_RANGE;
 
-   for(auto tag : message->detections)
+   for(auto tag : _sensors->GetTags())
    {
-      if(tag.id != 0) continue;
-
-      auto p = tag.pose.pose.position;
+      if(tag.GetId() != 0) continue;
 
       switch(_state)
       {
       case NotHolding:
-         if(Aligned(p) && Distance(p) < PICKUP_DISTANCE)
+         if(fabs(tag.Alignment()) < ALIGNMENT_THRESHOLD
+            && tag.HorizontalDistance() < PICKUP_DISTANCE)
          {
             _state = LastInch;
          }
          break;
       case Checking:
-         if(p.x - _cameraOffset < 0.01)
+         if(fabs(tag.Alignment()) < 0.01)
          {
-            _distanceToTarget = hypot(hypot(p.x, p.y), p.z);
+            _distanceToTarget = tag.Distance();
          }
          break;
       default:
@@ -109,25 +101,6 @@ void PickUpCube::PickupTimeout(const ros::TimerEvent& event)
    }
 }
 
-bool PickUpCube::Aligned(const geometry_msgs::Point p)
-{
-   std::cout << "alignment " << fabs(p.x - _cameraOffset) << std::endl;
-   return (fabs(p.x - _cameraOffset) < 0.005);
-}
-
-double PickUpCube::Distance(const geometry_msgs::Point p)
-{
-   double distanceFromCamera;
-   distanceFromCamera = hypot(hypot(p.x, p.y), p.z);
-   distanceFromCamera *= distanceFromCamera;
-   double ch = _cameraHeight*_cameraHeight;
-
-   if((distanceFromCamera - ch) > 0)
-      return sqrt(distanceFromCamera - ch);
-   else
-      return 0.00001; // arbitrary small distance
-}
-
 void PickUpCube::ResetTimer(double duration)
 {
    if(!_allowReset) return;
@@ -139,6 +112,8 @@ void PickUpCube::ResetTimer(double duration)
 
 void PickUpCube::Update()
 {
+   ProcessTags();
+   _centerRange = _sensors->GetCenterSonar();
    _action = _llAction;
 
    switch(_state)

@@ -2,15 +2,15 @@
 
 #define MAX_TURN 100
 
-void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
+void AlignToCube::ProcessTags()
 {
    bool target_detected;
    double minimum_distance = 100;
    double distance = 0;
    double linearDistance = 0;
-   for(auto tag : message->detections)
+   for(auto tag : _sensors->GetTags())
    {
-      if(tag.id != 0)
+      if(tag.GetId() != 0)
       {
          // If we can detect a nest tag then igore any other detections.
          _distanceToTag = 0;
@@ -18,12 +18,12 @@ void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstP
          return;
       }
       target_detected = true;
-      double d = tag.pose.pose.position.x - _cameraOffset;
-      if(fabs(d) < minimum_distance)
+      double alignment = tag.Alignment();
+      if(fabs(alignment) < minimum_distance)
       {
-         minimum_distance = fabs(d);
-         distance = d;
-         linearDistance = hypot(hypot(tag.pose.pose.position.x, tag.pose.pose.position.y), tag.pose.pose.position.z);
+         minimum_distance = fabs(alignment);
+         distance = alignment;
+         linearDistance = tag.Distance();
       }
    }
 
@@ -38,14 +38,12 @@ void AlignToCube::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstP
    }
 }
 
-AlignToCube::AlignToCube(std::string name, double cameraOffset) :
-   _cameraOffset(cameraOffset),
+AlignToCube::AlignToCube(const SwarmieSensors* sensors) :
+   Behavior(sensors),
    _distanceToTag(0),
    _linearDistance(0),
    _integral(0)
-{
-   _tagSubscriber = _nh.subscribe(name + "/targets", 1, &AlignToCube::TagHandler, this);
-}
+{}
 
 void AlignToCube::Update()
 {

@@ -11,15 +11,8 @@
  */
 class StraightLineBehavior : public Behavior
 {
-private:
-   ros::Subscriber _odomSubscriber;
-
-   bool   _heading_set;
-   double _heading;
-
-   void OdometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 public:
-   StraightLineBehavior(std::string name);
+   StraightLineBehavior();
    ~StraightLineBehavior() {}
 
    void Update() override;

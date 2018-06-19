@@ -1,32 +1,23 @@
 #include "AvoidNest.hpp"
 #include <cmath>
 
-AvoidNest::AvoidNest(std::string name, double cameraOffset, double cameraHeight) :
-   _cameraOffset(cameraOffset),
-   _cameraHeight(cameraHeight),
+AvoidNest::AvoidNest(const SwarmieSensors* sensors) :
+   Behavior(sensors),
    _persist(false)   
-{
-   _tagSubscriber = _nh.subscribe(name + "/targets", 1, &AvoidNest::TagHandler, this);
-}
+{}
 
-double AvoidNest::HorizontalDistance(double x, double y, double z)
-{
-   double distanceFromCamera = hypot(hypot(x, y), z);
-   return sqrt(distanceFromCamera*distanceFromCamera - _cameraHeight*_cameraHeight);
-}
-
-void AvoidNest::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
+void AvoidNest::TagHandler()
 {
    _tagsRight = 0;
    _tagsLeft  = 0;
    _tooClose = false;
-   for(auto tag : message->detections)
+   for(auto tag : _sensors->GetTags())
    {
-      if(tag.id == 0)
+      if(tag.GetId() == 0)
       {
          continue; // skip blocks
       }
-      if(tag.pose.pose.position.x + _cameraOffset > 0)
+      if(tag.Alignment() > 0)
       {
          _tagsRight++;
       }
@@ -34,8 +25,8 @@ void AvoidNest::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr
       {
          _tagsLeft++;
       }
-      auto tagPos = tag.pose.pose.position;
-      if(HorizontalDistance(tagPos.x, tagPos.y, tagPos.z) <= 0.2)
+
+      if(tag.HorizontalDistance() <= 0.2)
       {
          _tooClose = true;
       }
@@ -50,6 +41,7 @@ void AvoidNest::PersistenceCallback(const ros::TimerEvent& event)
 void AvoidNest::Update()
 {
    _action = _llAction;
+   TagHandler();
    
    if(_persist)
    {

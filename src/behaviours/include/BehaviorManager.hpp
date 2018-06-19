@@ -4,8 +4,10 @@
 #include <ros/ros.h>
 
 #include "RobotInterface.hpp"
+#include "SwarmieSensors.hpp"
 
 #include <vector>
+#include <memory>
 
 class Behavior
 {
@@ -13,12 +15,14 @@ protected:
    Action _llAction;
    Action _action;
    ros::NodeHandle _nh;
+   const SwarmieSensors* _sensors;
+
    Behavior* _subsumedBehavior;
    Action GetSubsumedAction();
 public:
-   Behavior();
+   Behavior(const SwarmieSensors* sensors);
    virtual ~Behavior();
-   
+
    Action GetAction() const { return _action; }
    virtual void Update() { _action = _llAction; }
 
@@ -29,7 +33,7 @@ public:
 class Constant : public Behavior
 {
 public:
-   Constant(Action a) { _action = a; }
+   Constant(Action a) : Behavior(nullptr) { _action = a; }
    ~Constant() {}
    void Update() override { /* Don't do anything */ }
 };
