@@ -23,6 +23,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(swarmie_interface
+  src/SwarmieSensors.cpp
+)
+
 add_library(behavior
     src/BehaviorManager.cpp
     src/RobotInterface.cpp
@@ -54,6 +58,7 @@ add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
 target_link_libraries(
   behaviours
   behavior
+  swarmie_interface
   ${catkin_LIBRARIES}
 )
 
