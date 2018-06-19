@@ -47,6 +47,7 @@ AlignToCube::AlignToCube(const SwarmieSensors* sensors) :
 
 void AlignToCube::Update()
 {
+   ProcessTags();
    _action = _llAction;
 
    if(fabs(_distanceToTag) > 0.005)

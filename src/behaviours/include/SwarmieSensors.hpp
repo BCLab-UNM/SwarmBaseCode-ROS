@@ -17,7 +17,7 @@ private:
    boost::math::quaternion<double> _orientation;
 
    const double CAMERA_HEIGHT = 0.195;
-   const double CAMERA_OFFSET = 0.023;
+   const double CAMERA_OFFSET = -0.023;
 public:
    Tag(int id, double x, double y, double z, boost::math::quaternion<double> orientation);
    ~Tag() {}

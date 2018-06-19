@@ -10,7 +10,7 @@ void StraightLineBehavior::Update()
    if(_llAction.drive.left < 75 && _llAction.drive.right < 75
       && _llAction.drive.right >= 0 && _llAction.drive.left >= 0)
    {
-      _action.drive.left += 65;
-      _action.drive.right += 65;
+      _action.drive.left += 100;
+      _action.drive.right += 100;
    }
 }
