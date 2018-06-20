@@ -1,6 +1,7 @@
 #include "BehaviorManager.hpp"
 #include "SwarmieInterface.hpp"
 #include <gtest/gtest.h>
+#include <boost/math/quaternion.hpp>
 
 TEST(BehaviorManager, noBehaviors) {
    // The default behavior is to sit and do nothing after lowering and
@@ -79,10 +80,33 @@ TEST(Constant, constantBehaviorNoChangeAfterLLActionUpdate) {
    EXPECT_EQ(a.grip, action.grip);   
 }
 
+TEST(SwarmieSensors, setSonar) {
+   SwarmieSensors sensors;
+   sensors.SetLeftSonar(0.1);
+   sensors.SetRightSonar(0.2);
+   sensors.SetCenterSonar(2.4);
+   EXPECT_EQ(0.1, sensors.GetLeftSonar());
+   EXPECT_EQ(0.2, sensors.GetRightSonar());
+   EXPECT_EQ(2.4, sensors.GetCenterSonar());
+}
+
+TEST(SwarmieSensors, initialTagDetections) {
+   // initially should not detect any tags.
+   SwarmieSensors sensors;
+   EXPECT_EQ(0, sensors.GetTags().size());
+}
+
+TEST(SwarmieSensors, setTags) {
+   SwarmieSensors sensors;
+   Tag t(0, 0, 0, 0, boost::math::quaternion<double>(1.2, 1.2, 1.2, 5.2));
+   sensors.DetectedTag(t);
+   std::vector<Tag> tags = sensors.GetTags();
+   EXPECT_EQ(1, sensors.GetTags().size());
+}
+
 int main(int argc, char** argv)
 {
    testing::InitGoogleTest(&argc, argv);
    ros::init(argc, argv, "tester");
-   ros::NodeHandle nh;
    return RUN_ALL_TESTS();
 }
