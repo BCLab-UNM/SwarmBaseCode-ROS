@@ -1,0 +1,26 @@
+language: cpp
+
+dist: xenial
+sudo: required
+
+env:
+  global:
+    - ros_distro: kinetic
+
+before_install:
+  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+  - sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+  - sudo apt update -qq
+  - sudo apt install -y ros-$ros_distro-desktop-full
+  - sudo rosdep init
+  - rosdep update
+  - sudo apt install -y libusb-dev python-rosinstall python-catkin-tools ros-$ros_distro-robot-localization ros-$ros_distro-usb-cam ros-$ros_distro-hector-gazebo-plugins ros-$ros_distro-joystick-drivers
+  - source /opt/ros/$ros_distro/setup.bash
+
+script:
+  - source /opt/ros/$ros_distro/setup.bash
+  - catkin build
+#  - roscore &
+#  - catkin run_tests
+#  - source devel/setup.bash
+#  - devel/lib/behaviours/behaviour_test
