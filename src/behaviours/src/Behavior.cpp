@@ -13,6 +13,8 @@
 #include "AlignToCube.hpp"
 #include "PickUpCube.hpp"
 
+#include "SwarmieInterface.hpp"
+
 #define CAMERA_OFFSET (-0.02)
 #define CAMERA_HEIGHT 0.195
 
@@ -55,18 +57,18 @@ int main(int argc, char **argv)
    ros::Timer statusTimer = nh.createTimer(ros::Duration(2),
                                            boost::bind(&statusHandler, statusPublisher, _1));
 
-   RobotInterface robot(name);
-   SwarmieSensors sensors(name);
-   BehaviorManager manager;
+   SwarmieInterface robot(name);
+   BehaviorManager  manager;
+   const SwarmieSensors* sensors = robot.GetSensors();
 
-   ObstacleBehavior     obstacle(&sensors);
+   ObstacleBehavior     obstacle(sensors);
    StraightLineBehavior driveStraight;
-   AvoidNest            avoidNest(&sensors);
-   AlignToCube          align(&sensors);
-   PickUpCube           pickup(&sensors);
+   AvoidNest            avoidNest(sensors);
+   AlignToCube          align(sensors);
+   PickUpCube           pickup(sensors);
 
    pickup.Subsumes(&driveStraight);
-   pickup.SetRecheckInterval(240);
+   pickup.SetRecheckInterval(60);
 
    manager.RegisterBehavior(&obstacle);
    manager.RegisterBehavior(&driveStraight);

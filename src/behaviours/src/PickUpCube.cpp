@@ -1,5 +1,5 @@
 #include "PickUpCube.hpp"
-#include "RobotInterface.hpp"
+#include "SwarmieInterface.hpp"
 
 PickUpCube::PickUpCube(const SwarmieSensors* sensors) :
    Behavior(sensors),

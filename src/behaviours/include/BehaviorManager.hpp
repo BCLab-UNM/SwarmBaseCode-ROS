@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 
-#include "RobotInterface.hpp"
+#include "SwarmieInterface.hpp"
 #include "SwarmieSensors.hpp"
 
 #include <vector>

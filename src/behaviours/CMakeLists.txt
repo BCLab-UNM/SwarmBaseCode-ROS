@@ -25,11 +25,11 @@ include_directories(
 
 add_library(swarmie_interface
   src/SwarmieSensors.cpp
+  src/SwarmieInterface.cpp
 )
 
 add_library(behavior
     src/BehaviorManager.cpp
-    src/RobotInterface.cpp
     src/ObstacleBehavior.cpp
     src/StraightLineBehavior.cpp
     src/AvoidNest.cpp
@@ -63,4 +63,4 @@ target_link_libraries(
 )
 
 catkin_add_gtest(behaviour_test test/test.cpp)
-target_link_libraries(behaviour_test behavior ${catkin_LIBRARIES})
+target_link_libraries(behaviour_test behavior swarmie_interface ${catkin_LIBRARIES})

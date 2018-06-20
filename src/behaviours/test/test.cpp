@@ -1,5 +1,5 @@
 #include "BehaviorManager.hpp"
-#include "RobotInterface.hpp"
+#include "SwarmieInterface.hpp"
 #include <gtest/gtest.h>
 
 TEST(BehaviorManager, noBehaviors) {
