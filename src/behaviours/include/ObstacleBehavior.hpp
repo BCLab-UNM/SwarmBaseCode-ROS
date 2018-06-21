@@ -8,6 +8,12 @@
 
 class ObstacleBehavior : public Behavior
 {
+private:
+   const double TURNAROUND_THRESHOLD = 0.4;
+   enum State { Normal, Turnaround } _state;
+
+   ros::Timer _turnaroundTimer;
+   void TurnaroundHandler(const ros::TimerEvent& event);
 public:
    ObstacleBehavior(const SwarmieSensors* sensors);
    ~ObstacleBehavior() {}

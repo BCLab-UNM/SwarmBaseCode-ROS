@@ -28,6 +28,7 @@ void AlignToCube::ProcessTags()
    }
 
    if(target_detected) {
+     std::cout << "distance to tag: " << linearDistance << std::endl;
       _linearDistance = linearDistance;
       _distanceToTag = distance;
    }
@@ -53,15 +54,15 @@ void AlignToCube::Update()
    if(fabs(_distanceToTag) > 0.005)
    {
       // set a turn speed proportionally to the misalignment + an integral term (a PI controller)
-      _action.drive.left = (_linearDistance * 80) + _distanceToTag * 100 + 10 * _integral;
-      _action.drive.right = (_linearDistance * 80) - (_distanceToTag * 100 + 10 * _integral);
+      _action.drive.left = (_linearDistance * 70) + _distanceToTag * 70 + 10 * _integral;
+      _action.drive.right = (_linearDistance * 70) - (_distanceToTag * 70 + 10 * _integral);
       _integral += _distanceToTag;
    }
    else if(_linearDistance != 0)
    {
       _integral = 0;
-      _action.drive.left = (_linearDistance * 80);
-      _action.drive.right = (_linearDistance * 80);
+      _action.drive.left = (_linearDistance * 70);
+      _action.drive.right = (_linearDistance * 70);
    }
    else
    {

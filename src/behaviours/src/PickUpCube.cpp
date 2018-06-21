@@ -120,12 +120,11 @@ void PickUpCube::Update()
    {
    case LastInch:
       std::cout << "in LastInch" << std::endl;
-      _action.drive.left = 30;
-      _action.drive.right = 30;
+      _action.drive.left = 60;
+      _action.drive.right = 60;
       ResetTimer(0.7);
       break;
    case Grip:
-      std::cout << "in Grip" << std::endl;
       _action.drive.left = 0;
       _action.drive.right = 0;
       _action.grip = GripperControl::CLOSED;
@@ -133,7 +132,6 @@ void PickUpCube::Update()
       ResetTimer(1.5);
       break;
    case Raise:
-      std::cout << "in Raise" << std::endl;
       _action.drive.left = 0;
       _action.drive.right = 0;
       _action.grip = GripperControl::CLOSED;
@@ -141,13 +139,11 @@ void PickUpCube::Update()
       ResetTimer(2);
       break;
    case Holding:
-      std::cout << "in Holding" << std::endl;
       _action = _subsumedBehavior->GetAction();
       _action.grip = GripperControl::CLOSED;
       _action.wrist = WristControl::DOWN_2_3;
       break;
    case Checking:
-      std::cout << "in Checking" << std::endl;
       _action.drive.left = 0;
       _action.drive.right = 0;
    case Rechecking:
@@ -155,7 +151,6 @@ void PickUpCube::Update()
       _action.wrist = WristControl::UP;
       break;
    default:
-      std::cout << "in Wait" << std::endl;
       break;
    }
 }
