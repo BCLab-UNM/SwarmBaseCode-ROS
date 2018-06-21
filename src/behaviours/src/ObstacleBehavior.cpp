@@ -12,23 +12,33 @@ ObstacleBehavior::ObstacleBehavior(const SwarmieSensors* sensors) :
    _turnaroundTimer.stop();
 }
 
-void ObstacleBehavior::Update()
+void ObstacleBehavior::UpdateState()
 {
-   _action = _llAction;
-
    switch(_state)
    {
    case Normal:
       if(_sensors->GetLeftSonar() < TURNAROUND_THRESHOLD
-         && _sensors->GetRightSonar() < TURNAROUND_THRESHOLD
-         && _sensors->GetCenterSonar() < TURNAROUND_THRESHOLD)
+         || _sensors->GetRightSonar() < TURNAROUND_THRESHOLD
+         || _sensors->GetCenterSonar() < TURNAROUND_THRESHOLD)
       {
          _state = Turnaround;
          _turnaroundTimer.stop();
          _turnaroundTimer.setPeriod(ros::Duration(1.0));
          _turnaroundTimer.start();
       }
-      
+      break;
+   }
+}
+
+void ObstacleBehavior::Update()
+{
+   _action = _llAction;
+
+   UpdateState();
+   
+   switch(_state)
+   {
+   case Normal:
       if(_sensors->GetLeftSonar() > 0.6)
          _action.drive.left  = 1/pow(0.6 - _sensors->GetLeftSonar(), 4);
       else
@@ -42,11 +52,11 @@ void ObstacleBehavior::Update()
       if(_sensors->GetCenterSonar() < 0.8) {
          if(_sensors->GetLeftSonar() < _sensors->GetRightSonar())
          {
-            _action.drive.right = -_action.drive.right;
+            _action.drive.right = -DRIVE_MAX;
          }
          else
          {
-            _action.drive.left = -_action.drive.left;
+            _action.drive.left = -DRIVE_MAX;
          }
       }
       break;
