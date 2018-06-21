@@ -2,6 +2,7 @@
 #include "SwarmieInterface.hpp"
 #include <gtest/gtest.h>
 #include <boost/math/quaternion.hpp>
+#include <algorithm> // count_if
 
 /**
  * Simple hash function to deterministically create many different tag
@@ -121,17 +122,24 @@ TEST(SwarmieSensors, setTagsOne) {
 
 TEST(SwarmieSensors, setTagsMany)
 {
+   const int MAX_TAG_ID = 257;
    SwarmieSensors sensors;
    boost::math::quaternion<double> q(0.2, 10.4, -1.2, 0.3);
    std::vector<Tag> tags_in;
    for(int i = 0; i <= 1024; i++)
    {
-      Tag t(simple_hash(i), i, i, i, q);
+      Tag t(simple_hash(i) % MAX_TAG_ID, i, i, i, q);
       sensors.DetectedTag(t);
       tags_in.push_back(t);
    }
    EXPECT_EQ(tags_in.size(), sensors.GetTags().size());
-   // TODO: count the number of tags with each ID and ensure that they match
+   std::vector<Tag> tags_out = sensors.GetTags();
+   for(int i = 0; i < MAX_TAG_ID; i++)
+   {
+      int i_out = std::count_if(tags_out.begin(), tags_out.end(), [i](Tag t) { return i == t.GetId(); } );
+      int i_in  = std::count_if(tags_in.begin(), tags_out.end(), [i](Tag t) { return i == t.GetId(); });
+      ASSERT_EQ(i_in, i_out);
+   }
 }
 
 int main(int argc, char** argv)
