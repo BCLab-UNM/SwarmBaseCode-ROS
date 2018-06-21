@@ -73,7 +73,7 @@ TEST(Constant, constantBehaviorNoChangeAfterUpdate) {
    EXPECT_EQ(a.drive.left, action.drive.left);
    EXPECT_EQ(a.drive.right, action.drive.right);
    EXPECT_EQ(a.wrist, action.wrist);
-   EXPECT_EQ(a.grip, action.grip);   
+   EXPECT_EQ(a.grip, action.grip);
 }
 
 TEST(Constant, constantBehaviorNoChangeAfterLLActionUpdate) {
@@ -94,7 +94,7 @@ TEST(Constant, constantBehaviorNoChangeAfterLLActionUpdate) {
    EXPECT_EQ(a.drive.left, action.drive.left);
    EXPECT_EQ(a.drive.right, action.drive.right);
    EXPECT_EQ(a.wrist, action.wrist);
-   EXPECT_EQ(a.grip, action.grip);   
+   EXPECT_EQ(a.grip, action.grip);
 }
 
 TEST(SwarmieSensors, setSonar) {
@@ -191,11 +191,11 @@ TEST(ObstacleBehavior, leftSonarTriggersMovement)
    obs.Update();
    a = obs.GetAction();
    EXPECT_TRUE(is_moving(a));
- 
+
    sensors.SetLeftSonar(0.8);
    obs.Update();
    a = obs.GetAction();
-   EXPECT_TRUE(is_moving(a));  
+   EXPECT_TRUE(is_moving(a));
 }
 
 TEST(ObstacleBehavior, rightSonarTriggersMovement)
@@ -227,7 +227,7 @@ TEST(ObstacleBehavior, rightSonarTriggersMovement)
    sensors.SetRightSonar(0.8);
    obs.Update();
    a = obs.GetAction();
-   EXPECT_TRUE(is_moving(a));  
+   EXPECT_TRUE(is_moving(a));
 }
 
 TEST(ObstacleBehavior, centerSonarTriggersMovement)
@@ -259,7 +259,7 @@ TEST(ObstacleBehavior, centerSonarTriggersMovement)
    sensors.SetCenterSonar(0.79);
    obs.Update();
    a = obs.GetAction();
-   EXPECT_TRUE(is_moving(a));  
+   EXPECT_TRUE(is_moving(a));
 }
 
 
@@ -316,8 +316,86 @@ TEST(ObstacleBehavior, centerSonarTriggersTurnaround)
    a = obs.GetAction();
    ASSERT_NE(a.drive.left, 0);
    ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));   
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
 }
+
+TEST(ObstacleBehavior, leftAndRightTriggerTurnaround)
+{
+   Action a;
+   SwarmieSensors sensors;
+   sensors.SetLeftSonar(3.2);
+   sensors.SetRightSonar(3.2);
+   sensors.SetCenterSonar(3.2);
+   ObstacleBehavior obs(&sensors);
+   obs.Update();
+
+   sensors.SetLeftSonar(0.2);
+   sensors.SetRightSonar(0.28);
+   obs.Update();
+   a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   ASSERT_NE(a.drive.right, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+}
+
+TEST(ObstacleBehavior, leftAndCenterTriggerTurnaround)
+{
+   Action a;
+   SwarmieSensors sensors;
+   sensors.SetLeftSonar(3.2);
+   sensors.SetRightSonar(3.2);
+   sensors.SetCenterSonar(3.2);
+   ObstacleBehavior obs(&sensors);
+   obs.Update();
+
+   sensors.SetLeftSonar(0.2);
+   sensors.SetCenterSonar(0.28);
+   obs.Update();
+   a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   ASSERT_NE(a.drive.right, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+}
+
+TEST(ObstacleBehavior, centerAndRightTriggerTurnaround)
+{
+   Action a;
+   SwarmieSensors sensors;
+   sensors.SetLeftSonar(3.2);
+   sensors.SetRightSonar(3.2);
+   sensors.SetCenterSonar(3.2);
+   ObstacleBehavior obs(&sensors);
+   obs.Update();
+
+   sensors.SetCenterSonar(0.2);
+   sensors.SetRightSonar(0.28);
+   obs.Update();
+   a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   ASSERT_NE(a.drive.right, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+}
+
+TEST(ObstacleBehavior, allTriggerTurnaround)
+{
+   Action a;
+   SwarmieSensors sensors;
+   sensors.SetLeftSonar(3.2);
+   sensors.SetRightSonar(3.2);
+   sensors.SetCenterSonar(3.2);
+   ObstacleBehavior obs(&sensors);
+   obs.Update();
+
+   sensors.SetCenterSonar(0.2);
+   sensors.SetRightSonar(0.28);
+   sensors.SetLeftSonar(0.1);
+   obs.Update();
+   a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   ASSERT_NE(a.drive.right, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+}
+
 
 int main(int argc, char** argv)
 {
