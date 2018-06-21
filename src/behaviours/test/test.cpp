@@ -137,7 +137,7 @@ TEST(SwarmieSensors, setTagsMany)
    for(int i = 0; i < MAX_TAG_ID; i++)
    {
       int i_out = std::count_if(tags_out.begin(), tags_out.end(), [i](Tag t) { return i == t.GetId(); } );
-      int i_in  = std::count_if(tags_in.begin(), tags_out.end(), [i](Tag t) { return i == t.GetId(); });
+      int i_in  = std::count_if(tags_in.begin(), tags_in.end(), [i](Tag t) { return i == t.GetId(); });
       ASSERT_EQ(i_in, i_out);
    }
 }
