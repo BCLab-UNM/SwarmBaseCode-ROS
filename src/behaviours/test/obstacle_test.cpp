@@ -1,12 +1,8 @@
 #include <gtest/gtest.h>
+#include "test_util.h"
 
 #include "ObstacleBehavior.hpp"
 #include "SwarmieSensors.hpp"
-
-bool is_moving(Action a)
-{
-   return (fabs(a.drive.left) >= 35 || fabs(a.drive.right) >= 35);
-}
 
 TEST(ObstacleBehavior, allFar)
 {
