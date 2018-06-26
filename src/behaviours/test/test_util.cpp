@@ -38,5 +38,38 @@ bool is_turning_right(Action a)
    return a.drive.left > a.drive.right*0.85;   
 }
 
+/* Tag positions values measured from the robot camera:
+ *
+ * _____________
+ * |A         B|
+ * |           |
+ * |           |
+ * |           |
+ * |D         C|
+ * -------------
+ *
+ * A -> x: -0.202 | y: -0.121 | z: 0.5
+ * B -> x: 0.213  | y: -0.116 | z: 0.63
+ * C -> x: 0.068  | y: 0.042  | z: 0.212
+ * D -> xL -0.069 | y: 0.039  | z: 0.63
+ */
 
+Tag tag_top_left(int id)
+{
+   return Tag(id, -0.202, -0.121, 0.5, DEFAULT_ORIENTATION);
+}
 
+Tag tag_top_right(int id)
+{
+   return Tag(id, 0.213, -0.116, 0.63, DEFAULT_ORIENTATION);
+}
+
+Tag tag_bottom_left(int id)
+{
+   return Tag(id, -0.069, 0.039, 0.63, DEFAULT_ORIENTATION);
+}
+
+Tag tag_bottom_right(int id)
+{
+   return Tag(id, 0.068, 0.042, 0.212, DEFAULT_ORIENTATION);
+}
