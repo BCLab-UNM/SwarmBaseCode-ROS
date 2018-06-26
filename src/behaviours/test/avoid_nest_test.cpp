@@ -32,7 +32,7 @@ TEST_F(AvoidNestTest, nonCenterTagNoAction) {
    EXPECT_FALSE(is_moving(a));
 }
 
-TEST_F(AvoidNestTest, centerTagTriggersMovement) {
+TEST_F(AvoidNestTest, nestTagTriggersMovement) {
    Tag t(NEST_TAG_ID, 1, 1, 1, defaultOrientation);
    sensors.DetectedTag(t);
    avoid.Update();
