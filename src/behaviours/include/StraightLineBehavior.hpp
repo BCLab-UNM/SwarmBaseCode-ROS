@@ -3,9 +3,6 @@
 
 #include "BehaviorManager.hpp"
 
-#include <ros/ros.h>
-#include <nav_msgs/Odometry.h>
-
 /**
  * Drive at a constant velocity while maintaining the current heading
  */

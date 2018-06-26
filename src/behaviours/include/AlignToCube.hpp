@@ -1,7 +1,6 @@
 #include "BehaviorManager.hpp"
 
-#include <ros/ros.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
+#define CUBE_TAG_ID 0
 
 class AlignToCube : public Behavior
 {

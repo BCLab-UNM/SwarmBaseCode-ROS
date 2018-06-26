@@ -1,8 +1,6 @@
 #ifndef _OBSTACLE_BEHAVIOR_HPP
 #define _OBSTACLE_BEHAVIOR_HPP
 
-#include <ros/ros.h>
-#include <sensor_msgs/Range.h>
 #include <math.h>
 
 #include "BehaviorManager.hpp"

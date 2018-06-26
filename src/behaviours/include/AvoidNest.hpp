@@ -3,8 +3,6 @@
 
 #include "BehaviorManager.hpp"
 
-#include <ros/ros.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
 #include <cmath>
 
 #define NEST_TAG_ID 256
