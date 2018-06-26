@@ -7,18 +7,23 @@
 #include "SwarmieSensors.hpp"
 #include "ROSTimer.hpp"
 
-TEST(AvoidNest, noTagsNoAction) {
+class AvoidNestTest : public testing::Test
+{
+protected:
    SwarmieSensors sensors;
-   AvoidNest<ROSTimer> avoid(&sensors);
-   avoid.Update();
+   AvoidNest<ROSTimer> avoid;
+
+   AvoidNestTest() : avoid(&sensors) {
+      avoid.Update();
+   }
+};
+
+TEST_F(AvoidNestTest, noTagsNoAction) {
    Action a = avoid.GetAction();
    EXPECT_FALSE(is_moving(a));
 }
 
-TEST(AvoidNest, nonCenterTagNoAction) {
-   SwarmieSensors sensors;
-   AvoidNest<ROSTimer> avoid(&sensors);
-   avoid.Update();
+TEST_F(AvoidNestTest, nonCenterTagNoAction) {
    Tag t(0, 1, 1, 1, boost::math::quaternion<double>(1.2, 1.2, 1.2, 2.1));
    sensors.DetectedTag(t);
    avoid.Update();
@@ -26,11 +31,8 @@ TEST(AvoidNest, nonCenterTagNoAction) {
    EXPECT_FALSE(is_moving(a));
 }
 
-TEST(AvoidNest, centerTagTriggersMovement) {
-   SwarmieSensors sensors;
-   AvoidNest<ROSTimer> avoid(&sensors);
-   avoid.Update();
-   Tag t(256, 1, 1, 1, boost::math::quaternion<double>(1.2, 1.2, 1.2, 2.1));
+TEST_F(AvoidNestTest, centerTagTriggersMovement) {
+   Tag t(NEST_TAG_ID, 1, 1, 1, boost::math::quaternion<double>(1.2, 1.2, 1.2, 2.1));
    sensors.DetectedTag(t);
    avoid.Update();
    Action a = avoid.GetAction();

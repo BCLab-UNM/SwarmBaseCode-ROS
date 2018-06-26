@@ -7,6 +7,8 @@
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <cmath>
 
+#define NEST_TAG_ID 256
+
 template <typename T>
 class AvoidNest : public Behavior
 {
@@ -31,7 +33,7 @@ private:
       _tooClose = false;
       for(auto tag : _sensors->GetTags())
       {
-         if(tag.GetId() == 0)
+         if(tag.GetId() != NEST_TAG_ID)
          {
             continue; // skip blocks
          }
