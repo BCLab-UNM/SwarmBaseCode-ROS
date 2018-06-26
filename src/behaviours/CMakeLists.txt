@@ -28,11 +28,13 @@ add_library(swarmie_interface
   src/SwarmieInterface.cpp
 )
 
+add_library(utilities
+   src/ROSTimer.cpp
+)
+
 add_library(behavior
     src/BehaviorManager.cpp
-    src/ObstacleBehavior.cpp
     src/StraightLineBehavior.cpp
-    src/AvoidNest.cpp
     src/AlignToCube.cpp
     src/PickUpCube.cpp    
 )
@@ -59,8 +61,9 @@ target_link_libraries(
   behaviours
   behavior
   swarmie_interface
+  utilities
   ${catkin_LIBRARIES}
 )
 
 catkin_add_gtest(behaviour_test test/test.cpp)
-target_link_libraries(behaviour_test behavior swarmie_interface ${catkin_LIBRARIES})
+target_link_libraries(behaviour_test behavior swarmie_interface utilities ${catkin_LIBRARIES})

@@ -13,6 +13,8 @@
 #include "AlignToCube.hpp"
 #include "PickUpCube.hpp"
 
+#include "ROSTimer.hpp"
+
 #include "SwarmieInterface.hpp"
 
 #define CAMERA_OFFSET (-0.02)
@@ -61,11 +63,11 @@ int main(int argc, char **argv)
    BehaviorManager  manager;
    const SwarmieSensors* sensors = robot.GetSensors();
 
-   ObstacleBehavior     obstacle(sensors);
-   StraightLineBehavior driveStraight;
-   AvoidNest            avoidNest(sensors);
-   AlignToCube          align(sensors);
-   PickUpCube           pickup(sensors);
+   ObstacleBehavior<ROSTimer> obstacle(sensors);
+   StraightLineBehavior       driveStraight;
+   AvoidNest<ROSTimer>        avoidNest(sensors);
+   AlignToCube                align(sensors);
+   PickUpCube                 pickup(sensors);
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);

@@ -1,6 +1,7 @@
 #include "BehaviorManager.hpp"
 #include "SwarmieInterface.hpp"
 #include "ObstacleBehavior.hpp"
+#include "ROSTimer.hpp"
 
 #include <gtest/gtest.h>
 #include <boost/math/quaternion.hpp>
@@ -156,7 +157,7 @@ TEST(ObstacleBehavior, allFar)
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
 
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
    Action a = obs.GetAction();
    EXPECT_LT(a.drive.left, 0.1);
@@ -174,7 +175,7 @@ TEST(ObstacleBehavior, leftSonarTriggersMovement)
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
 
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetLeftSonar(0.3);
@@ -206,7 +207,7 @@ TEST(ObstacleBehavior, rightSonarTriggersMovement)
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
 
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetRightSonar(0.3);
@@ -238,7 +239,7 @@ TEST(ObstacleBehavior, centerSonarTriggersMovement)
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
 
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetCenterSonar(0.3);
@@ -272,7 +273,7 @@ TEST(ObstacleBehavior, leftTriggersTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetLeftSonar(0.29);
@@ -290,7 +291,7 @@ TEST(ObstacleBehavior, rightTriggersTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetRightSonar(0.29);
@@ -308,7 +309,7 @@ TEST(ObstacleBehavior, centerSonarTriggersTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetCenterSonar(0.29);
@@ -326,7 +327,7 @@ TEST(ObstacleBehavior, leftAndRightTriggerTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetLeftSonar(0.2);
@@ -345,7 +346,7 @@ TEST(ObstacleBehavior, leftAndCenterTriggerTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetLeftSonar(0.2);
@@ -364,7 +365,7 @@ TEST(ObstacleBehavior, centerAndRightTriggerTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetCenterSonar(0.2);
@@ -383,7 +384,7 @@ TEST(ObstacleBehavior, allTriggerTurnaround)
    sensors.SetLeftSonar(3.2);
    sensors.SetRightSonar(3.2);
    sensors.SetCenterSonar(3.2);
-   ObstacleBehavior obs(&sensors);
+   ObstacleBehavior<ROSTimer> obs(&sensors);
    obs.Update();
 
    sensors.SetCenterSonar(0.2);
