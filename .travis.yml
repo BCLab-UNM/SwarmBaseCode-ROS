@@ -22,5 +22,4 @@ script:
   - catkin build
   - roscore &
   - catkin run_tests
-  - source devel/setup.bash
   - catkin_test_results
