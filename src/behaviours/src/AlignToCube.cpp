@@ -28,7 +28,6 @@ void AlignToCube::ProcessTags()
    }
 
    if(target_detected) {
-     std::cout << "distance to tag: " << linearDistance << std::endl;
       _linearDistance = linearDistance;
       _distanceToTag = distance;
    }
