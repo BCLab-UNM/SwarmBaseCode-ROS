@@ -33,6 +33,9 @@ TEST_F(AlignToCubeTest, nonCubeTagNoMovement) {
 TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
    sensors.DetectedTag(tag_top_left(CUBE_TAG_ID));
    align.Update();
+   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
    EXPECT_TRUE(is_turning_left(align.GetAction()));
 
    sensors.ClearDetections();
@@ -41,6 +44,9 @@ TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
 
    sensors.DetectedTag(tag_bottom_left(CUBE_TAG_ID));
    align.Update();
+   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
    EXPECT_TRUE(is_turning_left(align.GetAction()));
 }
 
@@ -51,10 +57,17 @@ TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
 
    sensors.ClearDetections();
    align.Update();
+   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
    EXPECT_FALSE(is_moving(align.GetAction()));
 
    sensors.DetectedTag(tag_bottom_right(CUBE_TAG_ID));
    align.Update();
+   // accumulate integral term in the PI controller
+   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
    EXPECT_TRUE(is_turning_right(align.GetAction()));   
 }
 
