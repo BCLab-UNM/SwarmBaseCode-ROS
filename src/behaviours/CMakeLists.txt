@@ -30,6 +30,7 @@ add_library(swarmie_interface
 
 add_library(utilities
    src/ROSTimer.cpp
+   src/PID.cpp
 )
 
 add_library(behavior

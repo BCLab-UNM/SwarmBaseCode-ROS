@@ -1,4 +1,5 @@
 #include "BehaviorManager.hpp"
+#include "PID.hpp"
 
 #define CUBE_TAG_ID 0
 
@@ -10,6 +11,8 @@ private:
 
    double _integral;
 
+   PID    _alignPID;
+   
    void ProcessTags();
 
 public:

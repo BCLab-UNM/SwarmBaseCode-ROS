@@ -42,29 +42,24 @@ AlignToCube::AlignToCube(const SwarmieSensors* sensors) :
    Behavior(sensors),
    _distanceToTag(0),
    _linearDistance(0),
-   _integral(0)
+   _integral(0),
+   _alignPID(0.88, 0.6, 0.2)
 {}
 
 void AlignToCube::Update()
 {
    ProcessTags();
    _action = _llAction;
+   _alignPID.Update(_distanceToTag);
 
    if(fabs(_distanceToTag) > 0.005)
    {
-      // set a turn speed proportionally to the misalignment + an integral term (a PI controller)
-      _action.drive.left = (_linearDistance * 70) + _distanceToTag * 55 + 15 * _integral;
-      _action.drive.right = (_linearDistance * 70) - (_distanceToTag * 55 + 15 * _integral);
-      _integral += _distanceToTag;
-   }
-   else if(_linearDistance != 0)
-   {
-      _integral = 0;
-      _action.drive.left = (_linearDistance * 70);
-      _action.drive.right = (_linearDistance * 70);
+      _action.drive.left = 100*_alignPID.GetControlOutput();
+      _action.drive.right = - (100*_alignPID.GetControlOutput());
    }
    else
    {
-      _integral = 0;
+      // managed to line up, reset the pid.
+      _alignPID.Reset();
    }
 }

@@ -36,31 +36,36 @@ TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
    for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_left(align.GetAction()));
+   EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
+                                                   << " | right: " << align.GetAction().drive.right;
 
    sensors.ClearDetections();
    align.Update();
-   EXPECT_FALSE(is_moving(align.GetAction()));
+   EXPECT_FALSE(is_moving(align.GetAction())) << "left: " << align.GetAction().drive.left
+                                              << " | right: " << align.GetAction().drive.right;
 
    sensors.DetectedTag(tag_bottom_left(CUBE_TAG_ID));
    align.Update();
    for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_left(align.GetAction()));
+   EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
+                                                   << " | right: " << align.GetAction().drive.right;
 }
 
 TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
    sensors.DetectedTag(tag_top_right(CUBE_TAG_ID));
    align.Update();
-   EXPECT_TRUE(is_turning_right(align.GetAction()));
+   EXPECT_TRUE(is_turning_right(align.GetAction())) << "left: " << align.GetAction().drive.left
+                                                    << " | right: " << align.GetAction().drive.right;
 
    sensors.ClearDetections();
    align.Update();
    for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_FALSE(is_moving(align.GetAction()));
+   EXPECT_FALSE(is_moving(align.GetAction())) << "left: " << align.GetAction().drive.left
+                                              << " | right: " << align.GetAction().drive.right;
 
    sensors.DetectedTag(tag_bottom_right(CUBE_TAG_ID));
    align.Update();
@@ -68,7 +73,8 @@ TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
    for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_right(align.GetAction()));   
+   EXPECT_TRUE(is_turning_right(align.GetAction())) << "left: " << align.GetAction().drive.left
+                                                    << " | right: " << align.GetAction().drive.right;
 }
 
 TEST_F(AlignToCubeTest, nestAndCubeVisible) {
