@@ -33,7 +33,7 @@ TEST_F(AlignToCubeTest, nonCubeTagNoMovement) {
 TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
    sensors.DetectedTag(tag_top_left(CUBE_TAG_ID));
    align.Update();
-   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
    EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
@@ -46,7 +46,7 @@ TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
 
    sensors.DetectedTag(tag_bottom_left(CUBE_TAG_ID));
    align.Update();
-   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
    EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
@@ -56,21 +56,21 @@ TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
 TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
    sensors.DetectedTag(tag_top_right(CUBE_TAG_ID));
    align.Update();
+   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
    EXPECT_TRUE(is_turning_right(align.GetAction())) << "left: " << align.GetAction().drive.left
                                                     << " | right: " << align.GetAction().drive.right;
 
    sensors.ClearDetections();
    align.Update();
-   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
-      align.Update();
-   }
    EXPECT_FALSE(is_moving(align.GetAction())) << "left: " << align.GetAction().drive.left
                                               << " | right: " << align.GetAction().drive.right;
 
    sensors.DetectedTag(tag_bottom_right(CUBE_TAG_ID));
    align.Update();
    // accumulate integral term in the PI controller
-   for(int i = 0; i < 10 && !is_moving(align.GetAction()); i++) {
+   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
    EXPECT_TRUE(is_turning_right(align.GetAction())) << "left: " << align.GetAction().drive.left
