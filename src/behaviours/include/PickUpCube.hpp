@@ -1,11 +1,6 @@
 #ifndef _PICK_UP_CUBE_HPP
 #define _PICK_UP_CUBE_HPP
 
-#include <ros/ros.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
-#include <geometry_msgs/Point.h>
-#include <sensor_msgs/Range.h>
-
 #include "BehaviorManager.hpp"
 #include "SwarmieSensors.hpp"
 
