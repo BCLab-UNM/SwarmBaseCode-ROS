@@ -3,7 +3,7 @@
 
 bool is_moving(Action a)
 {
-   return (fabs(a.drive.left) >= 35 || fabs(a.drive.right) >= 35);
+   return (fabs(a.drive.left) >= 30 || fabs(a.drive.right) >= 30);
 }
 
 bool is_turning_left(Action a)
