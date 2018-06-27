@@ -67,7 +67,7 @@ int main(int argc, char **argv)
    StraightLineBehavior       driveStraight;
    AvoidNest<ROSTimer>        avoidNest(sensors);
    AlignToCube                align(sensors);
-   PickUpCube                 pickup(sensors);
+   PickUpCube<ROSTimer>       pickup(sensors);
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);
