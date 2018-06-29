@@ -10,7 +10,7 @@ void AlignToCube::ProcessTags()
    double linearDistance = 0;
    for(auto tag : _sensors->GetTags())
    {
-      if(tag.GetId() != CUBE_TAG_ID)
+      if(tag.GetId() != Tag::CUBE_TAG_ID)
       {
          // If we can detect a nest tag then igore any other detections.
          _distanceToTag = 0;

@@ -2,10 +2,9 @@
 #define _AVOID_NEST_HPP
 
 #include "BehaviorManager.hpp"
+#include "SwarmieSensors.hpp"
 
 #include <cmath>
-
-#define NEST_TAG_ID 256
 
 template <typename T>
 class AvoidNest : public Behavior
@@ -31,7 +30,7 @@ private:
       _tooClose = false;
       for(auto tag : _sensors->GetTags())
       {
-         if(tag.GetId() != NEST_TAG_ID)
+         if(tag.GetId() != Tag::NEST_TAG_ID)
          {
             continue; // skip blocks
          }

@@ -33,7 +33,7 @@ TEST_F(AvoidNestTest, nonCenterTagNoAction) {
 }
 
 TEST_F(AvoidNestTest, nestTagTriggersMovement) {
-   Tag t(NEST_TAG_ID, 1, 1, 1, defaultOrientation);
+   Tag t(Tag::NEST_TAG_ID, 1, 1, 1, defaultOrientation);
    sensors.DetectedTag(t);
    avoid.Update();
    Action a = avoid.GetAction();
@@ -41,7 +41,7 @@ TEST_F(AvoidNestTest, nestTagTriggersMovement) {
 }
 
 TEST_F(AvoidNestTest, nestAtTopLeftOfFrameTriggersRightTurn) {
-   Tag t = tag_top_left(NEST_TAG_ID);
+   Tag t = tag_top_left(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
    Action a = avoid.GetAction();
@@ -49,7 +49,7 @@ TEST_F(AvoidNestTest, nestAtTopLeftOfFrameTriggersRightTurn) {
 }
 
 TEST_F(AvoidNestTest, nestAtBottomLeftOfFrameTriggersRightTurn) {
-   Tag t = tag_bottom_left(NEST_TAG_ID);
+   Tag t = tag_bottom_left(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
    Action a = avoid.GetAction();
@@ -57,7 +57,7 @@ TEST_F(AvoidNestTest, nestAtBottomLeftOfFrameTriggersRightTurn) {
 }
 
 TEST_F(AvoidNestTest, nestAtTopRightOfFrameTriggersLeftTurn) {
-   Tag t = tag_top_right(NEST_TAG_ID);
+   Tag t = tag_top_right(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
    Action a = avoid.GetAction();
@@ -65,7 +65,7 @@ TEST_F(AvoidNestTest, nestAtTopRightOfFrameTriggersLeftTurn) {
 }
 
 TEST_F(AvoidNestTest, nestAtBottomRightOfFrameTriggersLeftTurn) {
-   Tag t = tag_bottom_right(NEST_TAG_ID);
+   Tag t = tag_bottom_right(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
    Action a = avoid.GetAction();

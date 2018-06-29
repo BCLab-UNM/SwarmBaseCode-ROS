@@ -4,8 +4,6 @@
 #include "BehaviorManager.hpp"
 #include "PID.hpp"
 
-#define CUBE_TAG_ID 0
-
 class AlignToCube : public Behavior
 {
 private:
