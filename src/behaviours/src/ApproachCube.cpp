@@ -4,7 +4,7 @@ ApproachCube::ApproachCube(const SwarmieSensors *sensors) :
    Behavior(sensors),
    _distanceToTag(0),
    _alignment(0),
-   _approachPID(0.8, 0.2, 0.25)
+   _approachPID(0.55, 0.05, 0.25)
 {}
 
 void ApproachCube::ProcessTags()
@@ -44,10 +44,10 @@ void ApproachCube::Update()
    _action = _llAction;
    _approachPID.Update(_distanceToTag);
 
-   if(fabs(_alignment) < 0.01)
+   if(fabs(_alignment) < 0.05)
    {
-      _action.drive.left += 100*_approachPID.GetControlOutput();
-      _action.drive.right += 100*_approachPID.GetControlOutput();
+      _action.drive.left += 60*_approachPID.GetControlOutput();
+      _action.drive.right += 60*_approachPID.GetControlOutput();
    }
    else
    {

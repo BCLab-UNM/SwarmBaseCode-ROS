@@ -43,7 +43,7 @@ AlignToCube::AlignToCube(const SwarmieSensors* sensors) :
    _distanceToTag(0),
    _linearDistance(0),
    _integral(0),
-   _alignPID(0.5, 0.2, 0.7) // XXX: tuned in simulation only.
+   _alignPID(0.8, 0.3, 0.98)
 {}
 
 void AlignToCube::Update()
