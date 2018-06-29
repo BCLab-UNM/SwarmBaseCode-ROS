@@ -69,7 +69,7 @@ int main(int argc, char **argv)
    AvoidNest<ROSTimer>        avoidNest(sensors);
    AlignToCube                align(sensors);
    ApproachCube               approach(sensors);
-   PickUpCube                 pickup(sensors);
+   PickUpCube<ROSTimer>       pickup(sensors);
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);
