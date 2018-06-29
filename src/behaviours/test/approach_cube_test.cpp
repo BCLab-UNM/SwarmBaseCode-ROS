@@ -25,15 +25,21 @@ TEST_F(ApproachCubeTest, nestTagOnlyNoMovement)
    Tag t = tag_top_left(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    approach.Update();
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
    EXPECT_FALSE(is_moving(approach.GetAction()));
 }
 
 TEST_F(ApproachCubeTest, nestTagAlignedNoMovement)
 {
-   Tag t(Tag::NEST_TAG_ID, -0.023, 0.01, 0.1, defaultOrientation);
+   Tag t(Tag::NEST_TAG_ID, -0.023, -0.12, 0.5, defaultOrientation);
    ASSERT_TRUE(fabs(t.Alignment()) < 0.01) << "Tag not aligned: " << t.Alignment() << std::endl;
    sensors.DetectedTag(t);
    approach.Update();
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
    EXPECT_FALSE(is_moving(approach.GetAction()));
 }
 
@@ -41,6 +47,35 @@ TEST_F(ApproachCubeTest, tagMisalignedNoMovement)
 {
    Tag t = tag_top_left(Tag::CUBE_TAG_ID);
    sensors.DetectedTag(t);
+   approach.Update();
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
+   EXPECT_FALSE(is_moving(approach.GetAction()));
+}
+
+TEST_F(ApproachCubeTest, tagAlignedMovement)
+{
+   Tag t(Tag::CUBE_TAG_ID, -0.022, -0.12, 0.4, defaultOrientation);
+   ASSERT_TRUE(fabs(t.Alignment()) < 0.01) << "Tag not aligned: " << t.Alignment() << std::endl;
+   sensors.DetectedTag(t);
+   approach.Update();
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
+   EXPECT_TRUE(is_moving(approach.GetAction()));
+}
+
+TEST_F(ApproachCubeTest, movementStopsWhenTagVanishes)
+{
+   Tag t(Tag::CUBE_TAG_ID, -0.022, -0.12, 0.4, defaultOrientation);
+   sensors.DetectedTag(t);
+   approach.Update();
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
+   EXPECT_TRUE(is_moving(approach.GetAction()));
+   sensors.ClearDetections();
    approach.Update();
    EXPECT_FALSE(is_moving(approach.GetAction()));
 }

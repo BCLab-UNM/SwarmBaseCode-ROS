@@ -83,4 +83,25 @@ TEST_F(AlignToCubeTest, nestAndCubeVisible) {
    EXPECT_FALSE(is_moving(align.GetAction()));
 }
 
-// TODO: tag aligned then no turn.
+TEST_F(AlignToCubeTest, movementStopsWhenTagVanishes)
+{
+   sensors.DetectedTag(tag_top_left(Tag::CUBE_TAG_ID));
+   align.Update();
+   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
+   EXPECT_TRUE(is_moving(align.GetAction()));
+   sensors.ClearDetections();
+   align.Update();
+   EXPECT_FALSE(is_moving(align.GetAction()));
+}
+
+TEST_F(AlignToCubeTest, noMovementWhenAligned)
+{
+   sensors.DetectedTag(Tag(Tag::CUBE_TAG_ID, -0.023, -0.12, 0.5, defaultOrientation));
+   align.Update();
+   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
+      align.Update();
+   }
+   EXPECT_FALSE(is_moving(align.GetAction()));
+}
