@@ -19,6 +19,9 @@ private:
    const double CAMERA_HEIGHT = 0.195;
    const double CAMERA_OFFSET = -0.023;
 public:
+   const int NEST_TAG_ID = 256;
+   const int CUBE_TAG_ID = 0;
+
    Tag(int id, double x, double y, double z, boost::math::quaternion<double> orientation);
    ~Tag() {}
    
@@ -31,6 +34,8 @@ public:
    boost::math::quaternion<double> GetOrientation() const { return _orientation; }
    double GetYaw() const;
    int    GetId() const { return _id; }
+   bool   IsCube() const;
+   bool   IsNest() const;
 };
 
 class SwarmieSensors

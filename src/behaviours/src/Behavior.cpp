@@ -11,6 +11,7 @@
 #include "StraightLineBehavior.hpp"
 #include "AvoidNest.hpp"
 #include "AlignToCube.hpp"
+#include "ApproachCube.hpp"
 #include "PickUpCube.hpp"
 
 #include "ROSTimer.hpp"
@@ -67,6 +68,7 @@ int main(int argc, char **argv)
    StraightLineBehavior       driveStraight;
    AvoidNest<ROSTimer>        avoidNest(sensors);
    AlignToCube                align(sensors);
+   ApproachCube               approach(sensors);
    PickUpCube                 pickup(sensors);
 
    pickup.Subsumes(&driveStraight);
@@ -76,6 +78,7 @@ int main(int argc, char **argv)
    manager.RegisterBehavior(&driveStraight);
    manager.RegisterBehavior(&avoidNest);
    manager.RegisterBehavior(&align);
+   manager.RegisterBehavior(&approach);
    manager.RegisterBehavior(&pickup);
  
    ros::Rate r(30); // 30 Hz

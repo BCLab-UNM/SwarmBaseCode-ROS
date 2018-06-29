@@ -4,7 +4,7 @@
 
 void AlignToCube::ProcessTags()
 {
-   bool target_detected;
+   bool target_detected = false;
    double minimum_distance = 100;
    double distance = 0;
    double linearDistance = 0;
@@ -57,9 +57,16 @@ void AlignToCube::Update()
       _action.drive.left = 100*_alignPID.GetControlOutput();
       _action.drive.right = - (100*_alignPID.GetControlOutput());
    }
+   else if(_linearDistance == 0)
+   {
+      // no cubes detected, don't take any action.
+      _alignPID.Reset();
+   }
    else
    {
-      // managed to line up, reset the pid.
+      // managed to line up, reset the pid, and set the drive to 0
+      _action.drive.left = 0;
+      _action.drive.right = 0;
       _alignPID.Reset();
    }
 }

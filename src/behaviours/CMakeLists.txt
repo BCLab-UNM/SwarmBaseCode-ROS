@@ -37,6 +37,7 @@ add_library(behavior
     src/BehaviorManager.cpp
     src/StraightLineBehavior.cpp
     src/AlignToCube.cpp
+    src/ApproachCube.cpp
     src/PickUpCube.cpp    
 )
 

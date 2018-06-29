@@ -1,3 +1,6 @@
+#ifndef _ALIGN_TO_CUBE_HPP
+#define _ALIGN_TO_CUBE_HPP
+
 #include "BehaviorManager.hpp"
 #include "PID.hpp"
 
@@ -21,3 +24,5 @@ public:
 
    void Update() override;
 };
+
+#endif // _ALIGN_TO_CUBE_HPP

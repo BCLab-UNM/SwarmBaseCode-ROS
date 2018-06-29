@@ -22,6 +22,16 @@ Tag::Tag(int id, double x, double y, double z, boost::math::quaternion<double> o
    _orientation(orientation)
 {}
 
+bool Tag::IsCube() const
+{
+   return _id == CUBE_TAG_ID;
+}
+
+bool Tag::IsNest() const
+{
+   return _id == NEST_TAG_ID;
+}
+
 double Tag::Alignment() const
 {
    return _x - CAMERA_OFFSET;
