@@ -76,6 +76,10 @@ TEST_F(ApproachCubeTest, movementStopsWhenTagVanishes)
    }
    EXPECT_TRUE(is_moving(approach.GetAction()));
    sensors.ClearDetections();
-   approach.Update();
+   // Update many times to test that the integral term is no longer
+   // having an effect.
+   for(int i = 0; i < 1000; i++) {
+      approach.Update();
+   }
    EXPECT_FALSE(is_moving(approach.GetAction()));
 }

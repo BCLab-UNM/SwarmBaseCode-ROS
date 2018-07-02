@@ -92,7 +92,11 @@ TEST_F(AlignToCubeTest, movementStopsWhenTagVanishes)
    }
    EXPECT_TRUE(is_moving(align.GetAction()));
    sensors.ClearDetections();
-   align.Update();
+   // Update many times to test that the integral term is no longer
+   // having an effect.
+   for(int i = 0; i < 1000; i++) {
+      align.Update();
+   }
    EXPECT_FALSE(is_moving(align.GetAction()));
 }
 
