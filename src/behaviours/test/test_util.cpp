@@ -20,7 +20,7 @@ bool is_turning_left(Action a)
    }
 
    // lets say we are turning if right is at least 15% greater than left.
-   return a.drive.right > a.drive.left*0.85;
+   return a.drive.right*0.85 > a.drive.left;
 }
 
 bool is_turning_right(Action a)
@@ -35,7 +35,7 @@ bool is_turning_right(Action a)
    }
 
    // lets say we are turning if right is at least 15% greater than left.
-   return a.drive.left > a.drive.right*0.85;   
+   return a.drive.left*0.85 > a.drive.right;   
 }
 
 /* Tag positions values measured from the robot camera:

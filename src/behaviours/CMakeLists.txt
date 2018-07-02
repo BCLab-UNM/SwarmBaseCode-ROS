@@ -72,6 +72,7 @@ catkin_add_gtest(behaviour_test
   test/obstacle_test.cpp
   test/avoid_nest_test.cpp
   test/align_to_cube_test.cpp
-  test/approach_cube_test.cpp)
+  test/approach_cube_test.cpp
+  test/straight_line_test.cpp)
 
 target_link_libraries(behaviour_test behavior swarmie_interface utilities ${catkin_LIBRARIES})
