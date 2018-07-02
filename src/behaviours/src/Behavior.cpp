@@ -13,6 +13,7 @@
 #include "AlignToCube.hpp"
 #include "ApproachCube.hpp"
 #include "PickUpCube.hpp"
+#include "DropOffCube.hpp"
 
 #include "ROSTimer.hpp"
 
@@ -70,6 +71,7 @@ int main(int argc, char **argv)
    AlignToCube                align(sensors);
    ApproachCube               approach(sensors);
    PickUpCube<ROSTimer>       pickup(sensors);
+   DropOffCube                dropOff(sensors);
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);
@@ -80,6 +82,7 @@ int main(int argc, char **argv)
    manager.RegisterBehavior(&align);
    manager.RegisterBehavior(&approach);
    manager.RegisterBehavior(&pickup);
+   manager.RegisterBehavior(&dropOff);
  
    ros::Rate r(30); // 30 Hz
    while(ros::ok())
