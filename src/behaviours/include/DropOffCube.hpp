@@ -9,9 +9,11 @@ private:
    enum State { Holding, NotHolding, Entering, Leaving } _state;
    void TagHandler();
    void UpdateState();
+   void ApproachCollectionZone();
 
-   int  _tagsLeft;
-   int  _tagsRight;
+   int    _tagsLeft;
+   int    _tagsRight;
+   double _averagePitch;
 
    bool _exited;
    bool _dropped_cube;
@@ -19,6 +21,7 @@ private:
     // once EXIT_THRESHOLD tags have been seen the rover has "exited"
     // the collection zone.
    const int EXIT_THRESHOLD = 5;
+   const int APPROACH_THRESHOLD = 8;
 public:
    DropOffCube(const SwarmieSensors *sensors);
    ~DropOffCube() {}
