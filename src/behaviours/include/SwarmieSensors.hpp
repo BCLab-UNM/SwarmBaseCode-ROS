@@ -32,10 +32,11 @@ public:
    double GetY() const { return _y; }
    double GetZ() const { return _z; }
    boost::math::quaternion<double> GetOrientation() const { return _orientation; }
-   double GetYaw() const;
-   int    GetId() const { return _id; }
-   bool   IsCube() const;
-   bool   IsNest() const;
+   double GetYaw()   const;
+   double GetPitch() const;
+   int    GetId()    const { return _id; }
+   bool   IsCube()   const;
+   bool   IsNest()   const;
 };
 
 class SwarmieSensors

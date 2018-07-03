@@ -68,3 +68,13 @@ double Tag::GetYaw() const
 
    return atan2(2.0*(y*z + w*x), w*w - x*x - y*y + z*z);
 }
+
+double Tag::GetPitch() const
+{
+   double x = _orientation.R_component_1();
+   double y = _orientation.R_component_2();
+   double z = _orientation.R_component_3();
+   double w = _orientation.R_component_4();
+
+   return asin(-2.0*(x*z - w*y));
+}
