@@ -8,7 +8,7 @@ template <typename T>
 class DropOffCube : public Behavior
 {
 private:
-   enum State { NotHolding, Holding, Centering, Entering, Leaving } _state;
+   enum State { NotHolding, Holding, Centering, Entering, Droping, Leaving } _state;
    void TagHandler()
    {
       _numNestTags = 0;
@@ -17,7 +17,7 @@ private:
       for(auto tag : _sensors->GetTags())
       {
          if(!tag.IsNest()) continue;
-         _averageAlignment += tag.GetAlignment();
+         _averageAlignment += tag.Alignment();
          _numNestTags++;
       }
 
@@ -79,7 +79,7 @@ private:
          _timer.StartOnce();
          break;
       case Droping:
-         _state = Leaving:
+         _state = Leaving;
          _timer.SetInterval(3.0);
          _timer.StartOnce();
          break;
@@ -148,6 +148,11 @@ public:
       case Leaving:
          Leave();
          break;
+      case Droping:
+         _action.drive.left = 0;
+         _action.drive.right = 0;
+         _action.grip = GripperControl::OPEN;
+         _action.wrist = WristControl::UP;
       case Holding:
       case NotHolding:
          _action = _llAction;
