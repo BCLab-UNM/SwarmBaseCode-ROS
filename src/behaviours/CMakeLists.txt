@@ -38,7 +38,6 @@ add_library(behavior
     src/StraightLineBehavior.cpp
     src/AlignToCube.cpp
     src/ApproachCube.cpp
-    src/DropOffCube.cpp
 )
 
 add_executable(

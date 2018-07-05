@@ -126,6 +126,16 @@ public:
    }
 
    ~PickUpCube() {}
+
+   void Reset() override
+   {
+      _state = NotHolding;
+      _allowReset = true;
+      _checkTimer.Stop();
+      _recheckTimer.Stop();
+      _pickupTimer.Stop();
+      _distanceToTarget = OUT_OF_RANGE;
+   }
    
    void Update() override
    {

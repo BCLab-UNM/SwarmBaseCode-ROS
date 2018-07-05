@@ -71,10 +71,12 @@ int main(int argc, char **argv)
    AlignToCube                align(sensors);
    ApproachCube               approach(sensors);
    PickUpCube<ROSTimer>       pickup(sensors);
-   DropOffCube                dropOff(sensors);
+   DropOffCube<ROSTimer>      dropOff(sensors);
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);
+
+   dropOff.Subsumes(&pickup);
 
    manager.RegisterBehavior(&obstacle);
    manager.RegisterBehavior(&driveStraight);
