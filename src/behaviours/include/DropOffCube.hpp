@@ -59,7 +59,7 @@ private:
          else if(fabs(_averageAlignment) < 0.02)
          {
             _state = Entering;
-            _timer.SetInterval(2.0);
+            _timer.SetInterval(2.25);
             _timer.StartOnce();
          }
          break;
@@ -80,7 +80,7 @@ private:
          break;
       case Droping:
          _state = Leaving;
-         _timer.SetInterval(3.0);
+         _timer.SetInterval(3.5);
          _timer.StartOnce();
          break;
       case Leaving:
@@ -108,6 +108,8 @@ private:
    {
       _action.drive.left = -35;
       _action.drive.right = -35;
+      _action.grip = GripperControl::OPEN;
+      _action.wrist = WristControl::UP;
    }
    
    int    _numNestTags;
@@ -127,7 +129,7 @@ public:
       Behavior(sensors),
       _state(NotHolding),
       _timer([this]() { this->Timeout(); }),
-      _centeringPID(0.5, 0.2, 0.5) // XXX: Not tuned
+      _centeringPID(1.5, 0.2, 0.5) // XXX: Not tuned
    {}
    
    ~DropOffCube() {}
