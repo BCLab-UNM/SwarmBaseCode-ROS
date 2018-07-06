@@ -84,8 +84,30 @@ TEST_F(ApproachCubeTest, movementStopsWhenTagVanishes)
    EXPECT_FALSE(is_moving(approach.GetAction()));
 }
 
-//TEST_F(ApproachCubeTest, // 2 cubes next to each other one aligned, one to the left slightly, at
-// y =~ 2/3 height of frame should be
-                         // approaching.
+// This is the actual position of cubes when this bug is triggered.
+// Tag[0]{ alignment: -0.0582302 | position: (-0.0812302, -0.0454901, 0.426023) | Orientation: (0.954242,-0.0389091,0.160215,-0.24948)}n
+// Tag[0]{ alignment: 0.00210978 | position: (-0.0208902, -0.0438522, 0.423104) | Orientation: (0.0378738,0.948888,0.2493,0.189805)}
+TEST_F(ApproachCubeTest, approachWhenBackgroundTagMisaligned)
+{
+   Tag aligned(Tag::CUBE_TAG_ID, -0.0208902, -0.0438522, 0.423104,
+               boost::math::quaternion<double>(0.0378738,0.948888,0.2493,0.189805));
+   Tag background(Tag::CUBE_TAG_ID, -0.0812302, -0.0454901, 0.426023,
+                  boost::math::quaternion<double>(0.954242,-0.0389091,0.160215,-0.24948));
 
-// TEST: Two cubes at same distance, one aligned one close to aliged. Should be moving
+   sensors.DetectedTag(background);
+   sensors.DetectedTag(aligned);
+
+   approach.Update();
+
+   EXPECT_TRUE(is_moving(approach.GetAction()));
+
+   sensors.ClearDetections();
+   approach.Update();
+
+   sensors.DetectedTag(aligned);
+   sensors.DetectedTag(background);
+
+   approach.Update();
+
+   EXPECT_TRUE(is_moving(approach.GetAction()));
+}
