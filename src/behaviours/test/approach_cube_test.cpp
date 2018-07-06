@@ -87,11 +87,42 @@ TEST_F(ApproachCubeTest, movementStopsWhenTagVanishes)
 // This is the actual position of cubes when this bug is triggered.
 // Tag[0]{ alignment: -0.0582302 | position: (-0.0812302, -0.0454901, 0.426023) | Orientation: (0.954242,-0.0389091,0.160215,-0.24948)}n
 // Tag[0]{ alignment: 0.00210978 | position: (-0.0208902, -0.0438522, 0.423104) | Orientation: (0.0378738,0.948888,0.2493,0.189805)}
-TEST_F(ApproachCubeTest, approachWhenBackgroundTagMisaligned)
+TEST_F(ApproachCubeTest, approachWhenBackgroundTagMisalignedToLeft)
 {
    Tag aligned(Tag::CUBE_TAG_ID, -0.0208902, -0.0438522, 0.423104,
                boost::math::quaternion<double>(0.0378738,0.948888,0.2493,0.189805));
    Tag background(Tag::CUBE_TAG_ID, -0.0812302, -0.0454901, 0.426023,
+                  boost::math::quaternion<double>(0.954242,-0.0389091,0.160215,-0.24948));
+
+   sensors.DetectedTag(background);
+   sensors.DetectedTag(aligned);
+
+   approach.Update();
+
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
+   EXPECT_TRUE(is_moving(approach.GetAction()));
+
+   sensors.ClearDetections();
+   approach.Update();
+
+   sensors.DetectedTag(aligned);
+   sensors.DetectedTag(background);
+
+   approach.Update();
+
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
+   EXPECT_TRUE(is_moving(approach.GetAction()));
+}
+
+TEST_F(ApproachCubeTest, approachWhenBackgroundTagMisalignedToRight)
+{
+   Tag aligned(Tag::CUBE_TAG_ID, -0.0208902, -0.0438522, 0.423104,
+               boost::math::quaternion<double>(0.0378738,0.948888,0.2493,0.189805));
+   Tag background(Tag::CUBE_TAG_ID, 0.1012302, -0.0454901, 0.426023,
                   boost::math::quaternion<double>(0.954242,-0.0389091,0.160215,-0.24948));
 
    sensors.DetectedTag(background);
