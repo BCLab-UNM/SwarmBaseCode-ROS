@@ -71,3 +71,12 @@ TEST_F(AvoidNestTest, nestAtBottomRightOfFrameTriggersLeftTurn) {
    Action a = avoid.GetAction();
    EXPECT_TRUE(is_turning_left(a));
 }
+
+TEST_F(AvoidNestTest, insideNestIgnoreTags) {
+   sensors.DetectedTag(negative_yaw_tag(Tag::NEST_TAG_ID));
+   avoid.Update();
+   EXPECT_FALSE(is_moving(avoid.GetAction()));
+   sensors.DetectedTag(tag_top_left(Tag::NEST_TAG_ID));
+   avoid.Update();
+   EXPECT_FALSE(is_moving(avoid.GetAction()));
+}

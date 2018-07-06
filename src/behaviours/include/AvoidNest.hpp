@@ -34,6 +34,15 @@ private:
          {
             continue; // skip blocks
          }
+
+         if(tag.GetYaw() < 0)
+         {
+            _tagsLeft = 0;
+            _tagsRight = 0;
+            _tooClose = false;
+            return;
+         }
+
          if(tag.Alignment() > 0)
          {
             _tagsRight++;

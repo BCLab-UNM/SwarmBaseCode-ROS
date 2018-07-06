@@ -56,20 +56,25 @@ bool is_turning_right(Action a)
 
 Tag tag_top_left(int id)
 {
-   return Tag(id, -0.202, -0.121, 0.5, DEFAULT_ORIENTATION);
+   return Tag(id, -0.202, -0.121, 0.5, POSITIVE_ORIENTATION);
 }
 
 Tag tag_top_right(int id)
 {
-   return Tag(id, 0.213, -0.116, 0.63, DEFAULT_ORIENTATION);
+   return Tag(id, 0.213, -0.116, 0.63, POSITIVE_ORIENTATION);
 }
 
 Tag tag_bottom_left(int id)
 {
-   return Tag(id, -0.069, 0.039, 0.63, DEFAULT_ORIENTATION);
+   return Tag(id, -0.069, 0.039, 0.63, POSITIVE_ORIENTATION);
 }
 
 Tag tag_bottom_right(int id)
 {
-   return Tag(id, 0.068, 0.042, 0.212, DEFAULT_ORIENTATION);
+   return Tag(id, 0.068, 0.042, 0.212, POSITIVE_ORIENTATION);
+}
+
+Tag negative_yaw_tag(int id)
+{
+   return Tag(id, 0.02, 0.0, 0.4, NEGATIVE_ORIENTATION);
 }
