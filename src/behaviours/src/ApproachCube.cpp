@@ -10,7 +10,7 @@ ApproachCube::ApproachCube(const SwarmieSensors *sensors) :
 void ApproachCube::ProcessTags()
 {
    bool   target_detected = false;
-   double minimum_distance = 100;
+   double minimum_alignment = 100;
    double distance = 0;
    for(auto tag : _sensors->GetTags())
    {
@@ -23,9 +23,9 @@ void ApproachCube::ProcessTags()
       }
 
       target_detected = true;
-      if(fabs(tag.Alignment()) < minimum_distance)
+      if(fabs(tag.Alignment()) < minimum_alignment)
       {
-         minimum_distance = tag.Alignment();
+         minimum_alignment = fabs(tag.Alignment());
          _alignment = tag.Alignment();
          _distanceToTag = tag.HorizontalDistance();
       }
