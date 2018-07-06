@@ -99,6 +99,9 @@ TEST_F(ApproachCubeTest, approachWhenBackgroundTagMisaligned)
 
    approach.Update();
 
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
    EXPECT_TRUE(is_moving(approach.GetAction()));
 
    sensors.ClearDetections();
@@ -109,5 +112,8 @@ TEST_F(ApproachCubeTest, approachWhenBackgroundTagMisaligned)
 
    approach.Update();
 
+   for(int i = 0; i < 30 && !is_moving(approach.GetAction()); i++) {
+      approach.Update();
+   }
    EXPECT_TRUE(is_moving(approach.GetAction()));
 }
