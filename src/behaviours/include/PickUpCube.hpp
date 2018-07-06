@@ -42,9 +42,10 @@ private:
             }
             break;
          case Checking:
-            if(fabs(tag.Alignment()) < 0.01)
+            if(fabs(tag.Alignment()) < 0.02)
             {
-               _distanceToTarget = tag.Distance();
+               if(_distanceToTarget > tag.Distance())
+                  _distanceToTarget = tag.Distance();
             }
             break;
          default:
@@ -126,6 +127,16 @@ public:
    }
 
    ~PickUpCube() {}
+
+   void Reset() override
+   {
+      _state = NotHolding;
+      _allowReset = true;
+      _checkTimer.Stop();
+      _recheckTimer.Stop();
+      _pickupTimer.Stop();
+      _distanceToTarget = OUT_OF_RANGE;
+   }
    
    void Update() override
    {

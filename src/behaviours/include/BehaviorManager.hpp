@@ -25,6 +25,7 @@ public:
 
    Action GetAction() const { return _action; }
    virtual void Update() { _action = _llAction; }
+   virtual void Reset() { }
 
    void SetLowerLevelAction(Action a) { _llAction = a; }
    void Subsumes(Behavior* b) { _subsumedBehavior = b; }
