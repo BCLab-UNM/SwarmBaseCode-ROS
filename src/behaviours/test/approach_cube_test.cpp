@@ -83,3 +83,9 @@ TEST_F(ApproachCubeTest, movementStopsWhenTagVanishes)
    }
    EXPECT_FALSE(is_moving(approach.GetAction()));
 }
+
+//TEST_F(ApproachCubeTest, // 2 cubes next to each other one aligned, one to the left slightly, at
+// y =~ 2/3 height of frame should be
+                         // approaching.
+
+// TEST: Two cubes at same distance, one aligned one close to aliged. Should be moving

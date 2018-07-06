@@ -45,7 +45,7 @@ TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
 
    sensors.DetectedTag(tag_bottom_left(Tag::CUBE_TAG_ID));
    align.Update();
-   for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
+   for(int i = 0; i < 50 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
    EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
