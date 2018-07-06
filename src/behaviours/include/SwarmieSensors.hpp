@@ -6,6 +6,7 @@
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <boost/math/quaternion.hpp>
 #include <cmath> // atan2
+#include <iostream> // ostream
 
 class Tag
 {
@@ -37,6 +38,8 @@ public:
    int    GetId()    const { return _id; }
    bool   IsCube()   const;
    bool   IsNest()   const;
+
+   friend std::ostream& operator<<(std::ostream& os, const Tag& tag);
 };
 
 class SwarmieSensors

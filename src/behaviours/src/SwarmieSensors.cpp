@@ -78,3 +78,10 @@ double Tag::GetPitch() const
 
    return asin(-2.0*(x*z - w*y));
 }
+
+std::ostream& operator<<(std::ostream& os, const Tag& tag)
+{
+   os << "Tag[" << tag.GetId() << "]{ alignment: " << tag.Alignment()
+      << " | position: (" << tag._x << ", " << tag._y << ", " << tag._z << ")"
+      << " | Orientation: " << tag._orientation << "}";
+}
