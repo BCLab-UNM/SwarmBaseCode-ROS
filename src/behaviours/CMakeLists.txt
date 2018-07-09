@@ -70,7 +70,7 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
-catkin_add_gtest(behaviour_test
+catkin_add_gmock(behaviour_test
   test/test_util.cpp
   test/test.cpp
   test/obstacle_test.cpp
@@ -79,4 +79,4 @@ catkin_add_gtest(behaviour_test
   test/approach_cube_test.cpp
   test/straight_line_test.cpp)
 
-target_link_libraries(behaviour_test behavior swarmie_interface utilities gmock ${catkin_LIBRARIES})
+target_link_libraries(behaviour_test behavior swarmie_interface utilities ${catkin_LIBRARIES})
