@@ -47,13 +47,16 @@ void AvoidNest::Update()
    _action = _llAction;
    TagHandler();
 
-   if(_persist && !_persistenceTimer->Expired())
+   if(_persist)
    {
-      _action = _savedAction;
-   }
-   else if(_persist && _persistenceTimer->Expired())
-   {
-      _persist = false;
+      if(!_persistenceTimer->Expired())
+      {
+         _action = _savedAction;
+      }
+      else
+      {
+         _persist = false;
+      }
    }
 
    if(_tooClose)

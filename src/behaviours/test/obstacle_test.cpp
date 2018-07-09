@@ -230,13 +230,14 @@ TEST_F(ObstacleBehaviorTest, turnaroundContinuesIfSonarStillReadsClose)
    EXPECT_EQ(a.drive.left, -(a.drive.right));
 }
 
-TEST_F(ObstacleBehaviorTest, turnaroundStopsAfterTimerExpires)
+TEST_F(ObstacleBehaviorTest, turnaroundStopsOnlyAfterTimerExpires)
 {
    using ::testing::Return;
    EXPECT_CALL(timer, StartOnce()).Times(1);
    EXPECT_CALL(timer, Expired())
-      .Times(1)
-      .WillRepeatedly(Return(true));
+      .Times(2)
+      .WillOnce(Return(false))
+      .WillOnce(Return(true));
 
    sensors.SetRightSonar(0.1);
    obs.Update();
@@ -245,6 +246,13 @@ TEST_F(ObstacleBehaviorTest, turnaroundStopsAfterTimerExpires)
    EXPECT_EQ(a.drive.left, -(a.drive.right));
 
    sensors.SetRightSonar(3.2);
+
+   // timer has not expired. keep turning
+   obs.Update();
+   EXPECT_NE(a.drive.left, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+
+   // timer expired. no movement.
    obs.Update();
    EXPECT_FALSE(is_moving(obs.GetAction()));
 }
