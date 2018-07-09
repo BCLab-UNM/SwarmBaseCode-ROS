@@ -10,10 +10,10 @@ class ObstacleBehaviorTest : public testing::Test
 {
 protected:
    SwarmieSensors sensors;
-   MockTimer t;
+   MockTimer timer;
    ObstacleBehavior obs;
    
-   ObstacleBehaviorTest() : obs(&sensors, &t) {
+   ObstacleBehaviorTest() : obs(&sensors, &timer) {
       sensors.SetLeftSonar(3.2);
       sensors.SetRightSonar(3.2);
       sensors.SetCenterSonar(3.2);
@@ -112,6 +112,7 @@ TEST_F(ObstacleBehaviorTest, centerSonarTriggersMovement)
 TEST_F(ObstacleBehaviorTest, leftTriggersTurnaround)
 {
    Action a;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetLeftSonar(0.29);
    obs.Update();
@@ -124,6 +125,7 @@ TEST_F(ObstacleBehaviorTest, leftTriggersTurnaround)
 TEST_F(ObstacleBehaviorTest, rightTriggersTurnaround)
 {
    Action a;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetRightSonar(0.29);
    obs.Update();
@@ -136,6 +138,7 @@ TEST_F(ObstacleBehaviorTest, rightTriggersTurnaround)
 TEST_F(ObstacleBehaviorTest, centerSonarTriggersTurnaround)
 {
    Action a;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetCenterSonar(0.29);
    obs.Update();
@@ -148,6 +151,7 @@ TEST_F(ObstacleBehaviorTest, centerSonarTriggersTurnaround)
 TEST_F(ObstacleBehaviorTest, leftAndRightTriggerTurnaround)
 {
    Action a;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetLeftSonar(0.2);
    sensors.SetRightSonar(0.28);
@@ -162,6 +166,8 @@ TEST_F(ObstacleBehaviorTest, leftAndCenterTriggerTurnaround)
 {
    Action a;
 
+   EXPECT_CALL(timer, StartOnce()).Times(1);
+
    sensors.SetLeftSonar(0.2);
    sensors.SetCenterSonar(0.28);
    obs.Update();
@@ -174,6 +180,7 @@ TEST_F(ObstacleBehaviorTest, leftAndCenterTriggerTurnaround)
 TEST_F(ObstacleBehaviorTest, centerAndRightTriggerTurnaround)
 {
    Action a;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetCenterSonar(0.2);
    sensors.SetRightSonar(0.28);
@@ -187,6 +194,7 @@ TEST_F(ObstacleBehaviorTest, centerAndRightTriggerTurnaround)
 TEST_F(ObstacleBehaviorTest, allTriggerTurnaround)
 {
    Action a;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetCenterSonar(0.2);
    sensors.SetRightSonar(0.28);
@@ -196,4 +204,47 @@ TEST_F(ObstacleBehaviorTest, allTriggerTurnaround)
    ASSERT_NE(a.drive.left, 0);
    ASSERT_NE(a.drive.right, 0);
    EXPECT_EQ(a.drive.left, -(a.drive.right));
+}
+
+TEST_F(ObstacleBehaviorTest, turnaroundContinuesIfSonarStillReadsClose)
+{
+   // Set expectations
+   using ::testing::Return;
+   EXPECT_CALL(timer, Expired())
+      .Times(1)
+      .WillOnce(Return(true));
+   // the timer should be started twice
+   EXPECT_CALL(timer, StartOnce())
+      .Times(2);
+
+   // do the test, we should be turning around
+   sensors.SetLeftSonar(0.1);
+   obs.Update();
+   Action a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+
+   obs.Update();
+   a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+}
+
+TEST_F(ObstacleBehaviorTest, turnaroundStopsAfterTimerExpires)
+{
+   using ::testing::Return;
+   EXPECT_CALL(timer, StartOnce()).Times(1);
+   EXPECT_CALL(timer, Expired())
+      .Times(1)
+      .WillRepeatedly(Return(true));
+
+   sensors.SetRightSonar(0.1);
+   obs.Update();
+   Action a = obs.GetAction();
+   ASSERT_NE(a.drive.left, 0);
+   EXPECT_EQ(a.drive.left, -(a.drive.right));
+
+   sensors.SetRightSonar(3.2);
+   obs.Update();
+   EXPECT_FALSE(is_moving(obs.GetAction()));
 }
