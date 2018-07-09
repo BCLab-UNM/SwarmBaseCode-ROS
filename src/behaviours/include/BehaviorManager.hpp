@@ -14,7 +14,6 @@ class Behavior
 protected:
    Action _llAction;
    Action _action;
-   ros::NodeHandle _nh;
    const SwarmieSensors* _sensors;
 
    Behavior* _subsumedBehavior;

@@ -5,16 +5,17 @@
 
 #include "AvoidNest.hpp"
 #include "SwarmieSensors.hpp"
-#include "ROSTimer.hpp"
+#include "MockTimer.hpp"
 
 class AvoidNestTest : public testing::Test
 {
 protected:
    SwarmieSensors sensors;
-   AvoidNest<ROSTimer> avoid;
+   MockTimer t;
+   AvoidNest avoid;
    boost::math::quaternion<double> defaultOrientation;
 
-   AvoidNestTest() : avoid(&sensors), defaultOrientation(1.2, 1.2, 1.2, 2.1) {
+   AvoidNestTest() : avoid(&sensors, &t), defaultOrientation(1.2, 1.2, 1.2, 2.1) {
       avoid.Update();
    }
 };

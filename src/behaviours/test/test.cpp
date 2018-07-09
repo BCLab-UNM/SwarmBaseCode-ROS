@@ -1,8 +1,8 @@
 #include "BehaviorManager.hpp"
 #include "SwarmieInterface.hpp"
 #include "ObstacleBehavior.hpp"
-#include "ROSTimer.hpp"
 
+#include "gmock/gmock.h"
 #include <gtest/gtest.h>
 #include <boost/math/quaternion.hpp>
 #include <algorithm> // count_if
@@ -148,6 +148,6 @@ TEST(SwarmieSensors, setTagsMany)
 int main(int argc, char** argv)
 {
    testing::InitGoogleTest(&argc, argv);
-   ros::init(argc, argv, "tester");
+   ::testing::InitGoogleMock(&argc, argv);
    return RUN_ALL_TESTS();
 }

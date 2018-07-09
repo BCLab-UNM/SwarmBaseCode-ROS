@@ -35,9 +35,13 @@ add_library(utilities
 
 add_library(behavior
     src/BehaviorManager.cpp
+    src/ObstacleBehavior.cpp
     src/StraightLineBehavior.cpp
+    src/AvoidNest.cpp
     src/AlignToCube.cpp
     src/ApproachCube.cpp
+    src/PickUpCube.cpp
+    src/DropOffCube.cpp
 )
 
 add_executable(
@@ -75,4 +79,4 @@ catkin_add_gtest(behaviour_test
   test/approach_cube_test.cpp
   test/straight_line_test.cpp)
 
-target_link_libraries(behaviour_test behavior swarmie_interface utilities ${catkin_LIBRARIES})
+target_link_libraries(behaviour_test behavior swarmie_interface utilities gmock ${catkin_LIBRARIES})

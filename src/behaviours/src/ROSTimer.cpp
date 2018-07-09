@@ -1,9 +1,9 @@
 #include "ROSTimer.hpp"
 
-ROSTimer::ROSTimer(std::function<void()> callback) :
+ROSTimer::ROSTimer() :
    _interval(1),
    _nh(),
-   _callback(callback)
+   _expired(false)
 {
    _timer = _nh.createTimer(ros::Duration(_interval), &ROSTimer::TimerCallback, this, true);
    _timer.stop();
@@ -18,14 +18,7 @@ void ROSTimer::SetInterval(double t)
 void ROSTimer::StartOnce()
 {
    _oneshot = true;
-   _timer.stop();
-   _timer.setPeriod(ros::Duration(_interval));
-   _timer.start();
-}
-
-void ROSTimer::StartRepeat()
-{
-   _oneshot = false;
+   _expired = false;
    _timer.stop();
    _timer.setPeriod(ros::Duration(_interval));
    _timer.start();
@@ -33,12 +26,13 @@ void ROSTimer::StartRepeat()
 
 void ROSTimer::Stop()
 {
+   _expired = false;
    _timer.stop();
 }
 
 void ROSTimer::TimerCallback(const ros::TimerEvent& event)
 {
-   _callback();
+   _expired = true;
    if(!_oneshot)
    {
       _timer.stop();
@@ -47,6 +41,7 @@ void ROSTimer::TimerCallback(const ros::TimerEvent& event)
    }
 }
 
-
-
-
+bool ROSTimer::Expired() const
+{
+   return _expired;
+}

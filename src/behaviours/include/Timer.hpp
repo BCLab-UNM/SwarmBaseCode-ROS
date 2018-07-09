@@ -9,8 +9,12 @@ public:
    
    virtual void SetInterval(double t) {}
    virtual void StartOnce() {}
-   virtual void StartRepeat() {}
    virtual void Stop() {}
+   virtual bool Expired() const {}
+
+   // XXX: Might need additional API functions in the future.
+   // int    NumTimesExpired()
+   // double TimeSinceExpired()
 };
 
 #endif // _TIMER_HPP

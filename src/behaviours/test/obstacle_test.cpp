@@ -3,16 +3,17 @@
 
 #include "ObstacleBehavior.hpp"
 #include "SwarmieSensors.hpp"
-#include "ROSTimer.hpp"
+#include "MockTimer.hpp"
 
 // Test fixture for obstacle behavior
 class ObstacleBehaviorTest : public testing::Test
 {
 protected:
    SwarmieSensors sensors;
-   ObstacleBehavior<ROSTimer> obs;
+   MockTimer t;
+   ObstacleBehavior obs;
    
-   ObstacleBehaviorTest() : obs(&sensors) {
+   ObstacleBehaviorTest() : obs(&sensors, &t) {
       sensors.SetLeftSonar(3.2);
       sensors.SetRightSonar(3.2);
       sensors.SetCenterSonar(3.2);

@@ -65,13 +65,13 @@ int main(int argc, char **argv)
    BehaviorManager  manager;
    const SwarmieSensors* sensors = robot.GetSensors();
 
-   ObstacleBehavior<ROSTimer> obstacle(sensors);
-   StraightLineBehavior       driveStraight;
-   AvoidNest<ROSTimer>        avoidNest(sensors);
-   AlignToCube                align(sensors);
-   ApproachCube               approach(sensors);
-   PickUpCube<ROSTimer>       pickup(sensors);
-   DropOffCube<ROSTimer>      dropOff(sensors);
+   ObstacleBehavior     obstacle(sensors, new ROSTimer());
+   StraightLineBehavior driveStraight;
+   AvoidNest            avoidNest(sensors, new ROSTimer());
+   AlignToCube          align(sensors);
+   ApproachCube         approach(sensors);
+   PickUpCube           pickup(sensors, new ROSTimer());
+   DropOffCube          dropOff(sensors, new ROSTimer());
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);

@@ -3,164 +3,47 @@
 
 #include "BehaviorManager.hpp"
 #include "PID.hpp"
+#include "Timer.hpp"
 
-template <typename T>
 class DropOffCube : public Behavior
 {
 private:
    enum State { NotHolding, Holding, Centering, Entering, Droping, Leaving } _state;
-   void TagHandler()
-   {
-      _numNestTags = 0;
-      _averageAlignment = 0;
-
-      for(auto tag : _sensors->GetTags())
-      {
-         if(!tag.IsNest()) continue;
-         _averageAlignment += tag.Alignment();
-         _numNestTags++;
-      }
-
-      if(_numNestTags > 0)
-      {
-         _averageAlignment /= _numNestTags;
-      }
-   }
+   void TagHandler();
 
    /**
     * Transition states based on lower level action.
     */
-   void UpdateState()
-   {
-      switch(_state)
-      {
-      case NotHolding:
-         if(_llAction.grip == GripperControl::CLOSED) {
-            _state = Holding;
-         }
-         break;
-      case Holding:
-         if(_llAction.grip == GripperControl::OPEN) {
-            _state = NotHolding;
-         }
-         else if(_numNestTags > 0)
-         {
-            _state = Centering;
-            _centeringPID.Reset();
-         }
-         break;
-      case Centering:
-         if(_numNestTags == 0)
-         {
-            // TODO: Don't consider target lost until it is not seen
-            // for X ticks
-            _state = Holding;
-         }
-         else if(fabs(_averageAlignment) < 0.02)
-         {
-            _state = Entering;
-            _timer.SetInterval(2.25);
-            _timer.StartOnce();
-         }
-         break;
-      }
-   }
+   void UpdateState();
 
    /**
     * Transition states based on timeouts.
     */
-   void Timeout()
-   {
-      switch(_state)
-      {
-      case Entering:
-         _state = Droping;
-         _timer.SetInterval(1.0);
-         _timer.StartOnce();
-         break;
-      case Droping:
-         _state = Leaving;
-         _timer.SetInterval(3.5);
-         _timer.StartOnce();
-         break;
-      case Leaving:
-         _subsumedBehavior->Reset();
-         _state = NotHolding;
-         break;
-      }
-   }
+   void Timeout();
+   void CheckTimeout();
 
-   void Center()
-   {
-      _centeringPID.Update(_averageAlignment);
-      double control = _centeringPID.GetControlOutput();
-      _action.drive.left  = 40 * control;
-      _action.drive.right = -40 * control;
-   }
-
-   void Enter()
-   {
-      _action.drive.left = 35;
-      _action.drive.right = 35;
-   }
-
-   void Leave()
-   {
-      _action.drive.left = -35;
-      _action.drive.right = -35;
-      _action.grip = GripperControl::OPEN;
-      _action.wrist = WristControl::UP;
-   }
+   void Center();
+   void Enter();
+   void Leave();
    
    int    _numNestTags;
    double _averageAlignment;
    
-   T _timer;
+   Timer* _timer;
 
    PID _centeringPID;
 
    // once EXIT_THRESHOLD tags have been seen the rover has "exited"
    // the collection zone.
-   const int EXIT_THRESHOLD = 5;
+   const int EXIT_THRESHOLD     = 5;
    const int APPROACH_THRESHOLD = 8;
 
 public:
-   DropOffCube(const SwarmieSensors *sensors) :
-      Behavior(sensors),
-      _state(NotHolding),
-      _timer([this]() { this->Timeout(); }),
-      _centeringPID(1.5, 0.2, 0.5) // XXX: Not tuned
-   {}
+   DropOffCube(const SwarmieSensors *sensors, Timer* timer);
    
    ~DropOffCube() {}
 
-   void Update() override
-   {
-      TagHandler();
-      UpdateState();
-
-      switch(_state)
-      {
-      case Centering:
-         Center();
-         break;
-      case Entering:
-         Enter();
-         break;
-      case Leaving:
-         Leave();
-         break;
-      case Droping:
-         _action.drive.left = 0;
-         _action.drive.right = 0;
-         _action.grip = GripperControl::OPEN;
-         _action.wrist = WristControl::UP;
-      case Holding:
-      case NotHolding:
-         _action = _llAction;
-         break;
-      }
-   }
+   void Update() override;
 };
 
 #endif // _DROP_OFF_CUBE_HPP

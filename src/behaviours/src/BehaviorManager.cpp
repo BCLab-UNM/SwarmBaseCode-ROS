@@ -3,8 +3,7 @@
 #include <unistd.h>
 
 Behavior::Behavior(const SwarmieSensors* sensors) :
-   _sensors(sensors),
-   _nh()
+   _sensors(sensors)
 {
    _llAction.drive.left  = 0.0;
    _llAction.drive.right = 0.0;
