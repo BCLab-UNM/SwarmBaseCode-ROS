@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# start_robots.sh [--prefix <prefix directory>] <calibration file name> <team name> <robot list>
+# start_robots.sh [--prefix <prefix directory>] [--team-prefix <team prefix>] <calibration file name> <team name> <robot list>
 
 launch_delay=10
 OPTSTRING=`getopt -l prefix:,team-prefix: -- $0 $@`
