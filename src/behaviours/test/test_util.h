@@ -11,11 +11,13 @@
 bool is_moving(Action a);
 bool is_turning_left(Action a);
 bool is_turning_right(Action a);
+bool is_moving_forward(Action a);
 
 Tag tag_top_left(int id);
 Tag tag_bottom_left(int id);
 Tag tag_top_right(int id);
 Tag tag_bottom_right(int id);
 Tag negative_yaw_tag(int id);
+Tag tag_aligned_close(int id);
 
 #endif // _TEST_UTIL_H

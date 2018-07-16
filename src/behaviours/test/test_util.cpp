@@ -6,6 +6,11 @@ bool is_moving(Action a)
    return (fabs(a.drive.left) >= 30 || fabs(a.drive.right) >= 30);
 }
 
+bool is_moving_forward(Action a)
+{
+   return (a.drive.right == a.drive.left && a.drive.left >= 30);
+}
+
 bool is_turning_left(Action a)
 {
    if(!is_moving(a)) {
