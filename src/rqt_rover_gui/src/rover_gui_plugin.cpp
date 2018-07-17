@@ -45,7 +45,7 @@ using namespace std;
 
 using boost::property_tree::ptree;
 
-namespace rqt_rover_gui 
+namespace rqt_rover_gui
 {
   RoverGUIPlugin::RoverGUIPlugin() :
       rqt_gui_cpp::Plugin(),
@@ -99,7 +99,7 @@ namespace rqt_rover_gui
     widget = new QWidget();
 
     ui.setupUi(widget);
-    
+
     context.addWidget(widget);
 
     // Next two lines allow us to catch keyboard input
@@ -138,18 +138,27 @@ namespace rqt_rover_gui
     connect(ui.map_popout_button, SIGNAL(pressed()), this, SLOT(mapPopoutButtonEventHandler()));
     connect(this, SIGNAL(allStopButtonSignal()), this, SLOT(allStopButtonEventHandler()));
 
-
+    // adgj
     // Joystick output display - Drive
-    connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(display(double)));
+    ////connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(setText(QString::number(double))));
+    ////connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(setText(QString::number(double))));
+    ////connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(setText(QString::number(double))));
+    ////connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(setText(QString::number(double))));
 
+    // adgj
     // Joystick output display - Gripper
-    connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(display(double)));
-    connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(display(double)));
-    connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(display(double)));
-    connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(display(double)));
+    //connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
+    ////connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(setText(QString::number(double))));
+    ////connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(setText(QString::number(double))));
+    ////connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(setText(QString::number(double))));
+    ////connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(setText(QString::number(double))));
 
     connect(this, SIGNAL(updateCurrentSimulationTimeLabel(QString)), ui.currentSimulationTimeLabel, SLOT(setText(QString)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
@@ -170,7 +179,7 @@ namespace rqt_rover_gui
     // Receive waypoint commands from MapFrame
     connect(ui.map_frame, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)), this, SLOT(receiveWaypointCmd(WaypointCmd, int, float, float)));
     connect(this, SIGNAL(sendWaypointReached(int)), ui.map_frame, SLOT(receiveWaypointReached(int)));
-    
+
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
 
@@ -254,7 +263,7 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
   {
     return;
   }
-  
+
      // Give the array values some helpful names:
     int left_stick_x_axis = 0; // Gripper fingers close and open
     int left_stick_y_axis = 1; // Gripper wrist up and down
@@ -649,7 +658,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     QString model_path = model_root+"/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
 
     readRoverModelXML(model_path);
-    
+
     //Set up subscribers
     image_transport::ImageTransport it(nh);
     camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
@@ -771,7 +780,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         gps_nav_solution_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
         rover_diagnostic_subscribers.erase(*it);
-        
+
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
         waypoint_cmd_publishers[*it].shutdown();
@@ -790,7 +799,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         selected_rover_name = "";
         rover_control_state.clear();
         rover_numSV_state.clear();
-        rover_names.clear();        
+        rover_names.clear();
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
         ui.rover_diags_list->clear();
@@ -847,7 +856,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     else
     {
     rover_names = new_rover_names;
-    
+
     emit sendInfoLogMessage("List of connected rovers has changed");
     selected_rover_name = "";
     ui.rover_list->clearSelection();
@@ -856,7 +865,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     // Also clear the rover diagnostics list
     ui.rover_diags_list->clear();
     ui.map_selection_list->clear();
-    
+
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
     ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
@@ -867,7 +876,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         //Set up publishers
         control_mode_publishers[*i]=nh.advertise<std_msgs::UInt8>("/"+*i+"/mode", 10, true); // last argument sets latch to true
         waypoint_cmd_publishers[*i]=nh.advertise<swarmie_msgs::Waypoint>("/"+*i+"/waypoints/cmd", 10, true);
-        
+
 
         //Set up subscribers
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
@@ -1033,7 +1042,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     int red = 255;
     int green = 255;
     int blue = 255;
-    
+
     // Check whether there is sim update data. Will be < 0 for the sim rate if a physical rover is sending the data.
     // If so assume the diagnostic data is coming from a simulated rover.
     // TODO: replace with a proper message type so we don't need to use in stream flags like this.
@@ -1197,14 +1206,14 @@ void RoverGUIPlugin::displayDiagLogMessage(QString msg)
     // Calculate the number of characters in the log. If the log size is larger than the max size specified
     // then find the position of the first newline that reduces the log size to less than the max size.
     // Delete all characters up to that position.
-    int overflow = diag_log_messages.size() - max_diag_log_length; 
-    
+    int overflow = diag_log_messages.size() - max_diag_log_length;
+
     // Get the position of the the first newline after the overflow amount
     int newline_pos = diag_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
-    
+
     // If the max size is exceeded and the number of characters to remove is less than
     // the size of the log remove those characters.
-    if ( overflow > 0 && newline_pos < diag_log_messages.size() ) {   
+    if ( overflow > 0 && newline_pos < diag_log_messages.size() ) {
       diag_log_messages.remove(0, newline_pos);
     }
 
@@ -1229,17 +1238,17 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
     // Calculate the number of characters in the log. If the log size is larger than the max size specified
     // then find the position of the first newline that reduces the log size to less than the max size.
     // Delete all characters up to that position.
-    int overflow = info_log_messages.size() - max_info_log_length; 
-    
+    int overflow = info_log_messages.size() - max_info_log_length;
+
     // Get the position of the the first newline after the overflow amount
     int newline_pos = info_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
-    
+
     // If the max size is exceeded and the number of characters to remove is less than
     // the size of the log remove those characters.
-    if ( overflow > 0 && newline_pos < info_log_messages.size() ) {   
+    if ( overflow > 0 && newline_pos < info_log_messages.size() ) {
       info_log_messages.remove(0, newline_pos);
     }
-    
+
     // Use the <br> tag to make log messages atomic for easier deletion later.
     info_log_messages += "<font color='white'>"+msg+"</font><br>";
 
@@ -1279,7 +1288,7 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     QString return_msg = stopROSJoyNode();
     emit sendInfoLogMessage(return_msg);
-    
+
     //Enable all stop button
     ui.all_stop_button->setEnabled(true);
     ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
@@ -1325,11 +1334,11 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     QString return_msg = startROSJoyNode();
     emit sendInfoLogMessage(return_msg);
-    
+
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
     ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
-    
+
     //Show joystick frame
     ui.joystick_frame->setHidden(false);
 
@@ -1371,7 +1380,7 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
     ui.joystick_control_radio_button->setChecked(false);
     ui.autonomous_control_radio_button->setChecked(true);
     ui.joystick_frame->setHidden(true);
-    
+
     // Disable all autonomous button
     ui.all_autonomous_button->setEnabled(false);
     ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
@@ -1550,7 +1559,7 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.joystick_control_radio_button->setChecked(true);
     ui.autonomous_control_radio_button->setChecked(false);
     ui.joystick_frame->setHidden(false);
-    
+
     //Disable all stop button
     ui.all_stop_button->setEnabled(false);
     ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
@@ -1966,7 +1975,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     emit sendInfoLogMessage("Shutting down subscribers...");
 
-    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
@@ -2000,21 +2009,21 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     // Possible error - the following seems to shutdown all subscribers not just those from simulation
 
-    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
     status_subscribers.clear();
 
-    for (map<string,ros::Subscriber>::iterator it=waypoint_subscribers.begin(); it!=waypoint_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=waypoint_subscribers.begin(); it!=waypoint_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
     waypoint_subscribers.clear();
 
-    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
@@ -2040,8 +2049,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 	it->second.shutdown();
       }
     waypoint_cmd_publishers.clear();
-    
-    
+
+
     return_msg += sim_mgr.stopGazeboClient();
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return_msg += "<br>";
@@ -2725,7 +2734,7 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 {
     sensor_msgs::Joy joy_msg;
     joy_msg.axes = {0.0,0.0,0.0,0.0,0.0,0.0};
-    
+
     if (joystick_publisher)
     {
 
@@ -2743,19 +2752,23 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
             case Qt::Key_I:
                 joy_msg.axes[4] = speed;
-                ui.joy_lcd_drive_forward->display(speed);
+                //ui.joy_lcd_drive_forward->display(speed);
+                ui.joy_lcd_drive_forward->setText(QString::number(speed));
                 break;
             case Qt::Key_K:
                 joy_msg.axes[4] = -speed;
-                ui.joy_lcd_drive_back->display(speed);
+                //ui.joy_lcd_drive_back->display(speed);
+                ui.joy_lcd_drive_back->setText(QString::number(speed));
                 break;
             case Qt::Key_J:
                 joy_msg.axes[3] = speed;
-                ui.joy_lcd_drive_left->display(speed);
+                //ui.joy_lcd_drive_left->display(speed);
+                ui.joy_lcd_drive_left->setText(QString::number(speed));
                 break;
             case Qt::Key_L:
                 joy_msg.axes[3] = -speed;
-                ui.joy_lcd_drive_right->display(speed);
+                //ui.joy_lcd_drive_right->display(speed);
+                ui.joy_lcd_drive_right->setText(QString::number(speed));
                 break;
             default:
                 // Not a direction key so ignore
@@ -2787,10 +2800,14 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
                 joy_msg.axes[4] = 0;
                 joy_msg.axes[3] = 0;
-                ui.joy_lcd_drive_forward->display(0);
-                ui.joy_lcd_drive_back->display(0);
-                ui.joy_lcd_drive_left->display(0);
-                ui.joy_lcd_drive_right->display(0);
+                //ui.joy_lcd_drive_forward->display(0);
+                //ui.joy_lcd_drive_back->display(0);
+                //ui.joy_lcd_drive_left->display(0);
+                //ui.joy_lcd_drive_right->display(0);
+                ui.joy_lcd_drive_forward->setText("0");
+                ui.joy_lcd_drive_back->setText("0");
+                ui.joy_lcd_drive_left->setText("0");
+                ui.joy_lcd_drive_right->setText("0");
 
                 joystick_publisher.publish(joy_msg);
                 return true;
@@ -2961,7 +2978,7 @@ void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float 
     msg.id = id;
     msg.x = x;
     msg.y = y;
-    
+
     waypoint_cmd_publishers[selected_rover_name].publish(msg);
 }
 
@@ -2977,4 +2994,3 @@ RoverGUIPlugin::~RoverGUIPlugin()
 
 
 PLUGINLIB_EXPORT_CLASS(rqt_rover_gui::RoverGUIPlugin, rqt_gui_cpp::Plugin)
-
