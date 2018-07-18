@@ -23,6 +23,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(core_interface
+  src/Velocity.cpp
+  src/Point.cpp
+  src/Action.cpp
+)
+
 add_library(swarmie_interface
   src/SwarmieSensors.cpp
   src/SwarmieInterface.cpp
@@ -78,6 +84,9 @@ catkin_add_gmock(behaviour_test
   test/align_to_cube_test.cpp
   test/approach_cube_test.cpp
   test/straight_line_test.cpp
-  test/pickup_test.cpp)
+  test/pickup_test.cpp
+  test/action_test.cpp
+  test/action_util.cpp
+)
 
-target_link_libraries(behaviour_test behavior swarmie_interface utilities ${catkin_LIBRARIES})
+target_link_libraries(behaviour_test behavior core_interface swarmie_interface utilities ${catkin_LIBRARIES})
