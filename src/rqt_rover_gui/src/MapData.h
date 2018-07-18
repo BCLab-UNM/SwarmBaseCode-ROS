@@ -11,6 +11,8 @@
 
 #include "MapData.h"
 
+enum VirtualFenceShape {UNDEFINED, CIRCLE, RECTANGLE};
+
 // This class is the "model" for std::map frame in the model-view UI pattern,
 // where std::mapFrame is the view.
 // This allows the creation of multiple std::maps without duplicating large amounts of std::map data.
@@ -24,6 +26,16 @@ public:
     void addToEKFRoverPath(std::string rover, float x, float y);
     void addTargetLocation(std::string rover, float x, float y);
     void addCollectionPoint(std::string rover, float x, float y);
+
+    // Define virtual fences (also called search range). The virtual fence constrains
+    // Robot movement. They currently apply to all robots, though setting a different virtual
+    // fence for each robot could be useful.
+    void setVirtualFenceRect(float center_x, float center_y, float height, float width);
+    void setVirtualFenceCircle(float center_x, float center_y, float radius);
+
+    VirtualFenceShape getVirtualFenceShape();
+    std::tuple<float,float,float,float> getVirtualFenceRect();
+    std::tuple<float,float,float> getVirtualFenceCircle();
 
     // Add a waypoint for the specified rover name
     // Returns the id of the waypoint. IDs are use to issue waypoint commands to the rover.
@@ -105,6 +117,12 @@ private:
     std::map<std::string, float> max_ekf_seen_y;
     std::map<std::string, float> min_ekf_seen_x;
     std::map<std::string, float> min_ekf_seen_y;
+
+    std::pair<float,float> virtual_fence_center;
+    float virtual_fence_height = 0;
+    float virtual_fence_width = 0;
+    float virtual_fence_radius = 0;
+    VirtualFenceShape virtual_fence_shape = UNDEFINED;
 
     bool display_global_offset;
 
