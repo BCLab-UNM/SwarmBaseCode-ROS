@@ -564,6 +564,15 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         rectangle_fence.addRect(corner_x, corner_y, width, height);
         painter.drawPath(rectangle_fence);
 
+        float rectangle_center_x = corner_x+width/2;
+        float rectangle_center_y = corner_y+height/2;
+
+        if (user_is_drawing_fence)
+        {
+            painter.drawEllipse(QPointF(rectangle_center_x,rectangle_center_y), 2.5, 2.5);
+            QString rect_geometry = "Center: (" + QString::number(rectangle_center_x) + ", " + QString::number(rectangle_center_y) + ")\nWidth: " + QString::number(width) + "\nHeight: " + QString::number(height);
+            painter.drawText(QRect(rectangle_center_x, rectangle_center_y, 300, 200), rect_geometry);
+        }
     }
 
     painter.setPen(Qt::white);
