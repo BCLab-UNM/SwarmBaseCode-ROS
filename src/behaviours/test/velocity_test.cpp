@@ -2,6 +2,8 @@
 
 #include "action_util.hpp"
 
+using namespace core;
+
 TEST(ActionTest, defaultVelocityActionDoesNothing)
 {
    VelocityAction va;

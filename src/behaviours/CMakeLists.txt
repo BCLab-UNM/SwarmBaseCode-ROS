@@ -85,7 +85,9 @@ catkin_add_gmock(behaviour_test
   test/approach_cube_test.cpp
   test/straight_line_test.cpp
   test/pickup_test.cpp
-  test/action_test.cpp
+  test/velocity_test.cpp
+  test/point_test.cpp
+  test/waypoint_test.cpp
   test/action_util.cpp
 )
 
