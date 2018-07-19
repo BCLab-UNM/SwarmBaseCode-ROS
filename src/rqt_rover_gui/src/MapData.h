@@ -30,11 +30,11 @@ public:
     // Define virtual fences (also called search range). The virtual fence constrains
     // Robot movement. They currently apply to all robots, though setting a different virtual
     // fence for each robot could be useful.
-    void setVirtualFenceRect(float center_x, float center_y, float height, float width);
+    void setVirtualFenceRectangle(float corner_x, float corner_y, float height, float width);
     void setVirtualFenceCircle(float center_x, float center_y, float radius);
 
     VirtualFenceShape getVirtualFenceShape();
-    std::tuple<float,float,float,float> getVirtualFenceRect();
+    std::tuple<float,float,float,float> getVirtualFenceRectangle();
     std::tuple<float,float,float> getVirtualFenceCircle();
 
     // Add a waypoint for the specified rover name
@@ -118,6 +118,7 @@ private:
     std::map<std::string, float> min_ekf_seen_x;
     std::map<std::string, float> min_ekf_seen_y;
 
+    std::pair<float,float> virtual_fence_corner;
     std::pair<float,float> virtual_fence_center;
     float virtual_fence_height = 0;
     float virtual_fence_width = 0;

@@ -192,8 +192,8 @@ namespace rqt_rover_gui
       float max_seen_width = -std::numeric_limits<float>::max();
       float max_seen_height = -std::numeric_limits<float>::max();
 
-      float fence_center_x = 0;
-      float fence_center_y = 0;
+      float fence_corner_x = 0;
+      float fence_corner_y = 0;
       bool user_is_drawing_fence = false;
 
       // Keyboard state

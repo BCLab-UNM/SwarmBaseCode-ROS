@@ -17,10 +17,10 @@ void MapData::setVirtualFenceCircle(float center_x, float center_y, float radius
     update_mutex.unlock();
 }
 
-void MapData::setVirtualFenceRect(float center_x, float center_y, float height, float width)
+void MapData::setVirtualFenceRectangle(float corner_x, float corner_y, float height, float width)
 {
     update_mutex.lock();
-    virtual_fence_center = pair<float,float>(center_x,center_y);
+    virtual_fence_corner = pair<float,float>(corner_x, corner_y);
     virtual_fence_height = height;
     virtual_fence_width = width;
     virtual_fence_shape = RECTANGLE;
@@ -250,9 +250,9 @@ void MapData::clear(string rover)
     update_mutex.unlock();
 }
 
-std::tuple<float,float,float,float> MapData::getVirtualFenceRect()
+std::tuple<float,float,float,float> MapData::getVirtualFenceRectangle()
 {
-    return std::tuple<float,float,float,float>(virtual_fence_center.first, virtual_fence_center.second, virtual_fence_height, virtual_fence_width);
+    return std::tuple<float,float,float,float>(virtual_fence_corner.first, virtual_fence_corner.second, virtual_fence_height, virtual_fence_width);
 }
 
 std::tuple<float,float,float> MapData::getVirtualFenceCircle()

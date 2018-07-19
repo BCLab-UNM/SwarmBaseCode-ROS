@@ -546,23 +546,22 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         float radius_x = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
         float radius_y = map_origin_y+((get<2>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
 
-        //emit sendInfoLogMessage("Circular fence detected: Fence center: <" + QString::number(center_x) + ", " + QString::number(center_y) + ">; Radius_x: " + QString::number(radius_x) + "Radius_y: " + QString::number(radius_y));
+        //emit sendInfoLogMessage("Circular fence detected: Fence center: (" + QString::number(center_x) + ", " + QString::number(center_y) + "); Radius_x: " + QString::number(radius_x) + "Radius_y: " + QString::number(radius_y));
         painter.drawEllipse(center_x, center_y, radius_x, radius_y);
     }
     else if (map_data->getVirtualFenceShape() == RECTANGLE)
     {
         painter.setPen(Qt::yellow);
-        tuple<float,float,float,float> virtual_fence = map_data->getVirtualFenceRect();
-        float center_x = map_origin_x+((get<0>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
-        float center_y = map_origin_y+((get<1>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
-        float width = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
-        float height = map_origin_y+((get<3>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+        tuple<float,float,float,float> virtual_fence = map_data->getVirtualFenceRectangle();
+        float corner_x = map_origin_x+((get<0>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+        float corner_y = map_origin_y+((get<1>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+        float width = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x) - corner_x;
+        float height = map_origin_y+((get<3>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y) - corner_y;
 
-        width -= center_x;
-        height -= center_y;
+        //emit sendInfoLogMessage("Rectangle fence detected: Fence corner: (" + QString::number(get<0>(virtual_fence)) + ", " + QString::number(get<1>(virtual_fence)) + "); Width: " + QString::number(width) + "Height: " + QString::number(height));
 
         QPainterPath rectangle_fence;
-        rectangle_fence.addRect(center_x, center_y, width, height);
+        rectangle_fence.addRect(corner_x, corner_y, width, height);
         painter.drawPath(rectangle_fence);
 
     }
@@ -669,15 +668,16 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
     // If the user is not already dragging the mouse to draw the fence then set the center
     if (event->buttons() == Qt::LeftButton && !user_is_drawing_fence && shift_key_down)
     {
-        user_is_drawing_fence = true;
+
 
         float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
         float mouse_map_y = ((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y;
 
-        fence_center_x = mouse_map_x;
-        fence_center_y = mouse_map_y;
+        fence_corner_x = mouse_map_x;
+        fence_corner_y = mouse_map_y;
 
-        emit sendInfoLogMessage("MapFrame: Mouse left button press with shift key down. Fence center: <" + QString::number(fence_center_x) + ", " + QString::number(fence_center_y) + ">");
+        emit sendInfoLogMessage("MapFrame: Mouse left button press with shift key down. Fence corner: (" + QString::number(fence_corner_x) + ", " + QString::number(fence_corner_y) + ")");
+        user_is_drawing_fence = true;
     }
 
     emit sendInfoLogMessage("MapFrame: Mouse left button press.");
@@ -771,14 +771,12 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
       //float delta_y = mouse_map_y - fence_center_y;
       //float fence_radius = sqrt(delta_x*delta_x + delta_y*delta_y);
 
-
-
-      map_data->setVirtualFenceRect(fence_center_x, fence_center_y, mouse_map_x, mouse_map_y);
-      emit sendInfoLogMessage(QString("MapFrame: mouse move drawing fence.") + " Center: <"
-                              + QString::number(fence_center_x)
+      map_data->setVirtualFenceRectangle(fence_corner_x, fence_corner_y, mouse_map_x, mouse_map_y);
+      emit sendInfoLogMessage(QString("MapFrame: mouse move drawing fence.") + " Corner: ("
+                              + QString::number(fence_corner_x)
                               + ","
-                              + QString::number(fence_center_y)
-                              + ">; Width: "
+                              + QString::number(fence_corner_y)
+                              + "); Width: "
                               + QString::number(mouse_map_x)
                               + "; Height: "
                               + QString::number(mouse_map_y)
