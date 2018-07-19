@@ -1,6 +1,36 @@
 #ifndef _VELOCITY_HPP
 #define _VELOCITY_HPP
 
+class Vector3
+{
+private:
+   double _x;
+   double _y;
+   double _z;
+public:
+   Vector3(double x, double y, double z) :
+      _x(x), _y(y), _z(z)
+      {}
+
+   ~Vector3() {}
+
+   double GetX() const { return _x; }
+   double GetY() const { return _y; }
+   double GetZ() const { return _z; }
+
+   void SetX(double x) { _x = x; }
+   void SetY(double y) { _y = y; }
+   void SetZ(double z) { _z = z; }
+
+   double Magnitude() const;
+
+   friend bool operator== (const Vector3& v, const Vector3& u);
+   friend Vector3 operator* (double x, const Vector3& v);
+   // TODO: dot-product.
+   Vector3 operator+ (const Vector3& v);
+   Vector3 operator- (const Vector3& v);
+};
+
 /**
  * Represents a linear velocity as the mognitude of its x, y, and z
  * components.
@@ -8,14 +38,17 @@
 class LinearVelocity
 {
 private:
-   double _x;
-   double _y;
-   double _z;
+   Vector3 _velocity;
 public:
    /**
     * The default constructor creates a velocity of 0 m/s in
     */
    LinearVelocity();
+
+   /**
+    * Create a linear velocity using a Vector3
+    */
+   LinearVelocity(Vector3 v);
 
    /**
     * Create a velocity only in the x direction.
@@ -77,14 +110,17 @@ public:
 class AngularVelocity
 {
 private:
-   double _roll;
-   double _pitch;
-   double _yaw;
+   Vector3 _velocity;
 public:
    /**
     * Create an angular volocity with magnitued 0.
     */
    AngularVelocity();
+
+   /**
+    * Create an angular velocity from a vector.
+    */
+   AngularVelocity(Vector3 v);
 
    /**
     * Create an angular velocity with the given magnitude in each of

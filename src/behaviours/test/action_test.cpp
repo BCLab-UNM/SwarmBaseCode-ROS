@@ -8,6 +8,42 @@ TEST(ActionTest, defaultVelocityActionDoesNothing)
    ASSERT_TRUE(is_nil(va));
 }
 
+TEST(Vector3Test, subtraction)
+{
+   Vector3 v(1,-2,6);
+   EXPECT_EQ(Vector3(0,0,0), v - v);
+}
+
+TEST(Vector3Test, multiplicationByOne)
+{
+   Vector3 v(-1,3,10);
+   EXPECT_EQ(v, 1*v);
+}
+
+TEST(Vector3Test, additiveInverse)
+{
+   Vector3 v1(0,0,1);
+   Vector3 v2(0,0,-1);
+   Vector3 v3(0,1,0);
+   Vector3 v4(0,-1,0);
+   Vector3 v5(1,0,0);
+   Vector3 v6(-1,0,0);
+
+   EXPECT_EQ(Vector3(0,0,0), v1 + v2);
+   EXPECT_EQ(Vector3(0,0,0), v3 + v4);
+   EXPECT_EQ(Vector3(0,0,0), v5 + v6);
+}
+
+TEST(Vector3Test, addition)
+{
+   Vector3 v1(1,0,0);
+   Vector3 v2(0,2,0);
+   Vector3 v3(0,0,3);
+   Vector3 nil(0,0,0);
+
+   EXPECT_EQ(Vector3(1,2,3), v1 + v2 + v3 + nil);
+}
+
 TEST(AngularVelocityTest, additiveInverse)
 {
    AngularVelocity av1(0,0,1);
