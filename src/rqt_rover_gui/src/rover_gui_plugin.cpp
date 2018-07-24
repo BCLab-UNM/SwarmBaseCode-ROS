@@ -27,6 +27,7 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
 #include <algorithm>
+#include <QScreen>
 
 #ifndef Q_MOC_RUN
 #include <boost/property_tree/xml_parser.hpp>
@@ -101,6 +102,20 @@ namespace rqt_rover_gui
     ui.setupUi(widget);
 
     context.addWidget(widget);
+
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = screen->geometry();
+    int height = screenGeometry.height();
+    int width = screenGeometry.width();
+    cout << "Available screen size: " << width << "x" << height << endl;
+
+    float scale_gui = 0.85;
+    int init_gui_width = scale_gui*width;
+    int init_gui_height = scale_gui*height;
+
+    cout << "Setting initial size to: " << init_gui_width << "x" << init_gui_height << endl;
+
+    widget->resize(init_gui_width, init_gui_height);
 
     // Next two lines allow us to catch keyboard input
     widget->installEventFilter(this);
@@ -210,10 +225,10 @@ namespace rqt_rover_gui
     ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white;");
 
     // Make the custom rover number combo box look greyed out to begin with
-    ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey; padding: 1px 0px 1px 3px;");
 
     ui.tab_widget->setCurrentIndex(0);
-    ui.log_tab->setCurrentIndex(1);
+    ui.log_tab->setCurrentIndex(0);
 
     ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
@@ -2867,7 +2882,7 @@ void RoverGUIPlugin::overrideNumRoversCheckboxToggledEventHandler(bool checked)
 {
     ui.custom_num_rovers_combobox->setEnabled(checked);
     if (checked) ui.custom_num_rovers_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px"); // The padding makes the item list color change work
-    else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey;");
+    else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey; padding: 1px 0px 1px 3px;");
 }
 
 void RoverGUIPlugin::createSavableWorldCheckboxToggledEventHandler(bool checked)
