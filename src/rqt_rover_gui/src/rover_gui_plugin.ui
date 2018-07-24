@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>1</horstretch>
+    <verstretch>1</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
@@ -1402,14 +1402,9 @@ QTabBar::tab:only-one {
                   <property name="frameShadow">
                    <enum>QFrame::Raised</enum>
                   </property>
-                  <zorder>camera_frame</zorder>
                  </widget>
                 </item>
                </layout>
-               <zorder>map_frame</zorder>
-               <zorder>map_frame</zorder>
-               <zorder>map_frame</zorder>
-               <zorder>map_frame</zorder>
               </widget>
              </item>
             </layout>

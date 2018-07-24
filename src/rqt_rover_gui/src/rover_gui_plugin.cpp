@@ -103,20 +103,30 @@ namespace rqt_rover_gui
 
     context.addWidget(widget);
 
+    // Set the minimum size to be either the minimum pixel size
+    // that lets all the text display (921x833)
+    // Or 50% of the screen so it looks better on hi res screens.
+    
     QScreen *screen = QGuiApplication::primaryScreen();
     QRect screenGeometry = screen->geometry();
     int height = screenGeometry.height();
     int width = screenGeometry.width();
     cout << "Available screen size: " << width << "x" << height << endl;
 
-    float scale_gui = 0.85;
+    float scale_gui = 0.50;
     int init_gui_width = scale_gui*width;
     int init_gui_height = scale_gui*height;
 
+    int min_pixel_height = 921;
+    int min_pixel_wdith = 833;
+
+    init_gui_width = init_gui_width < 921? 921: init_gui_width;
+    init_gui_height = init_gui_height < 833? 833: init_gui_height;
+    
+    widget->setMinimumSize( init_gui_width, init_gui_height );
+
     cout << "Setting initial size to: " << init_gui_width << "x" << init_gui_height << endl;
-
-    widget->resize(init_gui_width, init_gui_height);
-
+    
     // Next two lines allow us to catch keyboard input
     widget->installEventFilter(this);
     widget->setFocus();
@@ -249,6 +259,7 @@ namespace rqt_rover_gui
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
     emit updateNumberOfSatellites("<font color='white'>---</font>");
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -1689,6 +1700,7 @@ void RoverGUIPlugin::mapPopoutButtonEventHandler()
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
 {
+  
     emit sendInfoLogMessage("Building simulation...");
 
     ui.build_simulation_button->setEnabled(false);
