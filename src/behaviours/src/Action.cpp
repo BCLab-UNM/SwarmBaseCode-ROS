@@ -134,7 +134,7 @@ namespace core {
    /// Composite action implementation
 
    Action::Action(VelocityAction v) :
-      _type(ActionType::VELOCITY),
+      _type(Type::VELOCITY),
       _velocity(v)
    {}
 
@@ -145,7 +145,7 @@ namespace core {
 
    VelocityAction Action::GetVelocity() const throw(BadType)
    {
-      if(_type != ActionType::VELOCITY)
+      if(_type != Type::VELOCITY)
       {
          throw BadType();
       }
@@ -154,22 +154,27 @@ namespace core {
 
    WaypointAction Action::GetWaypoint() const throw(BadType)
    {
-      if(_type != ActionType::WAYPOINT)
+      if(_type != Type::WAYPOINT)
       {
          throw BadType();
       }
       return _waypoint;
    }
 
+   Action::Type Action::GetType() const
+   {
+      return _type;
+   }
+
    void Action::SetAction(WaypointAction w)
    {
-      _type = ActionType::WAYPOINT;
+      _type = Type::WAYPOINT;
       _waypoint = w;
    }
 
    void Action::SetAction(VelocityAction v)
    {
-      _type = ActionType::VELOCITY;
+      _type = Type::VELOCITY;
       _velocity = v;
    }
 }

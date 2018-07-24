@@ -24,6 +24,7 @@ include_directories(
 )
 
 add_library(core_interface
+  src/Heading.cpp
   src/Velocity.cpp
   src/Point.cpp
   src/Action.cpp
@@ -89,6 +90,7 @@ catkin_add_gmock(behaviour_test
   test/point_test.cpp
   test/waypoint_test.cpp
   test/action_util.cpp
+  test/heading_test.cpp
 )
 
 target_link_libraries(behaviour_test behavior core_interface swarmie_interface utilities ${catkin_LIBRARIES})

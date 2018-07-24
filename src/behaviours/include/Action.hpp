@@ -75,10 +75,10 @@ namespace core {
    {
    public:
       class BadType{};
-      enum ActionType { VELOCITY, WAYPOINT };
+      enum Type { VELOCITY, WAYPOINT };
 
    private:
-      ActionType _type;
+      Type _type;
 
       union
       {
@@ -93,6 +93,7 @@ namespace core {
 
       VelocityAction GetVelocity() const throw(BadType);
       WaypointAction GetWaypoint() const throw(BadType);
+      Action::Type   GetType()     const;
 
       void SetAction(VelocityAction v);
       void SetAction(WaypointAction w);
