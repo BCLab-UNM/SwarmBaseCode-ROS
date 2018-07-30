@@ -12,10 +12,11 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   apriltags_ros
   swarmie_msgs
+  mavros_msgs
   )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs swarmie_msgs roscpp sensor_msgs std_msgs random_numbers tf apriltags_ros
+  CATKIN_DEPENDS geometry_msgs swarmie_msgs roscpp sensor_msgs std_msgs random_numbers tf apriltags_ros mavros_msgs
 )
 
 include_directories(
@@ -56,12 +57,25 @@ add_executable(
   src/Behavior.cpp
 )
 
+add_executable(
+  JUAV_behaviours
+  src/JUAV_Behavior.cpp
+)
+
 add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(
   behaviours
   behavior
   core_interface
+  swarmie_interface
+  utilities
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(
+  JUAV_behaviours
+  behavior
   swarmie_interface
   utilities
   ${catkin_LIBRARIES}
