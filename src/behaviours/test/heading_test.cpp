@@ -3,8 +3,6 @@
 
 #include <cmath>
 
-using namespace core;
-
 TEST(HeadingTest, zeroEquivalentHeadings)
 {
    Heading h0(0);

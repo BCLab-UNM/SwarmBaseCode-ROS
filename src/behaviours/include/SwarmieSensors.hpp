@@ -1,12 +1,12 @@
 #ifndef _SWARMIE_SENSORS_HPP
 #define _SWARMIE_SENSORS_HPP
 
-#include <ros/ros.h>
-#include <sensor_msgs/Range.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
 #include <boost/math/quaternion.hpp>
 #include <cmath> // atan2
 #include <iostream> // ostream
+
+#include "Point.hpp"
+#include "Heading.hpp"
 
 class Tag
 {
@@ -50,11 +50,10 @@ private:
    double _centerSonar;
    std::vector<Tag> _detections;
 
-   void LeftSonarHandler  (const sensor_msgs::Range& range);
-   void RightSonarHandler (const sensor_msgs::Range& range);
-   void CenterSonarHandler(const sensor_msgs::Range& range);
+   Point   _deadReckoningPosition;
+   Point   _gpsFusedPosition;
+   Heading _heading;
 
-   void TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
 public:
    SwarmieSensors();
    ~SwarmieSensors() {};

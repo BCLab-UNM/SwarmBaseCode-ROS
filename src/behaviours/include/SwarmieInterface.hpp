@@ -2,6 +2,9 @@
 #define _SWARMIE_INTERFACE_HPP
 
 #include <ros/ros.h>
+#include <sensor_msgs/Range.h>
+#include <nav_msgs/Odometry.h>
+#include <apriltags_ros/AprilTagDetectionArray.h>
 #include "SwarmieSensors.hpp"
 #include "Action.hpp"
 
@@ -46,6 +49,8 @@ private:
    void LeftSonarHandler(const sensor_msgs::Range& range);
    void CenterSonarHandler(const sensor_msgs::Range& range);
    void RightSonarHandler(const sensor_msgs::Range& range);
+   void OdometryHandler(const nav_msgs::Odometry::ConstPtr& odom);
+   void GPSFusedHandler(const nav_msgs::Odometry::ConstPtr& odom);
 public:
    SwarmieInterface(std::string name);
    ~SwarmieInterface() {}
