@@ -564,13 +564,17 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         rectangle_fence.addRect(corner_x, corner_y, width, height);
         painter.drawPath(rectangle_fence);
 
-        float rectangle_center_x = corner_x+width/2;
-        float rectangle_center_y = corner_y+height/2;
-
         if (user_is_drawing_fence)
         {
-            painter.drawEllipse(QPointF(rectangle_center_x,rectangle_center_y), 2.5, 2.5);
-            QString rect_geometry = "Center: (" + QString::number(rectangle_center_x) + ", " + QString::number(rectangle_center_y) + ")\nWidth: " + QString::number(width) + "\nHeight: " + QString::number(height);
+            float rectangle_center_x = corner_x+width/2;
+            float rectangle_center_y = corner_y+width/2;
+            float meter_conversion_factor = max_seen_width/map_width; // Convert pixels into meters
+            float rectangle_center_x_in_meters = (corner_x+width/2) * meter_conversion_factor;
+            float rectangle_center_y_in_meters = (corner_y+height/2) * meter_conversion_factor;
+            float width_in_meters = abs(width * meter_conversion_factor); // abs because distances must be positive values
+            float height_in_meters = abs(height * meter_conversion_factor);
+            painter.drawEllipse(QPointF(rectangle_center_x_in_meters, rectangle_center_y_in_meters), 2.5, 2.5);
+            QString rect_geometry = "Center: (" + QString::number(rectangle_center_x_in_meters) + ", " + QString::number(rectangle_center_y_in_meters) + ")\nWidth: " + QString::number(width_in_meters)  + " m\nHeight: " + QString::number(height_in_meters) + " m";
             painter.drawText(QRect(rectangle_center_x, rectangle_center_y, 300, 200), rect_geometry);
         }
     }
