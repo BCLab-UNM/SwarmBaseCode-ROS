@@ -14,7 +14,7 @@ private:
    int    _tagsRight;
    bool   _persist;
    bool   _tooClose;
-   Action _savedAction;
+   SwarmieAction _savedAction;
 
    Timer* _persistenceTimer;
 

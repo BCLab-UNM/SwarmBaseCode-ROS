@@ -3,21 +3,24 @@
 
 #include <ros/ros.h>
 #include "SwarmieSensors.hpp"
+#include "Action.hpp"
 
 enum class WristControl   { UP, DOWN, DOWN_2_3 };
 enum class GripperControl { OPEN, CLOSED };
 
-struct DriveControl
+class SwarmieAction : public core::Action
 {
-   double left;
-   double right;
-};
-
-struct Action
-{
-   DriveControl   drive;
-   WristControl   wrist;
-   GripperControl grip;
+private:
+   WristControl   _wrist;
+   GripperControl _grip;
+public:
+   SwarmieAction() : core::Action(core::VelocityAction()) {}
+   SwarmieAction(core::VelocityAction va) : core::Action(va) {}
+   ~SwarmieAction() {}
+   GripperControl GripperCommand() const { return _grip; }
+   WristControl   WristCommand()   const { return _wrist; }
+   void SetGrip(GripperControl g);
+   void SetWrist(WristControl w);
 };
 
 class SwarmieInterface
@@ -48,7 +51,7 @@ public:
    ~SwarmieInterface() {}
 
    const SwarmieSensors* GetSensors() { return &_sensors; }
-   void DoAction(Action a);
+   void DoAction(const SwarmieAction& a);
 };
 
 #endif // _ROBOT_INTERFACE_HPP

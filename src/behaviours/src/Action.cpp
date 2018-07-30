@@ -20,44 +20,84 @@ namespace core {
 
    VelocityAction::~VelocityAction() {}
 
-   double VelocityAction::SetRoll(double roll)
+   void VelocityAction::SetRoll(double roll)
    {
       _angular.SetRoll(roll);
    }
 
-   double VelocityAction::SetPitch(double pitch)
+   void VelocityAction::SetPitch(double pitch)
    {
       _angular.SetPitch(pitch);
    }
 
-   double VelocityAction::SetYaw(double yaw)
+   void VelocityAction::SetYaw(double yaw)
    {
       _angular.SetYaw(yaw);
    }
 
-   double VelocityAction::SetX(double x)
+   void VelocityAction::SetX(double x)
    {
       _linear.SetX(x);
    }
 
-   double VelocityAction::SetY(double y)
+   void VelocityAction::SetY(double y)
    {
       _linear.SetY(y);
    }
 
-   double VelocityAction::SetZ(double z)
+   void VelocityAction::SetZ(double z)
    {
       _linear.SetZ(z);
    }
 
    double VelocityAction::GetAngularMagnitude() const
    {
-      _angular.GetMagnitude();
+      return _angular.GetMagnitude();
    }
 
    double VelocityAction::GetLinearMagnitude() const
    {
-      _linear.GetMagnitude();
+      return _linear.GetMagnitude();
+   }
+
+   double VelocityAction::GetX() const
+   {
+      return _linear.GetX();
+   }
+
+   double VelocityAction::GetY() const
+   {
+      return _linear.GetY();
+   }
+
+   double VelocityAction::GetZ() const
+   {
+      return _linear.GetX();
+   }
+
+   double VelocityAction::GetRoll() const
+   {
+      return _angular.GetRoll();
+   }
+
+   double VelocityAction::GetPitch() const
+   {
+      return _angular.GetPitch();
+   }
+
+   double VelocityAction::GetYaw() const
+   {
+      return _angular.GetYaw();
+   }
+
+   void VelocityAction::SetAngular(AngularVelocity v)
+   {
+      _angular = v;
+   }
+
+   void VelocityAction::SetLinear(LinearVelocity v)
+   {
+      _linear = v;
    }
 
    WaypointAction::WaypointAction(Point w) :

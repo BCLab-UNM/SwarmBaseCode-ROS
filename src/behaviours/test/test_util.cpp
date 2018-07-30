@@ -1,46 +1,41 @@
 #include "test_util.h"
 #include "SwarmieInterface.hpp"
 
-bool is_moving(Action a)
+bool is_moving(core::Action a)
 {
-   return (fabs(a.drive.left) >= 30 || fabs(a.drive.right) >= 30);
+   return (a.GetType() == core::Action::Type::VELOCITY)
+      && (a.GetVelocity().GetLinearMagnitude() > 0.01 || a.GetVelocity().GetAngularMagnitude() > 0.01);
 }
 
-bool is_moving_forward(Action a)
+bool is_moving_forward(core::Action a)
 {
-   return (a.drive.right == a.drive.left && a.drive.left >= 30);
+   if(a.GetType() != core::Action::Type::VELOCITY)
+   {
+      return false;
+   }
+   else
+   {
+      core::VelocityAction v = a.GetVelocity();
+      return v.GetX() > 0.01 && v.GetY() == 0 && v.GetZ() == 0 && v.GetAngularMagnitude() < 0.01;
+   }
 }
 
-bool is_turning_left(Action a)
+bool is_turning_left(core::Action a)
 {
    if(!is_moving(a)) {
       return false;
    }
    
-   // if one wheel is negative then it must be the left wheel.
-   // otherwise the right wheel must be greater than the left.
-   if(a.drive.left < 0)
-   {
-      return a.drive.right >= 0;
-   }
-
-   // lets say we are turning if right is at least 15% greater than left.
-   return a.drive.right*0.85 > a.drive.left;
+   return a.GetVelocity().GetAngularMagnitude() > 0.01 && a.GetVelocity().GetYaw() > 0;
 }
 
-bool is_turning_right(Action a)
+bool is_turning_right(core::Action a)
 {
    if(!is_moving(a)) {
       return false;
    }
    
-   if(a.drive.right < 0)
-   {
-      return a.drive.left >= 0;
-   }
-
-   // lets say we are turning if right is at least 15% greater than left.
-   return a.drive.left*0.85 > a.drive.right;   
+   return a.GetVelocity().GetAngularMagnitude() > 0.01 && a.GetVelocity().GetYaw() < 0;
 }
 
 /* Tag positions values measured from the robot camera:

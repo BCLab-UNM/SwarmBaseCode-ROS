@@ -24,7 +24,7 @@ protected:
 TEST_F(ObstacleBehaviorTest, allFar)
 {
    obs.Update();
-   Action a = obs.GetAction();
+   SwarmieAction a = obs.GetAction();
    EXPECT_FALSE(is_moving(a));
 }
 
@@ -33,7 +33,7 @@ TEST_F(ObstacleBehaviorTest, allFar)
 // be non-negligible
 TEST_F(ObstacleBehaviorTest, leftSonarTriggersMovement)
 {
-   Action a;
+   SwarmieAction a;
 
    sensors.SetLeftSonar(0.3);
    obs.Update();
@@ -58,7 +58,7 @@ TEST_F(ObstacleBehaviorTest, leftSonarTriggersMovement)
 
 TEST_F(ObstacleBehaviorTest, rightSonarTriggersMovement)
 {
-   Action a;
+   SwarmieAction a;
 
    sensors.SetRightSonar(0.3);
    obs.Update();
@@ -83,12 +83,12 @@ TEST_F(ObstacleBehaviorTest, rightSonarTriggersMovement)
 
 TEST_F(ObstacleBehaviorTest, centerSonarTriggersMovement)
 {
-   Action a;
+   SwarmieAction a;
 
    sensors.SetCenterSonar(0.3);
    obs.Update();
    a = obs.GetAction();
-   EXPECT_TRUE(is_moving(a));
+   EXPECT_TRUE(is_moving(a)) << a.GetVelocity().GetAngularMagnitude();
 
    sensors.SetCenterSonar(0.5);
    obs.Update();
@@ -106,65 +106,58 @@ TEST_F(ObstacleBehaviorTest, centerSonarTriggersMovement)
    EXPECT_TRUE(is_moving(a));
 }
 
-
-// TODO: If any one sonar reads below 0.3 then left + right = 0 &&
-// left /= 0 && right /= 0. ie. the action is to turn in place.
 TEST_F(ObstacleBehaviorTest, leftTriggersTurnaround)
 {
-   Action a;
+   SwarmieAction a;
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetLeftSonar(0.29);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, rightTriggersTurnaround)
 {
-   Action a;
+   SwarmieAction a;
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetRightSonar(0.29);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, centerSonarTriggersTurnaround)
 {
-   Action a;
+   SwarmieAction a;
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetCenterSonar(0.29);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, leftAndRightTriggerTurnaround)
 {
-   Action a;
+   SwarmieAction a;
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetLeftSonar(0.2);
    sensors.SetRightSonar(0.28);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, leftAndCenterTriggerTurnaround)
 {
-   Action a;
+   SwarmieAction a;
 
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
@@ -172,28 +165,26 @@ TEST_F(ObstacleBehaviorTest, leftAndCenterTriggerTurnaround)
    sensors.SetCenterSonar(0.28);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, centerAndRightTriggerTurnaround)
 {
-   Action a;
+   SwarmieAction a;
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetCenterSonar(0.2);
    sensors.SetRightSonar(0.28);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, allTriggerTurnaround)
 {
-   Action a;
+   SwarmieAction a;
    EXPECT_CALL(timer, StartOnce()).Times(1);
 
    sensors.SetCenterSonar(0.2);
@@ -201,9 +192,8 @@ TEST_F(ObstacleBehaviorTest, allTriggerTurnaround)
    sensors.SetLeftSonar(0.1);
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   ASSERT_NE(a.drive.right, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, turnaroundContinuesIfSonarStillReadsClose)
@@ -220,14 +210,14 @@ TEST_F(ObstacleBehaviorTest, turnaroundContinuesIfSonarStillReadsClose)
    // do the test, we should be turning around
    sensors.SetLeftSonar(0.1);
    obs.Update();
-   Action a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   SwarmieAction a = obs.GetAction();
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 
    obs.Update();
    a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 }
 
 TEST_F(ObstacleBehaviorTest, turnaroundStopsOnlyAfterTimerExpires)
@@ -241,16 +231,16 @@ TEST_F(ObstacleBehaviorTest, turnaroundStopsOnlyAfterTimerExpires)
 
    sensors.SetRightSonar(0.1);
    obs.Update();
-   Action a = obs.GetAction();
-   ASSERT_NE(a.drive.left, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   SwarmieAction a = obs.GetAction();
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 
    sensors.SetRightSonar(3.2);
 
    // timer has not expired. keep turning
    obs.Update();
-   EXPECT_NE(a.drive.left, 0);
-   EXPECT_EQ(a.drive.left, -(a.drive.right));
+   EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
+   EXPECT_TRUE(a.GetVelocity().GetAngularMagnitude() > 0.05);
 
    // timer expired. no movement.
    obs.Update();

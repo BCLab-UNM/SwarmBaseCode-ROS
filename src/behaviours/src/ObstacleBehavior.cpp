@@ -1,5 +1,7 @@
 #include "ObstacleBehavior.hpp"
 
+#include <algorithm> // std::min
+
 ObstacleBehavior::ObstacleBehavior(const SwarmieSensors* sensors, Timer* timer) :
    Behavior(sensors),
    _state(Normal),
@@ -30,6 +32,13 @@ void ObstacleBehavior::UpdateState()
    }
 }
 
+bool ObstacleBehavior::AllFar()
+{
+   return _sensors->GetLeftSonar()   > 2.8
+      &&  _sensors->GetCenterSonar() > 2.8
+      &&  _sensors->GetRightSonar()  > 2.8;
+}
+
 void ObstacleBehavior::Update()
 {
    _action = _llAction;
@@ -39,30 +48,33 @@ void ObstacleBehavior::Update()
    switch(_state)
    {
    case Normal:
-      if(_sensors->GetLeftSonar() > 0.6)
-         _action.drive.left  = 1/pow(0.6 - _sensors->GetLeftSonar(), 4);
-      else
-         _action.drive.left = DRIVE_MAX;
-
-      if(_sensors->GetRightSonar() > 0.6)
-         _action.drive.right = 1/pow(0.6 - _sensors->GetRightSonar(), 4);
-      else
-         _action.drive.right = DRIVE_MAX;
-
-      if(_sensors->GetCenterSonar() < 0.8) {
-         if(_sensors->GetLeftSonar() < _sensors->GetRightSonar())
-         {
-            _action.drive.right = -DRIVE_MAX;
-         }
-         else
-         {
-            _action.drive.left = -DRIVE_MAX;
-         }
+      if(AllFar()) {
+         _action.SetAction(
+            core::VelocityAction());
+         return;
       }
+
+      if(_sensors->GetLeftSonar() > 0.8)
+         _action.SetAction(
+            core::VelocityAction(
+               AngularVelocity(0.0, 0.0, -std::min(1/pow(0.6 - _sensors->GetLeftSonar(), 4), 1.0))));
+      else
+         _action.SetAction(
+            core::VelocityAction(
+               AngularVelocity(0, 0, -1)));
+
+      if(_sensors->GetRightSonar() > 0.8)
+         _action.SetAction(
+            core::VelocityAction(
+               AngularVelocity(0.0, 0.0, std::min(1/pow(0.6 - _sensors->GetLeftSonar(), 4), 1.0))));
+      else
+         _action.SetAction(
+            core::VelocityAction(
+               AngularVelocity(0,0,1)));
+
       break;
    case Turnaround:
-      _action.drive.right = DRIVE_MAX;
-      _action.drive.left  = -DRIVE_MAX;
+      _action.SetAction(core::VelocityAction(AngularVelocity(0,0,1)));
       break;
    }
 }

@@ -90,7 +90,7 @@ int main(int argc, char **argv)
    while(ros::ok())
    {
       ros::spinOnce();
-      Action action = manager.NextAction();
+      SwarmieAction action = manager.NextAction();
       robot.DoAction(action);
       r.sleep();
    }

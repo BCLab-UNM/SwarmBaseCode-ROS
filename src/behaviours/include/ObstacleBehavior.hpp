@@ -17,6 +17,7 @@ private:
 
    void TurnaroundHandler();
    void UpdateState();
+   bool AllFar();
    
 public:
     ObstacleBehavior(const SwarmieSensors* sensors, Timer* timer);

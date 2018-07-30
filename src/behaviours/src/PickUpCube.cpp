@@ -119,35 +119,31 @@ void PickUpCube::Update()
    switch(_state)
    {
    case LastInch:
-      _action.drive.left = 60;
-      _action.drive.right = 60;
+      _action.SetAction(core::VelocityAction(LinearVelocity(0.6)));
       ResetPickupTimer(0.7);
       break;
    case Grip:
-      _action.drive.left = 0;
-      _action.drive.right = 0;
-      _action.grip = GripperControl::CLOSED;
-      _action.wrist = WristControl::DOWN;
+      _action.SetAction(core::VelocityAction());
+      _action.SetGrip(GripperControl::CLOSED);
+      _action.SetWrist(WristControl::DOWN);
       ResetPickupTimer(1.5);
       break;
    case Raise:
-      _action.drive.left = 0;
-      _action.drive.right = 0;
-      _action.grip = GripperControl::CLOSED;
-      _action.wrist = WristControl::UP;
+      _action.SetAction(core::VelocityAction());
+      _action.SetGrip(GripperControl::CLOSED);
+      _action.SetWrist(WristControl::UP);
       ResetPickupTimer(2);
       break;
    case Holding:
       _action = _subsumedBehavior->GetAction();
-      _action.grip = GripperControl::CLOSED;
-      _action.wrist = WristControl::DOWN_2_3;
+      _action.SetGrip(GripperControl::CLOSED);
+      _action.SetWrist(WristControl::DOWN_2_3);
       break;
    case Checking:
-      _action.drive.left = 0;
-      _action.drive.right = 0;
+      _action.SetAction(core::VelocityAction());
    case Rechecking:
-      _action.grip = GripperControl::CLOSED;
-      _action.wrist = WristControl::UP;
+      _action.SetGrip(GripperControl::CLOSED);
+      _action.SetWrist(WristControl::UP);
       break;
    default:
       break;

@@ -21,7 +21,7 @@ protected:
 };
 
 TEST_F(AvoidNestTest, noTagsNoAction) {
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_FALSE(is_moving(a));
 }
 
@@ -29,7 +29,7 @@ TEST_F(AvoidNestTest, nonCenterTagNoAction) {
    Tag t(0, 1, 1, 1, defaultOrientation);
    sensors.DetectedTag(t);
    avoid.Update();
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_FALSE(is_moving(a));
 }
 
@@ -38,7 +38,7 @@ TEST_F(AvoidNestTest, nestTagTriggersMovement) {
    Tag t(Tag::NEST_TAG_ID, 1, 1, 1, defaultOrientation);
    sensors.DetectedTag(t);
    avoid.Update();
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_TRUE(is_moving(a));
 }
 
@@ -47,7 +47,7 @@ TEST_F(AvoidNestTest, nestAtTopLeftOfFrameTriggersRightTurn) {
    Tag t = tag_top_left(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_TRUE(is_turning_right(a));
 }
 
@@ -56,7 +56,7 @@ TEST_F(AvoidNestTest, nestAtBottomLeftOfFrameTriggersRightTurn) {
    Tag t = tag_bottom_left(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_TRUE(is_turning_right(a));
 }
 
@@ -65,7 +65,7 @@ TEST_F(AvoidNestTest, nestAtTopRightOfFrameTriggersLeftTurn) {
    Tag t = tag_top_right(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_TRUE(is_turning_left(a));
 }
 
@@ -75,7 +75,7 @@ TEST_F(AvoidNestTest, nestAtBottomRightOfFrameTriggersLeftTurn) {
    Tag t = tag_bottom_right(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    avoid.Update();
-   Action a = avoid.GetAction();
+   SwarmieAction a = avoid.GetAction();
    EXPECT_TRUE(is_turning_left(a));
 }
 

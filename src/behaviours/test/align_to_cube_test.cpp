@@ -5,6 +5,7 @@
 
 #include "AlignToCube.hpp"
 #include "SwarmieSensors.hpp"
+#include "SwarmieInterface.hpp"
 
 class AlignToCubeTest : public testing::Test
 {
@@ -17,7 +18,7 @@ protected:
 };
 
 TEST_F(AlignToCubeTest, noCubeNoMovement) {
-   Action a = align.GetAction();
+   SwarmieAction a = align.GetAction();
    EXPECT_FALSE(is_moving(a));
 }
 
@@ -25,7 +26,7 @@ TEST_F(AlignToCubeTest, nonCubeTagNoMovement) {
    Tag t = tag_top_left(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
    align.Update();
-   Action a = align.GetAction();
+   SwarmieAction a = align.GetAction();
    EXPECT_FALSE(is_moving(a));
 }
 
@@ -35,21 +36,18 @@ TEST_F(AlignToCubeTest, cubeOnLeftTurnLeft) {
    for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
-                                                   << " | right: " << align.GetAction().drive.right;
+   EXPECT_TRUE(is_turning_left(align.GetAction())) << "Yaw: " << align.GetAction().GetVelocity().GetYaw();
 
    sensors.ClearDetections();
    align.Update();
-   EXPECT_FALSE(is_moving(align.GetAction())) << "left: " << align.GetAction().drive.left
-                                              << " | right: " << align.GetAction().drive.right;
+   EXPECT_FALSE(is_moving(align.GetAction()));
 
    sensors.DetectedTag(tag_bottom_left(Tag::CUBE_TAG_ID));
    align.Update();
    for(int i = 0; i < 50 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_left(align.GetAction())) << "left: " << align.GetAction().drive.left
-                                                   << " | right: " << align.GetAction().drive.right;
+   EXPECT_TRUE(is_turning_left(align.GetAction())) << "Yaw: " << align.GetAction().GetVelocity().GetYaw();
 }
 
 TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
@@ -58,13 +56,11 @@ TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
    for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_right(align.GetAction())) << "left: " << align.GetAction().drive.left
-                                                    << " | right: " << align.GetAction().drive.right;
+   EXPECT_TRUE(is_turning_right(align.GetAction()));
 
    sensors.ClearDetections();
    align.Update();
-   EXPECT_FALSE(is_moving(align.GetAction())) << "left: " << align.GetAction().drive.left
-                                              << " | right: " << align.GetAction().drive.right;
+   EXPECT_FALSE(is_moving(align.GetAction()));
 
    sensors.DetectedTag(tag_bottom_right(Tag::CUBE_TAG_ID));
    align.Update();
@@ -72,8 +68,7 @@ TEST_F(AlignToCubeTest, cubeOnRightTurnRight) {
    for(int i = 0; i < 30 && !is_moving(align.GetAction()); i++) {
       align.Update();
    }
-   EXPECT_TRUE(is_turning_right(align.GetAction())) << "left: " << align.GetAction().drive.left
-                                                    << " | right: " << align.GetAction().drive.right;
+   EXPECT_TRUE(is_turning_right(align.GetAction()));
 }
 
 TEST_F(AlignToCubeTest, nestAndCubeVisible) {

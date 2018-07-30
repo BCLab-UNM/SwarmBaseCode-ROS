@@ -21,13 +21,19 @@ namespace core {
       VelocityAction(LinearVelocity linear, AngularVelocity angular);
       ~VelocityAction();
 
-      double SetRoll(double yaw);
-      double SetPitch(double pitch);
-      double SetYaw(double yaw);
+      void SetRoll(double yaw);
+      void SetPitch(double pitch);
+      void SetYaw(double yaw);
+      void SetX(double x);
+      void SetY(double y);
+      void SetZ(double z);
 
-      double SetX(double x);
-      double SetY(double y);
-      double SetZ(double z);
+      double GetX() const;
+      double GetY() const;
+      double GetZ() const;
+      double GetRoll()  const;
+      double GetPitch() const;
+      double GetYaw()   const;
 
       void SetLinear(LinearVelocity linear);
       void SetAngular(AngularVelocity angular);
@@ -89,7 +95,7 @@ namespace core {
    public:
       Action(VelocityAction v);
       Action(WaypointAction w);
-      ~Action();
+      ~Action() {}
 
       VelocityAction GetVelocity() const throw(BadType);
       WaypointAction GetWaypoint() const throw(BadType);

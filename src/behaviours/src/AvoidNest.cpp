@@ -1,4 +1,6 @@
 #include "AvoidNest.hpp"
+#include "Action.hpp"
+#include "Velocity.hpp"
 
 AvoidNest::AvoidNest(const SwarmieSensors* sensors, Timer* timer) :
    Behavior(sensors),
@@ -61,21 +63,18 @@ void AvoidNest::Update()
 
    if(_tooClose)
    {
-      _action.drive.left = -100;
-      _action.drive.right = -100;
+      _action.SetAction(core::VelocityAction(LinearVelocity(-1)));
    }
 
    if(_tagsLeft > 0 || _tagsRight > 0)
    {
       if(_tagsLeft > _tagsRight)
       {
-         _action.drive.left = 100;
-         _action.drive.right = -100;
+         _action.SetAction(core::VelocityAction(AngularVelocity(0, 0, -1)));
       }
       else
       {
-         _action.drive.left = -100;
-         _action.drive.right = 100;
+         _action.SetAction(core::VelocityAction(AngularVelocity(0, 0, 1)));
       }
 
       _persist = true;

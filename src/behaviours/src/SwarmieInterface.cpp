@@ -3,6 +3,16 @@
 #include <std_msgs/Float32.h>
 #include <swarmie_msgs/Skid.h>
 
+void SwarmieAction::SetWrist(WristControl w)
+{
+   _wrist = w;
+}
+
+void SwarmieAction::SetGrip(GripperControl g)
+{
+   _grip = g;
+}
+
 SwarmieInterface::SwarmieInterface(std::string name) :
    _nh()
 {
@@ -46,26 +56,38 @@ void SwarmieInterface::CenterSonarHandler(const sensor_msgs::Range& range)
    _sensors.SetCenterSonar(range.range);
 }
 
-void SwarmieInterface::DoAction(Action a)
+void SwarmieInterface::DoAction(const SwarmieAction& a)
 {
    std_msgs::Float32 finger;
-   finger.data = (a.grip == GripperControl::OPEN ? GRIP_OPEN_ANGLE : GRIP_CLOSED_ANGLE);
+   finger.data = (a.GripperCommand() == GripperControl::OPEN ? GRIP_OPEN_ANGLE : GRIP_CLOSED_ANGLE);
    std_msgs::Float32 wrist;
-   if(a.wrist == WristControl::UP)
+   if(a.WristCommand() == WristControl::UP)
    {
       wrist.data = WRIST_UP_ANGLE;
    }
-   else if(a.wrist == WristControl::DOWN)
+   else if(a.WristCommand() == WristControl::DOWN)
    {
       wrist.data = WRIST_DOWN_ANGLE;
    }
-   else if(a.wrist == WristControl::DOWN_2_3)
+   else if(a.WristCommand() == WristControl::DOWN_2_3)
    {
       wrist.data = 0.666666 * WRIST_DOWN_ANGLE;
    }
+
    swarmie_msgs::Skid skid;
-   skid.left = a.drive.left;
-   skid.right = a.drive.right;
+   // TODO: Waypoint Action
+   if(a.GetType() == core::Action::Type::VELOCITY)
+   {
+      core::VelocityAction v = a.GetVelocity();
+      // Swarmie only uses yaw and x
+      skid.left  = v.GetX()*255 - v.GetYaw()*255;
+      skid.right = v.GetX()*255 + v.GetYaw()*255;
+   }
+   else
+   {
+      skid.left = 0;
+      skid.right = 0;
+   }
 
    _gripPublisher.publish(finger);
    _wristPublisher.publish(wrist);

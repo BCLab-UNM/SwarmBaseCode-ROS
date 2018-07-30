@@ -43,7 +43,7 @@ AlignToCube::AlignToCube(const SwarmieSensors* sensors) :
    _distanceToTag(0),
    _linearDistance(0),
    _integral(0),
-   _alignPID(1.5, 0.1, 0.85)
+   _alignPID(-1.5, 0.1, 0.85)
 {}
 
 void AlignToCube::Update()
@@ -54,8 +54,9 @@ void AlignToCube::Update()
 
    if(fabs(_distanceToTag) > 0.005)
    {
-      _action.drive.left = 100*_alignPID.GetControlOutput();
-      _action.drive.right = - (100*_alignPID.GetControlOutput());
+      core::VelocityAction v;
+      v.SetAngular(AngularVelocity(0, 0, _alignPID.GetControlOutput()));
+      _action.SetAction(v);
    }
    else if(_linearDistance == 0)
    {
@@ -64,9 +65,8 @@ void AlignToCube::Update()
    }
    else
    {
-      // managed to line up, reset the pid, and set the drive to 0
-      _action.drive.left = 0;
-      _action.drive.right = 0;
+      // managed to line up, reset the pid, and set the action to idle
+      _action.SetAction(core::VelocityAction());
       _alignPID.Reset();
    }
 }

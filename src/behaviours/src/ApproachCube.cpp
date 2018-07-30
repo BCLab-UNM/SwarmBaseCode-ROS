@@ -46,8 +46,9 @@ void ApproachCube::Update()
 
    if(fabs(_alignment) < 0.05)
    {
-      _action.drive.left += 50*_approachPID.GetControlOutput();
-      _action.drive.right += 50*_approachPID.GetControlOutput();
+      core::VelocityAction v = _llAction.GetVelocity();
+      v.SetLinear(LinearVelocity(_approachPID.GetControlOutput()));
+      _action.SetAction(v);
    }
    else
    {

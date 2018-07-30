@@ -31,12 +31,12 @@ void DropOffCube::UpdateState()
    switch(_state)
    {
    case NotHolding:
-      if(_llAction.grip == GripperControl::CLOSED) {
+      if(_llAction.GripperCommand() == GripperControl::CLOSED) {
          _state = Holding;
       }
       break;
    case Holding:
-      if(_llAction.grip == GripperControl::OPEN) {
+      if(_llAction.GripperCommand() == GripperControl::OPEN) {
          _state = NotHolding;
       }
       else if(_numNestTags > 0)
@@ -99,22 +99,21 @@ void DropOffCube::Center()
 {
    _centeringPID.Update(_averageAlignment);
    double control = _centeringPID.GetControlOutput();
-   _action.drive.left  = 40 * control;
-   _action.drive.right = -40 * control;
+   core::VelocityAction v;
+   v.SetAngular(AngularVelocity(0, 0, -control));
+   _action.SetAction(v);
 }
 
 void DropOffCube::Enter()
 {
-   _action.drive.left = 35;
-   _action.drive.right = 35;
+   _action.SetAction(core::VelocityAction(LinearVelocity(0.35)));
 }
 
 void DropOffCube::Leave()
 {
-   _action.drive.left = -35;
-   _action.drive.right = -35;
-   _action.grip = GripperControl::OPEN;
-   _action.wrist = WristControl::UP;
+   _action.SetAction(core::VelocityAction(LinearVelocity(-0.35)));
+   _action.SetGrip(GripperControl::OPEN);
+   _action.SetWrist(WristControl::UP);
 }
 
 void DropOffCube::Update()
@@ -135,10 +134,9 @@ void DropOffCube::Update()
       Leave();
       break;
    case Droping:
-      _action.drive.left = 0;
-      _action.drive.right = 0;
-      _action.grip = GripperControl::OPEN;
-      _action.wrist = WristControl::UP;
+      _action.SetAction(core::VelocityAction());
+      _action.SetGrip(GripperControl::OPEN);
+      _action.SetWrist(WristControl::UP);
    case Holding:
    case NotHolding:
       _action = _llAction;

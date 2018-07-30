@@ -54,17 +54,6 @@ add_library(behavior
 add_executable(
   behaviours
   src/Behavior.cpp
-#  src/Tag.cpp
-#  src/ObstacleController.cpp 
-#  src/PickUpController.cpp
-#  src/DropOffController.cpp
-#  src/SearchController.cpp
-#  src/ROSAdapter.cpp
-#  src/PID.cpp
-#  src/DriveController.cpp
-#  src/RangeController.cpp
-#  src/LogicController.cpp
-#  src/ManualWaypointController.cpp
 )
 
 add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
@@ -72,6 +61,7 @@ add_dependencies(behaviours ${catkin_EXPORTED_TARGETS})
 target_link_libraries(
   behaviours
   behavior
+  core_interface
   swarmie_interface
   utilities
   ${catkin_LIBRARIES}

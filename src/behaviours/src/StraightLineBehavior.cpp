@@ -1,4 +1,5 @@
 #include "StraightLineBehavior.hpp"
+#include "Velocity.hpp"
 
 StraightLineBehavior::StraightLineBehavior() :
    Behavior(nullptr)
@@ -7,10 +8,12 @@ StraightLineBehavior::StraightLineBehavior() :
 void StraightLineBehavior::Update()
 {
    _action = _llAction;
-   if(_llAction.drive.left < 75 && _llAction.drive.right < 75
-      && _llAction.drive.right >= 0 && _llAction.drive.left >= 0)
+
+   // TODO: guard against waypoint actions
+   if(_llAction.GetVelocity().GetAngularMagnitude() < 0.75)
    {
-      _action.drive.left += 50;
-      _action.drive.right += 50;
+      core::VelocityAction v = _llAction.GetVelocity();
+      v.SetLinear(LinearVelocity(0.5));
+      _action.SetAction(v);
    }
 }
