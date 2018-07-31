@@ -22,6 +22,7 @@
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32MultiArray.h>
 #include "swarmie_msgs/Waypoint.h"
+#include "swarmie_msgs/VirtualFence.h"
 
 // Include Controllers
 #include "LogicController.h"
@@ -169,7 +170,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message);
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
-void virtualFenceHandler(const std_msgs::Float32MultiArray& message);
+void virtualFenceHandler(const swarmie_msgs::VirtualFence& message);
 void manualWaypointHandler(const swarmie_msgs::Waypoint& message);
 void behaviourStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
@@ -509,16 +510,16 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {
 }
 
 // Allows a virtual fence to be defined and enabled or disabled through ROS
-void virtualFenceHandler(const std_msgs::Float32MultiArray& message) 
+void virtualFenceHandler(const swarmie_msgs::VirtualFence& message) 
 {
   // Read data from the message array
   // The first element is an integer indicating the shape type
   // 0 = Disable the virtual fence
   // 1 = circle
   // 2 = rectangle
-  int shape_type = static_cast<int>(message.data[0]); // Shape type
+  int cmd = static_cast<int>(message.cmd); // Shape type
   
-  if (shape_type == 0)
+  if (cmd == 0)
   {
     logicController.setVirtualFenceOff();
   }
@@ -526,24 +527,23 @@ void virtualFenceHandler(const std_msgs::Float32MultiArray& message)
   {
     // Elements 2 and 3 are the x and y coordinates of the range center
     Point center;
-    center.x = message.data[1]; // Range center x
-    center.y = message.data[2]; // Range center y
+    center.x = message.center_x; // Range center x
+    center.y = message.center_y; // Range center y
     
     // If the shape type is "circle" then element 4 is the radius, if rectangle then width
-    switch ( shape_type )
+    switch ( cmd )
     {
     case 1: // Circle
     {
-      if ( message.data.size() != 4 ) throw ROSAdapterRangeShapeInvalidTypeException("Wrong number of parameters for circle shape type in ROSAdapter.cpp:virtualFenceHandler()");
-      float radius = message.data[3]; 
-      logicController.setVirtualFenceOn( new RangeCircle(center, radius) );
+      //if ( message.data.size() != 4 ) throw ROSAdapterRangeShapeInvalidTypeException("Wrong number of parameters for circle shape type in ROSAdapter.cpp:virtualFenceHandler()");
+      //float radius = message.data; 
+      //logicController.setVirtualFenceOn( new RangeCircle(center, radius) );
       break;
     }
     case 2: // Rectangle 
     {
-      if ( message.data.size() != 5 ) throw ROSAdapterRangeShapeInvalidTypeException("Wrong number of parameters for rectangle shape type in ROSAdapter.cpp:virtualFenceHandler()");
-      float width = message.data[3]; 
-      float height = message.data[4]; 
+      float width = message.width; 
+      float height = message.height; 
       logicController.setVirtualFenceOn( new RangeRectangle(center, width, height) );
       break;
     }

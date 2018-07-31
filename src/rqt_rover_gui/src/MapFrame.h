@@ -27,6 +27,7 @@
 #include <utility> // For STL pair
 #include <map>
 #include <QString>
+#include "MapData.h"
 
 // Forward declarations
 class QMainWindow;
@@ -95,6 +96,7 @@ namespace rqt_rover_gui
 
     signals:
 
+      void sendVirtualFenceCmd(VirtualFenceCmd vf, float center_x, float center_y, float width, float height);
       void sendInfoLogMessage(QString msg);
       void sendWaypointCmd(WaypointCmd, int, float, float);
       void delayedUpdate();

@@ -9,9 +9,8 @@
 #include <string>
 #include <QMutex>
 
-#include "MapData.h"
-
-enum VirtualFenceShape {UNDEFINED, CIRCLE, RECTANGLE};
+// Virtual fence command definitions that can be sent to the rover
+enum VirtualFenceCmd {UNDEFINED, CIRCLE, RECTANGLE};
 
 // This class is the "model" for std::map frame in the model-view UI pattern,
 // where std::mapFrame is the view.
@@ -33,7 +32,7 @@ public:
     void setVirtualFenceRectangle(float corner_x, float corner_y, float height, float width);
     void setVirtualFenceCircle(float center_x, float center_y, float radius);
 
-    VirtualFenceShape getVirtualFenceShape();
+    VirtualFenceCmd getVirtualFenceCmd();
     std::tuple<float,float,float,float> getVirtualFenceRectangle();
     std::tuple<float,float,float> getVirtualFenceCircle();
 
@@ -123,7 +122,7 @@ private:
     float virtual_fence_height = 0;
     float virtual_fence_width = 0;
     float virtual_fence_radius = 0;
-    VirtualFenceShape virtual_fence_shape = UNDEFINED;
+    VirtualFenceCmd virtual_fence_cmd = UNDEFINED;
 
     bool display_global_offset;
 

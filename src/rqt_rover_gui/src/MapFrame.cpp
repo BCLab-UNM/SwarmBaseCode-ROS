@@ -8,7 +8,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QMouseEvent>
-#include <MapData.h>
 #include "MapFrame.h"
 
 namespace rqt_rover_gui
@@ -534,7 +533,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
     hardware_rover_color_index = (hardware_rover_color_index + 1) % 8;
 
     // Draw the virtual fence
-    if (map_data->getVirtualFenceShape() == CIRCLE)
+    if (map_data->getVirtualFenceCmd() == CIRCLE)
     {
 
         painter.setPen(Qt::yellow);
@@ -549,7 +548,7 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         //emit sendInfoLogMessage("Circular fence detected: Fence center: (" + QString::number(center_x) + ", " + QString::number(center_y) + "); Radius_x: " + QString::number(radius_x) + "Radius_y: " + QString::number(radius_y));
         painter.drawEllipse(center_x, center_y, radius_x, radius_y);
     }
-    else if (map_data->getVirtualFenceShape() == RECTANGLE)
+    else if (map_data->getVirtualFenceCmd() == RECTANGLE)
     {
         painter.setPen(Qt::yellow);
         tuple<float,float,float,float> virtual_fence = map_data->getVirtualFenceRectangle();

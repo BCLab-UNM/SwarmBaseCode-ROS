@@ -52,6 +52,7 @@
 #include <mutex>
 #include <ublox_msgs/NavSOL.h>
 #include "swarmie_msgs/Waypoint.h" // For waypoint commands
+#include "swarmie_msgs/VirtualFence.h" // For virtual fence commands
 
 //ROS msg types
 //#include "rover_onboard_target_detection/ATag.h"
@@ -204,6 +205,11 @@ namespace rqt_rover_gui {
     void displayDiagLogMessage(QString msg);
     void receiveWaypointCmd(WaypointCmd, int, float, float);
 
+    // This slot recives parameters for building a virtual fence (aka range) command to send to rovers.
+    // The slot will publish the command to all known rovers.
+    void receiveVirtualFenceCmd(VirtualFenceCmd cmd, float center_x, float center_y, float width, float height);
+
+
     // Needed to refocus the keyboard events when the user clicks on the widget list
     // to the main widget so keyboard manual control is handled properly
     void refocusKeyboardEventHandler();
@@ -216,6 +222,7 @@ namespace rqt_rover_gui {
     // ROS Publishers
     map<string,ros::Publisher> control_mode_publishers;
     map<string,ros::Publisher> waypoint_cmd_publishers;
+    ros::Publisher virtualfence_cmd_publisher;
     ros::Publisher joystick_publisher;
 
     // ROS Subscribers
