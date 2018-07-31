@@ -139,6 +139,7 @@ namespace rqt_rover_gui
     }
 
     widget->setMinimumSize(init_gui_width, init_gui_height);
+    //widget->setMinimumSize(0, 0);
 
     cout << "Setting initial size to: " << init_gui_width << "x" << init_gui_height << endl;
 
