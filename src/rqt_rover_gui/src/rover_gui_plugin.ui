@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>927</width>
-    <height>821</height>
+    <width>898</width>
+    <height>833</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -39,23 +39,24 @@
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(0, 0, 0);
-border-color: rgb(255, 255, 255);</string>
+border-color: rgb(255, 255, 255);
+font-size: 15px;</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_11">
    <property name="spacing">
-    <number>1</number>
+    <number>5</number>
    </property>
    <property name="leftMargin">
-    <number>1</number>
+    <number>5</number>
    </property>
    <property name="topMargin">
-    <number>1</number>
+    <number>5</number>
    </property>
    <property name="rightMargin">
-    <number>1</number>
+    <number>5</number>
    </property>
    <property name="bottomMargin">
-    <number>1</number>
+    <number>5</number>
    </property>
    <item>
     <widget class="QFrame" name="rover_status_frame">
@@ -91,7 +92,7 @@ border-color: rgb(255, 255, 255);</string>
        <widget class="QFrame" name="version_frame">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>1</horstretch>
+          <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -169,12 +170,18 @@ border-color: rgb(255, 255, 255);</string>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="frame_2">
+       <widget class="QFrame" name="rover_list_frame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-          <horstretch>1</horstretch>
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
           <verstretch>1</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -184,19 +191,19 @@ border-color: rgb(255, 255, 255);</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_15">
          <property name="leftMargin">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="topMargin">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="spacing">
-          <number>1</number>
+          <number>0</number>
          </property>
          <item row="0" column="2">
           <widget class="QLabel" name="label_39">
@@ -208,7 +215,7 @@ border-color: rgb(255, 255, 255);</string>
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
+             <pointsize>-1</pointsize>
             </font>
            </property>
            <property name="styleSheet">
@@ -222,6 +229,9 @@ border-color: rgb(255, 255, 255);</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
+           </property>
+           <property name="margin">
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -239,13 +249,13 @@ border-color: rgb(255, 255, 255);</string>
           <widget class="QLabel" name="label_38">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>3</horstretch>
+             <horstretch>4</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
+             <pointsize>-1</pointsize>
             </font>
            </property>
            <property name="styleSheet">
@@ -259,6 +269,9 @@ border-color: rgb(255, 255, 255);</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
+           </property>
+           <property name="margin">
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -276,7 +289,7 @@ border-color: rgb(255, 255, 255);</string>
           <widget class="QLabel" name="label_37">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>4</horstretch>
+             <horstretch>8</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
@@ -288,6 +301,9 @@ border-color: rgb(255, 255, 255);</string>
            </property>
            <property name="text">
             <string>Rovers</string>
+           </property>
+           <property name="margin">
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -305,10 +321,10 @@ border-color: rgb(255, 255, 255);</string>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="frame_3">
+       <widget class="QFrame" name="rover_info_frame">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>1</horstretch>
+          <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -400,10 +416,10 @@ border-color: rgb(255, 255, 255);</string>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="frame_4">
+       <widget class="QFrame" name="sim_timer_status_frame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>1</horstretch>
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -504,6 +520,22 @@ border-color: rgb(255, 255, 255);</string>
             <property name="spacing">
              <number>5</number>
             </property>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_36">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>2</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);</string>
+              </property>
+              <property name="text">
+               <string>Timer Start:</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_32">
               <property name="sizePolicy">
@@ -533,22 +565,6 @@ border-color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
                <string>Timer Stop:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_36">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>2</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(255, 255, 255);</string>
-              </property>
-              <property name="text">
-               <string>Timer Start:</string>
               </property>
              </widget>
             </item>
@@ -607,15 +623,15 @@ border-color: rgb(255, 255, 255);</string>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="build_sim_frame">
+       <widget class="QFrame" name="sim_buttons_frame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">color:rgb(255, 255, 255);</string>
+         <string notr="true">color: white;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -625,51 +641,30 @@ border-color: rgb(255, 255, 255);</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_8">
          <property name="leftMargin">
-          <number>15</number>
+          <number>5</number>
          </property>
          <property name="topMargin">
-          <number>15</number>
+          <number>5</number>
          </property>
          <property name="rightMargin">
-          <number>15</number>
+          <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>15</number>
+          <number>5</number>
          </property>
-         <property name="spacing">
-          <number>10</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="build_simulation_button">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);
-border: 1px solid white;
-</string>
-           </property>
-           <property name="text">
-            <string>Build Simulation</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QPushButton" name="clear_simulation_button">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
             </sizepolicy>
            </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 border-color: rgb(255, 255, 255);
 border: 1px solid white;
+padding: 5px;
 </string>
            </property>
            <property name="text">
@@ -677,42 +672,64 @@ border: 1px solid white;
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="visualize_simulation_button">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);
-border: 1px solid white;
-</string>
-           </property>
-           <property name="text">
-            <string>Toggle Visualization</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
+         <item row="3" column="0">
           <widget class="QCheckBox" name="start_visualization_on_build_checkbox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
             </sizepolicy>
            </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
-font: 9pt &quot;Ubuntu&quot;;</string>
+padding: 5px;
+/* font: 9pt &quot;Ubuntu&quot;; */</string>
            </property>
            <property name="text">
             <string>Start Visualization On Build</string>
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="build_simulation_button">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white;
+padding: 5px;
+</string>
+           </property>
+           <property name="text">
+            <string>Build Simulation</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="visualize_simulation_button">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white;
+padding: 5px;
+</string>
+           </property>
+           <property name="text">
+            <string>Toggle Visualization</string>
            </property>
           </widget>
          </item>
@@ -723,7 +740,7 @@ font: 9pt &quot;Ubuntu&quot;;</string>
        <widget class="QFrame" name="rover_controls_frame">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>1</horstretch>
+          <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -752,7 +769,7 @@ font: 9pt &quot;Ubuntu&quot;;</string>
          <item>
           <widget class="QFrame" name="rover_control_frame">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>1</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
@@ -765,19 +782,19 @@ font: 9pt &quot;Ubuntu&quot;;</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="spacing">
-             <number>1</number>
+             <number>5</number>
             </property>
             <property name="leftMargin">
-             <number>1</number>
+             <number>5</number>
             </property>
             <property name="topMargin">
-             <number>1</number>
+             <number>5</number>
             </property>
             <property name="rightMargin">
-             <number>1</number>
+             <number>5</number>
             </property>
             <property name="bottomMargin">
-             <number>1</number>
+             <number>5</number>
             </property>
             <item>
              <widget class="QLabel" name="rover_control_label">
@@ -789,7 +806,7 @@ font: 9pt &quot;Ubuntu&quot;;</string>
               </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <pointsize>-1</pointsize>
                </font>
               </property>
               <property name="styleSheet">
@@ -850,6 +867,7 @@ font: 9pt &quot;Ubuntu&quot;;</string>
                <string notr="true">color: rgb(255, 255, 255);
 border-color: rgb(255, 255, 255);
 border: 1px solid white;
+padding: 5px;
 </string>
               </property>
               <property name="text">
@@ -869,7 +887,7 @@ border: 1px solid white;
                <string notr="true">color: rgb(255, 255, 255);
 border-color: rgb(255, 255, 255);
 border: 1px solid white;
-</string>
+padding: 5px;</string>
               </property>
               <property name="text">
                <string>Stop All Rovers</string>
@@ -882,7 +900,7 @@ border: 1px solid white;
          <item>
           <widget class="QStackedWidget" name="joystick_frame">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>1</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
@@ -898,6 +916,21 @@ border: 1px solid white;
            </property>
            <widget class="QWidget" name="joystick_enabled_page">
             <layout class="QGridLayout" name="gridLayout_9">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
+             <property name="spacing">
+              <number>5</number>
+             </property>
              <item row="2" column="3">
               <widget class="QLabel" name="joy_lcd_drive_right">
                <property name="sizePolicy">
@@ -1111,7 +1144,7 @@ border: 1px solid white;
               <widget class="QLabel" name="joystick_disabled_label">
                <property name="font">
                 <font>
-                 <pointsize>10</pointsize>
+                 <pointsize>-1</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1169,9 +1202,9 @@ border: 1px solid white;
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
+          <verstretch>1</verstretch>
          </sizepolicy>
         </property>
         <property name="styleSheet">
@@ -1240,7 +1273,7 @@ QTabBar::tab:only-one {
 </string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="sensor_display_tab">
          <attribute name="title">
@@ -1266,7 +1299,7 @@ QTabBar::tab:only-one {
            <widget class="QFrame" name="sensor_display_top_frame">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
+              <horstretch>1</horstretch>
               <verstretch>3</verstretch>
              </sizepolicy>
             </property>
@@ -1276,7 +1309,10 @@ QTabBar::tab:only-one {
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
             </property>
-            <layout class="QGridLayout" name="gridLayout_20">
+            <layout class="QHBoxLayout" name="horizontalLayout_16">
+             <property name="spacing">
+              <number>1</number>
+             </property>
              <property name="leftMargin">
               <number>1</number>
              </property>
@@ -1289,47 +1325,12 @@ QTabBar::tab:only-one {
              <property name="bottomMargin">
               <number>1</number>
              </property>
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <item row="0" column="2">
-              <widget class="QLabel" name="label_44">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 255, 255);</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Box</enum>
-               </property>
-               <property name="text">
-                <string>Map</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_43">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 255, 255);</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Box</enum>
-               </property>
-               <property name="text">
-                <string>Camera</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QFrame" name="frame_15">
+             <item>
+              <widget class="QFrame" name="camera_display_frame">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
+                 <horstretch>1</horstretch>
+                 <verstretch>1</verstretch>
                 </sizepolicy>
                </property>
                <property name="frameShape">
@@ -1338,7 +1339,10 @@ QTabBar::tab:only-one {
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QGridLayout" name="gridLayout_10">
+               <layout class="QVBoxLayout" name="verticalLayout_13">
+                <property name="spacing">
+                 <number>1</number>
+                </property>
                 <property name="leftMargin">
                  <number>1</number>
                 </property>
@@ -1351,34 +1355,47 @@ QTabBar::tab:only-one {
                 <property name="bottomMargin">
                  <number>1</number>
                 </property>
-                <property name="spacing">
-                 <number>1</number>
-                </property>
-                <item row="0" column="0">
+                <item>
+                 <widget class="QLabel" name="label_43">
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::Box</enum>
+                  </property>
+                  <property name="text">
+                   <string>Camera</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="rqt_rover_gui::CameraFrame" name="camera_frame">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
+                    <horstretch>1</horstretch>
                     <verstretch>1</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
+                   <enum>QFrame::NoFrame</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
+                   <enum>QFrame::Plain</enum>
                   </property>
                  </widget>
                 </item>
                </layout>
               </widget>
              </item>
-             <item row="1" column="2">
-              <widget class="QFrame" name="frame_16">
+             <item>
+              <widget class="QFrame" name="map_display_frame">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
+                 <horstretch>1</horstretch>
+                 <verstretch>1</verstretch>
                 </sizepolicy>
                </property>
                <property name="frameShape">
@@ -1387,7 +1404,10 @@ QTabBar::tab:only-one {
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QGridLayout" name="gridLayout_18">
+               <layout class="QVBoxLayout" name="verticalLayout_14">
+                <property name="spacing">
+                 <number>1</number>
+                </property>
                 <property name="leftMargin">
                  <number>1</number>
                 </property>
@@ -1400,22 +1420,35 @@ QTabBar::tab:only-one {
                 <property name="bottomMargin">
                  <number>1</number>
                 </property>
-                <property name="spacing">
-                 <number>1</number>
-                </property>
-                <item row="0" column="0">
+                <item>
+                 <widget class="QLabel" name="label_44">
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::Box</enum>
+                  </property>
+                  <property name="text">
+                   <string>Map</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="rqt_rover_gui::MapFrame" name="map_frame">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
+                    <horstretch>1</horstretch>
                     <verstretch>1</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
+                   <enum>QFrame::NoFrame</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
+                   <enum>QFrame::Plain</enum>
                   </property>
                  </widget>
                 </item>
@@ -1429,7 +1462,7 @@ QTabBar::tab:only-one {
            <widget class="QFrame" name="sensor_display_bottom_frame">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
+              <horstretch>1</horstretch>
               <verstretch>1</verstretch>
              </sizepolicy>
             </property>
@@ -1439,7 +1472,10 @@ QTabBar::tab:only-one {
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
             </property>
-            <layout class="QGridLayout" name="gridLayout_19">
+            <layout class="QHBoxLayout" name="horizontalLayout_15">
+             <property name="spacing">
+              <number>1</number>
+             </property>
              <property name="leftMargin">
               <number>1</number>
              </property>
@@ -1452,81 +1488,157 @@ QTabBar::tab:only-one {
              <property name="bottomMargin">
               <number>1</number>
              </property>
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <item row="0" column="3">
-              <widget class="QLabel" name="label_42">
+             <item>
+              <widget class="QFrame" name="ultrasound_display_frame">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>3</horstretch>
+                 <horstretch>1</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 255, 255);</string>
-               </property>
                <property name="frameShape">
-                <enum>QFrame::Box</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
-               <property name="text">
-                <string>Map Settings</string>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <property name="spacing">
+                 <number>1</number>
+                </property>
+                <property name="leftMargin">
+                 <number>1</number>
+                </property>
+                <property name="topMargin">
+                 <number>1</number>
+                </property>
+                <property name="rightMargin">
+                 <number>1</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>1</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_40">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>2</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::Box</enum>
+                  </property>
+                  <property name="text">
+                   <string>Ultrasound</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="rqt_rover_gui::USFrame" name="us_frame">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>1</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_40">
+             <item>
+              <widget class="QFrame" name="imu_display_frame">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>2</horstretch>
+                 <horstretch>1</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 255, 255);</string>
+               <property name="toolTipDuration">
+                <number>-1</number>
                </property>
                <property name="frameShape">
-                <enum>QFrame::Box</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
-               <property name="text">
-                <string>Ultrasound</string>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="spacing">
+                 <number>1</number>
+                </property>
+                <property name="leftMargin">
+                 <number>1</number>
+                </property>
+                <property name="topMargin">
+                 <number>1</number>
+                </property>
+                <property name="rightMargin">
+                 <number>1</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>1</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="imu_label">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>2</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::Box</enum>
+                  </property>
+                  <property name="text">
+                   <string>IMU</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>1</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="label_41">
+             <item>
+              <widget class="QFrame" name="map_settings_display_frame">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>2</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 255, 255);</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Box</enum>
-               </property>
-               <property name="text">
-                <string>IMU</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QFrame" name="frame_11">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
-                 <verstretch>1</verstretch>
+                 <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="frameShape">
@@ -1552,7 +1664,35 @@ QTabBar::tab:only-one {
                  <number>1</number>
                 </property>
                 <item>
+                 <widget class="QLabel" name="label_42">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>3</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::Box</enum>
+                  </property>
+                  <property name="text">
+                   <string>Map Settings</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QGroupBox" name="groupBox_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>1</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">color: rgb(255, 255, 255);</string>
                   </property>
@@ -1623,6 +1763,12 @@ QTabBar::tab:only-one {
                 </item>
                 <item>
                  <widget class="QGroupBox" name="groupBox_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>1</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">color: rgb(255, 255, 255);</string>
                   </property>
@@ -1672,33 +1818,6 @@ QTabBar::tab:only-one {
                  </widget>
                 </item>
                 <item>
-                 <widget class="QFrame" name="frame_13">
-                  <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Plain</enum>
-                  </property>
-                  <layout class="QGridLayout" name="gridLayout_21">
-                   <property name="leftMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="spacing">
-                    <number>1</number>
-                   </property>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QFrame" name="frame_14">
                   <property name="frameShape">
                    <enum>QFrame::NoFrame</enum>
@@ -1734,10 +1853,17 @@ QTabBar::tab:only-one {
                    </item>
                    <item>
                     <widget class="QPushButton" name="map_popout_button">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">color: rgb(255, 255, 255);
 border-color: rgb(255, 255, 255);
 border: 1px solid white;
+padding: 5px;
 </string>
                      </property>
                      <property name="text">
@@ -1751,100 +1877,30 @@ border: 1px solid white;
                </layout>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QFrame" name="frame_17">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_22">
-                <property name="leftMargin">
-                 <number>1</number>
-                </property>
-                <property name="topMargin">
-                 <number>1</number>
-                </property>
-                <property name="rightMargin">
-                 <number>1</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>1</number>
-                </property>
-                <property name="spacing">
-                 <number>1</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="rqt_rover_gui::USFrame" name="us_frame">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>1</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QFrame" name="frame_18">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_23">
-                <property name="leftMargin">
-                 <number>1</number>
-                </property>
-                <property name="topMargin">
-                 <number>1</number>
-                </property>
-                <property name="rightMargin">
-                 <number>1</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>1</number>
-                </property>
-                <property name="spacing">
-                 <number>1</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="rqt_rover_gui::IMUFrame" name="imu_frame">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>1</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_20">
+           <spacer name="verticalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QFrame" name="sensor_display_checkbox_frame">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
+              <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -1869,7 +1925,7 @@ border: 1px solid white;
               </spacer>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_5">
+              <widget class="QCheckBox" name="camera_display_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
@@ -1882,7 +1938,7 @@ border: 1px solid white;
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_10">
+              <widget class="QCheckBox" name="map_display_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
@@ -1895,7 +1951,7 @@ border: 1px solid white;
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_9">
+              <widget class="QCheckBox" name="ultrasound_display_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
@@ -1908,7 +1964,7 @@ border: 1px solid white;
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_8">
+              <widget class="QCheckBox" name="imu_display_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
@@ -1921,7 +1977,7 @@ border: 1px solid white;
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_11">
+              <widget class="QCheckBox" name="map_settings_display_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
@@ -1953,7 +2009,7 @@ border: 1px solid white;
         </widget>
         <widget class="QWidget" name="simulation_control_tab">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -1982,38 +2038,44 @@ border: 1px solid white;
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>1</horstretch>
-              <verstretch>2</verstretch>
+              <verstretch>3</verstretch>
              </sizepolicy>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
             </property>
             <property name="styleSheet">
              <string notr="true">color:rgb(255, 255, 255);</string>
             </property>
             <property name="frameShape">
-             <enum>QFrame::Box</enum>
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <property name="spacing">
-              <number>1</number>
+              <number>5</number>
+             </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SetDefaultConstraint</enum>
              </property>
              <property name="leftMargin">
-              <number>1</number>
+              <number>5</number>
              </property>
              <property name="topMargin">
-              <number>1</number>
+              <number>5</number>
              </property>
              <property name="rightMargin">
-              <number>1</number>
+              <number>5</number>
              </property>
              <property name="bottomMargin">
-              <number>1</number>
+              <number>5</number>
              </property>
              <item>
               <widget class="QFrame" name="left_sim_setup_frame">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>1</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -2026,69 +2088,20 @@ border: 1px solid white;
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_10">
                 <property name="spacing">
-                 <number>2</number>
+                 <number>4</number>
                 </property>
                 <property name="leftMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
                 <property name="topMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
                 <property name="rightMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
-                <item>
-                 <widget class="QFrame" name="frame_10">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Plain</enum>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_9">
-                   <property name="spacing">
-                    <number>5</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>15</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::MinimumExpanding</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QGroupBox" name="groupBox">
                   <property name="sizePolicy">
@@ -2207,6 +2220,7 @@ border: 1px solid white;
                          <string notr="true">color: rgb(255, 255, 255);
 border-color: rgb(255, 255, 255);
 border: 1px solid white;
+padding: 5px;
 </string>
                         </property>
                         <property name="text">
@@ -2218,7 +2232,7 @@ border: 1px solid white;
                        <widget class="QLabel" name="custom_world_path">
                         <property name="sizePolicy">
                          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                          <horstretch>3</horstretch>
+                          <horstretch>2</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
@@ -2238,22 +2252,6 @@ border: 1px solid white;
                    </item>
                   </layout>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_10">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Minimum</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                 <item>
                  <widget class="QFrame" name="frame_6">
@@ -2559,29 +2557,13 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
                   </layout>
                  </widget>
                 </item>
-                <item>
-                 <spacer name="verticalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::MinimumExpanding</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                </layout>
               </widget>
              </item>
              <item>
               <widget class="QFrame" name="right_sim_setup_frame">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>1</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -2593,34 +2575,21 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_11">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
                 <property name="leftMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
                 <property name="topMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
                 <property name="rightMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>8</number>
+                 <number>0</number>
                 </property>
-                <item>
-                 <spacer name="verticalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::MinimumExpanding</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QFrame" name="frame_9">
                   <property name="frameShape">
@@ -2714,35 +2683,20 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                  <widget class="QLabel" name="number_of_tags_disclaimer">
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:rgb(255, 255, 255);</string>
+                   <string notr="true">color:grey;</string>
                   </property>
                   <property name="text">
-                   <string>*not available for Power Law or Custom World</string>
+                   <string>*not available for Power Law
+    or Custom World</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Minimum</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                 <item>
                  <widget class="QGroupBox" name="round_type_button_group">
@@ -2847,7 +2801,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                          <bool>false</bool>
                         </property>
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                           <horstretch>1</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -2907,22 +2861,6 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="verticalSpacer_7">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Minimum</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
                  <widget class="QCheckBox" name="create_savable_world_checkbox">
                   <property name="styleSheet">
                    <string notr="true">color:rgb(255, 255, 255);</string>
@@ -2932,50 +2870,18 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                  </widget>
                 </item>
-                <item>
-                 <spacer name="verticalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::MinimumExpanding</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                </layout>
               </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::MinimumExpanding</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="simulation_control_bottom_frame">
+           <widget class="QFrame" name="sim_sensor_output_frame">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>1</horstretch>
-              <verstretch>2</verstretch>
+              <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="frameShape">
@@ -2986,19 +2892,19 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <property name="spacing">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="leftMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <item>
               <widget class="QFrame" name="camera_info_frame">
@@ -3016,19 +2922,19 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_5">
                 <property name="leftMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="topMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="rightMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="spacing">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <item row="5" column="0">
                  <widget class="QLabel" name="imu_update_rate_val_6">
@@ -3040,7 +2946,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3061,7 +2967,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3082,7 +2988,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3103,7 +3009,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3111,30 +3017,6 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="text">
                    <string>Rate</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="imu_update_rate_val_4">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>9</pointsize>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">color:rgb(255, 255, 255);</string>
-                  </property>
-                  <property name="text">
-                   <string>Noise Stdev</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -3148,7 +3030,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3162,14 +3044,14 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                 <item row="0" column="0" colspan="2">
                  <widget class="QLabel" name="camera_frame_title_label">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3196,7 +3078,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3217,7 +3099,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3238,7 +3120,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3259,7 +3141,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3280,7 +3162,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3301,7 +3183,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3309,6 +3191,30 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="text">
                    <string>val</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="imu_update_rate_val_4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>-1</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">color:rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="text">
+                   <string>Noise Stdev</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -3331,19 +3237,19 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                </property>
                <layout class="QGridLayout" name="gridLayout">
                 <property name="leftMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="topMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="rightMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="spacing">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <item row="8" column="1">
                  <widget class="QLabel" name="gps_drift_freq">
@@ -3355,7 +3261,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3376,7 +3282,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3397,7 +3303,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3418,7 +3324,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3439,7 +3345,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3460,7 +3366,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3481,7 +3387,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3502,7 +3408,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3523,7 +3429,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3544,7 +3450,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3565,7 +3471,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3586,7 +3492,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3607,7 +3513,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3628,7 +3534,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3649,7 +3555,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3670,7 +3576,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3684,14 +3590,14 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                 <item row="1" column="0" colspan="2">
                  <widget class="QLabel" name="GPS_title_label">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3727,19 +3633,19 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_6">
                 <property name="leftMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="topMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="rightMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="spacing">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <item row="2" column="1">
                  <widget class="QLabel" name="sonar_min">
@@ -3751,7 +3657,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3775,7 +3681,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3799,7 +3705,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3823,7 +3729,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3847,7 +3753,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3868,7 +3774,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3892,7 +3798,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3916,7 +3822,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3937,7 +3843,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3958,7 +3864,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -3972,14 +3878,14 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                 <item row="0" column="0" colspan="2">
                  <widget class="QLabel" name="ultrasound_title_label">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4006,7 +3912,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4030,7 +3936,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4051,7 +3957,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4072,7 +3978,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4098,35 +4004,35 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                 <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
+                <enum>QFrame::Sunken</enum>
                </property>
                <layout class="QGridLayout" name="gridLayout_4">
                 <property name="leftMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="topMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="rightMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <property name="spacing">
-                 <number>1</number>
+                 <number>5</number>
                 </property>
                 <item row="0" column="0" colspan="4">
                  <widget class="QLabel" name="IMU_title_label">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4153,7 +4059,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4174,7 +4080,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4195,7 +4101,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4216,7 +4122,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4237,7 +4143,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4258,7 +4164,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4279,7 +4185,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4300,7 +4206,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4321,7 +4227,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4342,7 +4248,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4363,7 +4269,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4384,7 +4290,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4405,7 +4311,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4426,7 +4332,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4447,7 +4353,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4468,7 +4374,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4489,7 +4395,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4510,7 +4416,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4531,7 +4437,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4552,7 +4458,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4573,8 +4479,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
-                    <underline>true</underline>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4604,8 +4509,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
-                    <underline>true</underline>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4626,8 +4530,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
-                    <underline>true</underline>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4648,8 +4551,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>9</pointsize>
-                    <underline>true</underline>
+                    <pointsize>-1</pointsize>
                    </font>
                   </property>
                   <property name="styleSheet">
@@ -4667,10 +4569,10 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_12">
+           <widget class="QFrame" name="sim_control_checkbox_frame">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-              <horstretch>0</horstretch>
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -4695,7 +4597,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
               </spacer>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox">
+              <widget class="QCheckBox" name="simulation_setup_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
@@ -4708,12 +4610,25 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_2">
+              <widget class="QCheckBox" name="sim_sensor_output_checkbox">
                <property name="styleSheet">
                 <string notr="true">color:rgb(255, 255, 255);</string>
                </property>
                <property name="text">
                 <string>Simulated Sensor Output</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="sim_buttons_display_checkbox">
+               <property name="styleSheet">
+                <string notr="true">color:rgb(255, 255, 255);</string>
+               </property>
+               <property name="text">
+                <string>Sim Buttons</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -4741,7 +4656,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="frame">
+       <widget class="QFrame" name="display_checkbox_frame">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -4772,7 +4687,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
           </spacer>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox_3">
+          <widget class="QCheckBox" name="log_tab_display_checkbox">
            <property name="styleSheet">
             <string notr="true">color:rgb(255, 255, 255);</string>
            </property>
@@ -4785,7 +4700,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox_4">
+          <widget class="QCheckBox" name="rover_controls_display_checkbox">
            <property name="styleSheet">
             <string notr="true">color:rgb(255, 255, 255);</string>
            </property>
@@ -4798,20 +4713,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox_6">
-           <property name="styleSheet">
-            <string notr="true">color:rgb(255, 255, 255);</string>
-           </property>
-           <property name="text">
-            <string>Sim Buttons</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_7">
+          <widget class="QCheckBox" name="sim_timer_status_display_checkbox">
            <property name="styleSheet">
             <string notr="true">color:rgb(255, 255, 255);</string>
            </property>
@@ -4821,6 +4723,176 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
            <property name="checked">
             <bool>true</bool>
            </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Minimum</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">color:rgb(255, 255, 255);</string>
+           </property>
+           <property name="text">
+            <string>Font Size:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="font_size_combobox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+border: 1px solid white;
+padding: 1px 0px 1px 3px; /*This makes text colour work*/
+</string>
+           </property>
+           <property name="currentIndex">
+            <number>10</number>
+           </property>
+           <property name="maxVisibleItems">
+            <number>5</number>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>5</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>6</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>7</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>8</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>9</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>10</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>11</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>12</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>13</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>14</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>15</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>16</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>17</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>18</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>19</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>20</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>21</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>22</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>23</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>24</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>25</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>45</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>65</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item>

@@ -111,14 +111,22 @@ namespace rqt_rover_gui
     QRect screenGeometry = screen->geometry();
     int height = screenGeometry.height();
     int width = screenGeometry.width();
+
     cout << "Available screen size: " << width << "x" << height << endl;
 
     float scale_gui = 0.50;
     int init_gui_width = scale_gui*width;
     int init_gui_height = scale_gui*height;
 
-    int min_pixel_height = 821;
-    int min_pixel_width = 927;
+    // The height of both of these frames should be exactly the same because they are side by side horizontally,
+    // but if, for some reason, that is not the case then we will take the average height.
+    int min_pixel_height = (ui.data_display_frame->frameSize().rheight() + ui.rover_status_frame->frameSize().rheight()) / 2;
+
+    // The sum of the widths should be used because they are side by side and should never be the same.
+    int min_pixel_width = ui.data_display_frame->frameSize().rwidth() + ui.rover_status_frame->frameSize().rwidth();
+
+    // cout << "min_pixel_height: " << min_pixel_height << endl;
+    // cout << "min_pixel_width: " << min_pixel_width << endl;
 
     if (height > min_pixel_height)
     {
@@ -170,27 +178,19 @@ namespace rqt_rover_gui
     connect(ui.map_popout_button, SIGNAL(pressed()), this, SLOT(mapPopoutButtonEventHandler()));
     connect(this, SIGNAL(allStopButtonSignal()), this, SLOT(allStopButtonEventHandler()));
 
-    // adgj
-    // Joystick output display - Drive
-    //connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
-    //connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(display(double)));
-    //connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(display(double)));
-    //connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(display(double)));
-    ////connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(setText(QString::number(double))));
-    ////connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(setText(QString::number(double))));
-    ////connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(setText(QString::number(double))));
-    ////connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(setText(QString::number(double))));
-
-    // adgj
-    // Joystick output display - Gripper
-    //connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(display(double)));
-    //connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(display(double)));
-    //connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(display(double)));
-    //connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
-    ////connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(setText(QString::number(double))));
-    ////connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(setText(QString::number(double))));
-    ////connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(setText(QString::number(double))));
-    ////connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(setText(QString::number(double))));
+    // scalable GUI display/hide checkboxes and other event handlers
+    connect(ui.camera_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(cameraDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.map_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(mapDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.ultrasound_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(ultrasoundDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.imu_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(imuDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.map_settings_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(mapSettingsDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.simulation_setup_checkbox, SIGNAL(toggled(bool)), this, SLOT(simulationSetupDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.sim_sensor_output_checkbox, SIGNAL(toggled(bool)), this, SLOT(simSensorOutputCheckboxToggledEventHandler(bool)));
+    connect(ui.log_tab_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(logTabDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.rover_controls_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(roverControlsDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.sim_buttons_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(simButtonsDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.sim_timer_status_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(simTimerStatusDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.font_size_combobox, SIGNAL(activated(int)), this, SLOT(changeFontEventComboBoxEventHandler(int)));
 
     connect(this, SIGNAL(updateCurrentSimulationTimeLabel(QString)), ui.currentSimulationTimeLabel, SLOT(setText(QString)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
@@ -1223,6 +1223,118 @@ void RoverGUIPlugin::uniqueRoverColorsCheckboxToggledEventHandler(bool checked)
 {
     ui.map_frame->setDisplayUniqueRoverColors(checked);
 }
+
+// scalable GUI event handlers
+
+void RoverGUIPlugin::cameraDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.camera_display_frame->setHidden(!checked);
+
+    if (ui.camera_display_frame->isHidden() && ui.map_display_frame->isHidden())
+    {
+        ui.sensor_display_top_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_top_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::mapDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_display_frame->setHidden(!checked);
+
+    if (ui.camera_display_frame->isHidden() && ui.map_display_frame->isHidden())
+    {
+        ui.sensor_display_top_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_top_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::ultrasoundDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.ultrasound_display_frame->setHidden(!checked);
+
+    if (ui.ultrasound_display_frame->isHidden() && ui.imu_display_frame->isHidden() && ui.map_settings_display_frame->isHidden())
+    {
+        ui.sensor_display_bottom_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_bottom_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::imuDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.imu_display_frame->setHidden(!checked);
+
+    if (ui.ultrasound_display_frame->isHidden() && ui.imu_display_frame->isHidden() && ui.map_settings_display_frame->isHidden())
+    {
+        ui.sensor_display_bottom_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_bottom_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::mapSettingsDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_settings_display_frame->setHidden(!checked);
+
+    if (ui.ultrasound_display_frame->isHidden() && ui.imu_display_frame->isHidden() && ui.map_settings_display_frame->isHidden())
+    {
+        ui.sensor_display_bottom_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_bottom_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::simulationSetupDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.simulation_setup_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::simSensorOutputCheckboxToggledEventHandler(bool checked)
+{
+    ui.sim_sensor_output_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::logTabDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.log_tab->setHidden(!checked);
+}
+
+void RoverGUIPlugin::roverControlsDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.rover_controls_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::simButtonsDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.sim_buttons_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::simTimerStatusDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.sim_timer_status_frame->setHidden(!checked);
+    ui.version_frame->setHidden(!checked);
+    ui.rover_info_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::changeFontEventComboBoxEventHandler(int index)
+{
+    ui.data_display_frame->setStyleSheet("background-color: rgb(0, 0, 0);\nborder-color: rgb(255, 255, 255);\nfont-size: " + ui.font_size_combobox->currentText() + "px");
+    ui.rover_status_frame->setStyleSheet("background-color: rgb(0, 0, 0);\nborder-color: rgb(255, 255, 255);\nfont-size: " + ui.font_size_combobox->currentText() + "px");
+}
+
+// end: scalable GUI event handlers
 
 void RoverGUIPlugin::displayDiagLogMessage(QString msg)
 {
@@ -2779,6 +2891,7 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             bool direction_key = true;
 
             float speed = 1;
+            int index = 0, max = 0;
 
             // displayLogMessage("Key press");
 
@@ -2804,6 +2917,25 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
                 //ui.joy_lcd_drive_right->display(speed);
                 ui.joy_lcd_drive_right->setText(QString::number(speed));
                 break;
+
+
+            // this doesn't work yet! ADGJ
+            case Qt::Key_Minus:
+                index = ui.font_size_combobox->currentIndex() - 1;
+                if (index >= 0)
+                {
+                    ui.font_size_combobox->setCurrentIndex(index);
+                }
+                break;
+            case Qt::Key_Plus:
+                index = ui.font_size_combobox->currentIndex() + 1;
+                max = ui.font_size_combobox->count() - 1;
+                if (index <= max)
+                {
+                    ui.font_size_combobox->setCurrentIndex(index);
+                }
+                break;
+
             default:
                 // Not a direction key so ignore
                 direction_key = false;
