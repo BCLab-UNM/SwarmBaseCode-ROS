@@ -238,10 +238,11 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
-    ui.joystick_frame->setHidden(false);
+    // ui.joystick_frame->setHidden(false);
+    ui.joystick_frame->setCurrentIndex(0);
 
     ui.custom_world_path_button->setEnabled(true);
-    ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white;");
+    ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
 
     // Make the custom rover number combo box look greyed out to begin with
     ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey; padding: 1px 0px 1px 3px;");
@@ -256,10 +257,10 @@ namespace rqt_rover_gui
     ui.all_autonomous_button->setEnabled(false);
     ui.all_stop_button->setEnabled(false);
 
-    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
@@ -727,13 +728,13 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         case 1: // manual
             ui.joystick_control_radio_button->setChecked(true);
             ui.autonomous_control_radio_button->setChecked(false);
-            ui.joystick_frame->setHidden(false);
+            ui.joystick_frame->setCurrentIndex(0);
             joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
             break;
         case 2: // autonomous
             ui.joystick_control_radio_button->setChecked(false);
             ui.autonomous_control_radio_button->setChecked(true);
-            ui.joystick_frame->setHidden(true);
+            ui.joystick_frame->setCurrentIndex(1);
             autonomousRadioButtonEventHandler(true); // Manually trigger the autonomous selected event
             break;
         default:
@@ -845,8 +846,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.joystick_control_radio_button->setEnabled(false);
         ui.all_autonomous_button->setEnabled(false);
         ui.all_stop_button->setEnabled(false);
-        ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
-        ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+        ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+        ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     }
     else if (new_rover_names == rover_names)
@@ -903,7 +904,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
-    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
+    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
     // This code is from above. Consider moving into a function or restructuring
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
@@ -1443,10 +1444,10 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     //Enable all stop button
     ui.all_stop_button->setEnabled(true);
-    ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
+    ui.all_stop_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
     //Hide joystick frame
-    ui.joystick_frame->setHidden(true);
+    ui.joystick_frame->setCurrentIndex(1);
 
     // disable waypoint input in map frame
     ui.map_frame->disableWaypoints(selected_rover_name);
@@ -1489,10 +1490,11 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
-    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
+    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
     //Show joystick frame
-    ui.joystick_frame->setHidden(false);
+    // ui.joystick_frame->setHidden(false);
+    ui.joystick_frame->setCurrentIndex(0);
 
     // enable wayoint input in the map frame
     ui.map_frame->enableWaypoints(selected_rover_name);
@@ -1531,11 +1533,11 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setChecked(false);
     ui.autonomous_control_radio_button->setChecked(true);
-    ui.joystick_frame->setHidden(true);
+    ui.joystick_frame->setCurrentIndex(1);
 
     // Disable all autonomous button
     ui.all_autonomous_button->setEnabled(false);
-    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     // Experiment Timer START
 
@@ -1710,11 +1712,11 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setChecked(true);
     ui.autonomous_control_radio_button->setChecked(false);
-    ui.joystick_frame->setHidden(false);
+    ui.joystick_frame->setCurrentIndex(0);
 
     //Disable all stop button
     ui.all_stop_button->setEnabled(false);
-    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     // reset the simulation timer variables
     ui.simulation_timer_combobox->setEnabled(true);
@@ -1767,7 +1769,7 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
     // Clear the sim path if custom distribution it deselected
     if(toggled)
     {
-        ui.custom_world_path_button->setStyleSheet("color: white; border:2px solid white;");
+        ui.custom_world_path_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
         ui.number_of_tags_label->setStyleSheet("color: grey;");
         ui.number_of_tags_combobox->setStyleSheet("color: grey; border:2px solid grey; padding: 1px 0px 1px 3px");
@@ -1776,7 +1778,7 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
     {
         sim_mgr.setCustomWorldPath("");
         ui.custom_world_path->setText("");
-        ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+        ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
         ui.number_of_tags_label->setStyleSheet("color: white;");
         ui.number_of_tags_combobox->setStyleSheet("color: white; border:2px solid white; padding: 1px 0px 1px 3px");
@@ -1830,7 +1832,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     emit sendInfoLogMessage("Building simulation...");
 
     ui.build_simulation_button->setEnabled(false);
-    ui.build_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.build_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     QString return_msg;
 
@@ -2071,8 +2073,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     ui.visualize_simulation_button->setEnabled(true);
     ui.clear_simulation_button->setEnabled(true);
 
-    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white;");
-    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
+    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
 
     ui.simulation_timer_combobox->setEnabled(true);
     ui.simulation_timer_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
@@ -2217,9 +2219,9 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     display_sim_visualization = false;
 
 
-    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
-    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
+    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     // reset waypoints
     ui.map_frame->resetAllWaypointPaths();
@@ -2878,13 +2880,42 @@ void RoverGUIPlugin::gazeboServerFinishedEventHandler()
     ui.clear_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
 
-    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
+    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
 }
 
 bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 {
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        int index = 0, max = 0;
+
+            switch( keyEvent->key() )
+            {
+            case Qt::Key_Minus:
+                index = ui.font_size_combobox->currentIndex() - 1;
+                if (index >= 0)
+                {
+                    ui.font_size_combobox->setCurrentIndex(index);
+                }
+                changeFontEventComboBoxEventHandler(index);
+                return true;
+                break;
+            case Qt::Key_Equal:
+                index = ui.font_size_combobox->currentIndex() + 1;
+                max = ui.font_size_combobox->count() - 1;
+                if (index <= max)
+                {
+                    ui.font_size_combobox->setCurrentIndex(index);
+                }
+                changeFontEventComboBoxEventHandler(index);
+                return true;
+                break;
+            }
+        }
+
     sensor_msgs::Joy joy_msg;
     joy_msg.axes = {0.0,0.0,0.0,0.0,0.0,0.0};
 
@@ -2898,7 +2929,6 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             bool direction_key = true;
 
             float speed = 1;
-            int index = 0, max = 0;
 
             // displayLogMessage("Key press");
 
@@ -2906,43 +2936,20 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
             case Qt::Key_I:
                 joy_msg.axes[4] = speed;
-                //ui.joy_lcd_drive_forward->display(speed);
                 ui.joy_lcd_drive_forward->setText(QString::number(speed));
                 break;
             case Qt::Key_K:
                 joy_msg.axes[4] = -speed;
-                //ui.joy_lcd_drive_back->display(speed);
                 ui.joy_lcd_drive_back->setText(QString::number(speed));
                 break;
             case Qt::Key_J:
                 joy_msg.axes[3] = speed;
-                //ui.joy_lcd_drive_left->display(speed);
                 ui.joy_lcd_drive_left->setText(QString::number(speed));
                 break;
             case Qt::Key_L:
                 joy_msg.axes[3] = -speed;
-                //ui.joy_lcd_drive_right->display(speed);
                 ui.joy_lcd_drive_right->setText(QString::number(speed));
                 break;
-
-
-            // this doesn't work yet! ADGJ
-            case Qt::Key_Minus:
-                index = ui.font_size_combobox->currentIndex() - 1;
-                if (index >= 0)
-                {
-                    ui.font_size_combobox->setCurrentIndex(index);
-                }
-                break;
-            case Qt::Key_Plus:
-                index = ui.font_size_combobox->currentIndex() + 1;
-                max = ui.font_size_combobox->count() - 1;
-                if (index <= max)
-                {
-                    ui.font_size_combobox->setCurrentIndex(index);
-                }
-                break;
-
             default:
                 // Not a direction key so ignore
                 direction_key = false;
@@ -2973,10 +2980,6 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
                 joy_msg.axes[4] = 0;
                 joy_msg.axes[3] = 0;
-                //ui.joy_lcd_drive_forward->display(0);
-                //ui.joy_lcd_drive_back->display(0);
-                //ui.joy_lcd_drive_left->display(0);
-                //ui.joy_lcd_drive_right->display(0);
                 ui.joy_lcd_drive_forward->setText("0");
                 ui.joy_lcd_drive_back->setText("0");
                 ui.joy_lcd_drive_left->setText("0");
