@@ -33,6 +33,7 @@ add_library(core_interface
 add_library(swarmie_interface
   src/SwarmieSensors.cpp
   src/SwarmieInterface.cpp
+  src/Tag.cpp
 )
 
 add_library(utilities
