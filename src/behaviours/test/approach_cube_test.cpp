@@ -5,6 +5,7 @@
 
 #include "ApproachCube.hpp"
 #include "SwarmieSensors.hpp"
+#include "Tag.hpp"
 
 class ApproachCubeTest : public testing::Test
 {

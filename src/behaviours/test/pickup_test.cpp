@@ -3,6 +3,8 @@
 #include "test_util.h"
 #include "PickUpCube.hpp"
 #include "MockTimer.hpp"
+#include "SwarmieSensors.hpp"
+#include "Tag.hpp"
 
 class PickUpCubeTest : public testing::Test
 {

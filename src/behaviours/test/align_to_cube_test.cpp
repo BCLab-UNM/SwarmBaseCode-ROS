@@ -6,6 +6,7 @@
 #include "AlignToCube.hpp"
 #include "SwarmieSensors.hpp"
 #include "SwarmieInterface.hpp"
+#include "Tag.hpp"
 
 class AlignToCubeTest : public testing::Test
 {

@@ -5,6 +5,7 @@
 
 #include "AvoidNest.hpp"
 #include "SwarmieSensors.hpp"
+#include "Tag.hpp"
 #include "MockTimer.hpp"
 
 class AvoidNestTest : public testing::Test

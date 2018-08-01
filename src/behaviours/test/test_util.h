@@ -3,7 +3,7 @@
 
 #include <boost/math/quaternion.hpp>
 #include "Action.hpp"
-#include "SwarmieSensors.hpp"   // Tag
+#include "Tag.hpp"
 
 
 #define POSITIVE_ORIENTATION boost::math::quaternion<double>(0.988,-0.025,0.014,0.152)
