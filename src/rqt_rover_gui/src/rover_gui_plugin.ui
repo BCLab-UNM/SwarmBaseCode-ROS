@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>992</width>
-    <height>701</height>
+    <height>712</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -3010,7 +3010,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>0</width>
-                    <height>15</height>
+                    <height>10</height>
                    </size>
                   </property>
                  </spacer>
@@ -3188,7 +3188,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>0</width>
-                    <height>15</height>
+                    <height>10</height>
                    </size>
                   </property>
                  </spacer>
@@ -3211,7 +3211,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>0</width>
-                    <height>15</height>
+                    <height>10</height>
                    </size>
                   </property>
                  </spacer>
