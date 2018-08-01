@@ -1327,8 +1327,8 @@ void RoverGUIPlugin::simButtonsDisplayCheckboxToggledEventHandler(bool checked)
 void RoverGUIPlugin::simTimerStatusDisplayCheckboxToggledEventHandler(bool checked)
 {
     ui.sim_timer_status_frame->setHidden(!checked);
-    ui.version_frame->setHidden(!checked);
-    ui.rover_info_frame->setHidden(!checked);
+    // ui.version_frame->setHidden(!checked);
+    // ui.rover_info_frame->setHidden(!checked);
 }
 
 void RoverGUIPlugin::tabWidgetDisplayCheckboxToggledEventHandler(bool checked)
