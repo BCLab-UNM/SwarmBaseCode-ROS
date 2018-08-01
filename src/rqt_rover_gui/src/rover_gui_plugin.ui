@@ -1482,7 +1482,7 @@ QTabBar::tab:only-one {
 </string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="sensor_display_tab">
          <attribute name="title">
@@ -3003,6 +3003,19 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QGroupBox" name="round_type_button_group">
                   <property name="title">
                    <string>Round Type</string>
@@ -3165,6 +3178,22 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="create_savable_world_checkbox">
                   <property name="styleSheet">
                    <string notr="true">color:rgb(255, 255, 255);</string>
@@ -3173,6 +3202,19 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
                    <string>Create Savable Gazebo World</string>
                   </property>
                  </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -5214,7 +5256,7 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
 </string>
            </property>
            <property name="currentIndex">
-            <number>10</number>
+            <number>0</number>
            </property>
            <property name="maxVisibleItems">
             <number>5</number>
@@ -5332,12 +5374,102 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
            </item>
            <item>
             <property name="text">
-             <string>45</string>
+             <string>26</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>65</string>
+             <string>27</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>28</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>29</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>30</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>31</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>32</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>33</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>34</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>35</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>36</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>37</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>38</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>39</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>40</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>41</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>42</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>43</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>44</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>45</string>
             </property>
            </item>
           </widget>
