@@ -216,6 +216,7 @@ namespace rqt_rover_gui {
     void roverControlsDisplayCheckboxToggledEventHandler(bool checked);
     void simButtonsDisplayCheckboxToggledEventHandler(bool checked);
     void simTimerStatusDisplayCheckboxToggledEventHandler(bool checked);
+    void tabWidgetDisplayCheckboxToggledEventHandler(bool checked);
     void changeFontEventComboBoxEventHandler(int index);
 
     // Needed to refocus the keyboard events when the user clicks on the widget list

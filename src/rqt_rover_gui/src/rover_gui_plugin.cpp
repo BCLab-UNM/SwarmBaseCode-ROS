@@ -191,6 +191,7 @@ namespace rqt_rover_gui
     connect(ui.rover_controls_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(roverControlsDisplayCheckboxToggledEventHandler(bool)));
     connect(ui.sim_buttons_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(simButtonsDisplayCheckboxToggledEventHandler(bool)));
     connect(ui.sim_timer_status_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(simTimerStatusDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.tab_widget_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(tabWidgetDisplayCheckboxToggledEventHandler(bool)));
     connect(ui.font_size_combobox, SIGNAL(activated(int)), this, SLOT(changeFontEventComboBoxEventHandler(int)));
 
     connect(this, SIGNAL(updateCurrentSimulationTimeLabel(QString)), ui.currentSimulationTimeLabel, SLOT(setText(QString)));
@@ -1327,6 +1328,11 @@ void RoverGUIPlugin::simTimerStatusDisplayCheckboxToggledEventHandler(bool check
     ui.sim_timer_status_frame->setHidden(!checked);
     ui.version_frame->setHidden(!checked);
     ui.rover_info_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::tabWidgetDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.tab_widget->setHidden(!checked);
 }
 
 void RoverGUIPlugin::changeFontEventComboBoxEventHandler(int index)

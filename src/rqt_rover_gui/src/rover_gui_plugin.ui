@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>938</width>
-    <height>717</height>
+    <width>987</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -2052,6 +2052,21 @@ padding: 5px;
              <enum>QFrame::Plain</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>5</number>
+             </property>
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
              <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
@@ -4829,19 +4844,6 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="sim_buttons_display_checkbox">
-               <property name="styleSheet">
-                <string notr="true">color:rgb(255, 255, 255);</string>
-               </property>
-               <property name="text">
-                <string>Sim Buttons</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="horizontalSpacer_6">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -4869,15 +4871,30 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="styleSheet">
+         <string notr="true">color:rgb(255, 255, 255);</string>
+        </property>
         <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
+         <enum>QFrame::Box</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Plain</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <property name="spacing">
+          <number>5</number>
+         </property>
          <property name="leftMargin">
-          <number>11</number>
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
          </property>
          <item>
           <spacer name="horizontalSpacer_3">
@@ -4886,14 +4903,40 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>1</width>
-             <height>1</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
+          <widget class="QCheckBox" name="tab_widget_display_checkbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color:rgb(255, 255, 255);
+font-size: 50%;</string>
+           </property>
+           <property name="text">
+            <string>Tabs</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QCheckBox" name="log_tab_display_checkbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
             <string notr="true">color:rgb(255, 255, 255);</string>
            </property>
@@ -4906,7 +4949,51 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
           </widget>
          </item>
          <item>
+          <widget class="QCheckBox" name="sim_timer_status_display_checkbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color:rgb(255, 255, 255);</string>
+           </property>
+           <property name="text">
+            <string>Sim Timer</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="sim_buttons_display_checkbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color:rgb(255, 255, 255);</string>
+           </property>
+           <property name="text">
+            <string>Sim Buttons</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QCheckBox" name="rover_controls_display_checkbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
             <string notr="true">color:rgb(255, 255, 255);</string>
            </property>
@@ -4919,41 +5006,41 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/</string>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="sim_timer_status_display_checkbox">
-           <property name="styleSheet">
-            <string notr="true">color:rgb(255, 255, 255);</string>
-           </property>
-           <property name="text">
-            <string>Sim Timer and Status</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_11">
+          <spacer name="horizontalSpacer_9">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Minimum</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>20</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="Line" name="line">
+           <property name="styleSheet">
+            <string notr="true">color:rgb(255, 255, 255);</string>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="font_size_label">
            <property name="styleSheet">
             <string notr="true">color:rgb(255, 255, 255);</string>
            </property>
            <property name="text">
             <string>Font Size:</string>
+           </property>
+           <property name="margin">
+            <number>0</number>
            </property>
           </widget>
          </item>
@@ -5108,8 +5195,8 @@ padding: 1px 0px 1px 3px; /*This makes text colour work*/
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>1</width>
-             <height>1</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </spacer>
