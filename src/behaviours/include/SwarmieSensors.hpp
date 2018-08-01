@@ -2,7 +2,6 @@
 #define _SWARMIE_SENSORS_HPP
 
 #include <boost/math/quaternion.hpp>
-#include <cmath> // atan2
 #include <iostream> // ostream
 
 #include "Point.hpp"
