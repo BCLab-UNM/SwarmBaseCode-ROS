@@ -63,15 +63,14 @@ int main(int argc, char **argv)
 
    SwarmieInterface robot(name);
    BehaviorManager  manager;
-   const SwarmieSensors* sensors = robot.GetSensors();
 
-   ObstacleBehavior     obstacle(sensors, new ROSTimer());
+   ObstacleBehavior     obstacle(new ROSTimer());
    StraightLineBehavior driveStraight;
-   AvoidNest            avoidNest(sensors, new ROSTimer());
-   AlignToCube          align(sensors);
-   ApproachCube         approach(sensors);
-   PickUpCube           pickup(sensors, new ROSTimer());
-   DropOffCube          dropOff(sensors, new ROSTimer());
+   AvoidNest            avoidNest(new ROSTimer());
+   AlignToCube          align();
+   ApproachCube         approach();
+   PickUpCube           pickup(new ROSTimer());
+   DropOffCube          dropOff(new ROSTimer());
 
    pickup.Subsumes(&driveStraight);
    pickup.SetRecheckInterval(60);
@@ -90,6 +89,7 @@ int main(int argc, char **argv)
    while(ros::ok())
    {
       ros::spinOnce();
+      const SwarmieSensors& sensors = robot.GetSensors();
       SwarmieAction action = manager.NextAction();
       robot.DoAction(action);
       r.sleep();

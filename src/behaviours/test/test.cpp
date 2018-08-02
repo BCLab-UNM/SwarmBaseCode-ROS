@@ -20,7 +20,7 @@ TEST(BehaviorManager, noBehaviors) {
    // The default behavior is to sit and do nothing after lowering and
    // opening the gripper.
    BehaviorManager manager;
-   SwarmieAction a = manager.NextAction();
+   SwarmieAction a = manager.NextAction(SwarmieSensors());
    EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
    EXPECT_EQ(0, a.GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(WristControl::DOWN, a.WristCommand());
@@ -35,7 +35,7 @@ TEST(BehaviorManager, constantBehavior) {
    action.SetGrip(GripperControl::CLOSED);
    Constant c(action);
    manager.RegisterBehavior(&c);
-   SwarmieAction a = manager.NextAction();
+   SwarmieAction a = manager.NextAction(SwarmieSensors());
    EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
    EXPECT_EQ(1.0, action.GetVelocity().GetYaw());
    EXPECT_EQ(a.WristCommand(), action.WristCommand());

@@ -57,7 +57,7 @@ public:
    SwarmieInterface(std::string name);
    ~SwarmieInterface() {}
 
-   const SwarmieSensors* GetSensors() { return &_sensors; }
+   const SwarmieSensors& GetSensors() { return _sensors; }
    void DoAction(const SwarmieAction& a);
 };
 

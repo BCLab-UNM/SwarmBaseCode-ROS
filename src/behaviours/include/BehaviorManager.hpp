@@ -42,12 +42,11 @@ public:
    ~BehaviorManager();
 
    void RegisterBehavior(Behavior* b);
-   SwarmieAction NextAction();
+   SwarmieAction NextAction(const SwarmieSensors& sensors);
 
 private:
    std::vector<Behavior*> _behaviors;
    Behavior *_base_behavior;
-   SwarmieSensors* _sensors;
 };
 
 #endif // _BEHAVIOR_MANAGER_HPP

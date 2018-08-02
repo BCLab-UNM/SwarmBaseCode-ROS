@@ -28,17 +28,13 @@ void BehaviorManager::RegisterBehavior(Behavior* b)
    _behaviors.push_back(b);
 }
 
-SwarmieAction BehaviorManager::NextAction()
+SwarmieAction BehaviorManager::NextAction(const SwarmieSensors& sensors)
 {
-   // No need to spin, the main() function will call ros::spin() once
-   // everything is set up.
-   // ros::spinOnce();
-   
    SwarmieAction nextAction = _base_behavior->GetAction();
 
    for(int level = 0; level < _behaviors.size(); level++)
    {
-      _behaviors[level]->Update(*_sensors, nextAction);
+      _behaviors[level]->Update(sensors, nextAction);
       nextAction = _behaviors[level]->GetAction();
    }
 
