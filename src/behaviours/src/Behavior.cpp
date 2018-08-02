@@ -67,8 +67,8 @@ int main(int argc, char **argv)
    ObstacleBehavior     obstacle(new ROSTimer());
    StraightLineBehavior driveStraight;
    AvoidNest            avoidNest(new ROSTimer());
-   AlignToCube          align();
-   ApproachCube         approach();
+   AlignToCube          align;
+   ApproachCube         approach;
    PickUpCube           pickup(new ROSTimer());
    DropOffCube          dropOff(new ROSTimer());
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
    {
       ros::spinOnce();
       const SwarmieSensors& sensors = robot.GetSensors();
-      SwarmieAction action = manager.NextAction();
+      SwarmieAction action = manager.NextAction(sensors);
       robot.DoAction(action);
       r.sleep();
    }
