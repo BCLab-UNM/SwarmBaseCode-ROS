@@ -27,8 +27,8 @@ Heading Heading::operator-(const Heading& h)
    return Heading(_heading - h._heading);
 }
 
-bool Heading::operator==(const Heading& h)
+bool operator==(const Heading& g, const Heading& h)
 {
-   return h._heading == _heading;
+   return h._heading == g._heading;
 }
 

@@ -2,6 +2,7 @@
 
 #include <std_msgs/Float32.h>
 #include <swarmie_msgs/Skid.h>
+#include <tf/tf.h> // for dealing with orientation
 
 void SwarmieAction::SetWrist(WristControl w)
 {
@@ -26,6 +27,8 @@ SwarmieInterface::SwarmieInterface(std::string name) :
    _rightSubscriber = _nh.subscribe(name + "/sonarRight", 1, &SwarmieInterface::RightSonarHandler, this);
    _centerSubscriber = _nh.subscribe(name + "/sonarCenter", 1, &SwarmieInterface::CenterSonarHandler, this);
    _tagSubscriber = _nh.subscribe(name + "/targets", 1, &SwarmieInterface::TagHandler, this);
+   _odomSubscriber = _nh.subscribe(name + "/odom/filtered", 1, &SwarmieInterface::OdometryHandler, this);
+   _gpsFusedSubscriber = _nh.subscribe(name + "/odom/ekf", 1, &SwarmieInterface::GPSFusedHandler, this);
 }
 
 void SwarmieInterface::TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message)
@@ -54,6 +57,30 @@ void SwarmieInterface::RightSonarHandler(const sensor_msgs::Range& range)
 void SwarmieInterface::CenterSonarHandler(const sensor_msgs::Range& range)
 {
    _sensors.SetCenterSonar(range.range);
+}
+
+void SwarmieInterface::OdometryHandler(const nav_msgs::Odometry::ConstPtr& odom)
+{
+   Point p(odom->pose.pose.position.x,
+           odom->pose.pose.position.y,
+           odom->pose.pose.position.z);
+   _sensors.SetDeadReckoningPosition(p);
+   tf::Quaternion q(odom->pose.pose.orientation.x,
+                    odom->pose.pose.orientation.y,
+                    odom->pose.pose.orientation.z,
+                    odom->pose.pose.orientation.w);
+   tf::Matrix3x3 m(q);
+   double roll, pitch, yaw;
+   m.getRPY(roll, pitch, yaw);
+   _sensors.SetHeading(yaw);
+}
+
+void SwarmieInterface::GPSFusedHandler(const nav_msgs::Odometry::ConstPtr& odom)
+{
+   Point p(odom->pose.pose.position.x,
+           odom->pose.pose.position.y,
+           odom->pose.pose.position.z);
+   _sensors.SetGPSFusedPosition(p);
 }
 
 void SwarmieInterface::DoAction(const SwarmieAction& a)

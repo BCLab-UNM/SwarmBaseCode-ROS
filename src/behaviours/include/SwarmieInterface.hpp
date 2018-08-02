@@ -37,6 +37,8 @@ private:
    ros::Subscriber _rightSubscriber;
    ros::Subscriber _centerSubscriber;
    ros::Subscriber _tagSubscriber;
+   ros::Subscriber _odomSubscriber;
+   ros::Subscriber _gpsFusedSubscriber;
 
    SwarmieSensors _sensors;
 

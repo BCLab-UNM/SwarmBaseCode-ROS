@@ -142,6 +142,24 @@ TEST(SwarmieSensors, setTagsMany)
    }
 }
 
+TEST(SwarmieSensors, deadReckoningPosition)
+{
+   SwarmieSensors sensors;
+   sensors.SetDeadReckoningPosition(Point(-1.23, 2.659));
+   sensors.SetGPSFusedPosition(Point(18.12, -100.2));
+   EXPECT_EQ(sensors.GetDeadReckoningPosition(), Point(-1.23,2.659));
+   EXPECT_EQ(sensors.GetGPSFusedPosition(), Point(18.12, -100.2));
+}
+
+TEST(SwarmieSensors, heading)
+{
+   SwarmieSensors sensors;
+   sensors.SetHeading(Heading(0));
+   EXPECT_EQ(sensors.GetHeading(), Heading(0));
+   sensors.SetHeading(Heading(2*M_PI/3));
+   EXPECT_EQ(sensors.GetHeading(), Heading(2*M_PI/3));
+}
+
 int main(int argc, char** argv)
 {
    testing::InitGoogleTest(&argc, argv);
