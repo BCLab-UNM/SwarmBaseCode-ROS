@@ -22,6 +22,8 @@
 
 #define CAMERA_OFFSET (-0.02)
 #define CAMERA_HEIGHT 0.195
+#define AUTO 2
+#define MANUAL 1
 
 int mode = 0;
 
@@ -99,11 +101,11 @@ int main(int argc, char **argv)
    {
      ros::spinOnce();
      
-     if (mode == 1)
+     if (mode == MANUAL)
      {
-       
+       //not implemented
      }
-     else if (mode == 2 || mode == 3)
+     else if (mode == AUTO)
      {
        const SwarmieSensors& sensors = robot.GetSensors();
        SwarmieAction action = manager.NextAction(sensors);
