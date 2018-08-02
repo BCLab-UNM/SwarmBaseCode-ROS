@@ -41,13 +41,17 @@ public:
    BehaviorManager();
    ~BehaviorManager();
 
-   void RegisterBehavior(Behavior* b);
-   SwarmieAction NextAction();
+   void RegisterCore(std::shared_pointer<core::RobotInterface> core_interface,
+                     std::shared_pointer<core::BehaviorStack> core_behaviors);
+   void RegisterMission(std::shared_pointer<mission::RobotInterface> mission_interface,
+                        std::shared_pointer<mission::BehaviorStack> mission_behaviors);
 
 private:
-   std::vector<Behavior*> _behaviors;
-   Behavior *_base_behavior;
    SwarmieSensors* _sensors;
+   std::shared_pointer<core::RobotInterface>    _core_interface;
+   std::shared_pointer<mission::RobotInterface> _core_interface;
+   std::shared_pointer<core::BehaviorStack>     _core_behaviors;
+   std::shared_pointer<mission::BehaviorStack>  _mission_behaviors;
 };
 
 #endif // _BEHAVIOR_MANAGER_HPP
