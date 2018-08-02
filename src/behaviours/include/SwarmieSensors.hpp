@@ -1,46 +1,11 @@
 #ifndef _SWARMIE_SENSORS_HPP
 #define _SWARMIE_SENSORS_HPP
 
-#include <ros/ros.h>
-#include <sensor_msgs/Range.h>
-#include <apriltags_ros/AprilTagDetectionArray.h>
-#include <boost/math/quaternion.hpp>
-#include <cmath> // atan2
 #include <iostream> // ostream
 
-class Tag
-{
-private:
-   int _id;
-   double _x;
-   double _y;
-   double _z;
-   boost::math::quaternion<double> _orientation;
-
-   const double CAMERA_HEIGHT = 0.195;
-   const double CAMERA_OFFSET = -0.023;
-public:
-   const static int NEST_TAG_ID = 256;
-   const static int CUBE_TAG_ID = 0;
-
-   Tag(int id, double x, double y, double z, boost::math::quaternion<double> orientation);
-   ~Tag() {}
-   
-   double Alignment() const;
-   double Distance() const;
-   double HorizontalDistance() const;
-   double GetX() const { return _x; }
-   double GetY() const { return _y; }
-   double GetZ() const { return _z; }
-   boost::math::quaternion<double> GetOrientation() const { return _orientation; }
-   double GetYaw()   const;
-   double GetPitch() const;
-   int    GetId()    const { return _id; }
-   bool   IsCube()   const;
-   bool   IsNest()   const;
-
-   friend std::ostream& operator<<(std::ostream& os, const Tag& tag);
-};
+#include "Tag.hpp"
+#include "Point.hpp"
+#include "Heading.hpp"
 
 class SwarmieSensors
 {
@@ -50,11 +15,10 @@ private:
    double _centerSonar;
    std::vector<Tag> _detections;
 
-   void LeftSonarHandler  (const sensor_msgs::Range& range);
-   void RightSonarHandler (const sensor_msgs::Range& range);
-   void CenterSonarHandler(const sensor_msgs::Range& range);
+   Point   _deadReckoningPosition;
+   Point   _gpsFusedPosition;
+   Heading _heading;
 
-   void TagHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message);
 public:
    SwarmieSensors();
    ~SwarmieSensors() {};
@@ -62,12 +26,19 @@ public:
    void SetLeftSonar(double range) { _leftSonar = range; }
    void SetRightSonar(double range) { _rightSonar = range; }
    void SetCenterSonar(double range) { _centerSonar = range; }
+   void SetDeadReckoningPosition(Point p) { _deadReckoningPosition = p; }
+   void SetGPSFusedPosition(Point p) { _gpsFusedPosition = p; }
+   void SetHeading(Heading h) { _heading = h; }
    void DetectedTag(Tag t);
    void ClearDetections();
    
-   double GetLeftSonar() const { return _leftSonar; }
-   double GetRightSonar() const { return _rightSonar; }
-   double GetCenterSonar() const { return _centerSonar; }
+   double  GetLeftSonar() const { return _leftSonar; }
+   double  GetRightSonar() const { return _rightSonar; }
+   double  GetCenterSonar() const { return _centerSonar; }
+   Point   GetDeadReckoningPosition() const { return _deadReckoningPosition; }
+   Point   GetGPSFusedPosition() const { return _gpsFusedPosition; }
+   Heading GetHeading() const { return _heading; }
+
    const std::vector<Tag> GetTags() const { return _detections; }
 };
 

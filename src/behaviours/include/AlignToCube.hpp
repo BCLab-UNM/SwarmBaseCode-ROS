@@ -14,13 +14,13 @@ private:
 
    PID    _alignPID;
    
-   void ProcessTags();
+   void ProcessTags(const SwarmieSensors& sensors);
 
 public:
-   AlignToCube(const SwarmieSensors* sensors);
+   AlignToCube();
    ~AlignToCube() {}
 
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& action) override;
 };
 
 #endif // _ALIGN_TO_CUBE_HPP

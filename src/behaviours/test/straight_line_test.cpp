@@ -8,10 +8,10 @@
 class StraightLineBehaviorTest : public testing::Test
 {
 protected:
+   SwarmieSensors sensors;
    StraightLineBehavior sl;
    StraightLineBehaviorTest() : sl() {
-      sl.SetLowerLevelAction(SwarmieAction(core::VelocityAction()));
-      sl.Update();
+      sl.Update(SwarmieSensors(), SwarmieAction(core::VelocityAction()));
    }
 };
 
@@ -26,8 +26,7 @@ TEST_F(StraightLineBehaviorTest, isTurningKeepsTurning)
 {
    SwarmieAction turn;
    turn.SetAction(core::VelocityAction(AngularVelocity(0,0,0.5)));
-   sl.SetLowerLevelAction(turn);
-   sl.Update();
+   sl.Update(sensors, turn);
    EXPECT_EQ(turn.GetVelocity().GetAngularMagnitude(), sl.GetAction().GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(turn.GetVelocity().GetYaw(), sl.GetAction().GetVelocity().GetYaw());
    EXPECT_EQ(0, turn.GetVelocity().GetLinearMagnitude());
@@ -38,7 +37,6 @@ TEST_F(StraightLineBehaviorTest, isRotatingKeepsRotating)
 {
    SwarmieAction turn;
    turn.SetAction(core::VelocityAction(AngularVelocity(0, 0, -0.6)));
-   sl.SetLowerLevelAction(turn);
-   sl.Update();
+   sl.Update(sensors, turn);
    EXPECT_EQ(turn.GetVelocity().GetYaw(), sl.GetAction().GetVelocity().GetYaw());
 }

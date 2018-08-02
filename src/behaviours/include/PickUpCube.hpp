@@ -14,6 +14,8 @@ private:
    const double ALIGNMENT_THRESHOLD = 0.005;
    const double OUT_OF_RANGE        = 100;
 
+   SwarmieSensors _sensors;
+
    Timer* _timer;
 
    bool   _allowReset;
@@ -32,12 +34,12 @@ private:
    inline void ResetPickupTimer(double time);
 
 public:
-   PickUpCube(const SwarmieSensors* sensors, Timer* timer);
+   PickUpCube(Timer* timer);
 
    ~PickUpCube() {}
 
    void Reset() override;   
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) override;
    
    void SetRecheckInterval(double t);
 };

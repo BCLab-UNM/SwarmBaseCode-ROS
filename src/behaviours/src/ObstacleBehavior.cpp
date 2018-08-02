@@ -2,15 +2,14 @@
 
 #include <algorithm> // std::min
 
-ObstacleBehavior::ObstacleBehavior(const SwarmieSensors* sensors, Timer* timer) :
-   Behavior(sensors),
+ObstacleBehavior::ObstacleBehavior(Timer* timer) :
    _state(Normal),
    _turnaroundTimer(timer)
 {
    _turnaroundTimer->SetInterval(1.0);
 }
 
-void ObstacleBehavior::UpdateState()
+void ObstacleBehavior::UpdateState(const SwarmieSensors& sensors)
 {
    if(_state == Turnaround && _turnaroundTimer->Expired())
    {
@@ -22,9 +21,9 @@ void ObstacleBehavior::UpdateState()
    // obstacles too close to it.
    if(_state == Normal)
    {
-      if(_sensors->GetLeftSonar() < TURNAROUND_THRESHOLD
-         || _sensors->GetRightSonar() < TURNAROUND_THRESHOLD
-         || _sensors->GetCenterSonar() < TURNAROUND_THRESHOLD)
+      if(sensors.GetLeftSonar() < TURNAROUND_THRESHOLD
+         || sensors.GetRightSonar() < TURNAROUND_THRESHOLD
+         || sensors.GetCenterSonar() < TURNAROUND_THRESHOLD)
       {
          _state = Turnaround;
          _turnaroundTimer->StartOnce();
@@ -32,41 +31,41 @@ void ObstacleBehavior::UpdateState()
    }
 }
 
-bool ObstacleBehavior::AllFar()
+bool ObstacleBehavior::AllFar(const SwarmieSensors& sensors)
 {
-   return _sensors->GetLeftSonar()   > 2.8
-      &&  _sensors->GetCenterSonar() > 2.8
-      &&  _sensors->GetRightSonar()  > 2.8;
+   return sensors.GetLeftSonar()   > 2.8
+      &&  sensors.GetCenterSonar() > 2.8
+      &&  sensors.GetRightSonar()  > 2.8;
 }
 
-void ObstacleBehavior::Update()
+void ObstacleBehavior::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
-   _action = _llAction;
+   _action = ll_action;
 
-   UpdateState();
+   UpdateState(sensors);
    
    switch(_state)
    {
    case Normal:
-      if(AllFar()) {
+      if(AllFar(sensors)) {
          _action.SetAction(
             core::VelocityAction());
          return;
       }
 
-      if(_sensors->GetLeftSonar() > 0.8)
+      if(sensors.GetLeftSonar() > 0.8)
          _action.SetAction(
             core::VelocityAction(
-               AngularVelocity(0.0, 0.0, -std::min(1/pow(0.6 - _sensors->GetLeftSonar(), 4), 1.0))));
+               AngularVelocity(0.0, 0.0, -std::min(1/pow(0.6 - sensors.GetLeftSonar(), 4), 1.0))));
       else
          _action.SetAction(
             core::VelocityAction(
                AngularVelocity(0, 0, -1)));
 
-      if(_sensors->GetRightSonar() > 0.8)
+      if(sensors.GetRightSonar() > 0.8)
          _action.SetAction(
             core::VelocityAction(
-               AngularVelocity(0.0, 0.0, std::min(1/pow(0.6 - _sensors->GetLeftSonar(), 4), 1.0))));
+               AngularVelocity(0.0, 0.0, std::min(1/pow(0.6 - sensors.GetLeftSonar(), 4), 1.0))));
       else
          _action.SetAction(
             core::VelocityAction(

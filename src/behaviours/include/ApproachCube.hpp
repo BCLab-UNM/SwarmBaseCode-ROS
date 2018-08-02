@@ -12,12 +12,12 @@ private:
 
    PID    _approachPID;
 
-   void ProcessTags();
+   void ProcessTags(const SwarmieSensors& sensors);
 public:
-   ApproachCube(const SwarmieSensors* sensors);
+   ApproachCube();
    ~ApproachCube() {}
 
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) override;
 };
 
 #endif // _APPROACH_CUBE_HPP

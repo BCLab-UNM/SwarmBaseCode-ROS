@@ -20,7 +20,7 @@ TEST(BehaviorManager, noBehaviors) {
    // The default behavior is to sit and do nothing after lowering and
    // opening the gripper.
    BehaviorManager manager;
-   SwarmieAction a = manager.NextAction();
+   SwarmieAction a = manager.NextAction(SwarmieSensors());
    EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
    EXPECT_EQ(0, a.GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(WristControl::DOWN, a.WristCommand());
@@ -35,7 +35,7 @@ TEST(BehaviorManager, constantBehavior) {
    action.SetGrip(GripperControl::CLOSED);
    Constant c(action);
    manager.RegisterBehavior(&c);
-   SwarmieAction a = manager.NextAction();
+   SwarmieAction a = manager.NextAction(SwarmieSensors());
    EXPECT_EQ(0, a.GetVelocity().GetLinearMagnitude());
    EXPECT_EQ(1.0, action.GetVelocity().GetYaw());
    EXPECT_EQ(a.WristCommand(), action.WristCommand());
@@ -62,7 +62,7 @@ TEST(Constant, constantBehaviorNoChangeAfterUpdate) {
    action.SetWrist(WristControl::UP);
    action.SetGrip(GripperControl::CLOSED);
    Constant c(action);
-   c.Update();
+   c.Update(SwarmieSensors(), SwarmieAction());
    SwarmieAction a = c.GetAction();
    EXPECT_EQ(a.GetVelocity().GetAngularMagnitude(), action.GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(a.GetVelocity().GetLinearMagnitude(), action.GetVelocity().GetLinearMagnitude());
@@ -81,8 +81,7 @@ TEST(Constant, constantBehaviorNoChangeAfterLLActionUpdate) {
    action2.SetAction(core::VelocityAction(AngularVelocity(0, 0, 0.75)));
    action2.SetWrist(WristControl::DOWN_2_3);
    action2.SetGrip(GripperControl::OPEN);
-   c.SetLowerLevelAction(action2);
-   c.Update();
+   c.Update(SwarmieSensors(), action2);
    SwarmieAction a = c.GetAction();
    EXPECT_EQ(a.GetVelocity().GetAngularMagnitude(), action.GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(a.GetVelocity().GetLinearMagnitude(), action.GetVelocity().GetLinearMagnitude());
@@ -141,6 +140,24 @@ TEST(SwarmieSensors, setTagsMany)
       int i_in  = std::count_if(tags_in.begin(), tags_in.end(), [i](Tag t) { return i == t.GetId(); });
       ASSERT_EQ(i_in, i_out);
    }
+}
+
+TEST(SwarmieSensors, deadReckoningPosition)
+{
+   SwarmieSensors sensors;
+   sensors.SetDeadReckoningPosition(Point(-1.23, 2.659));
+   sensors.SetGPSFusedPosition(Point(18.12, -100.2));
+   EXPECT_EQ(sensors.GetDeadReckoningPosition(), Point(-1.23,2.659));
+   EXPECT_EQ(sensors.GetGPSFusedPosition(), Point(18.12, -100.2));
+}
+
+TEST(SwarmieSensors, heading)
+{
+   SwarmieSensors sensors;
+   sensors.SetHeading(Heading(0));
+   EXPECT_EQ(sensors.GetHeading(), Heading(0));
+   sensors.SetHeading(Heading(2*M_PI/3));
+   EXPECT_EQ(sensors.GetHeading(), Heading(2*M_PI/3));
 }
 
 int main(int argc, char** argv)

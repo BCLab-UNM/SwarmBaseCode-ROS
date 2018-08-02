@@ -2,12 +2,7 @@
 
 #include <unistd.h>
 
-Behavior::Behavior(const SwarmieSensors* sensors) :
-   _sensors(sensors)
-{
-   _llAction.SetWrist(WristControl::DOWN);
-   _llAction.SetGrip(GripperControl::OPEN);
-}
+Behavior::Behavior() {}
 
 Behavior::~Behavior() {}
 
@@ -33,18 +28,13 @@ void BehaviorManager::RegisterBehavior(Behavior* b)
    _behaviors.push_back(b);
 }
 
-SwarmieAction BehaviorManager::NextAction()
+SwarmieAction BehaviorManager::NextAction(const SwarmieSensors& sensors)
 {
-   // No need to spin, the main() function will call ros::spin() once
-   // everything is set up.
-   // ros::spinOnce();
-   
    SwarmieAction nextAction = _base_behavior->GetAction();
 
    for(int level = 0; level < _behaviors.size(); level++)
    {
-      _behaviors[level]->SetLowerLevelAction(nextAction);
-      _behaviors[level]->Update();
+      _behaviors[level]->Update(sensors, nextAction);
       nextAction = _behaviors[level]->GetAction();
    }
 

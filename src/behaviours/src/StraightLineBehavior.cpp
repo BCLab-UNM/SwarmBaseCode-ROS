@@ -1,18 +1,17 @@
 #include "StraightLineBehavior.hpp"
 #include "Velocity.hpp"
 
-StraightLineBehavior::StraightLineBehavior() :
-   Behavior(nullptr)
+StraightLineBehavior::StraightLineBehavior()
 {}
 
-void StraightLineBehavior::Update()
+void StraightLineBehavior::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
-   _action = _llAction;
+   _action = ll_action;
 
    // TODO: guard against waypoint actions
-   if(_llAction.GetVelocity().GetAngularMagnitude() < 0.75)
+   if(ll_action.GetVelocity().GetAngularMagnitude() < 0.75)
    {
-      core::VelocityAction v = _llAction.GetVelocity();
+      core::VelocityAction v = ll_action.GetVelocity();
       v.SetLinear(LinearVelocity(0.5));
       _action.SetAction(v);
    }

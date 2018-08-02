@@ -12,7 +12,7 @@ public:
    StraightLineBehavior();
    ~StraightLineBehavior() {}
 
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) override;
 };
 
 #endif // _STRAIGHT_LINE_BEHAVIOR_HPP

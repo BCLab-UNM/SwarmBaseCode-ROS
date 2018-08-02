@@ -1,18 +1,17 @@
 #include "ApproachCube.hpp"
 
-ApproachCube::ApproachCube(const SwarmieSensors *sensors) :
-   Behavior(sensors),
+ApproachCube::ApproachCube() :
    _distanceToTag(0),
    _alignment(0),
    _approachPID(0.4, 0.05, 0.35)
 {}
 
-void ApproachCube::ProcessTags()
+void ApproachCube::ProcessTags(const SwarmieSensors& sensors)
 {
    bool   target_detected = false;
    double minimum_alignment = 100;
    double distance = 0;
-   for(auto tag : _sensors->GetTags())
+   for(auto tag : sensors.GetTags())
    {
       if(!tag.IsCube())
       {
@@ -38,15 +37,15 @@ void ApproachCube::ProcessTags()
    }
 }
 
-void ApproachCube::Update()
+void ApproachCube::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
-   ProcessTags();
-   _action = _llAction;
+   ProcessTags(sensors);
+   _action = ll_action;
    _approachPID.Update(_distanceToTag);
 
    if(fabs(_alignment) < 0.05)
    {
-      core::VelocityAction v = _llAction.GetVelocity();
+      core::VelocityAction v = ll_action.GetVelocity();
       v.SetLinear(LinearVelocity(_approachPID.GetControlOutput()));
       _action.SetAction(v);
    }

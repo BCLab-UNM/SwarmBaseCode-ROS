@@ -18,13 +18,13 @@ private:
 
    Timer* _persistenceTimer;
 
-   void TagHandler();
+   void TagHandler(const SwarmieSensors& sensors);
    
 public:
-   AvoidNest(const SwarmieSensors* sensors, Timer* timer);
+   AvoidNest(Timer* timer);
    ~AvoidNest() {}
 
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) override;
 };
 
 #endif // _AVOID_NEST_HPP

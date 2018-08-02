@@ -12,30 +12,27 @@
 class Behavior
 {
 protected:
-   SwarmieAction _llAction;
    SwarmieAction _action;
-   const SwarmieSensors* _sensors;
 
    Behavior* _subsumedBehavior;
    SwarmieAction GetSubsumedAction();
 public:
-   Behavior(const SwarmieSensors* sensors);
+   Behavior();
    virtual ~Behavior();
 
    SwarmieAction GetAction() const { return _action; }
-   virtual void Update() { _action = _llAction; }
+   virtual void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) { _action = ll_action; }
    virtual void Reset() { }
 
-   void SetLowerLevelAction(SwarmieAction a) { _llAction = a; }
    void Subsumes(Behavior* b) { _subsumedBehavior = b; }
 };
 
 class Constant : public Behavior
 {
 public:
-   Constant(SwarmieAction a) : Behavior(nullptr) { _action = a; }
+   Constant(SwarmieAction a) { _action = a; }
    ~Constant() {}
-   void Update() override { /* Don't do anything */ }
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) override { /* Don't do anything */ }
 };
 
 class BehaviorManager
@@ -45,7 +42,7 @@ public:
    ~BehaviorManager();
 
    void RegisterBehavior(Behavior* b);
-   SwarmieAction NextAction();
+   SwarmieAction NextAction(const SwarmieSensors& sensors);
 
 private:
    std::vector<Behavior*> _behaviors;
