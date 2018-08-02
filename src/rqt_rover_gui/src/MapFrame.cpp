@@ -221,8 +221,8 @@ void MapFrame::paintEvent(QPaintEvent* event) {
   map_width = this->width()-1;// Minus 1 or will go off the edge
   map_height = this->height()-1;//
 
-  int map_center_x = map_origin_x+((map_width-map_origin_x)/2);
-  int map_center_y = map_origin_y+((map_height-map_origin_y)/2);
+  map_center_x = map_origin_x+((map_width-map_origin_x)/2);
+  map_center_y = map_origin_y+((map_height-map_origin_y)/2);
 
   // The map axes do not need to be redrawn for each rover so this code is
   // sandwiched between the two rover display list loops
@@ -566,13 +566,13 @@ void MapFrame::paintEvent(QPaintEvent* event) {
         if (user_is_drawing_fence)
         {
             float rectangle_center_x = corner_x+width/2;
-            float rectangle_center_y = corner_y+width/2;
+            float rectangle_center_y = corner_y+height/2;
             float meter_conversion_factor = max_seen_width/map_width; // Convert pixels into meters
-            float rectangle_center_x_in_meters = (corner_x+width/2) * meter_conversion_factor;
-            float rectangle_center_y_in_meters = (corner_y+height/2) * meter_conversion_factor;
+            float rectangle_center_x_in_meters = ((corner_x+width/2)-map_center_x) * meter_conversion_factor;
+            float rectangle_center_y_in_meters = ((corner_y+height/2)-map_center_y) * meter_conversion_factor;
             float width_in_meters = abs(width * meter_conversion_factor); // abs because distances must be positive values
             float height_in_meters = abs(height * meter_conversion_factor);
-            painter.drawEllipse(QPointF(rectangle_center_x_in_meters, rectangle_center_y_in_meters), 2.5, 2.5);
+            painter.drawEllipse(QPointF(rectangle_center_x, rectangle_center_y), 2.5, 2.5);
             QString rect_geometry = "Center: (" + QString::number(rectangle_center_x_in_meters) + ", " + QString::number(rectangle_center_y_in_meters) + ")\nWidth: " + QString::number(width_in_meters)  + " m\nHeight: " + QString::number(height_in_meters) + " m";
             painter.drawText(QRect(rectangle_center_x, rectangle_center_y, 300, 200), rect_geometry);
         }
@@ -670,7 +670,32 @@ void MapFrame::mouseReleaseEvent(QMouseEvent *event)
   previous_translate_y = translate_y;
 
   if (user_is_drawing_fence)
+  {
+    // Stop drawing the fence
     user_is_drawing_fence = false;
+
+    // Extract the geometry of the virtual fence from map data
+    tuple<float,float,float,float> virtual_fence = map_data->getVirtualFenceRectangle();
+    float corner_x = map_origin_x+((get<0>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+    float corner_y = map_origin_y+((get<1>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+    float width = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x) - corner_x;
+    float height = map_origin_y+((get<3>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y) - corner_y;
+    float rectangle_center_x = corner_x+width/2;
+    float rectangle_center_y = corner_y+width/2;
+
+    // Convert the geometry into meters using robot data plotted in the map to relate pixel space to actual meters
+    float meter_conversion_factor = max_seen_width/map_width; // Convert pixels into meters
+    float rectangle_center_x_in_meters = ((corner_x+width/2)-map_center_x) * meter_conversion_factor;
+    float rectangle_center_y_in_meters = ((corner_y+height/2)-map_center_y) * meter_conversion_factor;
+    float width_in_meters = abs(width * meter_conversion_factor); // abs because distances must be positive values
+    float height_in_meters = abs(height * meter_conversion_factor);
+
+    // Gett the command associated with the virtual fence. This can be the shape or undefined. Undefined will delete the virtual fence.
+    VirtualFenceCmd cmd = map_data->getVirtualFenceCmd();
+
+    // Send the command to Rover GUI. Rover GUI will package it up for ROS.
+    sendVirtualFenceCmd( cmd, rectangle_center_x_in_meters, rectangle_center_y_in_meters, width_in_meters, height_in_meters );
+  }
 }
 
 void MapFrame::mousePressEvent(QMouseEvent *event)
