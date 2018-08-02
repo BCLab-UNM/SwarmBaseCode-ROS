@@ -27,7 +27,7 @@ rosparam set tf_prefix $HOSTNAME
 #Startup ROS packages/processes
 
 echo "rosrun behaviours"
-nohup > logs/$HOSTNAME"_behaviours_log.txt" rosrun behaviours behaviours &
+nohup > logs/$HOSTNAME"_behaviours_log.txt" rosrun behaviours JUAV_behaviours &
 
 echo "rosrun diagnostics"
 nohup > logs/$HOSTNAME"_diagnostics_log.txt" rosrun diagnostics diagnostics &
