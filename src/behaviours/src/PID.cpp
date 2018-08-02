@@ -1,10 +1,15 @@
+//This PID.cpp file controls the proportional, intergral, and derivative terms
+//Used for moving the rover at certain speeds (slow during cube pickup, normal during cube search)
 #include "PID.h"
 
+//Constructor
 PID::PID() {   }
 
+//constructor with a config parameter
 PID::PID(PIDConfig config)
 {
   this->config = config;
+  //sets the integral error array to have nothing inside
   integralErrorHistArray.resize(config.integralErrorHistoryLength, 0.0);
 }
 
@@ -13,8 +18,11 @@ float PID::PIDOut(float calculatedError, float setPoint)
 
   //cout << "ErrorSize:  " << Error.size() << endl;
 
+  //The Error variable is a vector of floats
+  //If the Error vector is greater than the length of the error history length
   if (Error.size() >= config.errorHistLength)
   {
+    //Then remove the last float of the Error vector
     Error.pop_back();
   }
 

@@ -1,7 +1,7 @@
 #ifndef SBRIDGE
 #define SBRIDGE
 
-//ROS messages
+// ROS messages
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/String.h>
@@ -26,16 +26,16 @@ class sbridge {
 
 	private:
 
-		//Publishers
+                // Publishers
 		ros::Publisher skidsteerPublish;
         ros::Publisher heartbeatPublisher;
         ros::Publisher infoLogPublisher;
 
-		//Subscribers
+                // Subscribers
 		ros::Subscriber driveControlSubscriber;
         ros::Subscriber modeSubscriber;
 
-        //Timer callback handler
+        // Timer callback handler
         void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 
         ros::Timer publish_heartbeat_timer;

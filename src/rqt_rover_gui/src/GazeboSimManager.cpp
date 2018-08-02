@@ -64,11 +64,11 @@ QProcess* GazeboSimManager::startGazeboClient()
 
     gazebo_client_process = new QProcess();
 
-    QString command = QString("rosrun gazebo_ros gzclient");
+    QString command = QString("rosrun gazebo_ros gzclient __name:=gzclient");
 
     gazebo_client_process->start(command);
 
-   // gazebo_client_process->waitForStarted();
+    // gazebo_client_process->waitForStarted();
 
     return gazebo_client_process;
 }

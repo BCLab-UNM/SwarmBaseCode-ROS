@@ -209,6 +209,20 @@ namespace rqt_rover_gui {
     // The slot will publish the command to all known rovers.
     void receiveVirtualFenceCmd(VirtualFenceCmd cmd, float center_x, float center_y, float width, float height);
 
+    // scalable GUI display event handlers
+    void cameraDisplayCheckboxToggledEventHandler(bool checked);
+    void mapDisplayCheckboxToggledEventHandler(bool checked);
+    void ultrasoundDisplayCheckboxToggledEventHandler(bool checked);
+    void imuDisplayCheckboxToggledEventHandler(bool checked);
+    void mapSettingsDisplayCheckboxToggledEventHandler(bool checked);
+    void simulationSetupDisplayCheckboxToggledEventHandler(bool checked);
+    void simSensorOutputCheckboxToggledEventHandler(bool checked);
+    void logTabDisplayCheckboxToggledEventHandler(bool checked);
+    void roverControlsDisplayCheckboxToggledEventHandler(bool checked);
+    void simButtonsDisplayCheckboxToggledEventHandler(bool checked);
+    void simTimerStatusDisplayCheckboxToggledEventHandler(bool checked);
+    void tabWidgetDisplayCheckboxToggledEventHandler(bool checked);
+    void changeFontEventComboBoxEventHandler(int index);
 
     // Needed to refocus the keyboard events when the user clicks on the widget list
     // to the main widget so keyboard manual control is handled properly
