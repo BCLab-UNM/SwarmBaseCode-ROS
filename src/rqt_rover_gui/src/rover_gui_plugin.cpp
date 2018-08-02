@@ -27,6 +27,7 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/UInt8.h>
 #include <algorithm>
+#include <QScreen>
 
 #ifndef Q_MOC_RUN
 #include <boost/property_tree/xml_parser.hpp>
@@ -45,7 +46,7 @@ using namespace std;
 
 using boost::property_tree::ptree;
 
-namespace rqt_rover_gui 
+namespace rqt_rover_gui
 {
   RoverGUIPlugin::RoverGUIPlugin() :
       rqt_gui_cpp::Plugin(),
@@ -99,8 +100,48 @@ namespace rqt_rover_gui
     widget = new QWidget();
 
     ui.setupUi(widget);
-    
+
     context.addWidget(widget);
+
+    // Set the minimum size to be either the minimum pixel size
+    // that lets all the text display (921x833)
+    // Or 50% of the screen so it looks better on hi res screens.
+
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = screen->geometry();
+    int height = screenGeometry.height();
+    int width = screenGeometry.width();
+
+    cout << "Available screen size: " << width << "x" << height << endl;
+
+    float scale_gui = 0.50;
+    int init_gui_width = scale_gui*width;
+    int init_gui_height = scale_gui*height;
+
+    // The height of both of these frames should be exactly the same because they are side by side horizontally,
+    // but if, for some reason, that is not the case then we will take the average height.
+    int min_pixel_height = (ui.data_display_frame->frameSize().rheight() + ui.rover_status_frame->frameSize().rheight()) / 2;
+
+    // The sum of the widths should be used because they are side by side and should never be the same.
+    int min_pixel_width = ui.data_display_frame->frameSize().rwidth() + ui.rover_status_frame->frameSize().rwidth();
+
+    // cout << "min_pixel_height: " << min_pixel_height << endl;
+    // cout << "min_pixel_width: " << min_pixel_width << endl;
+
+    if (height > min_pixel_height)
+    {
+      init_gui_width = init_gui_width < min_pixel_width ? min_pixel_width : init_gui_width;
+    }
+
+    if (width > min_pixel_width)
+    {
+      init_gui_height = init_gui_height < min_pixel_height ? min_pixel_height : init_gui_height;
+    }
+
+    widget->setMinimumSize(init_gui_width, init_gui_height);
+    //widget->setMinimumSize(0, 0);
+
+    cout << "Setting initial size to: " << init_gui_width << "x" << init_gui_height << endl;
 
     // Next two lines allow us to catch keyboard input
     widget->installEventFilter(this);
@@ -138,18 +179,20 @@ namespace rqt_rover_gui
     connect(ui.map_popout_button, SIGNAL(pressed()), this, SLOT(mapPopoutButtonEventHandler()));
     connect(this, SIGNAL(allStopButtonSignal()), this, SLOT(allStopButtonEventHandler()));
 
-
-    // Joystick output display - Drive
-    connect(this, SIGNAL(joystickDriveForwardUpdate(double)), ui.joy_lcd_drive_forward, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveBackwardUpdate(double)), ui.joy_lcd_drive_back, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveLeftUpdate(double)), ui.joy_lcd_drive_left, SLOT(display(double)));
-    connect(this, SIGNAL(joystickDriveRightUpdate(double)), ui.joy_lcd_drive_right, SLOT(display(double)));
-
-    // Joystick output display - Gripper
-    connect(this, SIGNAL(joystickGripperWristUpUpdate(double)), ui.joy_lcd_gripper_up, SLOT(display(double)));
-    connect(this, SIGNAL(joystickGripperWristDownUpdate(double)), ui.joy_lcd_gripper_down, SLOT(display(double)));
-    connect(this, SIGNAL(joystickGripperFingersCloseUpdate(double)), ui.joy_lcd_gripper_close, SLOT(display(double)));
-    connect(this, SIGNAL(joystickGripperFingersOpenUpdate(double)), ui.joy_lcd_gripper_open, SLOT(display(double)));
+    // scalable GUI display/hide checkboxes and other event handlers
+    connect(ui.camera_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(cameraDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.map_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(mapDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.ultrasound_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(ultrasoundDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.imu_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(imuDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.map_settings_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(mapSettingsDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.simulation_setup_checkbox, SIGNAL(toggled(bool)), this, SLOT(simulationSetupDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.sim_sensor_output_checkbox, SIGNAL(toggled(bool)), this, SLOT(simSensorOutputCheckboxToggledEventHandler(bool)));
+    connect(ui.log_tab_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(logTabDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.rover_controls_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(roverControlsDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.sim_buttons_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(simButtonsDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.sim_timer_status_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(simTimerStatusDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.tab_widget_display_checkbox, SIGNAL(toggled(bool)), this, SLOT(tabWidgetDisplayCheckboxToggledEventHandler(bool)));
+    connect(ui.font_size_combobox, SIGNAL(activated(int)), this, SLOT(changeFontEventComboBoxEventHandler(int)));
 
     connect(this, SIGNAL(updateCurrentSimulationTimeLabel(QString)), ui.currentSimulationTimeLabel, SLOT(setText(QString)));
     connect(this, SIGNAL(updateObstacleCallCount(QString)), ui.perc_of_time_avoiding_obstacles, SLOT(setText(QString)));
@@ -170,7 +213,7 @@ namespace rqt_rover_gui
     // Receive waypoint commands from MapFrame
     connect(ui.map_frame, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)), this, SLOT(receiveWaypointCmd(WaypointCmd, int, float, float)));
     connect(this, SIGNAL(sendWaypointReached(int)), ui.map_frame, SLOT(receiveWaypointReached(int)));
-    
+
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
 
@@ -195,16 +238,17 @@ namespace rqt_rover_gui
     ui.map_frame->setDisplayEncoderData(ui.encoder_checkbox->isChecked());
     ui.map_frame->setDisplayEKFData(ui.ekf_checkbox->isChecked());
 
-    ui.joystick_frame->setHidden(false);
+    // ui.joystick_frame->setHidden(false);
+    ui.joystick_frame->setCurrentIndex(0);
 
     ui.custom_world_path_button->setEnabled(true);
-    ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white;");
+    ui.custom_world_path_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
 
     // Make the custom rover number combo box look greyed out to begin with
-    ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey; padding: 1px 0px 1px 3px;");
 
     ui.tab_widget->setCurrentIndex(0);
-    ui.log_tab->setCurrentIndex(1);
+    ui.log_tab->setCurrentIndex(0);
 
     ui.texture_combobox->setItemData(0, QColor(Qt::white), Qt::TextColorRole);
 
@@ -213,10 +257,10 @@ namespace rqt_rover_gui
     ui.all_autonomous_button->setEnabled(false);
     ui.all_stop_button->setEnabled(false);
 
-    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     //QString return_msg = startROSJoyNode();
     //displayLogMessage(return_msg);
@@ -225,6 +269,7 @@ namespace rqt_rover_gui
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
     emit updateNumberOfSatellites("<font color='white'>---</font>");
+
   }
 
   void RoverGUIPlugin::shutdownPlugin()
@@ -254,7 +299,7 @@ void RoverGUIPlugin::joyEventHandler(const sensor_msgs::Joy::ConstPtr& joy_msg)
   {
     return;
   }
-  
+
      // Give the array values some helpful names:
     int left_stick_x_axis = 0; // Gripper fingers close and open
     int left_stick_y_axis = 1; // Gripper wrist up and down
@@ -649,7 +694,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     QString model_path = model_root+"/"+QString::fromStdString(selected_rover_name)+"/model.sdf";
 
     readRoverModelXML(model_path);
-    
+
     //Set up subscribers
     image_transport::ImageTransport it(nh);
     camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
@@ -683,13 +728,13 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
         case 1: // manual
             ui.joystick_control_radio_button->setChecked(true);
             ui.autonomous_control_radio_button->setChecked(false);
-            ui.joystick_frame->setHidden(false);
+            ui.joystick_frame->setCurrentIndex(0);
             joystickRadioButtonEventHandler(true); // Manually trigger the joystick selected event
             break;
         case 2: // autonomous
             ui.joystick_control_radio_button->setChecked(false);
             ui.autonomous_control_radio_button->setChecked(true);
-            ui.joystick_frame->setHidden(true);
+            ui.joystick_frame->setCurrentIndex(1);
             autonomousRadioButtonEventHandler(true); // Manually trigger the autonomous selected event
             break;
         default:
@@ -771,7 +816,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         gps_nav_solution_subscribers.erase(*it);
         ekf_subscribers.erase(*it);
         rover_diagnostic_subscribers.erase(*it);
-        
+
         // Shudown Publishers
         control_mode_publishers[*it].shutdown();
         waypoint_cmd_publishers[*it].shutdown();
@@ -790,7 +835,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         selected_rover_name = "";
         rover_control_state.clear();
         rover_numSV_state.clear();
-        rover_names.clear();        
+        rover_names.clear();
         ui.rover_list->clearSelection();
         ui.rover_list->clear();
         ui.rover_diags_list->clear();
@@ -801,8 +846,8 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         ui.joystick_control_radio_button->setEnabled(false);
         ui.all_autonomous_button->setEnabled(false);
         ui.all_stop_button->setEnabled(false);
-        ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
-        ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+        ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+        ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     }
     else if (new_rover_names == rover_names)
@@ -847,7 +892,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     else
     {
     rover_names = new_rover_names;
-    
+
     emit sendInfoLogMessage("List of connected rovers has changed");
     selected_rover_name = "";
     ui.rover_list->clearSelection();
@@ -856,10 +901,10 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
     // Also clear the rover diagnostics list
     ui.rover_diags_list->clear();
     ui.map_selection_list->clear();
-    
+
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
-    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
+    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
     // This code is from above. Consider moving into a function or restructuring
     for(set<string>::const_iterator i = rover_names.begin(); i != rover_names.end(); ++i)
@@ -867,7 +912,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         //Set up publishers
         control_mode_publishers[*i]=nh.advertise<std_msgs::UInt8>("/"+*i+"/mode", 10, true); // last argument sets latch to true
         waypoint_cmd_publishers[*i]=nh.advertise<swarmie_msgs::Waypoint>("/"+*i+"/waypoints/cmd", 10, true);
-        
+
 
         //Set up subscribers
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
@@ -1033,7 +1078,7 @@ void RoverGUIPlugin::diagnosticEventHandler(const ros::MessageEvent<const std_ms
     int red = 255;
     int green = 255;
     int blue = 255;
-    
+
     // Check whether there is sim update data. Will be < 0 for the sim rate if a physical rover is sending the data.
     // If so assume the diagnostic data is coming from a simulated rover.
     // TODO: replace with a proper message type so we don't need to use in stream flags like this.
@@ -1182,6 +1227,123 @@ void RoverGUIPlugin::uniqueRoverColorsCheckboxToggledEventHandler(bool checked)
     ui.map_frame->setDisplayUniqueRoverColors(checked);
 }
 
+// scalable GUI event handlers
+
+void RoverGUIPlugin::cameraDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.camera_display_frame->setHidden(!checked);
+
+    if (ui.camera_display_frame->isHidden() && ui.map_display_frame->isHidden())
+    {
+        ui.sensor_display_top_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_top_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::mapDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_display_frame->setHidden(!checked);
+
+    if (ui.camera_display_frame->isHidden() && ui.map_display_frame->isHidden())
+    {
+        ui.sensor_display_top_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_top_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::ultrasoundDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.ultrasound_display_frame->setHidden(!checked);
+
+    if (ui.ultrasound_display_frame->isHidden() && ui.imu_display_frame->isHidden() && ui.map_settings_display_frame->isHidden())
+    {
+        ui.sensor_display_bottom_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_bottom_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::imuDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.imu_display_frame->setHidden(!checked);
+
+    if (ui.ultrasound_display_frame->isHidden() && ui.imu_display_frame->isHidden() && ui.map_settings_display_frame->isHidden())
+    {
+        ui.sensor_display_bottom_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_bottom_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::mapSettingsDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.map_settings_display_frame->setHidden(!checked);
+
+    if (ui.ultrasound_display_frame->isHidden() && ui.imu_display_frame->isHidden() && ui.map_settings_display_frame->isHidden())
+    {
+        ui.sensor_display_bottom_frame->setHidden(true);
+    }
+    else
+    {
+        ui.sensor_display_bottom_frame->setHidden(false);
+    }
+}
+
+void RoverGUIPlugin::simulationSetupDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.simulation_setup_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::simSensorOutputCheckboxToggledEventHandler(bool checked)
+{
+    ui.sim_sensor_output_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::logTabDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.log_tab->setHidden(!checked);
+}
+
+void RoverGUIPlugin::roverControlsDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.rover_controls_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::simButtonsDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.sim_buttons_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::simTimerStatusDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.sim_timer_status_frame->setHidden(!checked);
+    // ui.version_frame->setHidden(!checked);
+    // ui.rover_info_frame->setHidden(!checked);
+}
+
+void RoverGUIPlugin::tabWidgetDisplayCheckboxToggledEventHandler(bool checked)
+{
+    ui.tab_widget->setHidden(!checked);
+}
+
+void RoverGUIPlugin::changeFontEventComboBoxEventHandler(int index)
+{
+    ui.data_display_frame->setStyleSheet("background-color: rgb(0, 0, 0);\nborder-color: rgb(255, 255, 255);\nfont-size: " + ui.font_size_combobox->currentText() + "px");
+    ui.rover_status_frame->setStyleSheet("background-color: rgb(0, 0, 0);\nborder-color: rgb(255, 255, 255);\nfont-size: " + ui.font_size_combobox->currentText() + "px");
+}
+
+// end: scalable GUI event handlers
+
 void RoverGUIPlugin::displayDiagLogMessage(QString msg)
 {
     if (msg.isEmpty()) msg = "Message is empty";
@@ -1197,14 +1359,14 @@ void RoverGUIPlugin::displayDiagLogMessage(QString msg)
     // Calculate the number of characters in the log. If the log size is larger than the max size specified
     // then find the position of the first newline that reduces the log size to less than the max size.
     // Delete all characters up to that position.
-    int overflow = diag_log_messages.size() - max_diag_log_length; 
-    
+    int overflow = diag_log_messages.size() - max_diag_log_length;
+
     // Get the position of the the first newline after the overflow amount
     int newline_pos = diag_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
-    
+
     // If the max size is exceeded and the number of characters to remove is less than
     // the size of the log remove those characters.
-    if ( overflow > 0 && newline_pos < diag_log_messages.size() ) {   
+    if ( overflow > 0 && newline_pos < diag_log_messages.size() ) {
       diag_log_messages.remove(0, newline_pos);
     }
 
@@ -1229,17 +1391,17 @@ void RoverGUIPlugin::displayInfoLogMessage(QString msg)
     // Calculate the number of characters in the log. If the log size is larger than the max size specified
     // then find the position of the first newline that reduces the log size to less than the max size.
     // Delete all characters up to that position.
-    int overflow = info_log_messages.size() - max_info_log_length; 
-    
+    int overflow = info_log_messages.size() - max_info_log_length;
+
     // Get the position of the the first newline after the overflow amount
     int newline_pos = info_log_messages.indexOf( "<br>", overflow, Qt::CaseSensitive );
-    
+
     // If the max size is exceeded and the number of characters to remove is less than
     // the size of the log remove those characters.
-    if ( overflow > 0 && newline_pos < info_log_messages.size() ) {   
+    if ( overflow > 0 && newline_pos < info_log_messages.size() ) {
       info_log_messages.remove(0, newline_pos);
     }
-    
+
     // Use the <br> tag to make log messages atomic for easier deletion later.
     info_log_messages += "<font color='white'>"+msg+"</font><br>";
 
@@ -1279,13 +1441,13 @@ void RoverGUIPlugin::autonomousRadioButtonEventHandler(bool marked)
 
     QString return_msg = stopROSJoyNode();
     emit sendInfoLogMessage(return_msg);
-    
+
     //Enable all stop button
     ui.all_stop_button->setEnabled(true);
-    ui.all_stop_button->setStyleSheet("color: white; border:2px solid white;");
+    ui.all_stop_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
     //Hide joystick frame
-    ui.joystick_frame->setHidden(true);
+    ui.joystick_frame->setCurrentIndex(1);
 
     // disable waypoint input in map frame
     ui.map_frame->disableWaypoints(selected_rover_name);
@@ -1325,13 +1487,14 @@ void RoverGUIPlugin::joystickRadioButtonEventHandler(bool marked)
 
     QString return_msg = startROSJoyNode();
     emit sendInfoLogMessage(return_msg);
-    
+
     //Enable all autonomous button
     ui.all_autonomous_button->setEnabled(true);
-    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white;");
-    
+    ui.all_autonomous_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
+
     //Show joystick frame
-    ui.joystick_frame->setHidden(false);
+    // ui.joystick_frame->setHidden(false);
+    ui.joystick_frame->setCurrentIndex(0);
 
     // enable wayoint input in the map frame
     ui.map_frame->enableWaypoints(selected_rover_name);
@@ -1370,11 +1533,11 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setChecked(false);
     ui.autonomous_control_radio_button->setChecked(true);
-    ui.joystick_frame->setHidden(true);
-    
+    ui.joystick_frame->setCurrentIndex(1);
+
     // Disable all autonomous button
     ui.all_autonomous_button->setEnabled(false);
-    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_autonomous_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     // Experiment Timer START
 
@@ -1549,11 +1712,11 @@ void RoverGUIPlugin::allStopButtonEventHandler()
     ui.autonomous_control_radio_button->setEnabled(true);
     ui.joystick_control_radio_button->setChecked(true);
     ui.autonomous_control_radio_button->setChecked(false);
-    ui.joystick_frame->setHidden(false);
-    
+    ui.joystick_frame->setCurrentIndex(0);
+
     //Disable all stop button
     ui.all_stop_button->setEnabled(false);
-    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.all_stop_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     // reset the simulation timer variables
     ui.simulation_timer_combobox->setEnabled(true);
@@ -1606,7 +1769,7 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
     // Clear the sim path if custom distribution it deselected
     if(toggled)
     {
-        ui.custom_world_path_button->setStyleSheet("color: white; border:2px solid white;");
+        ui.custom_world_path_button->setStyleSheet("color: white; border:2px solid white; border-radius:12px; padding: 5px;");
 
         ui.number_of_tags_label->setStyleSheet("color: grey;");
         ui.number_of_tags_combobox->setStyleSheet("color: grey; border:2px solid grey; padding: 1px 0px 1px 3px");
@@ -1615,7 +1778,7 @@ void RoverGUIPlugin::customWorldRadioButtonEventHandler(bool toggled)
     {
         sim_mgr.setCustomWorldPath("");
         ui.custom_world_path->setText("");
-        ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey;");
+        ui.custom_world_path_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
         ui.number_of_tags_label->setStyleSheet("color: white;");
         ui.number_of_tags_combobox->setStyleSheet("color: white; border:2px solid white; padding: 1px 0px 1px 3px");
@@ -1665,10 +1828,11 @@ void RoverGUIPlugin::mapPopoutButtonEventHandler()
 
 void RoverGUIPlugin::buildSimulationButtonEventHandler()
 {
+
     emit sendInfoLogMessage("Building simulation...");
 
     ui.build_simulation_button->setEnabled(false);
-    ui.build_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.build_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     QString return_msg;
 
@@ -1909,8 +2073,8 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     ui.visualize_simulation_button->setEnabled(true);
     ui.clear_simulation_button->setEnabled(true);
 
-    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white;");
-    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white;");
+    ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
 
     ui.simulation_timer_combobox->setEnabled(true);
     ui.simulation_timer_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
@@ -1966,7 +2130,7 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     emit sendInfoLogMessage("Shutting down subscribers...");
 
-    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=encoder_subscribers.begin(); it!=encoder_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
@@ -2000,21 +2164,21 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 
     // Possible error - the following seems to shutdown all subscribers not just those from simulation
 
-    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=status_subscribers.begin(); it!=status_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
     status_subscribers.clear();
 
-    for (map<string,ros::Subscriber>::iterator it=waypoint_subscribers.begin(); it!=waypoint_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=waypoint_subscribers.begin(); it!=waypoint_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
       }
     waypoint_subscribers.clear();
 
-    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it) 
+    for (map<string,ros::Subscriber>::iterator it=obstacle_subscribers.begin(); it!=obstacle_subscribers.end(); ++it)
       {
 	qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 	it->second.shutdown();
@@ -2040,8 +2204,8 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
 	it->second.shutdown();
       }
     waypoint_cmd_publishers.clear();
-    
-    
+
+
     return_msg += sim_mgr.stopGazeboClient();
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
     return_msg += "<br>";
@@ -2055,9 +2219,9 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     display_sim_visualization = false;
 
 
-    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
-    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
+    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
+    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
 
     // reset waypoints
     ui.map_frame->resetAllWaypointPaths();
@@ -2716,16 +2880,45 @@ void RoverGUIPlugin::gazeboServerFinishedEventHandler()
     ui.clear_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
 
-    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey;");
-    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white;");
+    ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
+    ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
 }
 
 bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
 {
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        int index = 0, max = 0;
+
+            switch( keyEvent->key() )
+            {
+            case Qt::Key_Minus:
+                index = ui.font_size_combobox->currentIndex() - 1;
+                if (index >= 0)
+                {
+                    ui.font_size_combobox->setCurrentIndex(index);
+                }
+                changeFontEventComboBoxEventHandler(index);
+                return true;
+                break;
+            case Qt::Key_Equal:
+                index = ui.font_size_combobox->currentIndex() + 1;
+                max = ui.font_size_combobox->count() - 1;
+                if (index <= max)
+                {
+                    ui.font_size_combobox->setCurrentIndex(index);
+                }
+                changeFontEventComboBoxEventHandler(index);
+                return true;
+                break;
+            }
+        }
+
     sensor_msgs::Joy joy_msg;
     joy_msg.axes = {0.0,0.0,0.0,0.0,0.0,0.0};
-    
+
     if (joystick_publisher)
     {
 
@@ -2743,19 +2936,19 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
             case Qt::Key_I:
                 joy_msg.axes[4] = speed;
-                ui.joy_lcd_drive_forward->display(speed);
+                ui.joy_lcd_drive_forward->setText(QString::number(speed));
                 break;
             case Qt::Key_K:
                 joy_msg.axes[4] = -speed;
-                ui.joy_lcd_drive_back->display(speed);
+                ui.joy_lcd_drive_back->setText(QString::number(speed));
                 break;
             case Qt::Key_J:
                 joy_msg.axes[3] = speed;
-                ui.joy_lcd_drive_left->display(speed);
+                ui.joy_lcd_drive_left->setText(QString::number(speed));
                 break;
             case Qt::Key_L:
                 joy_msg.axes[3] = -speed;
-                ui.joy_lcd_drive_right->display(speed);
+                ui.joy_lcd_drive_right->setText(QString::number(speed));
                 break;
             default:
                 // Not a direction key so ignore
@@ -2787,10 +2980,10 @@ bool RoverGUIPlugin::eventFilter(QObject *target, QEvent *event)
             {
                 joy_msg.axes[4] = 0;
                 joy_msg.axes[3] = 0;
-                ui.joy_lcd_drive_forward->display(0);
-                ui.joy_lcd_drive_back->display(0);
-                ui.joy_lcd_drive_left->display(0);
-                ui.joy_lcd_drive_right->display(0);
+                ui.joy_lcd_drive_forward->setText("0");
+                ui.joy_lcd_drive_back->setText("0");
+                ui.joy_lcd_drive_left->setText("0");
+                ui.joy_lcd_drive_right->setText("0");
 
                 joystick_publisher.publish(joy_msg);
                 return true;
@@ -2850,7 +3043,7 @@ void RoverGUIPlugin::overrideNumRoversCheckboxToggledEventHandler(bool checked)
 {
     ui.custom_num_rovers_combobox->setEnabled(checked);
     if (checked) ui.custom_num_rovers_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px"); // The padding makes the item list color change work
-    else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey;");
+    else ui.custom_num_rovers_combobox->setStyleSheet("color: grey; border:1px solid grey; padding: 1px 0px 1px 3px;");
 }
 
 void RoverGUIPlugin::createSavableWorldCheckboxToggledEventHandler(bool checked)
@@ -2961,7 +3154,7 @@ void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float 
     msg.id = id;
     msg.x = x;
     msg.y = y;
-    
+
     waypoint_cmd_publishers[selected_rover_name].publish(msg);
 }
 
@@ -2977,4 +3170,3 @@ RoverGUIPlugin::~RoverGUIPlugin()
 
 
 PLUGINLIB_EXPORT_CLASS(rqt_rover_gui::RoverGUIPlugin, rqt_gui_cpp::Plugin)
-
