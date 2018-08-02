@@ -20,7 +20,6 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
-#include <std_msgs/Float32MultiArray.h>
 #include "swarmie_msgs/Waypoint.h"
 #include "swarmie_msgs/VirtualFence.h"
 
@@ -165,17 +164,17 @@ tf::TransformListener *tfListener;
 void sigintEventHandler(int signal);
 
 //Callback handlers
-void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);
-void modeHandler(const std_msgs::UInt8::ConstPtr& message);
-void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);
-void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);
-void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
-void virtualFenceHandler(const swarmie_msgs::VirtualFence& message);
-void manualWaypointHandler(const swarmie_msgs::Waypoint& message);
-void behaviourStateMachine(const ros::TimerEvent&);
-void publishStatusTimerEventHandler(const ros::TimerEvent& event);
-void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
-void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);
+void joyCmdHandler(const sensor_msgs::Joy::ConstPtr& message);			//for joystick control
+void modeHandler(const std_msgs::UInt8::ConstPtr& message);				//for detecting which mode the robot needs to be in
+void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& tagInfo);	//receives and stores April Tag Data using the TAG class
+void odometryHandler(const nav_msgs::Odometry::ConstPtr& message);			//receives and stores ODOM information
+void mapHandler(const nav_msgs::Odometry::ConstPtr& message);				//receives and stores GPS information
+void virtualFenceHandler(const swarmie_msgs::VirtualFence& message);		        //Used to set an invisible boundary for robots to keep them from traveling outside specific bounds
+void manualWaypointHandler(const swarmie_msgs::Waypoint& message);			//Receives a waypoint (from GUI) and sets the coordinates
+void behaviourStateMachine(const ros::TimerEvent&);					//Upper most state machine, calls logic controller to perform all actions
+void publishStatusTimerEventHandler(const ros::TimerEvent& event);			//Publishes "ONLINE" when rover is successfully connected
+void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);			
+void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);	//handles ultrasound data and stores data
 
 // Converts the time passed as reported by ROS (which takes Gazebo simulation rate into account) into milliseconds as an integer.
 long int getROSTimeInMilliSecs();
