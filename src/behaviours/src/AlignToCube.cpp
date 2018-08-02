@@ -2,13 +2,13 @@
 
 #define MAX_TURN 100
 
-void AlignToCube::ProcessTags()
+void AlignToCube::ProcessTags(const SwarmieSensors& sensors)
 {
    bool target_detected = false;
    double minimum_distance = 100;
    double distance = 0;
    double linearDistance = 0;
-   for(auto tag : _sensors->GetTags())
+   for(auto tag : sensors.GetTags())
    {
       if(tag.GetId() != Tag::CUBE_TAG_ID)
       {
@@ -38,18 +38,17 @@ void AlignToCube::ProcessTags()
    }
 }
 
-AlignToCube::AlignToCube(const SwarmieSensors* sensors) :
-   Behavior(sensors),
+AlignToCube::AlignToCube() :
    _distanceToTag(0),
    _linearDistance(0),
    _integral(0),
    _alignPID(-1.5, 0.1, 0.85)
 {}
 
-void AlignToCube::Update()
+void AlignToCube::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
-   ProcessTags();
-   _action = _llAction;
+   ProcessTags(sensors);
+   _action = ll_action;
    _alignPID.Update(_distanceToTag);
 
    if(fabs(_distanceToTag) > 0.005)

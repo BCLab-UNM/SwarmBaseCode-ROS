@@ -16,14 +16,14 @@ private:
    Timer* _turnaroundTimer;
 
    void TurnaroundHandler();
-   void UpdateState();
-   bool AllFar();
+   void UpdateState(const SwarmieSensors& sensors);
+   bool AllFar(const SwarmieSensors& sensors);
    
 public:
-    ObstacleBehavior(const SwarmieSensors* sensors, Timer* timer);
+    ObstacleBehavior(Timer* timer);
    ~ObstacleBehavior() {}
 
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& action) override;
 };
 
 #endif // _OBSTACLE_BEHAVIOR_HPP

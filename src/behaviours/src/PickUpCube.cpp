@@ -1,12 +1,12 @@
 #include "PickUpCube.hpp"
 
-PickUpCube::PickUpCube(const SwarmieSensors* sensors, Timer* timer) :
-   Behavior(sensors),
+PickUpCube::PickUpCube(Timer* timer) :
    _state(NotHolding),
    _allowReset(true),
    _distanceToTarget(OUT_OF_RANGE),
    _timer(timer),
-   _recheckInterval(60.0)
+   _recheckInterval(60.0),
+   _sensors(SwarmieSensors())
 {}
 
 
@@ -14,7 +14,7 @@ void PickUpCube::ProcessTags()
 {
    _distanceToTarget = OUT_OF_RANGE;
 
-   for(auto tag : _sensors->GetTags())
+   for(auto tag : _sensors.GetTags())
    {
       if(!tag.IsCube()) continue;
 
@@ -82,7 +82,7 @@ void PickUpCube::TimerTriggered()
       break;
    case Checking:
    case Rechecking:
-      if(_sensors->GetCenterSonar() < 0.12 || _distanceToTarget < 0.14)
+      if(_sensors.GetCenterSonar() < 0.12 || _distanceToTarget < 0.14)
       {
          _state = Holding;
          StartRecheckTimer();
@@ -107,14 +107,15 @@ void PickUpCube::Reset()
    _distanceToTarget = OUT_OF_RANGE;
 }
 
-void PickUpCube::Update()
+void PickUpCube::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
+   _sensors = sensors;
    ProcessTags();
    if(_timer->Expired())
    {
       TimerTriggered();
    }
-   _action = _llAction;
+   _action = ll_action;
 
    switch(_state)
    {

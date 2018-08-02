@@ -2,18 +2,17 @@
 #include "Action.hpp"
 #include "Velocity.hpp"
 
-AvoidNest::AvoidNest(const SwarmieSensors* sensors, Timer* timer) :
-   Behavior(sensors),
+AvoidNest::AvoidNest(Timer* timer) :
    _persist(false),
    _persistenceTimer(timer) {}
 
 
-void AvoidNest::TagHandler()
+void AvoidNest::TagHandler(const SwarmieSensors& sensors)
 {
    _tagsRight = 0;
    _tagsLeft  = 0;
    _tooClose = false;
-   for(auto tag : _sensors->GetTags())
+   for(auto tag : sensors.GetTags())
    {
       if(tag.GetId() != Tag::NEST_TAG_ID)
       {
@@ -44,10 +43,10 @@ void AvoidNest::TagHandler()
    }
 }
 
-void AvoidNest::Update()
+void AvoidNest::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
-   _action = _llAction;
-   TagHandler();
+   _action = ll_action;
+   TagHandler(sensors);
 
    if(_persist)
    {

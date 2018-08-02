@@ -13,8 +13,8 @@ protected:
    MockTimer timer;
    PickUpCube pickup;
 
-   PickUpCubeTest() : pickup(&sensors, &timer) {
-      pickup.Update();
+   PickUpCubeTest() : pickup(&timer) {
+      pickup.Update(sensors, SwarmieAction());
    }
 };
 
@@ -26,22 +26,22 @@ TEST_F(PickUpCubeTest, noActionWhenNoCubes)
 TEST_F(PickUpCubeTest, noActionWhenMisaligned)
 {
    sensors.DetectedTag(tag_top_left(Tag::CUBE_TAG_ID));
-   pickup.Update();
+   pickup.Update(sensors, SwarmieAction());
    EXPECT_FALSE(is_moving(pickup.GetAction()));
    sensors.ClearDetections();
 
    sensors.DetectedTag(tag_top_right(Tag::CUBE_TAG_ID));
-   pickup.Update();
+   pickup.Update(sensors, SwarmieAction());
    EXPECT_FALSE(is_moving(pickup.GetAction()));
    sensors.ClearDetections();
 
    sensors.DetectedTag(tag_bottom_right(Tag::CUBE_TAG_ID));
-   pickup.Update();
+   pickup.Update(sensors, SwarmieAction());
    EXPECT_FALSE(is_moving(pickup.GetAction()));
    sensors.ClearDetections();
 
    sensors.DetectedTag(tag_bottom_left(Tag::CUBE_TAG_ID));
-   pickup.Update();
+   pickup.Update(sensors, SwarmieAction());
    EXPECT_FALSE(is_moving(pickup.GetAction()));
    sensors.ClearDetections();
 }
@@ -51,7 +51,7 @@ TEST_F(PickUpCubeTest, noActionWhenOnlyDetectingNest)
 {
    Tag t = tag_aligned_close(Tag::NEST_TAG_ID);
    sensors.DetectedTag(t);
-   pickup.Update();
+   pickup.Update(sensors, SwarmieAction());
    ASSERT_FALSE(is_moving(pickup.GetAction()));
 }
 
@@ -62,7 +62,7 @@ TEST_F(PickUpCubeTest, moveForwardWhenCubeAlignedAndClose)
 
    Tag t = tag_aligned_close(Tag::CUBE_TAG_ID);
    sensors.DetectedTag(t);
-   pickup.Update();
+   pickup.Update(sensors, SwarmieAction());
    ASSERT_TRUE(is_moving_forward());
 }
 #endif // 0

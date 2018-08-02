@@ -1,19 +1,18 @@
 #include "DropOffCube.hpp"
 
-DropOffCube::DropOffCube(const SwarmieSensors *sensors, Timer* timer) :
-   Behavior(sensors),
+DropOffCube::DropOffCube(Timer* timer) :
    _state(NotHolding),
    _timer(timer),
    _centeringPID(1.5, 0.2, 0.5) // XXX: Not tuned
 {}
 
 
-void DropOffCube::TagHandler()
+void DropOffCube::TagHandler(const SwarmieSensors& sensors)
 {
    _numNestTags = 0;
    _averageAlignment = 0;
 
-   for(auto tag : _sensors->GetTags())
+   for(auto tag : sensors.GetTags())
    {
       if(!tag.IsNest()) continue;
       _averageAlignment += tag.Alignment();
@@ -26,17 +25,17 @@ void DropOffCube::TagHandler()
    }
 }
 
-void DropOffCube::UpdateState()
+void DropOffCube::UpdateState(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
    switch(_state)
    {
    case NotHolding:
-      if(_llAction.GripperCommand() == GripperControl::CLOSED) {
+      if(ll_action.GripperCommand() == GripperControl::CLOSED) {
          _state = Holding;
       }
       break;
    case Holding:
-      if(_llAction.GripperCommand() == GripperControl::OPEN) {
+      if(ll_action.GripperCommand() == GripperControl::OPEN) {
          _state = NotHolding;
       }
       else if(_numNestTags > 0)
@@ -116,11 +115,11 @@ void DropOffCube::Leave()
    _action.SetWrist(WristControl::UP);
 }
 
-void DropOffCube::Update()
+void DropOffCube::Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action)
 {
-   TagHandler();
+   TagHandler(sensors);
    CheckTimeout();
-   UpdateState();
+   UpdateState(sensors, ll_action);
 
    switch(_state)
    {
@@ -139,7 +138,7 @@ void DropOffCube::Update()
       _action.SetWrist(WristControl::UP);
    case Holding:
    case NotHolding:
-      _action = _llAction;
+      _action = ll_action;
       break;
    }
 }

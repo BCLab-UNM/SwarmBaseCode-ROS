@@ -2,12 +2,7 @@
 
 #include <unistd.h>
 
-Behavior::Behavior(const SwarmieSensors* sensors) :
-   _sensors(sensors)
-{
-   _llAction.SetWrist(WristControl::DOWN);
-   _llAction.SetGrip(GripperControl::OPEN);
-}
+Behavior::Behavior() {}
 
 Behavior::~Behavior() {}
 
@@ -43,8 +38,7 @@ SwarmieAction BehaviorManager::NextAction()
 
    for(int level = 0; level < _behaviors.size(); level++)
    {
-      _behaviors[level]->SetLowerLevelAction(nextAction);
-      _behaviors[level]->Update();
+      _behaviors[level]->Update(*_sensors, nextAction);
       nextAction = _behaviors[level]->GetAction();
    }
 

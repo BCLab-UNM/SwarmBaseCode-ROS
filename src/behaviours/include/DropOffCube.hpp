@@ -9,12 +9,12 @@ class DropOffCube : public Behavior
 {
 private:
    enum State { NotHolding, Holding, Centering, Entering, Droping, Leaving } _state;
-   void TagHandler();
+   void TagHandler(const SwarmieSensors& sensors);
 
    /**
     * Transition states based on lower level action.
     */
-   void UpdateState();
+   void UpdateState(const SwarmieSensors& sensors, const SwarmieAction& ll_action);
 
    /**
     * Transition states based on timeouts.
@@ -39,11 +39,11 @@ private:
    const int APPROACH_THRESHOLD = 8;
 
 public:
-   DropOffCube(const SwarmieSensors *sensors, Timer* timer);
+   DropOffCube(Timer* timer);
    
    ~DropOffCube() {}
 
-   void Update() override;
+   void Update(const SwarmieSensors& sensors, const SwarmieAction& ll_action) override;
 };
 
 #endif // _DROP_OFF_CUBE_HPP

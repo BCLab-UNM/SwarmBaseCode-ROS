@@ -12,8 +12,8 @@ private:
    double _z;
    boost::math::quaternion<double> _orientation;
 
-   const double CAMERA_HEIGHT = 0.195;
-   const double CAMERA_OFFSET = -0.023;
+   static constexpr double CAMERA_HEIGHT = 0.195;
+   static constexpr double CAMERA_OFFSET = -0.023;
 public:
    const static int NEST_TAG_ID = 256;
    const static int CUBE_TAG_ID = 0;

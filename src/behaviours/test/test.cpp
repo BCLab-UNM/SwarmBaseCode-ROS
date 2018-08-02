@@ -62,7 +62,7 @@ TEST(Constant, constantBehaviorNoChangeAfterUpdate) {
    action.SetWrist(WristControl::UP);
    action.SetGrip(GripperControl::CLOSED);
    Constant c(action);
-   c.Update();
+   c.Update(SwarmieSensors(), SwarmieAction());
    SwarmieAction a = c.GetAction();
    EXPECT_EQ(a.GetVelocity().GetAngularMagnitude(), action.GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(a.GetVelocity().GetLinearMagnitude(), action.GetVelocity().GetLinearMagnitude());
@@ -81,8 +81,7 @@ TEST(Constant, constantBehaviorNoChangeAfterLLActionUpdate) {
    action2.SetAction(core::VelocityAction(AngularVelocity(0, 0, 0.75)));
    action2.SetWrist(WristControl::DOWN_2_3);
    action2.SetGrip(GripperControl::OPEN);
-   c.SetLowerLevelAction(action2);
-   c.Update();
+   c.Update(SwarmieSensors(), action2);
    SwarmieAction a = c.GetAction();
    EXPECT_EQ(a.GetVelocity().GetAngularMagnitude(), action.GetVelocity().GetAngularMagnitude());
    EXPECT_EQ(a.GetVelocity().GetLinearMagnitude(), action.GetVelocity().GetLinearMagnitude());
