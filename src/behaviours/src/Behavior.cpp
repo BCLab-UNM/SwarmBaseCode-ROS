@@ -5,6 +5,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/UInt8.h>
 
 #include "BehaviorManager.hpp"
 #include "ObstacleBehavior.hpp"
@@ -21,6 +22,10 @@
 
 #define CAMERA_OFFSET (-0.02)
 #define CAMERA_HEIGHT 0.195
+#define AUTO 2
+#define MANUAL 1
+
+int mode = 0;
 
 void heartbeatHandler(ros::Publisher& heartbeatPublisher, const ros::TimerEvent& event)
 {
@@ -34,6 +39,10 @@ void statusHandler(ros::Publisher& statusPublisher, const ros::TimerEvent& event
    std_msgs::String msg;
    msg.data = "subsumption2";
    statusPublisher.publish(msg);
+}
+
+void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
+  mode = message->data;
 }
 
 int main(int argc, char **argv)
@@ -54,6 +63,8 @@ int main(int argc, char **argv)
    ros::init(argc, argv, name + "_BEHAVIOUR");
    ros::NodeHandle nh;
 
+   ros::Subscriber modeSubscriber = nh.subscribe((name + "/mode"), 1, modeHandler);						//receives mode from GUI
+   
    ros::Publisher heartbeatPublisher = nh.advertise<std_msgs::String>(name + "/behaviour/heartbeat", 1, true);
    ros::Timer heartbeatTimer = nh.createTimer(ros::Duration(2),
                                               boost::bind(&heartbeatHandler, heartbeatPublisher, _1));
@@ -88,10 +99,19 @@ int main(int argc, char **argv)
    ros::Rate r(30); // 30 Hz
    while(ros::ok())
    {
-      ros::spinOnce();
-      const SwarmieSensors& sensors = robot.GetSensors();
-      SwarmieAction action = manager.NextAction(sensors);
-      robot.DoAction(action);
-      r.sleep();
+     ros::spinOnce();
+     
+     if (mode == MANUAL)
+     {
+       //not implemented
+     }
+     else if (mode == AUTO)
+     {
+       const SwarmieSensors& sensors = robot.GetSensors();
+       SwarmieAction action = manager.NextAction(sensors);
+       robot.DoAction(action);
+     }
+     
+     r.sleep();
    }
 }
