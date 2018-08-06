@@ -3,10 +3,10 @@
 # Function definitions
 startGazeboServer()
 {
-    local world_file_path = $1
+    local world_file_path=$1
     rosparam set /use_sim_time true
-    rosrun gazebo_ros gzserver world_file_path
-    echo "Attempted to start Gazebo server with world file: $1" 
+    rosrun gazebo_ros gzserver $world_file_path &
+    echo "Attempted to start Gazebo server with world file: $1"
 }
 
 stopGazeboServer()
@@ -17,7 +17,7 @@ stopGazeboServer()
 
 startGazeboClient()
 {
-    rosrun gazebo_ros gzclient __name:=gzclient
+    rosrun gazebo_ros gzclient __name:=gzclient &
     echo "Attempted to start Gazebo client"
 }
 
@@ -27,10 +27,36 @@ stopGazeboClient()
     echo "Attempted to stop Gazebo client"
 }
 
+addCollectionZone()
+{
+rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/collection_disk/model.sdf \
+               -model collection_disk \
+               -x 0 \
+               -y 0 \
+               -z 0 \
+               -R 0 \
+               -P 0 \
+               -Y 0
+    echo "Attempted to add collection_zone: name=collection_disk, x=0, y=0, z=0, roll=0, pitch=0, yaw=0"
+}
+
+addGroundPlane()
+{
+rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/concrete_ground_plane/model.sdf \
+               -model concrete_ground_plane \
+               -x 0 \
+               -y 0 \
+               -z 0 \
+               -R 0 \
+               -P 0 \
+               -Y 0
+    echo "Attempted to add concrete ground plane: name=concrete_ground_plane, x=0, y=0, z=0, roll=0, pitch=0, yaw=0"
+}
+
 # Stops the ROS nodes associated with rovers
 startRoverNode()
 {
-    local rover_name = $1
+    local rover_name=$1
     roslaunch $PWD/launch/swarmie.launch name:=$rover_name
     echo "Attempted to start rover ROS nodes"
 }
@@ -38,7 +64,7 @@ startRoverNode()
 # Stops the ROS nodes associated with rovers
 stopRoverNode()
 {
-    local rover_name = $1
+    local rover_name=$1
     rosnode kill rover_name_APRILTAG
     rosnode kill rover_name_BASE2CAM
     rosnode kill rover_name_DIAGNOSTICS
@@ -48,34 +74,36 @@ stopRoverNode()
     rosnode kill rover_name_NAVSAT
     rosnode kill rover_name_OBSTACLE
     rosnode kill rover_name_ODOM
-    echo "Attempted to kill rover ROS nodes"
+    echo "Attempted to kill rover ROS nodes: name=$rover_name"
 }
 
 addRover()
 {
-    local rover_name = $1
-    local x = $2
-    local y = $3
-    local z = $4
-    local roll = $5
-    local pitch = $6
-    local yaw = $7
+    local rover_name=$1
+    local x=$2
+    local y=$3
+    local z=$4
+    local roll=$5
+    local pitch=$6
+    local yaw=$7
     
     rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/$rover_name/model.sdf \
-               -model $rover_name \
-               -x x \
-               -y y \
-               -z z \
-               -R roll \
-               -P pitch \
-               -Y yaw
+           -model $rover_name \
+           -x $x \
+           -y $y \
+           -z $z \
+           -R $roll \
+           -P $pitch \
+           -Y $yaw
+    echo "Attempted to add rover: name=$rover_name, x=$x, y=$y, z=$z, roll=$roll, pitch=$pitch, yaw=$yaw"
 }
 
-if [ $# -ne 5 -o $# -ne 4 ]
+# If not given 4 or 5 arguments then show the usage text
+if [ $# -ne 5 -a $# -ne 4 ]
 then
-    echo "Usage: $0 world_file_path num_rovers(1-6) scoring_output_path experiment_time_in_minutes [visualize]"
-    echo "Example: $0 ../simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30 visualize"
-    echo "Example: $0 ../simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30"   
+    echo "Usage: $0 world_file_path num_rovers(1-8) scoring_output_path experiment_duration_in_minutes [visualize]"
+    echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30 visualize"
+    echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30"   
    exit 1
 fi
    
@@ -95,60 +123,192 @@ pkill roscore
 roscore &
 sleep 2
 
+echo "Experiment started at $(date +%d-%m-%Y" "%H:%M:%S)."
+
 #---------------------------------------------------------#
+# Set the interval at which to check whether the experiment duration has elapsed
+# The following line set the interval to 1 minute
+END_EXPERIMENT_CHECK_INTERVAL=1s
 
+# Delay between adding rovers
+# The following line set the interval to 2 seconds
+MODEL_ADD_INTERVAL=2s
+
+#---------------------------------------------------------#
+# The maximum number of rovers a user can request is currently
+MAX_ROVERS=8
+
+#---------------------------------------------------------#
 # Read the world file path from command line
-WORLD_FILE_PATH = $1
+WORLD_FILE_PATH=$1
+echo "World file path: $WORLD_FILE_PATH"
 
 # Start the gazebo simulation
-startGazeboServer WORLD_FILE_PATH
+startGazeboServer $WORLD_FILE_PATH
 
 # Start the gazebo simulation
-if [$# -eq 5 -a $5 -eq "visualize"]
-   then
-       startGazeboClient
+if [ $# -eq 5 -a "$5" = "visualize" ]
+then
+    echo "User requested that the Gazebo client be started"
+    startGazeboClient
 fi
 
-# Get the current sim time: start time
-
-# Load the world file
+# Read the number of rovers to create from command line
+NUM_ROVERS=$2
+echo "The user requested $NUM_ROVERS rovers."
+if [[ $NUM_ROVERS -gt $MAX_ROVERS ]]; then
+    echo "User requested too many rovers. Maximum rovers is $MAX_ROVERS. Exiting."
+    exit 2
+fi
 
 #---------------------------------------------------------#
 
-# Read the number of rovers to create from command line
-NUM_ROVERS = $2
+addCollectionZone
 
-# Specify rover names
+addGroundPlane
 
 
-for 
-
+#---------------------------------------------------------#
 
 # Add the rovers to the simulation
 
+#  The distances that determine the X, Y coords of the rovers is determined as follows:
+#  The distance to the rover from a corner position is calculated differently
+#  than the distance to a cardinal position.
+# 
+#  The cardinal direction rovers are a straightforward calculation where:
+#      a = the distance to the edge of the collection zone
+#          i.e., 1/2 of the collection zone square side length
+#      b = the 50cm distance required by the rules for placing the rover
+#      c = offset for the simulation for the center of the rover (30cm)
+#          i.e., the rover position is at the center of its body
+# 
+#  The corner rovers use trigonometry to calculate the distance where each
+#  value of d, e, and f, are the legs to an isosceles right triangle. In
+#  other words, we are calculating and summing X and Y offsets to position
+#  the rover.
+#      d = a
+#      e = xy offset to move the rover 50cm from the corner of the collection zone
+#      f = xy offset to move the rover 30cm to account for its position being
+#          calculated at the center of its body
+# 
+#                        *  *          d = 0.508m
+#                      *      *        e = 0.354m
+#                    *          *    + f = 0.212m
+#                  *     /*     *    ------------
+#                  *    / | f *            1.072m
+#                    * /--| *
+#                     /* *
+#                    / | e
+#                   /--|
+#      *************
+#      *          /|
+#      *         / |
+#      *        /  | d                 a = 0.508m
+#      *       /   |     *********     b = 0.500m
+#      *      /    |     *       *   + c = 0.300m
+#      *     *-----|-----*---*   *   ------------
+#      *        a  *  b  * c     *         1.308m
+#      *           *     *********
+#      *           *
+#      *           *
+#      *           *
+#      *************
+
+# Specify rover names
+ROVER_NAMES=( "achilles" "aeneas" "ajax" "diomedes" "hector" "paris" "thor" "zeus" )
+
+# Specify rover start coordinates
+ROVER_POSITIONS_X=( -1.308 0.000 1.308 0.000 1.072 -1.072 -1.072 1.072 )
+ROVER_POSITIONS_Y=( 0.000 -1.308 0.000 1.308 1.072 -1.072 1.072 -1.072 )
+ 
+# In this case, the yaw is the value that turns rover "left" and "right" */
+ROVER_YAWS=( 0.000 1.571 -3.142 -1.571 -2.356 0.785 -0.785 2.356 )
+
+echo "Adding rovers to Gazebo and starting their ROS nodes..."
+
+# Add rovers to the simulation and start the associated ROS nodes
+for (( i=0;i<=$NUM_ROVERS;i++ ));
+do
+    sleep $MODEL_ADD_INTERVAL
+    addRover ${ROVER_NAMES[i]} ${ROVER_POSITIONS_X[i]} ${ROVER_POSITIONS_Y[i]} 0 0 0 ${ROVER_YAWS[i]}
+    sleep $MODEL_ADD_INTERVAL
+    startRoverNode ${ROVER_NAMES[i]}
+done
+
+echo "Finished adding rovers."
+
 #---------------------------------------------------------#
 
+sleep $MODEL_ADD_INTERVAL
+
+echo "Setting rovers to autonomous mode..."
+
 # Send the autonomous command to all rovers
+for (( i=0;i<$NUM_ROVERS;i++ ));
+do
+    # Publish the autonomous mode command ("2") to each rover. Latch the message ("-l").
+    rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/String "2" &
+    echo "Publishing 2 on /${ROVER_NAMES[i]}/mode"
+done
+ 
+echo "Finished setting rovers to autonomous mode."
 
 # Read output file path from command line
-SCORE_OUTPUT_PATH = $3
+SCORE_OUTPUT_PATH=$3
 
-# Pipe /score ros topic to output file
+mkdir -p $(dirname $SCORE_OUTPUT_PATH)
+
+echo "User specified $SCORE_OUTPUT_PATH as the file to which score information should be appended."
 
 #---------------------------------------------------------#
 
 # Read the experiment time from command line
-EXPERIMENT_TIME = $4
+EXPERIMENT_DURATION_IN_MINUTES=$4
+EXPERIMENT_DURATION_IN_SECONDS=$(( $EXPERIMENT_DURATION_IN_MINUTES*60 ))
 
-# Loop --
+echo "Experiment duration will be $EXPERIMENT_DURATION_IN_SECONDS seconds."
 
-#      Poll gazebo for current sim time
+# Read the current sim time (in seconds) from the ros topic /clock
+# Uses awk to match on first occurence of "secs: number".
+# {print $2} prints the number to the shell variable 
+# exit the awk after first match because we dont care about "nsecs: number"
+CURRENT_TIME=$(rostopic echo -n 1 /clock | awk '/secs: [0-9]+$/{print $2; exit}')
+START_TIME=$(rostopic echo -n 1 /clock | awk '/secs: [0-9]+$/{print $2; exit}')
 
-#      If current time time - start time exceeds the experiment time end simulation 
+echo "Initialised current gazebo time to $CURRENT_TIME"
+echo "Initialised start gazebo time to $START_TIME"
 
-#---------------------------------------------------------#
+# Let the simulation run until the experiment duration is reached
+YELLOW='\033[0;33m'
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
 
+#Write header
+echo "Time (s), Score\n" >> $SCORE_OUTPUT_PATH
 
+until (( $CURRENT_TIME-$START_TIME>=$EXPERIMENT_DURATION_IN_SECONDS )); do
+    # Update the current sim time
+    CURRENT_TIME=$(rostopic echo -n 1 /clock | awk '/secs: [0-9]+$/{print $2; exit}')
+    echo -e "Experiment time remaining ${YELLOW}$(( $EXPERIMENT_DURATION_IN_SECONDS-($CURRENT_TIME-$START_TIME) ))${NC} seconds."
+    # Pipe /score ros topic to output file
+    echo -e "${PURPLE}Time: $(($CURRENT_TIME-$START_TIME)), Score: $(rostopic echo -n 1 /collectionZone/score | sed 's/[^0-9]*//g')${NC}"
+    echo "$(($CURRENT_TIME-$START_TIME)), $(rostopic echo -n 1 /collectionZone/score | sed 's/[^0-9]*//g')\n" >> $SCORE_OUTPUT_PATH
+    
+    sleep $END_EXPERIMENT_CHECK_INTERVAL
+done
+
+echo "The specified experiment duration ($EXPERIMENT_DURATION_IN_MINUTES) has elapsed. End autonomous mode for all rovers."
+
+# Send the autonomous command to all rovers
+for (( i=0;i<=$NUM_ROVERS;i++ ));
+do
+    # Publish the autonomous mode command ("2") to each rover. Latch the message ("-l").
+    rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/String "2" &
+    echo "Publishing 1 on /${ROVER_NAMES[i]}/mode"
+done
+
+echo "Finished placing all rovers into manual mode. Ending simulation..."
 
 # The rover program cleans up after itself but if there is a crash this helps to make sure there are no leftovers
 echo Cleaning up ROS and Gazebo Processes
@@ -161,3 +321,5 @@ pkill roscore
 # Restore previous environment
 export GAZEBO_MODEL_PATH=$previous_gazebo_model_path
 export GAZEBO_PLUGIN_PATH=$previous_gazebo_plugin_path
+
+echo "Experiment finished at $(date +%d-%m-%Y" "%H:%M:%S)."
