@@ -1684,13 +1684,15 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if (ui.final_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
          arena_dim = 23.1;
-         addFinalsWalls();
+         //addFinalsWalls();
+         addFinalsTagBoundary();
          emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else if (ui.prelim_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
         arena_dim = 15;
-        addPrelimsWalls();
+        //addPrelimsWalls();
+        addPrelimsTagBoundary();
         emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else
@@ -2485,6 +2487,71 @@ QString RoverGUIPlugin::addPrelimsWalls()
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 
    output += sim_mgr.addModel("barrier_prelim_round", "Barrier_South", 0, arena_dim/2, 0, 0, 0, M_PI/2, 0);
+   progress_dialog.setValue(4*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   return output;
+}
+
+// Add a tag boundary to the simulation
+QString RoverGUIPlugin::addFinalsTagBoundary()
+{
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing Barriers");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
+   QString output;
+   //East & West are slightly elevated so barriers overlap neatly in the corners
+   output += sim_mgr.addModel("at1_barrier_final_round", "Barrier_West", -arena_dim/2, 0, 0.001, 0 );
+   progress_dialog.setValue(1*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   output += sim_mgr.addModel("at1_barrier_final_round", "Barrier_North", 0, -arena_dim/2, 0, 0, 0, M_PI/2, 0);
+   progress_dialog.setValue(2*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   output += sim_mgr.addModel("at1_barrier_final_round", "Barrier_East", arena_dim/2, 0, 0.001, 0 );
+   progress_dialog.setValue(3*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   output += sim_mgr.addModel("at1_barrier_final_round", "Barrier_South", 0, arena_dim/2, 0, 0, 0, M_PI/2, 0);
+   progress_dialog.setValue(4*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   return output;
+}
+
+QString RoverGUIPlugin::addPrelimsTagBoundary()
+{
+    QProgressDialog progress_dialog;
+    progress_dialog.setWindowTitle("Placing Barriers");
+    progress_dialog.setCancelButton(NULL); // no cancel button
+    progress_dialog.setWindowModality(Qt::ApplicationModal);
+    progress_dialog.setWindowFlags(progress_dialog.windowFlags() | Qt::WindowStaysOnTopHint);
+    progress_dialog.resize(500, 50);
+    progress_dialog.show();
+
+    // Setting wall clearance to zero - radius of a wall does not make sense. Barrier clearance values ensure models are not placed on the walls.
+
+   QString output;
+   //East & West are slightly elevated so barriers overlap neatly in the corners
+   output += sim_mgr.addModel("at1_barrier_prelim_round", "Barrier_West", -arena_dim/2, 0, 0.001, 0 );
+   progress_dialog.setValue(1*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   output += sim_mgr.addModel("at1_barrier_prelim_round", "Barrier_North", 0, -arena_dim/2, 0, 0, 0, M_PI/2, 0);
+   progress_dialog.setValue(2*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   output += sim_mgr.addModel("at1_barrier_prelim_round", "Barrier_East", arena_dim/2, 0, 0.001, 0 );
+   progress_dialog.setValue(3*100.0f/4);
+   qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+   output += sim_mgr.addModel("at1_barrier_prelim_round", "Barrier_South", 0, arena_dim/2, 0, 0, 0, M_PI/2, 0);
    progress_dialog.setValue(4*100.0f/4);
    qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 

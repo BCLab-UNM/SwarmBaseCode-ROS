@@ -1,4 +1,4 @@
-material at1_barrier_prelim_round/Diffuse
+material at1_barrier_final_round/Diffuse
 {
   technique
   {
@@ -9,7 +9,7 @@ material at1_barrier_prelim_round/Diffuse
       texture_unit
       {
         texture atag-1.png
-        scale 0.003125 0.3333333
+        scale 0.0020833333 0.3333333
       }
     }
   }
