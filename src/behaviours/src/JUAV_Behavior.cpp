@@ -165,7 +165,12 @@ int main(int argc, char **argv)
           
         }
         
-        if(juav_current_location.pose.position.z >= 1 && takeoff_attempted)
+        if(juav_current_location.pose.position.z >= 1 && takeoff_attempted && landed)
+        {
+          landed = false;
+        }
+        
+        if(!landed)
         {
           geometry_msgs::PoseStamped start_pose;
           start_pose.pose.position.x = 5;
