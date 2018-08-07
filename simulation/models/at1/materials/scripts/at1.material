@@ -1,0 +1,16 @@
+material at1/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      transparent_sorting on
+
+      texture_unit
+      {
+        texture atag-1.png
+        scale 1 1
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+	<model name="at1 barrier prelim round">
+		<static>true</static>
+		<link name='link'>
+			<visual name='visual'>
+				<geometry>
+					<box>
+						<size>0.15 15 0.001</size>
+					</box>
+				</geometry>
+				<material>
+					<script>
+						<uri>model://at1_barrier_prelim_round/materials/scripts</uri>
+						<uri>model://at1_barrier_prelim_round/materials/textures</uri>
+						<name>at1_barrier_prelim_round/Diffuse</name>
+					</script>
+				</material>
+			</visual>
+		</link>     
+	</model>
+</sdf>
