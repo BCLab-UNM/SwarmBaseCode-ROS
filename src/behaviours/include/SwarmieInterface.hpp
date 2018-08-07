@@ -5,6 +5,8 @@
 #include <sensor_msgs/Range.h>
 #include <nav_msgs/Odometry.h>
 #include <apriltags_ros/AprilTagDetectionArray.h>
+
+#include "RobotInterface.hpp"
 #include "SwarmieSensors.hpp"
 #include "Action.hpp"
 
@@ -26,7 +28,7 @@ public:
    void SetWrist(WristControl w);
 };
 
-class SwarmieInterface
+class SwarmieInterface : public core::RobotInterface
 {
 private:
    ros::NodeHandle _nh;
@@ -37,6 +39,8 @@ private:
    ros::Subscriber _rightSubscriber;
    ros::Subscriber _centerSubscriber;
    ros::Subscriber _tagSubscriber;
+   ros::Subscriber _odomSubscriber;
+   ros::Subscriber _gpsFusedSubscriber;
 
    SwarmieSensors _sensors;
 
@@ -55,8 +59,8 @@ public:
    SwarmieInterface(std::string name);
    ~SwarmieInterface() {}
 
-   const SwarmieSensors* GetSensors() { return &_sensors; }
-   void DoAction(const SwarmieAction& a);
+   const core::Sensors& GetSensors() override { return _sensors; }
+   void DoAction(const core::Action& a) override;
 };
 
 #endif // _ROBOT_INTERFACE_HPP

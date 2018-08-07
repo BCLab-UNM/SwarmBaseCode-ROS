@@ -93,6 +93,7 @@ namespace core {
       };
 
    public:
+      Action();
       Action(VelocityAction v);
       Action(WaypointAction w);
       ~Action() {}
@@ -103,6 +104,21 @@ namespace core {
 
       void SetAction(VelocityAction v);
       void SetAction(WaypointAction w);
+   };
+
+}
+
+namespace mission {
+
+   /**
+    * The required interfact to mission::Action consists only of a
+    * method that extracts the core::Action component of the mission
+    * action.
+    */
+   class Action
+   {
+   public:
+      virtual core::Action GetCoreAction();
    };
 
 }

@@ -13,7 +13,7 @@ public:
 
    Heading operator+(const Heading& h);
    Heading operator-(const Heading& h);
-   bool operator==(const Heading& h);
+   friend bool operator==(const Heading& g, const Heading& h);
 };
 
 #endif // _CORE_HEADING_HPP

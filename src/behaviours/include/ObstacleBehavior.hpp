@@ -6,7 +6,7 @@
 #include "BehaviorManager.hpp"
 #include "Timer.hpp"
 
-class ObstacleBehavior : public Behavior
+class ObstacleBehavior : public core::Behavior
 {
 private:
    const double DRIVE_MAX = 512;

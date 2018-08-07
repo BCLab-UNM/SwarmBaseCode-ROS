@@ -183,6 +183,11 @@ namespace core {
       _waypoint(w)
    {}
 
+   Action::Action() :
+      _type(Type::VELOCITY),
+      _velocity(VelocityAction(LinearVelocity(0)))
+   {}
+
    VelocityAction Action::GetVelocity() const throw(BadType)
    {
       if(_type != Type::VELOCITY)
