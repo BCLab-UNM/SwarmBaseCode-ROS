@@ -91,6 +91,8 @@ geometry_msgs::Pose2D centerLocationMap;	//A GPS point of the center location, u
 geometry_msgs::Pose2D centerLocationOdom;	//The centers location based on ODOM
 geometry_msgs::Pose2D centerLocationMapRef;	//Variable used in TransformMapCenterToOdom, can be moved to make it local instead of global
 
+geometry_msgs::PoseStamped follow_me; //this is a test
+
 int currentMode = 0;
 const float behaviourLoopTimeStep = 0.1; 	//time between the behaviour loop calls
 const float status_publish_interval = 1;	//time between publishes
@@ -133,6 +135,9 @@ ros::Publisher heartbeatPublisher;		//publishes ROSAdapters status via its "hear
 // to indicate when waypoints have been reached.
 ros::Publisher waypointFeedbackPublisher;	//publishes a waypoint to travel to if the rover is given a waypoint in manual mode
 
+ros::Publisher mavros_odom_publish; //this is a test
+ros::Publisher mavros_follow_publish;
+
 // Subscribers
 ros::Subscriber joySubscriber;			//receives joystick information
 ros::Subscriber modeSubscriber; 		//receives mode from GUI
@@ -140,6 +145,9 @@ ros::Subscriber targetSubscriber;		//receives tag data
 ros::Subscriber odometrySubscriber;		//receives ODOM data
 ros::Subscriber mapSubscriber;			//receives GPS data
 ros::Subscriber virtualFenceSubscriber;		//receives data for vitrual boundaries
+
+ros::Subscriber uavSubscriber; //test
+
 // manualWaypointSubscriber listens on "/<robot>/waypoints/cmd" for
 // swarmie_msgs::Waypoint messages.
 ros::Subscriber manualWaypointSubscriber; 	//receives manual waypoints given from GUI
@@ -175,7 +183,7 @@ void behaviourStateMachine(const ros::TimerEvent&);					//Upper most state machi
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);			//Publishes "ONLINE" when rover is successfully connected
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);			
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);	//handles ultrasound data and stores data
-
+void juavHandler(const nav_msgs::Odometry::ConstPtr& message);
 // Converts the time passed as reported by ROS (which takes Gazebo simulation rate into account) into milliseconds as an integer.
 long int getROSTimeInMilliSecs();
 
@@ -208,6 +216,9 @@ int main(int argc, char **argv) {
   mapSubscriber = mNH.subscribe((publishedName + "/odom/ekf"), 10, mapHandler);						//receives GPS data
   virtualFenceSubscriber = mNH.subscribe(("/virtualFence"), 10, virtualFenceHandler);					//receives data for vitrual boundaries
   manualWaypointSubscriber = mNH.subscribe((publishedName + "/waypoints/cmd"), 10, manualWaypointHandler);		//receives manual waypoints given from GUI
+  
+  uavSubscriber = mNH.subscribe(("mavros/global_position/local"), 10, juavHandler);		//receives mavros postition messages, this is a test
+  
   message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
@@ -221,6 +232,10 @@ int main(int argc, char **argv) {
   driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);			//publishes motor commands to the motors
   heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);		//publishes ROSAdapters status via its "heartbeat"
   waypointFeedbackPublisher = mNH.advertise<swarmie_msgs::Waypoint>((publishedName + "/waypoints"), 1, true);		//publishes a waypoint to travel to if the rover is given a waypoint in manual mode
+  
+  mavros_follow_publish = mNH.advertise<geometry_msgs::PoseStamped> (("mavros/setpoint_position/local"), 1);
+  
+  mavros_odom_publish = mNH.advertise<nav_msgs::Odometry>(("mavros/odom/filtered"), 10);
 
   //timers
   publish_status_timer = mNH.createTimer(ros::Duration(status_publish_interval), publishStatusTimerEventHandler);
@@ -256,8 +271,7 @@ int main(int argc, char **argv) {
   return EXIT_SUCCESS;
 }
 
-
-// This is the top-most logic control block organised as a state machine.
+// This is the top-most logic control block organised as a encoderEventHandlerstate machine.
 // This function calls the dropOff, pickUp, and search controllers.
 // This block passes the goal location to the proportional-integral-derivative
 // controllers in the abridge package.
@@ -276,7 +290,6 @@ void behaviourStateMachine(const ros::TimerEvent&)
 
     if (timerTimeElapsed > startDelayInSeconds)
     {
-
       // initialization has run
       initilized = true;
       //TODO: this just sets center to 0 over and over and needs to change
@@ -306,7 +319,14 @@ void behaviourStateMachine(const ros::TimerEvent&)
       return;
     }
     
+    
   }
+  
+  follow_me.pose.position.x = currentLocation.x - centerLocationOdom.x;
+  follow_me.pose.position.y = currentLocation.y - centerLocationOdom.y;
+  follow_me.pose.position.z = 10.0; //meters
+  
+  mavros_follow_publish.publish(follow_me);
 
   // Robot is in autonomous mode
   if (currentMode == 2 || currentMode == 3)
@@ -322,7 +342,6 @@ void behaviourStateMachine(const ros::TimerEvent&)
     
     //ask logic controller for the next set of actuator commands
     result = logicController.DoWork();
-    
     bool wait = false;	//a variable created to check if we are in a waiting state
     
     //if a wait behaviour is thrown sit and do nothing untill logicController is ready
@@ -406,7 +425,7 @@ void behaviourStateMachine(const ros::TimerEvent&)
     {
       // if the logic controller requested that the robot drive, then
       // drive. Otherwise there are no manual waypoints and the robot
-      // should sit idle. (ie. only drive according to joystick
+      // should sit idle. (ie. only drive according to joysticksetpoint_position
       // input).
       sendDriveCommand(result.pd.left,result.pd.right);
     }
@@ -485,6 +504,21 @@ void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_ms
   
   logicController.SetSonarData(sonarLeft->range, sonarCenter->range, sonarRight->range);
   
+}
+
+
+void juavHandler(const nav_msgs::Odometry::ConstPtr& message) {
+  geometry_msgs::Pose2D juav_current_location;
+  
+  juav_current_location.x = message->pose.pose.position.x;
+  juav_current_location.y = message->pose.pose.position.y;
+  
+  cout << "x = " << juav_current_location.x << " y = " << juav_current_location.y << endl;
+  
+  //message.header.frame_id = "mavros/odom";
+  //message.child_frame_id = "macros/base_link";
+  
+  mavros_odom_publish.publish(message);
 }
 
 void odometryHandler(const nav_msgs::Odometry::ConstPtr& message) {

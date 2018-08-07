@@ -8,9 +8,10 @@
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
 	<arg name="fcu_protocol" default="v2.0" />
-	<arg name="respawn_mavros" default="false" />
+	<arg name="respawn_mavros" default="true" />
+	<arg name="system_id" default="1" />
 
-	<include file="$(find mavros)/launch/node.launch">
+	<include ns="cronus" file="$(find mavros)/launch/node.launch">
 		<arg name="pluginlists_yaml" value="$(find mavros)/launch/apm_pluginlists.yaml" />
 		<arg name="config_yaml" value="$(find mavros)/launch/apm_config.yaml" />
 
