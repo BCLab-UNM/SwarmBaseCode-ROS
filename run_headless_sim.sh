@@ -57,7 +57,7 @@ rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/concrete_ground_
 startRoverNode()
 {
     local rover_name=$1
-    roslaunch $PWD/launch/swarmie.launch name:=$rover_name
+    roslaunch $PWD/launch/swarmie.launch name:=$rover_name > logs/$rover_name.log &
     echo "Attempted to start rover ROS nodes"
 }
 
@@ -248,7 +248,7 @@ echo "Setting rovers to autonomous mode..."
 for (( i=0;i<$NUM_ROVERS;i++ ));
 do
     # Publish the autonomous mode command ("2") to each rover. Latch the message ("-l").
-    rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/String "2" &
+    rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/UInt8 2 &
     echo "Publishing 2 on /${ROVER_NAMES[i]}/mode"
 done
  
