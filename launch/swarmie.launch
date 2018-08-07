@@ -6,7 +6,6 @@
   <node name="$(arg name)_DIAGNOSTICS" pkg="diagnostics" type="diagnostics" args="$(arg name)" />
   <node name="$(arg name)_SBRIDGE" pkg="sbridge" type="sbridge" args="$(arg name)" />
   <node name="$(arg name)_BEHAVIOUR" pkg="behaviours" type="behaviours" args="$(arg name)" output="screen"/>
-  <node name="$(arg name)_OBSTACLE" pkg="obstacle_detection" type="obstacle" args="$(arg name)" />
 
   <node pkg="robot_localization" type="navsat_transform_node" name="$(arg name)_NAVSAT" respawn="false">
 
