@@ -126,7 +126,9 @@ then
     echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30"   
    exit 1
 fi
-   
+
+EXPERIMENT_REAL_SETUP_START_TIME_IN_SECONDS=$(date +%s)
+
 echo "Running in $PWD" 
 previous_gazebo_model_path=${GAZEBO_MODEL_PATH}
 previous_gazebo_plugin_path=${GAZEBO_PLUGIN_PATH}
@@ -304,7 +306,10 @@ YELLOW='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-#Write header
+EXPERIMENT_REAL_SETUP_END_TIME_IN_SECONDS=$(date +%s)
+EXPERIMENT_REAL_START_TIME_IN_SECONDS=$(date +%s)
+
+#Collect the score over time and write to screen and file
 echo "Time (s), Score\n" >> $SCORE_OUTPUT_PATH
 
 until (( $CURRENT_TIME-$START_TIME>=$EXPERIMENT_DURATION_IN_SECONDS )); do
@@ -328,7 +333,28 @@ do
     echo "Publishing 1 on /${ROVER_NAMES[i]}/mode"
 done
 
+EXPERIMENT_REAL_END_TIME_IN_SECONDS=$(date +%s)
+
+ELAPSED_REAL_TIME_IN_SECONDS=$(( $EXPERIMENT_REAL_END_TIME_IN_SECONDS-$EXPERIMENT_REAL_START_TIME_IN_SECONDS ))
+ELAPSED_REAL_TIME_IN_MINUTES=$(( $ELAPSED_REAL_TIME_IN_SECONDS/60 ))
+ELAPSED_SETUP_REAL_TIME_IN_SECONDS=$(( $EXPERIMENT_REAL_SETUP_END_TIME_IN_SECONDS-$EXPERIMENT_REAL_SETUP_START_TIME_IN_SECONDS ))
+ELAPSED_SETUP_REAL_TIME_IN_MINUTES=$(( $ELAPSED_SETUP_REAL_TIME_IN_SECONDS/60 ))
+ELAPSED_TOTAL_TIME_IN_SECONDS=$(( $ELAPSED_SETUP_REAL_TIME_IN_SECONDS+$ELAPSED_REAL_TIME_IN_SECONDS ))
+ELAPSED_TOTAL_TIME_IN_MINUTES=$(( $ELAPSED_TOTAL_TIME_IN_SECONDS/60 ))
+
+echo "Experiment setup took $ELAPSED_SETUP_REAL_TIME_IN_SECONDS seconds."
+echo "Experiment setup took $ELAPSED_SETUP_REAL_TIME_IN_MINUTES minutes."
+
+echo "Experiment run took $ELAPSED_REAL_TIME_IN_SECONDS seconds."
+echo "Experiment run took $ELAPSED_REAL_TIME_IN_MINUTES minutes."
+
+echo "Experiment run took $ELAPSED_TOTAL_TIME_IN_SECONDS seconds."
+echo "Experiment run took $ELAPSED_TOTAL_TIME_IN_MINUTES minutes."
+
 echo "Finished placing all rovers into manual mode. Ending simulation..."
+
+# Report some simulation efficiency information
+echo "The $EXPERIMENT_DURATION_IN_MINUTES minute long experiment took $ELAPSED_REAL_TIME_IN_MINUTES minutes of real time to simulate with $ELAPSED_SETUP_REAL_TIME_IN_MINUTES minutes of setup time."
 
 # The rover program cleans up after itself but if there is a crash this helps to make sure there are no leftovers
 echo Cleaning up ROS and Gazebo Processes
