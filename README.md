@@ -286,6 +286,8 @@ Replace ~/SwarmBaseCode-ROS with the path to your git repository.
 
 11. Press the run cmake button.
 
+12. Press the "Finish" button.
+
 ~~11. Click the "Edit" toolbox icon on the left.~~
 
 ~~12. Double-click CMakeLists.txt.~~
