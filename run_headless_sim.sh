@@ -72,7 +72,6 @@ stopRoverNode()
     rosnode kill rover_name_BEHAVIOUR
     rosnode kill rover_name_SBRIDGE
     rosnode kill rover_name_NAVSAT
-    rosnode kill rover_name_OBSTACLE
     rosnode kill rover_name_ODOM
     echo "Attempted to kill rover ROS nodes: name=$rover_name"
 }
