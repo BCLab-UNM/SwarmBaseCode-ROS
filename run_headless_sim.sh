@@ -227,7 +227,7 @@ ROVER_YAWS=( 0.000 1.571 -3.142 -1.571 -2.356 0.785 -0.785 2.356 )
 echo "Adding rovers to Gazebo and starting their ROS nodes..."
 
 # Add rovers to the simulation and start the associated ROS nodes
-for (( i=0;i<=$NUM_ROVERS;i++ ));
+for (( i=0;i<$NUM_ROVERS;i++ ));
 do
     sleep $MODEL_ADD_INTERVAL
     addRover ${ROVER_NAMES[i]} ${ROVER_POSITIONS_X[i]} ${ROVER_POSITIONS_Y[i]} 0 0 0 ${ROVER_YAWS[i]}
@@ -300,7 +300,7 @@ done
 echo "The specified experiment duration ($EXPERIMENT_DURATION_IN_MINUTES) has elapsed. End autonomous mode for all rovers."
 
 # Send the autonomous command to all rovers
-for (( i=0;i<=$NUM_ROVERS;i++ ));
+for (( i=0;i<$NUM_ROVERS;i++ ));
 do
     # Publish the autonomous mode command ("2") to each rover. Latch the message ("-l").
     rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/String "2" &
