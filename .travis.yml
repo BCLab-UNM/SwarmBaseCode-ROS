@@ -24,3 +24,4 @@ script:
 #  - catkin run_tests
 #  - source devel/setup.bash
 #  - devel/lib/behaviours/behaviour_test
+   - testing/run_tests.sh
