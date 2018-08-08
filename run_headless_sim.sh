@@ -1,11 +1,20 @@
 #!/bin/bash
 
 # Function definitions
+
+function userExit()
+{
+    echo "Received SIGINT. Exiting."
+    rosnode kill -all
+    ./cleanup.sh
+    exit
+}
+
 startGazeboServer()
 {
     local world_file_path=$1
     rosparam set /use_sim_time true
-    rosrun gazebo_ros gzserver $world_file_path &
+    setsid rosrun gazebo_ros gzserver $world_file_path &
     echo "Attempted to start Gazebo server with world file: $1"
 }
 
@@ -17,7 +26,7 @@ stopGazeboServer()
 
 startGazeboClient()
 {
-    rosrun gazebo_ros gzclient __name:=gzclient &
+    setsid rosrun gazebo_ros gzclient __name:=gzclient &
     echo "Attempted to start Gazebo client"
 }
 
@@ -29,7 +38,7 @@ stopGazeboClient()
 
 addCollectionZone()
 {
-rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/collection_disk/model.sdf \
+setsid rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/collection_disk/model.sdf \
                -model collection_disk \
                -x 0 \
                -y 0 \
@@ -42,7 +51,7 @@ rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/collection_disk/
 
 addGroundPlane()
 {
-rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/concrete_ground_plane/model.sdf \
+setsid rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/concrete_ground_plane/model.sdf \
                -model concrete_ground_plane \
                -x 0 \
                -y 0 \
@@ -54,15 +63,15 @@ rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/concrete_ground_
 }
 
 # Stops the ROS nodes associated with rovers
-startRoverNode()
+startRoverNodes()
 {
     local rover_name=$1
-    roslaunch $PWD/launch/swarmie.launch name:=$rover_name > logs/$rover_name.log &
+    setsid roslaunch $PWD/launch/swarmie.launch name:=$rover_name > logs/$rover_name.log &
     echo "Attempted to start rover ROS nodes"
 }
 
 # Stops the ROS nodes associated with rovers
-stopRoverNode()
+stopRoverNodes()
 {
     local rover_name=$1
     rosnode kill rover_name_APRILTAG
@@ -73,6 +82,8 @@ stopRoverNode()
     rosnode kill rover_name_SBRIDGE
     rosnode kill rover_name_NAVSAT
     rosnode kill rover_name_ODOM
+
+    rosnode cleanup
     echo "Attempted to kill rover ROS nodes: name=$rover_name"
 }
 
@@ -86,7 +97,7 @@ addRover()
     local pitch=$6
     local yaw=$7
     
-    rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/$rover_name/model.sdf \
+    setsid rosrun gazebo_ros spawn_model -sdf -file $PWD/simulation/models/$rover_name/model.sdf \
            -model $rover_name \
            -x $x \
            -y $y \
@@ -96,6 +107,16 @@ addRover()
            -Y $yaw
     echo "Attempted to add rover: name=$rover_name, x=$x, y=$y, z=$z, roll=$roll, pitch=$pitch, yaw=$yaw"
 }
+
+#---------------------------------------------------------#
+#
+#  The top level script
+#
+#
+#---------------------------------------------------------#
+
+# Exit script if user enters ctl-c or sends interrupt
+trap userExit SIGINT
 
 # If not given 4 or 5 arguments then show the usage text
 if [ $# -ne 5 -a $# -ne 4 ]
@@ -232,7 +253,7 @@ do
     sleep $MODEL_ADD_INTERVAL
     addRover ${ROVER_NAMES[i]} ${ROVER_POSITIONS_X[i]} ${ROVER_POSITIONS_Y[i]} 0 0 0 ${ROVER_YAWS[i]}
     sleep $MODEL_ADD_INTERVAL
-    startRoverNode ${ROVER_NAMES[i]}
+    startRoverNodes ${ROVER_NAMES[i]}
 done
 
 echo "Finished adding rovers."
