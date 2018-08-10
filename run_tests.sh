@@ -38,7 +38,7 @@ trap userExit SIGINT
 
 
 # Run the headless simulation see sun_headless_sim.sh usage output for parameter definitions
-setsid ./run_headless_sim.sh simulation/worlds/powerlaw_targets_example.world 2 /dev/null 1 42 &
+setsid ./run_headless_sim.sh simulation/worlds/powerlaw_targets_example.world 3 /dev/null 2 42 &
 
 sleep 30
 
