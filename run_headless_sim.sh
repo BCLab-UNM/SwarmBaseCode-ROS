@@ -13,12 +13,13 @@ function userExit()
 startGazeboServer()
 {
     local world_file_path=$1
+    local random_seed=$2
     rosparam set /use_sim_time true
-    setsid rosrun gazebo_ros gzserver $world_file_path &
-    echo "Attempted to start Gazebo server with world file: $1"
+    setsid rosrun gazebo_ros gzserver $world_file_path --seed $random_seed &
+    echo "Attempted to start Gazebo server with world file: $world_file_path and random seed $random_seed"
 }
 
-stopGazeboServer()
+stopGazebo()
 {
     pkill gzserver
     echo "Attempted to stop Gazebo server" 
@@ -119,11 +120,11 @@ addRover()
 trap userExit SIGINT
 
 # If not given 4 or 5 arguments then show the usage text
-if [ $# -ne 5 -a $# -ne 4 ]
+if [ $# -ne 6 -a $# -ne 5 ]
 then
-    echo "Usage: $0 world_file_path num_rovers(1-8) scoring_output_path experiment_duration_in_minutes [visualize]"
-    echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30 visualize"
-    echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30"   
+    echo "Usage: $0 world_file_path num_rovers(1-8) scoring_output_path experiment_duration_in_minutes random_seed [visualize]"
+    echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt 30 random_seed visualize"
+    echo "Example: $0 simulation/worlds/powerlaw_targets_example.world 6 ~/swarmathon_data/experiment1.txt random_seed 30"   
    exit 1
 fi
 
@@ -165,11 +166,16 @@ MAX_ROVERS=8
 WORLD_FILE_PATH=$1
 echo "World file path: $WORLD_FILE_PATH"
 
-# Start the gazebo simulation
-startGazeboServer $WORLD_FILE_PATH
+#---------------------------------------------------------#
+# Read the random seed to give gazebo
+RANDOM_SEED=$5
+echo "Random seed: $RANDOM_SEED"
 
 # Start the gazebo simulation
-if [ $# -eq 5 -a "$5" = "visualize" ]
+startGazeboServer $WORLD_FILE_PATH $RANDOM_SEED
+
+# Start the gazebo simulation
+if [ $# -eq 6 -a "$6" = "visualize" ]
 then
     echo "User requested that the Gazebo client be started"
     startGazeboClient
