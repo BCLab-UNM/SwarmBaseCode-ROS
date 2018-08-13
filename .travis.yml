@@ -15,6 +15,7 @@ before_install:
   - sudo rosdep init
   - rosdep update
   - sudo apt install -y libusb-dev python-rosinstall python-catkin-tools ros-$ros_distro-robot-localization ros-$ros_distro-usb-cam ros-$ros_distro-hector-gazebo-plugins ros-$ros_distro-joystick-drivers
+  - sudo apt-get install -y ros-$ros_distro-mavros ros-$ros_distro-mavros-extras
   - source /opt/ros/$ros_distro/setup.bash
 
 script:
