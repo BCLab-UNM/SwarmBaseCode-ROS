@@ -1,0 +1,11 @@
+<launch>
+  <param name="tf_prefix" value="$(arg name)" />
+  
+  <node name="$(arg name)_BEHAVIOURS" pkg="behaviours" type="JUAV_behaviours" args="$(arg name)" output="screen"/>
+  <node name="$(arg name)_DIAGNOSTICS" pkg="diagnostics" type="diagnostics" args="$(arg name)" />
+
+
+
+
+  
+</launch>
