@@ -150,7 +150,6 @@ echo "Experiment started at $(date +%d-%m-%Y" "%H:%M:%S)."
 
 #---------------------------------------------------------#
 # Set the interval at which to check whether the experiment duration has elapsed
-# The following line set the interval to 1 minute
 END_EXPERIMENT_CHECK_INTERVAL=1s
 
 # Delay between adding rovers
