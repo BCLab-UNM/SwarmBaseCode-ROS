@@ -68,7 +68,7 @@ QProcess* GazeboSimManager::startGazeboClient()
 
     gazebo_client_process->start(command);
 
-   // gazebo_client_process->waitForStarted();
+    // gazebo_client_process->waitForStarted();
 
     return gazebo_client_process;
 }
