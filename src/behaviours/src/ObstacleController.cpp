@@ -172,40 +172,35 @@ void ObstacleController::setTagData(vector<Tag> tags){
 
   // this loop is to get the number of center tags
   if (!targetHeld) {
-    for (int i = 0; i < tags.size(); i++) { //redundant for loop
+    for (int i = 0; i < tags.size(); i++) {
       if (tags[i].getID() == 256) {
 
-	collection_zone_seen = checkForCollectionZoneTags( tags );
+  collection_zone_seen = checkForCollectionZoneTags( tag[i] );
         timeSinceTags = current_time;
       }
     }
   }
 }
 
-bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags ) {
+bool ObstacleController::checkForCollectionZoneTags( Tag tag ) {
 
-  for ( auto & tag : tags ) { 
+  // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle.
+  //If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle.
+  //This allows the robot to leave the collection zone after dropping off a target.
+  if ( tag.calcYaw() > 0 )
+    {
+      // checks if tag is on the right or left side of the image
+      if (tag.getPositionX() + camera_offset_correction > 0) {
+        count_right_collection_zone_tags++;
 
-    // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle. 
-    //If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle. 
-    //This allows the robot to leave the collection zone after dropping off a target.
-    if ( tag.calcYaw() > 0 ) 
-      {
-	// checks if tag is on the right or left side of the image
-	if (tag.getPositionX() + camera_offset_correction > 0) {
-	  count_right_collection_zone_tags++;
-	  
-	} else {
-	  count_left_collection_zone_tags++;
-	}
+      } else {
+        count_left_collection_zone_tags++;
       }
-    
-  }
+    }
 
 
   // Did any tags indicate that the robot is inside the collection zone?
   return count_left_collection_zone_tags + count_right_collection_zone_tags > 0;
-
 }
 
 //obstacle controller should inrerupt is based upon the transition from not seeing and obstacle to seeing an obstacle
