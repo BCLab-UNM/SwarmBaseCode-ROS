@@ -175,7 +175,7 @@ void ObstacleController::setTagData(vector<Tag> tags){
     for (int i = 0; i < tags.size(); i++) {
       if (tags[i].getID() == 256) {
 
-  collection_zone_seen = checkForCollectionZoneTags( tag[i] );
+  collection_zone_seen = checkForCollectionZoneTags( tags[i] );
         timeSinceTags = current_time;
       }
     }

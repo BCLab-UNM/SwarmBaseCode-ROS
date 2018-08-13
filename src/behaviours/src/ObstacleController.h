@@ -41,7 +41,7 @@ private:
 
   // Are there AprilTags in the camera view that mark the collection zone
   // and are those AprilTags oriented towards or away from the camera.
-  bool checkForCollectionZoneTags( vector<Tag> );
+  bool checkForCollectionZoneTags( Tag tag );
   
   const float K_angular = 1.0; //radians a second turn rate to avoid obstacles
   const float reactivate_center_sonar_threshold = 0.8; //reactive center sonar if it goes back above this distance, assuming it is deactivated
