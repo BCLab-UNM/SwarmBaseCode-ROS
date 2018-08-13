@@ -39,8 +39,9 @@ private:
   // Try not to run into a physical object
   void avoidObstacle();
 
-  // Are there AprilTags in the camera view that mark the collection zone
+  // Are there AprilTags in the camera view that mark the collection zone or tag boundary
   // and are those AprilTags oriented towards or away from the camera.
+   bool checkForBoundaryTags( Tag tag );
   bool checkForCollectionZoneTags( Tag tag );
   
   const float K_angular = 1.0; //radians a second turn rate to avoid obstacles
@@ -63,6 +64,8 @@ private:
   float center = 0; //distance on center ultrasound
   float right = 0; //distance on right ultrasound
 
+  unsigned int count_left_boundary_tags;
+  unsigned int count_right_boundary_tags;
   unsigned int count_left_collection_zone_tags;
   unsigned int count_right_collection_zone_tags;
 
@@ -79,6 +82,7 @@ private:
   bool previousTargetState = false;
 
   bool phys = false; // Physical obstacle
+  bool tag_boundary_seen = false; // The obstacle is the arena boundary defined by AprilTags
   bool collection_zone_seen = false; // The obstacle is the collection zone
   
   bool set_waypoint = false;
