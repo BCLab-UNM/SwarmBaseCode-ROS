@@ -36,12 +36,11 @@ private:
   // Try not to run over the collection zone
   void avoidCollectionZone();
 
-  // Try not to run into a physical object
+  // Try not to run into a physical object or the tag boundary
   void avoidObstacle();
 
-  // Are there AprilTags in the camera view that mark the collection zone or tag boundary
+  // Are there AprilTags in the camera view that mark the collection zone
   // and are those AprilTags oriented towards or away from the camera.
-   bool checkForBoundaryTags( Tag tag );
   bool checkForCollectionZoneTags( Tag tag );
   
   const float K_angular = 1.0; //radians a second turn rate to avoid obstacles
@@ -64,8 +63,6 @@ private:
   float center = 0; //distance on center ultrasound
   float right = 0; //distance on right ultrasound
 
-  unsigned int count_left_boundary_tags;
-  unsigned int count_right_boundary_tags;
   unsigned int count_left_collection_zone_tags;
   unsigned int count_right_collection_zone_tags;
 

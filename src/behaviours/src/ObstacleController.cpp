@@ -18,11 +18,11 @@ void ObstacleController::Reset() {
   delay = current_time;
 }
 
-// Avoid crashing into objects detected by the ultraound
+// Avoid crashing into objects detected by the ultrasound or the tag bouundary
 void ObstacleController::avoidObstacle() {
   
     //always turn left to avoid obstacles
-    if (right < 0.8 || center < 0.8 || left < 0.8) {
+    if (right < 0.8 || center < 0.8 || left < 0.8 || tag_boundary_seen) {
       result.type = precisionDriving;
 
       result.pd.cmdAngular = -K_angular;
@@ -168,9 +168,6 @@ void ObstacleController::ProcessData() {
 // If the top of the tags are away from the rover then treat them as obstacles. 
 void ObstacleController::setTagData(vector<Tag> tags){
   tag_boundary_seen = false;
-  count_left_boundary_tags = 0;
-  count_right_boundary_tags = 0;
-
   collection_zone_seen = false;
   count_left_collection_zone_tags = 0;
   count_right_collection_zone_tags = 0;
@@ -178,11 +175,11 @@ void ObstacleController::setTagData(vector<Tag> tags){
   // give Boundary tag type precedence, even if holding a target
   for (int i = 0; i < tags.size(); i++) {
     if (tags[i].getID() == 1) {
-      tag_boundary_seen = checkForBoundaryTags( tags[i] );
+      tag_boundary_seen = true;
       timeSinceTags = current_time;
+      return; // we don't check anything else if we're at a boundary
     }
   }
-  //TODO improve abstraction level to reduce duplicate code here and to loop over tag vector only once
 
   // this loop is to get the number of center tags
   if (!targetHeld) {
@@ -193,20 +190,6 @@ void ObstacleController::setTagData(vector<Tag> tags){
       }
     }
   }
-}
-
-bool ObstacleController::checkForBoundaryTags( Tag tag ) {
-  // checks if tag is on the right or left side of the image
-  if (tag.getPositionX() + camera_offset_correction > 0) {
-    count_right_boundary_tags++;
-
-  } else {
-    count_left_boundary_tags++;
-  }
-
-
-  // Did any tags indicate that the robot is inside the collection zone?
-  return count_left_boundary_tags + count_right_boundary_tags > 0;
 }
 
 bool ObstacleController::checkForCollectionZoneTags( Tag tag ) {
