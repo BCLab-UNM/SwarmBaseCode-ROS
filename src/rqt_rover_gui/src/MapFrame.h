@@ -27,6 +27,7 @@
 #include <utility> // For STL pair
 #include <map>
 #include <QString>
+#include "MapData.h"
 
 // Forward declarations
 class QMainWindow;
@@ -95,6 +96,7 @@ namespace rqt_rover_gui
 
     signals:
 
+      void sendVirtualFenceCmd(VirtualFenceCmd vf, float center_x, float center_y, float width, float height);
       void sendInfoLogMessage(QString msg);
       void sendWaypointCmd(WaypointCmd, int, float, float);
       void delayedUpdate();
@@ -106,11 +108,18 @@ namespace rqt_rover_gui
         
     protected:
 
+      // React to draw requests
       void paintEvent(QPaintEvent *event);
+
+      // React to mouse events
       void mouseReleaseEvent(QMouseEvent *event);
       void mousePressEvent(QMouseEvent *event);
       void mouseMoveEvent(QMouseEvent *event);
       void wheelEvent(QWheelEvent *);
+
+      // React to keyboard events
+      void keyPressEvent(QKeyEvent* event);
+      void keyReleaseEvent(QKeyEvent* event);
 
     private:
 
@@ -184,6 +193,14 @@ namespace rqt_rover_gui
       
       float max_seen_width = -std::numeric_limits<float>::max();
       float max_seen_height = -std::numeric_limits<float>::max();
+
+      float fence_corner_x = 0;
+      float fence_corner_y = 0;
+      bool user_is_drawing_fence = false;
+
+      // Keyboard state
+      // This can be fooled when multiple shift keys are pressed or released at the same time.
+      bool shift_key_down = false;
 
       std::string rover_currently_selected; // This is the rover selected in the main GUI.
 

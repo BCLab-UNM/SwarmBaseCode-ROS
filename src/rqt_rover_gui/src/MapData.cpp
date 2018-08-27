@@ -7,6 +7,26 @@ MapData::MapData()
     display_global_offset = false;
 }
 
+// Define virtual fences for display to the user.
+void MapData::setVirtualFenceCircle(float center_x, float center_y, float radius)
+{
+    update_mutex.lock();
+    virtual_fence_center = pair<float,float>(center_x,center_y);
+    virtual_fence_radius = radius;
+    virtual_fence_cmd = CIRCLE;
+    update_mutex.unlock();
+}
+
+void MapData::setVirtualFenceRectangle(float corner_x, float corner_y, float height, float width)
+{
+    update_mutex.lock();
+    virtual_fence_corner = pair<float,float>(corner_x, corner_y);
+    virtual_fence_height = height;
+    virtual_fence_width = width;
+    virtual_fence_cmd = RECTANGLE;
+    update_mutex.unlock();
+}
+
 void MapData::addToGPSRoverPath(string rover, float x, float y)
 {
   // Negate the y direction to orient the map so up is north.
@@ -228,6 +248,21 @@ void MapData::clear(string rover)
     rover_mode.erase(rover);
 
     update_mutex.unlock();
+}
+
+std::tuple<float,float,float,float> MapData::getVirtualFenceRectangle()
+{
+    return std::tuple<float,float,float,float>(virtual_fence_corner.first, virtual_fence_corner.second, virtual_fence_height, virtual_fence_width);
+}
+
+std::tuple<float,float,float> MapData::getVirtualFenceCircle()
+{
+    return std::tuple<float,float,float>(virtual_fence_center.first, virtual_fence_center.second, virtual_fence_radius);
+}
+
+VirtualFenceCmd MapData::getVirtualFenceCmd()
+{
+    return virtual_fence_cmd;
 }
 
 std::vector< std::pair<float,float> >* MapData::getEKFPath(std::string rover_name)

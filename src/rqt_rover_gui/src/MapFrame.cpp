@@ -8,7 +8,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QMouseEvent>
-#include <MapData.h>
 #include "MapFrame.h"
 
 namespace rqt_rover_gui
@@ -52,6 +51,9 @@ MapFrame::MapFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent)
   // Trigger mouseMoveEvent even when button not pressed
   setMouseTracking(true);
 
+  // Accept keyboard events when a mouse click occurs in this frame
+  // Mouse press events are latched so that they are recieved here even when the key was pressed before the map click
+  setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 }
 
 // This can't go in the constructor or there will be an infinite regression.
@@ -219,8 +221,8 @@ void MapFrame::paintEvent(QPaintEvent* event) {
   map_width = this->width()-1;// Minus 1 or will go off the edge
   map_height = this->height()-1;//
 
-  int map_center_x = map_origin_x+((map_width-map_origin_x)/2);
-  int map_center_y = map_origin_y+((map_height-map_origin_y)/2);
+  map_center_x = map_origin_x+((map_width-map_origin_x)/2);
+  map_center_y = map_origin_y+((map_height-map_origin_y)/2);
 
   // The map axes do not need to be redrawn for each rover so this code is
   // sandwiched between the two rover display list loops
@@ -543,6 +545,52 @@ void MapFrame::paintEvent(QPaintEvent* event) {
 
     hardware_rover_color_index = (hardware_rover_color_index + 1) % 8;
 
+    // Draw the virtual fence
+    if (map_data->getVirtualFenceCmd() == CIRCLE)
+    {
+
+        painter.setPen(Qt::yellow);
+        tuple<float,float,float> virtual_fence = map_data->getVirtualFenceCircle();
+        float center_x = map_origin_x+((get<0>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+        float center_y = map_origin_y+((get<1>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+
+        // Radius x and y because the map may not be scaled isomorphically
+        float radius_x = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+        float radius_y = map_origin_y+((get<2>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+
+        //emit sendInfoLogMessage("Circular fence detected: Fence center: (" + QString::number(center_x) + ", " + QString::number(center_y) + "); Radius_x: " + QString::number(radius_x) + "Radius_y: " + QString::number(radius_y));
+        painter.drawEllipse(center_x, center_y, radius_x, radius_y);
+    }
+    else if (map_data->getVirtualFenceCmd() == RECTANGLE)
+    {
+        painter.setPen(Qt::yellow);
+        tuple<float,float,float,float> virtual_fence = map_data->getVirtualFenceRectangle();
+        float corner_x = map_origin_x+((get<0>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+        float corner_y = map_origin_y+((get<1>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+        float width = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x) - corner_x;
+        float height = map_origin_y+((get<3>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y) - corner_y;
+
+        //emit sendInfoLogMessage("Rectangle fence detected: Fence corner: (" + QString::number(get<0>(virtual_fence)) + ", " + QString::number(get<1>(virtual_fence)) + "); Width: " + QString::number(width) + "Height: " + QString::number(height));
+
+        QPainterPath rectangle_fence;
+        rectangle_fence.addRect(corner_x, corner_y, width, height);
+        painter.drawPath(rectangle_fence);
+
+        if (user_is_drawing_fence)
+        {
+            float rectangle_center_x = corner_x+width/2;
+            float rectangle_center_y = corner_y+height/2;
+            float meter_conversion_factor = max_seen_width/map_width; // Convert pixels into meters
+            float rectangle_center_x_in_meters = ((corner_x+width/2)-map_center_x) * meter_conversion_factor;
+            float rectangle_center_y_in_meters = ((corner_y+height/2)-map_center_y) * meter_conversion_factor;
+            float width_in_meters = abs(width * meter_conversion_factor); // abs because distances must be positive values
+            float height_in_meters = abs(height * meter_conversion_factor);
+            painter.drawEllipse(QPointF(rectangle_center_x, rectangle_center_y), 2.5, 2.5);
+            QString rect_geometry = "Center: (" + QString::number(rectangle_center_x_in_meters) + ", " + QString::number(rectangle_center_y_in_meters) + ")\nWidth: " + QString::number(width_in_meters)  + " m\nHeight: " + QString::number(height_in_meters) + " m";
+            painter.drawText(QRect(rectangle_center_x, rectangle_center_y, 300, 200), rect_geometry);
+        }
+    }
+
     painter.setPen(Qt::white);
   } // End rover display list set iteration
 
@@ -633,10 +681,57 @@ void MapFrame::mouseReleaseEvent(QMouseEvent *event)
 {
   previous_translate_x = translate_x;
   previous_translate_y = translate_y;
+
+  if (user_is_drawing_fence)
+  {
+    // Stop drawing the fence
+    user_is_drawing_fence = false;
+
+    // Extract the geometry of the virtual fence from map data
+    tuple<float,float,float,float> virtual_fence = map_data->getVirtualFenceRectangle();
+    float corner_x = map_origin_x+((get<0>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x);
+    float corner_y = map_origin_y+((get<1>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y);
+    float width = map_origin_x+((get<2>(virtual_fence)-min_seen_x)/max_seen_width)*(map_width-map_origin_x) - corner_x;
+    float height = map_origin_y+((get<3>(virtual_fence)-min_seen_y)/max_seen_height)*(map_height-map_origin_y) - corner_y;
+    float rectangle_center_x = corner_x+width/2;
+    float rectangle_center_y = corner_y+width/2;
+
+    // Convert the geometry into meters using robot data plotted in the map to relate pixel space to actual meters
+    float meter_conversion_factor = max_seen_width/map_width; // Convert pixels into meters
+    float rectangle_center_x_in_meters = ((corner_x+width/2)-map_center_x) * meter_conversion_factor;
+    float rectangle_center_y_in_meters = ((corner_y+height/2)-map_center_y) * meter_conversion_factor;
+    float width_in_meters = abs(width * meter_conversion_factor); // abs because distances must be positive values
+    float height_in_meters = abs(height * meter_conversion_factor);
+
+    // Gett the command associated with the virtual fence. This can be the shape or undefined. Undefined will delete the virtual fence.
+    VirtualFenceCmd cmd = map_data->getVirtualFenceCmd();
+
+    // Send the command to Rover GUI. Rover GUI will package it up for ROS.
+    sendVirtualFenceCmd( cmd, rectangle_center_x_in_meters, rectangle_center_y_in_meters, width_in_meters, height_in_meters );
+  }
 }
 
 void MapFrame::mousePressEvent(QMouseEvent *event)
 {
+  // Handle user defining the virtual fence by left clicking and dragging with shift held down
+  // Holding shift while dragging indicates the user wants to create a circular virtual fence
+    // If the user is not already dragging the mouse to draw the fence then set the center
+    if (event->buttons() == Qt::LeftButton && !user_is_drawing_fence && shift_key_down)
+    {
+
+
+        float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
+        float mouse_map_y = ((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y;
+
+        fence_corner_x = mouse_map_x;
+        fence_corner_y = mouse_map_y;
+
+        emit sendInfoLogMessage("MapFrame: Mouse left button press with shift key down. Fence corner: (" + QString::number(fence_corner_x) + ", " + QString::number(fence_corner_y) + ")");
+        user_is_drawing_fence = true;
+    }
+
+    emit sendInfoLogMessage("MapFrame: Mouse left button press.");
+
   std::set<std::string>::iterator it = display_list.find(rover_currently_selected);
 
   // Failure condition: a valid rover is not selected.
@@ -717,6 +812,29 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
   // Get the mouse pointer position to print on the map
   mouse_pointer_position = event->pos();
 
+  if ( event->type() == QEvent::MouseMove && event->buttons() == Qt::LeftButton && shift_key_down && user_is_drawing_fence )
+  {
+      float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
+      float mouse_map_y = ((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y;
+
+      //float delta_x = mouse_map_x - fence_center_x;
+      //float delta_y = mouse_map_y - fence_center_y;
+      //float fence_radius = sqrt(delta_x*delta_x + delta_y*delta_y);
+
+      map_data->setVirtualFenceRectangle(fence_corner_x, fence_corner_y, mouse_map_x, mouse_map_y);
+      emit sendInfoLogMessage(QString("MapFrame: mouse move drawing fence.") + " Corner: ("
+                              + QString::number(fence_corner_x)
+                              + ","
+                              + QString::number(fence_corner_y)
+                              + "); Width: "
+                              + QString::number(mouse_map_x)
+                              + "; Height: "
+                              + QString::number(mouse_map_y)
+                              );
+
+      return;
+  }
+
   // Do not adjust panning in auto-transform mode.. the changes will not be reflected
     // and will be applied only when the user clicks on manual panning mode which will
     // cause undesired results.
@@ -748,6 +866,8 @@ void MapFrame::mouseMoveEvent(QMouseEvent *event)
         // emit sendInfoLogMessage("MapFrame: mouse move: xp: " + QString::number(previous_clicked_position.x()) + " yp: " + QString::number(previous_clicked_position.y()));
 
         // Store the current mouse position for use in the map
+
+
       }
    }
 }
@@ -942,6 +1062,27 @@ void MapFrame::receiveCurrentRoverName( QString rover_name )
   {
       popout_mapframe->receiveCurrentRoverName(rover_name);
   }
+}
+
+void MapFrame::keyPressEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Shift)
+    {
+        emit sendInfoLogMessage("MapFrame: shift key pressed.");
+        shift_key_down = true;
+    }
+
+
+}
+
+void MapFrame::keyReleaseEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Shift)
+    {
+        emit sendInfoLogMessage("MapFrame: shift key released.");
+        shift_key_down = false;
+        user_is_drawing_fence = false;
+    }
 }
 
 void MapFrame::enableWaypoints(string rover_name)

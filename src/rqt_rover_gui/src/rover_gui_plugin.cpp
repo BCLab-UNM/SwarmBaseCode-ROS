@@ -213,6 +213,9 @@ namespace rqt_rover_gui
     // Receive waypoint commands from MapFrame
     connect(ui.map_frame, SIGNAL(sendWaypointCmd(WaypointCmd, int, float, float)), this, SLOT(receiveWaypointCmd(WaypointCmd, int, float, float)));
     connect(this, SIGNAL(sendWaypointReached(int)), ui.map_frame, SLOT(receiveWaypointReached(int)));
+    
+    // Receive virtual fence commands from MapFrame
+    connect(ui.map_frame, SIGNAL(sendVirtualFenceCmd(VirtualFenceCmd, float, float, float, float)), this, SLOT(receiveVirtualFenceCmd(VirtualFenceCmd, float, float, float, float)));
 
     // Receive log messages from contained frames
     connect(ui.map_frame, SIGNAL(sendInfoLogMessage(QString)), this, SLOT(receiveInfoLogMessage(QString)));
@@ -268,12 +271,15 @@ namespace rqt_rover_gui
     info_log_subscriber = nh.subscribe("/infoLog", 10, &RoverGUIPlugin::infoLogMessageEventHandler, this);
     diag_log_subscriber = nh.subscribe("/diagsLog", 10, &RoverGUIPlugin::diagLogMessageEventHandler, this);
 
+    virtualfence_cmd_publisher = nh.advertise<swarmie_msgs::VirtualFence>("/virtualFence/", 10, true);
+
     emit updateNumberOfSatellites("<font color='white'>---</font>");
 
   }
 
   void RoverGUIPlugin::shutdownPlugin()
   {
+    virtualfence_cmd_publisher.shutdown();
     map_data->clear(); // Clear the map and stop drawing before the map_frame is destroyed
     ui.map_frame->clear();
     clearSimulationButtonEventHandler();
@@ -824,6 +830,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         // Delete Publishers
         control_mode_publishers.erase(*it);
         waypoint_cmd_publishers.erase(*it);
+
 
         ui.map_frame->resetWaypointPathForSelectedRover(*it);
     }
@@ -3157,6 +3164,24 @@ void RoverGUIPlugin::receiveWaypointCmd(WaypointCmd cmd, int id, float x, float 
 
     waypoint_cmd_publishers[selected_rover_name].publish(msg);
 }
+
+// Publish the virtual fence commands recieved from MapFrame to ROS
+void RoverGUIPlugin::receiveVirtualFenceCmd(VirtualFenceCmd cmd, float center_x, float center_y, float width, float height)
+{
+    sendInfoLogMessage("Virtual Fence Command Recieved");
+  
+    // At the moment there is only one global virtual fence topic that all rovers listen to
+    // Use the Virtual Fence custom message type to package up the command to publish. Relies on the VirtualFence enum matching the message definition.
+    swarmie_msgs::VirtualFence msg;
+    msg.cmd = cmd;
+    msg.center_x = center_x;
+    msg.center_y = center_y;
+    msg.width = width;
+    msg.height = height;
+
+    virtualfence_cmd_publisher.publish(msg);
+}
+
 
 // Clean up memory when this object is deleted
 RoverGUIPlugin::~RoverGUIPlugin()
