@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "running pkill on old rosnodes"
 pkill behaviours_JUAV
+pkill diagnostics
 
 source "../devel/setup.bash"
 export GAZEBO_MODEL_PATH="../simulation/models"
@@ -14,26 +15,28 @@ then
     exit 1
 else
     export ROS_MASTER_URI=http://$1:11311
-
 fi
 
 
-#Set prefix to fully qualify transforms for each robot
-echo "set prefix to fully qualify transforms for each robot: $HOSTNAME"
-rosparam set tf_prefix $HOSTNAME
+if [ -z "$2" ]
+then
+    echo "No name given starting with current machine hostname: $HOSTNAME"
+    name=$HOSTNAME
+else
+    echo "Name given starting as: $2"
+    echo "Starting as simulated JUAV"
+    name=$2
+fi
 
+#Set prefix to fully qualify transforms for each robot
+echo "set prefix to fully qualify transforms for each robot: $name"
+rosparam set tf_prefix $name
 
 
 #Startup ROS packages/processes
 
-#echo "rosrun behaviours"
-#nohup > logs/$HOSTNAME"_behaviours_log.txt" rosrun behaviours JUAV_behaviours &
-
-#echo "rosrun diagnostics"
-#nohup > logs/$HOSTNAME"_diagnostics_log.txt" rosrun diagnostics diagnostics &
-
 echo "Running JUAV launch file"
-roslaunch ../launch/JUAV.launch name:=$HOSTNAME &
+roslaunch ../launch/JUAV.launch name:=$name &
 
 
 #Wait for user input to terminate processes
@@ -42,11 +45,9 @@ while true; do
     read choice;
 
     if [ "$choice" == "q" ];then
-	rosnode kill $HOSTNAME\_BEHAVIOUR
+	rosnode kill $name\_BEHAVIOUR
+	rosnode kill $name\_DIAGNOSTICS
 
 	exit 1
     fi
 done
-
-
-#rosrun gazebo_ros spawn_model -sdf -file SwarmBaseCode-ROS/simulation/models/iris_with_standoffs_demo/model.sdf -model 1
