@@ -255,7 +255,7 @@ function runSwarmieWebsite() {
         console.log(head);
     });*/
 
-    function createPassthrough(sourceRosHandle, destinationRosHandle, robotSubscription, messageReceived) {
+    function createPassthrough(sourceRosHandle, destinationRosHandle, robotSubscription, messageReceived, oneShot = false) {
 
         var passthroughHandle = {
             sourceTopic : new ROSLIB.Topic({
@@ -274,13 +274,16 @@ function runSwarmieWebsite() {
         
         passthroughHandle.sourceTopic.subscribe(function(message) {
             passthroughHandle.destinationTopic.publish(message);
+            if (oneShot) {
+                passthroughHandle.sourceTopic.unsubscribe();
+            };
         });
         return passthroughHandle;
     };
  
     createPassthrough(robotRos, laptopRos, '/abridge/heartbeat', 'std_msgs/String');
     createPassthrough(robotRos, laptopRos, '/behaviour/heartbeat', 'std_msgs/String');
-    createPassthrough(robotRos, laptopRos, '/camera/camera_info', 'sensor_msgs/CameraInfo');
+    createPassthrough(robotRos, laptopRos, '/camera/camera_info', 'sensor_msgs/CameraInfo', true);
 //    createPassthrough(robotRos, laptopRos, '/camera/image', 'sensor_msgs/Image');
   //  createPassthrough(robotRos, laptopRos, '/camera/image/compressed', 'sensor_msgs/CompressedImage');
     // createPassthrough(robotRos, laptopRos, '/camera/image/compressed/parameter_descriptions', 'dynamic_reconfigure/ConfigDescription');
@@ -295,7 +298,7 @@ function runSwarmieWebsite() {
      createPassthrough(laptopRos, robotRos, '/driveControl', 'geometry_msgs/Twist');
     createPassthrough(laptopRos, robotRos, '/fingerAngle/cmd', 'std_msgs/Float32');
    // createPassthrough(robotRos, laptopRos, '/fingerAngle/prev_cmd', 'geometry_msgs/QuaternionStamped');
-    createPassthrough(robotRos, laptopRos, '/fix', 'sensor_msgs/NavSatFix');
+   // createPassthrough(robotRos, laptopRos, '/fix', 'sensor_msgs/NavSatFix');
     createPassthrough(robotRos, laptopRos, '/fix_velocity', 'geometry_msgs/TwistWithCovarianceStamped');
     createPassthrough(robotRos, laptopRos, '/imu', 'sensor_msgs/Imu');
     createPassthrough(laptopRos, robotRos, '/joystick', 'sensor_msgs/Joy');
@@ -315,14 +318,14 @@ function runSwarmieWebsite() {
     createPassthrough(robotRos, laptopRos, '/state_machine', 'std_msgs/String');
     createPassthrough(robotRos, laptopRos, '/status', 'std_msgs/String');
     createPassthrough(robotRos, laptopRos, '/targets', 'apriltags_ros/AprilTagDetectionArray');
-    // createPassthrough(robotRos, laptopRos, '/targets/image', 'sensor_msgs/Image');
-    // createPassthrough(robotRos, laptopRos, '/targets/image/compressed', 'sensor_msgs/CompressedImage');
+    createPassthrough(robotRos, laptopRos, '/targets/image', 'sensor_msgs/Image');
+     createPassthrough(robotRos, laptopRos, '/targets/image/compressed', 'sensor_msgs/CompressedImage');
     // createPassthrough(robotRos, laptopRos, '/targets/image/compressed/parameter_descriptions', 'dynamic_reconfigure/ConfigDescription');
     // createPassthrough(robotRos, laptopRos, '/targets/image/compressed/parameter_updates', 'dynamic_reconfigure/Config');
     // createPassthrough(robotRos, laptopRos, '/targets/image/compressedDepth', 'sensor_msgs/CompressedImage');
     // createPassthrough(robotRos, laptopRos, '/targets/image/compressedDepth/parameter_descriptions', 'dynamic_reconfigure/ConfigDescription');
     // createPassthrough(robotRos, laptopRos, '/targets/image/compressedDepth/parameter_updates', 'dynamic_reconfigure/Config');
-    createPassthrough(robotRos, laptopRos, '/targets/image/theora', 'theora_image_transport/Packet');
+    //createPassthrough(robotRos, laptopRos, '/targets/image/theora', 'theora_image_transport/Packet');
  //   createPassthrough(robotRos, laptopRos, '/targets/image/theora/parameter_descriptions', 'dynamic_reconfigure/ConfigDescription');
  //   createPassthrough(robotRos, laptopRos, '/targets/image/theora/parameter_updates', 'dynamic_reconfigure/Config');
   //  createPassthrough(robotRos, laptopRos, '/waypoints', 'swarmie_msgs/Waypoint');
