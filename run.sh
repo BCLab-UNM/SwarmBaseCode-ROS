@@ -19,6 +19,7 @@ echo Killing roscore
 pkill roscore
 roscore &
 sleep 2
+roslaunch rosbridge_server rosbridge_websocket.launch &
 rqt -s rqt_rover_gui
 # The rover program cleans up after itself but if there is a crash this helps to make sure there are no leftovers
 echo Cleaning up ROS and Gazebo Processes
