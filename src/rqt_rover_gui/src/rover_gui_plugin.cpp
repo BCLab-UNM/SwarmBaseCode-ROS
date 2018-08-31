@@ -2071,13 +2071,14 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     //sim_mgr.startGazeboClient();
 
     ui.visualize_simulation_button->setEnabled(true);
-    ui.clear_simulation_button->setEnabled(true);
-
     ui.visualize_simulation_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
+    ui.clear_simulation_button->setEnabled(true);
     ui.clear_simulation_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
-
     ui.simulation_timer_combobox->setEnabled(true);
     ui.simulation_timer_combobox->setStyleSheet("color: white; border:1px solid white; padding: 1px 0px 1px 3px");
+    ui.custom_world_path_button->setEnabled(false);
+    ui.custom_world_path_button->setStyleSheet("color: grey;border:1px solid grey; border-radius:12px; padding: 5px;");
+    ui.custom_world_path->setStyleSheet("color: grey;");
 
     emit sendInfoLogMessage("Finished building simulation.");
 
@@ -2216,9 +2217,11 @@ void RoverGUIPlugin::clearSimulationButtonEventHandler()
     ui.visualize_simulation_button->setEnabled(false);
     ui.build_simulation_button->setEnabled(true);
     ui.clear_simulation_button->setEnabled(false);
+    ui.custom_world_path_button->setEnabled(true);
     display_sim_visualization = false;
 
-
+    ui.custom_world_path_button->setStyleSheet("color: white;border:1px solid white; border-radius:12px; padding: 5px;");
+    ui.custom_world_path->setStyleSheet("color: white;");
     ui.build_simulation_button->setStyleSheet("color: white; border:1px solid white; border-radius:12px; padding: 5px;");
     ui.visualize_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");
     ui.clear_simulation_button->setStyleSheet("color: grey; border:2px solid grey; border-radius:12px; padding: 5px;");

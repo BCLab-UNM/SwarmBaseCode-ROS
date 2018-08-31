@@ -2463,7 +2463,7 @@ border-radius: 12px;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QFrame" name="frame_21">
+                    <widget class="QFrame" name="custom_world_frame">
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
                      </property>
