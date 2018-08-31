@@ -21,7 +21,7 @@ IMUFrame::IMUFrame(QWidget *parent, Qt::WindowFlags flags) : QFrame(parent)
         // Make a test cube
         float center_x = this->width()/2;
         float center_y = this->height()/2;
-        float width_of_square = 100;
+        float width_of_square = 2*this->width()/3;
 
         cube[0] = make_tuple(width_of_square/2, -width_of_square/2, -width_of_square/2);
         cube[1] = make_tuple(width_of_square/2, width_of_square/2, -width_of_square/2);
@@ -97,14 +97,29 @@ void IMUFrame::rotateTimerEventHandler()
 
 void IMUFrame::paintEvent(QPaintEvent* event)
 {
-
     QPainter painter(this);
     painter.setPen(Qt::white);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     float center_x = this->width()/2;
-
     float center_y = this->height()/2;
+
+    // scale the size of the square with the current frame size dynamically;
+    // the width of the cube scales to the width or height of the frame,
+    // whichever one is smaller
+    float width_of_square = (this->width() < this->height()) ? (2*this->width()/3) : (2*this->height()/3);
+    cube[0] = make_tuple(-width_of_square/2, width_of_square/2, width_of_square/2);
+    cube[1] = make_tuple(-width_of_square/2, -width_of_square/2, width_of_square/2);
+    cube[2] = make_tuple(width_of_square/2, -width_of_square/2, width_of_square/2);
+    cube[3] = make_tuple(width_of_square/2, width_of_square/2, width_of_square/2);
+    cube[4] = make_tuple(-width_of_square/2, width_of_square/2, -width_of_square/2);
+    cube[5] = make_tuple(-width_of_square/2, -width_of_square/2, -width_of_square/2);
+    cube[6] = make_tuple(width_of_square/2, -width_of_square/2, -width_of_square/2);
+    cube[7] = make_tuple(width_of_square/2, width_of_square/2, -width_of_square/2);
+    line1_start = make_tuple(-width_of_square/2, 0, 0);
+    line2_start = make_tuple(width_of_square/2, 0, 0);
+    line1_end = make_tuple(-width_of_square, 0, 0);
+    line2_end = make_tuple(width_of_square, 0, 0);
 
     // Track the frames per second for development purposes
     QString frames_per_second;
