@@ -3,7 +3,7 @@
 LogicController::LogicController() {
 
   logicState = LOGIC_STATE_INTERRUPT;
-  processState = PROCCESS_STATE_SEARCHING;
+  processState = PROCESS_STATE_SEARCHING;
 
   ProcessData();
 
@@ -17,7 +17,7 @@ void LogicController::Reset() {
 
   std::cout << "LogicController.Reset()" << std::endl;
   logicState = LOGIC_STATE_INTERRUPT;
-  processState = PROCCESS_STATE_SEARCHING;
+  processState = PROCESS_STATE_SEARCHING;
 
   ProcessData();
 
@@ -102,9 +102,9 @@ Result LogicController::DoWork()
       // Ask for the procces state to change to the next state or loop around to the begining.
       //  enum ProcessState {
       //    _FIRST = 0,
-      //    PROCCESS_STATE_SEARCHING = 0,
-      //    PROCCESS_STATE_TARGET_PICKEDUP,
-      //    PROCCESS_STATE_DROP_OFF,
+      //    PROCESS_STATE_SEARCHING = 0,
+      //    PROCESS_STATE_TARGET_PICKEDUP,
+      //    PROCESS_STATE_DROP_OFF,
       //    _LAST,
       //    PROCESS_STATE_MANUAL // robot is under manual control
       //  };
@@ -232,7 +232,7 @@ void LogicController::ProcessData()
 {
 
   // This controller priority is used when searching.
-  if (processState == PROCCESS_STATE_SEARCHING)
+  if (processState == PROCESS_STATE_SEARCHING)
   {
     prioritizedControllers = {
       PrioritizedController{0, (Controller*)(&searchController)},
@@ -245,7 +245,7 @@ void LogicController::ProcessData()
   }
 
   // This priority is used when returning a target to the center collection zone.
-  else if (processState  == PROCCESS_STATE_TARGET_PICKEDUP)
+  else if (processState  == PROCESS_STATE_TARGET_PICKEDUP)
   {
     prioritizedControllers = {
     PrioritizedController{-1, (Controller*)(&searchController)},
@@ -258,7 +258,7 @@ void LogicController::ProcessData()
   }
 
   // This priority is used when returning a target to the center collection zone.
-  else if (processState  == PROCCESS_STATE_DROP_OFF)
+  else if (processState  == PROCESS_STATE_DROP_OFF)
   {
     prioritizedControllers = {
       PrioritizedController{-1, (Controller*)(&searchController)},
@@ -312,7 +312,7 @@ bool LogicController::HasWork()
 void LogicController::controllerInterconnect()
 {
 
-  if (processState == PROCCESS_STATE_SEARCHING)
+  if (processState == PROCESS_STATE_SEARCHING)
   {
 
     // Obstacle controller needs to know if the center ultrasound should be ignored.
