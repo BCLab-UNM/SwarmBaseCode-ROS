@@ -4,7 +4,7 @@ previous_gazebo_model_path=${GAZEBO_MODEL_PATH}
 previous_gazebo_plugin_path=${GAZEBO_PLUGIN_PATH}
 export SWARMATHON_APP_ROOT="$PWD"
 export GAZEBO_MODEL_PATH="$PWD/simulation/models"
-export GAZEBO_PLUGIN_PATH="$PWD/build/gazebo_plugins"
+export GAZEBO_PLUGIN_PATH="$PWD/build/gazebo_plugins":~/ardupilot_gazebo/build
 source "$PWD/devel/setup.bash"
 echo Cleaning up ROS and Gazebo Processes
 
