@@ -5255,8 +5255,11 @@ border: 1px solid white;
 padding: 1px 0px 1px 3px; /*This makes text colour work*/
 </string>
            </property>
+           <property name="currentText">
+            <string>15</string>
+           </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>10</number>
            </property>
            <property name="maxVisibleItems">
             <number>5</number>
