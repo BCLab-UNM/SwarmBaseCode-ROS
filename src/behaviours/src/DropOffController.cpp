@@ -214,6 +214,10 @@ Result DropOffController::DoWork() {
     }
     if (count > 0) // Reset gaurd to prevent drop offs due to loosing tracking on tags for a frame or 2.
     {
+       if(count < centerTagThreshold)
+       {
+          result.pd.cmdVel = 0.1;
+       }
       lastCenterTagThresholdTime = current_time;
     }
     //time since we dropped below countGuard tags
