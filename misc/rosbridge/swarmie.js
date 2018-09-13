@@ -304,8 +304,7 @@ function runSwarmieWebsite() {
     createPassthrough(laptopRos, robotRos, '/joystick', 'sensor_msgs/Joy');
     createPassthrough(laptopRos, robotRos, '/mode', 'std_msgs/UInt8');
     // createPassthrough(robotRos, laptopRos, '/navposllh', 'ublox_msgs/NavPOSLLH');
-    // createPassthrough(robotRos, laptopRos, '/navsol', 'ublox_msgs/NavSOL');
-    // createPassthrough(robotRos, laptopRos, '/navstatus', 'ublox_msgs/NavSTATUS');
+    createPassthrough(robotRos, laptopRos, '/navsol', 'ublox_msgs/NavSOL')
     // createPassthrough(robotRos, laptopRos, '/navvelned', 'ublox_msgs/NavVELNED');
     createPassthrough(robotRos, laptopRos, '/odom', 'nav_msgs/Odometry');
     createPassthrough(robotRos, laptopRos, '/odom/ekf', 'nav_msgs/Odometry'); 
