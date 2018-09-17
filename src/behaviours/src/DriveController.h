@@ -90,7 +90,7 @@ private:
 
   StateMachineStates state_machine_state = STATE_MACHINE_WAITING;
 
-  void ProcessData();
+  void processData();
 
 };
 

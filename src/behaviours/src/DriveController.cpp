@@ -2,31 +2,29 @@
 
 DriveController::DriveController() {
 
-  fastVelPID.SetConfiguration(fastVelConfig());
-  fastYawPID.SetConfiguration(fastYawConfig());
+  fast_vel_PID.SetConfiguration(fastVelConfig());
+  fast_yaw_PID.SetConfiguration(fastYawConfig());
 
-  slowVelPID.SetConfiguration(slowVelConfig());
-  slowYawPID.SetConfiguration(slowYawConfig());
+  slow_vel_PID.SetConfiguration(slowVelConfig());
+  slow_yaw_PID.SetConfiguration(slowYawConfig());
 
-  constVelPID.SetConfiguration(constVelConfig());
-  constYawPID.SetConfiguration(constYawConfig());
+  const_vel_PID.SetConfiguration(constVelConfig());
+  const_vaw_PID.SetConfiguration(constYawConfig());
 
 
 }
 
-DriveController::~DriveController() {}
-
-void DriveController::Reset()
+void DriveController::reset()
 {
   waypoints.clear();
 
-  if (stateMachineState == STATE_MACHINE_ROTATE || stateMachineState == STATE_MACHINE_SKID_STEER)
+  if (state_machine_state == STATE_MACHINE_ROTATE || state_machine_state == STATE_MACHINE_SKID_STEER)
   {
-    stateMachineState = STATE_MACHINE_WAYPOINTS;
+    state_machine_state = STATE_MACHINE_WAYPOINTS;
   }
 }
 
-Result DriveController::DoWork()
+Result DriveController::doWork()
 {
   
   ///WARNING waypoint input must use FAST_PID at this point in time failure to set fast pid will result in no movment
@@ -44,7 +42,7 @@ Result DriveController::DoWork()
       //do nothing till told otherwise
       left = 0.0;
       right = 0.0;
-      stateMachineState = STATE_MACHINE_WAITING;
+      state_machine_state = STATE_MACHINE_WAITING;
     }
 
   }
@@ -53,18 +51,18 @@ Result DriveController::DoWork()
   {
 
     //interpret input result as a precision driving command
-    stateMachineState = STATE_MACHINE_PRECISION_DRIVING;
+    state_machine_state = STATE_MACHINE_PRECISION_DRIVING;
 
   }
 
   else if(result.type == waypoint)
   {
     //interpret input result as new waypoints to add into the queue
-    ProcessData();
+    processData();
 
   }
 
-  switch(stateMachineState)
+  switch(state_machine_state)
   {
 
   //Handlers and the final state of STATE_MACHINE are the only parts allowed to call INTERUPT
@@ -73,7 +71,7 @@ Result DriveController::DoWork()
   case STATE_MACHINE_PRECISION_DRIVING:
   {
 
-    ProcessData();
+    processData();
     break;
   }
 
@@ -83,12 +81,12 @@ Result DriveController::DoWork()
 
     //Handles route planning and navigation as well as making sure all waypoints are valid.
 
-    bool tooClose = true;
+    bool too_close = true;
     //while we have waypoints and they are tooClose to drive to
-    while (!waypoints.empty() && tooClose)
+    while (!waypoints.empty() && too_close)
     {
       //check next waypoint for distance
-      if (hypot(waypoints.back().x-currentLocation.x, waypoints.back().y-currentLocation.y) < waypointTolerance)
+      if (hypot(waypoints.back().x-current_location.x, waypoints.back().y-current_location.y) < waypoint_tolerance)
       {
         //if too close remove it
         waypoints.pop_back();
@@ -96,24 +94,24 @@ Result DriveController::DoWork()
       else
       {
         //this waypoint is far enough to be worth driving to
-        tooClose = false;
+        too_close = false;
       }
     }
     
     //if we are out of waypoints then interupt and return to logic controller
     if (waypoints.empty())
     {
-      stateMachineState = STATE_MACHINE_WAITING;
+      state_machine_state = STATE_MACHINE_WAITING;
       result.type = behavior;
-      interupt = true;
+      interrupt = true;
       return result;
     }
     else
     {
       //select setpoint for heading and begin driving to the next waypoint
-      stateMachineState = STATE_MACHINE_ROTATE;
-      waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
-      result.pd.setPointYaw = waypoints.back().theta;
+      state_machine_state = STATE_MACHINE_ROTATE;
+      waypoints.back().theta = atan2(waypoints.back().y - current_location.y, waypoints.back().x - current_location.x);
+      result.pd.set_point_yaw = waypoints.back().theta;
 
       //cout << "**************************************************************************" << endl; //DEBUGGING CODE
       //cout << "Waypoint x : " << waypoints.back().x << " y : " << waypoints.back().y << endl; //DEBUGGING CODE
@@ -128,26 +126,26 @@ Result DriveController::DoWork()
     // Rotate left or right depending on sign of angle
     // Stay in this state until angle is minimized
 
-    waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
+    waypoints.back().theta = atan2(waypoints.back().y - current_location.y, waypoints.back().x - current_location.x);
 
-    // Calculate the diffrence between current and desired heading in radians.
-    float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
+    // Calculate the difference between current and desired heading in radians.
+    float error_yaw = angles::shortest_angular_distance(current_location.theta, waypoints.back().theta);
 
-    //cout << "ROTATE Error yaw:  " << errorYaw << " target heading : " << waypoints.back().theta << " current heading : " << currentLocation.theta << endl; //DEBUGGING CODE
-    //cout << "Waypoint x : " << waypoints.back().x << " y : " << waypoints.back().y << " currentLoc x : " << currentLocation.x << " y : " << currentLocation.y << endl; //DEBUGGING CODE
+    //cout << "ROTATE Error yaw:  " << error_yaw << " target heading : " << waypoints.back().theta << " current heading : " << current_lcation.theta << endl; //DEBUGGING CODE
+    //cout << "Waypoint x : " << waypoints.back().x << " y : " << waypoints.back().y << " currentLoc x : " << current_location.x << " y : " << current_location.y << endl; //DEBUGGING CODE
 
-    result.pd.setPointVel = 0.0;
+    result.pd.set_point_vel = 0.0;
     //Calculate absolute value of angle
 
-    float abs_error = fabs(angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta));
+    float abs_error = fabs(angles::shortest_angular_distance(current_location.theta, waypoints.back().theta));
 
-    // If angle > rotateOnlyAngleTolerance radians rotate but dont drive forward.
-    if (abs_error > rotateOnlyAngleTolerance)
+    // If angle > rotate_only_angle_tolerance radians rotate but dont drive forward.
+    if (abs_error > rotate_only_angle_tolerance)
     {
       // rotate but dont drive.
       if (result.PIDMode == FAST_PID)
       {
-        fastPID(0.0, errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
+        fastPID(0.0, error_yaw, result.pd.set_point_vel, result.pd.set_point_yaw);
       }
 
       break;
@@ -155,7 +153,7 @@ Result DriveController::DoWork()
     else
     {
       //move to differential drive step
-      stateMachineState = STATE_MACHINE_SKID_STEER;
+      state_machine_state = STATE_MACHINE_SKID_STEER;
 
       //fall through on purpose.
     }
@@ -163,29 +161,29 @@ Result DriveController::DoWork()
 
   case STATE_MACHINE_SKID_STEER:
   {
-      // Calculate angle between currentLocation.x/y and waypoints.back().x/y
+      // Calculate angle between current_location.x/y and waypoints.back().x/y
       // Drive forward
       // Stay in this state until angle is at least PI/2
 
     // calculate the distance between current and desired heading in radians
-    waypoints.back().theta = atan2(waypoints.back().y - currentLocation.y, waypoints.back().x - currentLocation.x);
-    float errorYaw = angles::shortest_angular_distance(currentLocation.theta, waypoints.back().theta);
-    float distance = hypot(waypoints.back().x - currentLocation.x, waypoints.back().y - currentLocation.y);
+    waypoints.back().theta = atan2(waypoints.back().y - current_location.y, waypoints.back().x - current_location.x);
+    float error_yaw = angles::shortest_angular_distance(current_location.theta, waypoints.back().theta);
+    float distance = hypot(waypoints.back().x - current_location.x, waypoints.back().y - current_location.y);
 
-    //cout << "Skid steer, Error yaw:  " << errorYaw << " target heading : " << waypoints.back().theta << " current heading : " << currentLocation.theta << " error distance : " << distance << endl; //DEBUGGING CODE
-    //cout << "Waypoint x : " << waypoints.back().x << " y : " << waypoints.back().y << " currentLoc x : " << currentLocation.x << " y : " << currentLocation.y << endl; //DEBUGGING CODE
+    //cout << "Skid steer, Error yaw:  " << error_yaw << " target heading : " << waypoints.back().theta << " current heading : " << current_location.theta << " error distance : " << distance << endl; //DEBUGGING CODE
+    //cout << "Waypoint x : " << waypoints.back().x << " y : " << waypoints.back().y << " currentLoc x : " << current_location.x << " y : " << current_location.y << endl; //DEBUGGING CODE
 
 
 
     // goal not yet reached drive while maintaining proper heading.
-    if (fabs(errorYaw) < M_PI_2 &&  distance > waypointTolerance)
+    if (fabs(error_yaw) < M_PI_2 &&  distance > waypoint_tolerance)
     {
       // drive and turn simultaniously
-      result.pd.setPointVel = searchVelocity;
+      result.pd.set_point_vel = search_velocity;
       if (result.PIDMode == FAST_PID)
       {
-        //cout << "linear velocity:  " << linearVelocity << endl; //DEBUGGING CODE
-        fastPID((searchVelocity-linearVelocity) ,errorYaw, result.pd.setPointVel, result.pd.setPointYaw);
+        //cout << "linear velocity:  " << linear_velocity << endl; //DEBUGGING CODE
+        fastPID((search_velocity-linear_velocity) ,error_yaw, result.pd.set_point_vel, result.pd.set_point_yaw);
       }
     }
     else {
@@ -194,7 +192,7 @@ Result DriveController::DoWork()
       right = 0.0;
 
       // move back to transform step
-      stateMachineState = STATE_MACHINE_WAYPOINTS;
+      state_machine_state = STATE_MACHINE_WAYPOINTS;
     }
 
     break;
@@ -217,11 +215,11 @@ Result DriveController::DoWork()
 
 }
 
-bool DriveController::ShouldInterrupt()
+bool DriveController::shouldInterrupt()
 {
-  if (interupt)
+  if (interrupt)
   {
-    interupt = false;
+    interrupt = false;
     return true;
   }
   else
@@ -230,11 +228,11 @@ bool DriveController::ShouldInterrupt()
   }
 }
 
-bool DriveController::HasWork() {   }
+bool DriveController::hasWork() {   }
 
 
 
-void DriveController::ProcessData()
+void DriveController::processData()
 {
   //determine if the drive commands are waypoint or precision driving
   if (result.type == waypoint) {
@@ -250,51 +248,51 @@ void DriveController::ProcessData()
     //add waypoints onto stack and change state to start following them
     if (!result.wpts.waypoints.empty()) {
       waypoints.insert(waypoints.end(),result.wpts.waypoints.begin(), result.wpts.waypoints.end());
-      stateMachineState = STATE_MACHINE_WAYPOINTS;
+      state_machine_state = STATE_MACHINE_WAYPOINTS;
     }
   }
   else if (result.type == precisionDriving)
   {
 
     //calculate inputs into the PIDS for precision driving
-    if (result.PIDMode == FAST_PID)
+    if (result.PID_mode == FAST_PID)
     {
-      float vel = result.pd.cmdVel -linearVelocity;
-      float setVel = result.pd.cmdVel;
-      fastPID(vel,result.pd.cmdAngularError, setVel, result.pd.setPointYaw);
+      float vel = result.pd.cmd_vel - linear_velocity;
+      float set_vel = result.pd.cmd_vel;
+      fastPID(vel,result.pd.cmd_angular_error, set_vel, result.pd.set_point_yaw);
     }
-    else if (result.PIDMode == SLOW_PID)
+    else if (result.PID_mode == SLOW_PID)
     {
       //will take longer to reach the setPoint but has less chanse of an overshoot especially with slow feedback
-      float vel = result.pd.cmdVel -linearVelocity;
-      float setVel = result.pd.cmdVel;
-      slowPID(vel,result.pd.cmdAngularError, setVel, result.pd.setPointYaw);
+      float vel = result.pd.cmd_vel - linear_velocity;
+      float setVel = result.pd.cmd_vel;
+      slowPID(vel,result.pd.cmd_angular_error, set_vel, result.pd.set_point_yaw);
     }
-    else if (result.PIDMode == CONST_PID)
+    else if (result.PID_mode == CONST_PID)
     {
       //vel is the same as fast PID however
       //this setup takes a target angular velocity to constantly turn at instead of a target heading
-      float vel = result.pd.cmdVel - linearVelocity;
-      float angular = result.pd.cmdAngular - angularVelocity;
+      float vel = result.pd.cmd_vel - linear_velocity;
+      float angular = result.pd.cmd_angular - angular_velocity;
 
-      //cout << "Ang. Vel.  " << angularVelocity << "  Ang. Error" << angular << endl; //DEBUGGING CODE
+      //cout << "Ang. Vel.  " << angular_velocity << "  Ang. Error" << angular << endl; //DEBUGGING CODE
 
-      constPID(vel, angular ,result.pd.setPointVel, result.pd.setPointYaw);
+      constPID(vel, angular ,result.pd.set_point_vel, result.pd.set_point_yaw);
     }
   }
 }
 
 
-void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel, float setPointYaw)
+void DriveController::fastPID(float error_vel, float error_yaw , float set_point_vel, float set_point_yaw)
 {
 
   // cout << "PID FAST" << endl; //DEBUGGING CODE
 
-  float velOut = fastVelPID.PIDOut(errorVel, setPointVel); //returns PWM target to try and get error vel to 0
-  float yawOut = fastYawPID.PIDOut(errorYaw, setPointYaw); //returns PWM target to try and get yaw error to 0
+  float vel_out = fast_vel_PID.PIDOut(error_vel, set_point_vel); //returns PWM target to try and get error vel to 0
+  float yaw_out = fast_yaw_PID.PIDOut(error_yaw, set_point_yaw); //returns PWM target to try and get yaw error to 0
 
-  int left = velOut - yawOut; //combine yaw and vel PWM values
-  int right = velOut + yawOut; //left and right are the same for vel output but opposite for yaw output
+  int left = vel_out - yaw_out; //combine yaw and vel PWM values
+  int right = vel_out + yaw_out; //left and right are the same for vel output but opposite for yaw output
 
   //prevent combine output from going over tihs value
   int sat = 180; 
@@ -306,15 +304,15 @@ void DriveController::fastPID(float errorVel, float errorYaw , float setPointVel
   this->right = right;
 }
 
-void DriveController::slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw)
+void DriveController::slowPID(float error_vel,float error_yaw, float set_point_vel, float set_point_yaw)
 {
   //cout << "PID SLOW" << endl; //DEBUGGING CODE
 
-  float velOut = slowVelPID.PIDOut(errorVel, setPointVel);
-  float yawOut = slowYawPID.PIDOut(errorYaw, setPointYaw);
+  float vel_out = slow_vel_PID.PIDOut(error_vel, set_point_vel);
+  float yaw_out = slow_yaw_PID.PIDOut(error_yaw, set_point_yaw);
 
-  int left = velOut - yawOut;
-  int right = velOut + yawOut;
+  int left = vel_out - yaw_out;
+  int right = vel_out + yaw_out;
 
   int sat = 180;
   if (left  >  sat) {left  =  sat;}
@@ -326,16 +324,16 @@ void DriveController::slowPID(float errorVel,float errorYaw, float setPointVel, 
   this->right = right;
 }
 
-void DriveController::constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw)
+void DriveController::constPID(float error_vel,float const_angular_error, float set_point_vel, float set_point_yaw)
 {
 
   //cout << "PID CONST" << endl; //DEBUGGING CODE
 
-  float velOut = constVelPID.PIDOut(erroVel, setPointVel);
-  float yawOut = constYawPID.PIDOut(constAngularError, setPointYaw);
+  float vel_out = const_vel_PID.PIDOut(error_vel, set_point_vel);
+  float yaw_out = const_yaw_PID.PIDOut(const_angular_error, set_point_yaw);
 
-  int left = velOut - yawOut;
-  int right = velOut + yawOut;
+  int left = vel_out - yaw_out;
+  int right = vel_out + yaw_out;
 
   int sat = 180;
   if (left  >  sat) {left  =  sat;}
@@ -348,10 +346,10 @@ void DriveController::constPID(float erroVel,float constAngularError, float setP
 }
 
 
-void DriveController::SetVelocityData(float linearVelocity,float angularVelocity)
+void DriveController::setVelocityData(float linear_velocity,float angular_velocity)
 {
-  this->linearVelocity = linearVelocity;
-  this->angularVelocity = angularVelocity;
+  this->linear_velocity = linear_velocity;
+  this->angular_velocity = angular_velocity;
 }
 
 
@@ -364,17 +362,17 @@ PIDConfig DriveController::fastVelConfig()
   config.Kp = 60; //proportional constant
   config.Ki = 10; //integral constant
   config.Kd = 2; //derivative constant
-  config.satUpper = 255; //upper limit for PID output
-  config.satLower = -255; //lower limit for PID output
-  config.antiWindup = config.satUpper; //prevent integral from acruing error untill proportional output drops below a certain limit
-  config.errorHistLength = 4; //how many time steps to average error over
-  config.alwaysIntegral = true; //should the integral alway be on or only when there is error
-  config.resetOnSetpoint = true; //reset the integral and error history whent he setpoint changes
-  config.feedForwardMultiplier = 610; //gives 127 pwm at 0.4 commandedspeed  ORIG:320
-  config.integralDeadZone = 0.01; //set the integral dead zone, prevented integral from growing or shrinking do to noise
-  config.integralErrorHistoryLength = 10000; //how many time ticks should error history should be stored for integration
-  config.integralMax = config.satUpper/2; //what is the limit of the integral output for the PID
-  config.derivativeAlpha = 0.7; //dead code not used
+  config.sat_upper = 255; //upper limit for PID output
+  config.sat_lower = -255; //lower limit for PID output
+  config.anti_windup = config.satUpper; //prevent integral from acruing error untill proportional output drops below a certain limit
+  config.error_hist_length = 4; //how many time steps to average error over
+  config.always_integral = true; //should the integral alway be on or only when there is error
+  config.reset_on_setpoint = true; //reset the integral and error history whent he setpoint changes
+  config.feed_forward_multiplier = 610; //gives 127 pwm at 0.4 commandedspeed  ORIG:320
+  config.integral_dead_zone = 0.01; //set the integral dead zone, prevented integral from growing or shrinking do to noise
+  config.integral_error_history_length = 10000; //how many time ticks should error history should be stored for integration
+  config.integral_max = config.sat_upper/2; //what is the limit of the integral output for the PID
+  config.derivative_alpha = 0.7; //dead code not used
 
   return config;
 
@@ -386,17 +384,17 @@ PIDConfig DriveController::fastYawConfig() {
   config.Kp = 60;
   config.Ki = 15;
   config.Kd = 5;
-  config.satUpper = 255;
-  config.satLower = -255;
-  config.antiWindup = config.satUpper/6;
-  config.errorHistLength = 4;
-  config.alwaysIntegral = false;
-  config.resetOnSetpoint = true;
-  config.feedForwardMultiplier = 0;
-  config.integralDeadZone = 0.01;
-  config.integralErrorHistoryLength = 10000;
-  config.integralMax = config.satUpper/3;
-  config.derivativeAlpha = 0.7;
+  config.sat_upper = 255;
+  config.sat_lower = -255;
+  config.anti_windup = config.sat_upper/6;
+  config.error_hist_length = 4;
+  config.always_integral = false;
+  config.reset_on_setpoint = true;
+  config.feed_forward_multiplier = 0;
+  config.integral_dead_zone = 0.01;
+  config.integral_error_history_length = 10000;
+  config.integral_max = config.sat_upper/3;
+  config.derivative_alpha = 0.7;
 
   return config;
 
@@ -408,17 +406,17 @@ PIDConfig DriveController::slowVelConfig() {
   config.Kp = 100;
   config.Ki = 8;
   config.Kd = 1.1;
-  config.satUpper = 255;
-  config.satLower = -255;
-  config.antiWindup = config.satUpper/2;
-  config.errorHistLength = 4;
-  config.alwaysIntegral = true;
-  config.resetOnSetpoint = true;
-  config.feedForwardMultiplier = 320; //gives 127 pwm at 0.4 commandedspeed
-  config.integralDeadZone = 0.01;
-  config.integralErrorHistoryLength = 10000;
-  config.integralMax = config.satUpper/2;
-  config.derivativeAlpha = 0.7;
+  config.sat_upper = 255;
+  config.sat_lower = -255;
+  config.anti_windup = config.sat_upper/2;
+  config.error_hist_length = 4;
+  config.always_integral = true;
+  config.reset_on_setpoint = true;
+  config.feed_forward_multiplier = 320; //gives 127 pwm at 0.4 commandedspeed
+  config.integral_dead_zone = 0.01;
+  config.integral_error_history_length = 10000;
+  config.integral_max = config.sat_upper/2;
+  config.derivative_alpha = 0.7;
 
   return config;
 
@@ -489,3 +487,5 @@ PIDConfig DriveController::constYawConfig() {
   return config;
 
 }
+
+DriveController::~DriveController() {}
