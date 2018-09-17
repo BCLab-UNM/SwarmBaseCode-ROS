@@ -36,12 +36,12 @@ private:
   // Try not to run over the collection zone
   void avoidCollectionZone();
 
-  // Try not to run into a physical object
+  // Try not to run into a physical object or the tag boundary
   void avoidObstacle();
 
   // Are there AprilTags in the camera view that mark the collection zone
   // and are those AprilTags oriented towards or away from the camera.
-  bool checkForCollectionZoneTags( vector<Tag> );
+  bool checkForCollectionZoneTags( Tag tag );
   
   const float K_angular = 1.0; //radians a second turn rate to avoid obstacles
   const float reactivate_center_sonar_threshold = 0.8; //reactive center sonar if it goes back above this distance, assuming it is deactivated
@@ -79,6 +79,7 @@ private:
   bool previousTargetState = false;
 
   bool phys = false; // Physical obstacle
+  bool tag_boundary_seen = false; // The obstacle is the arena boundary defined by AprilTags
   bool collection_zone_seen = false; // The obstacle is the collection zone
   
   bool set_waypoint = false;

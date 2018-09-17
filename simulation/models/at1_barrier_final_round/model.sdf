@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="at1 Barrier Final Round">
+    <static>true</static>
+    <link name="link">
+    	<visual name="visual">
+        	<geometry>
+           		<box>
+	    			<size> 0.15 24 0.001</size>
+          		</box>
+        	</geometry>
+		<material>
+			<script>
+				<uri>model://at1_barrier_final_round/materials/scripts</uri>
+				<uri>model://at1_barrier_final_round/materials/textures</uri>
+				<name>at1_barrier_final_round/Diffuse</name>
+			</script>
+		</material>
+      	</visual>
+     </link>
+  </model>
+</sdf>

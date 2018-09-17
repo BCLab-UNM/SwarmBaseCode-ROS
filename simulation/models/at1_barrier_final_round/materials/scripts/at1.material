@@ -1,0 +1,16 @@
+material at1_barrier_final_round/Diffuse
+{
+  technique
+  {
+    pass
+    {
+      transparent_sorting on
+
+      texture_unit
+      {
+        texture atag-1.png
+        scale 0.0020833333 0.3333333
+      }
+    }
+  }
+}

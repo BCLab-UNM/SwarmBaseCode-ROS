@@ -18,11 +18,11 @@ void ObstacleController::Reset() {
   delay = current_time;
 }
 
-// Avoid crashing into objects detected by the ultraound
+// Avoid crashing into objects detected by the ultrasound or the tag bouundary
 void ObstacleController::avoidObstacle() {
   
     //always turn left to avoid obstacles
-    if (right < 0.8 || center < 0.8 || left < 0.8) {
+    if (right < 0.8 || center < 0.8 || left < 0.8 || tag_boundary_seen) {
       result.type = precisionDriving;
 
       result.pd.cmdAngular = -K_angular;
@@ -104,11 +104,12 @@ void ObstacleController::setCurrentLocation(Point currentLocation) {
 void ObstacleController::ProcessData() {
 
   //timeout timer for no tag messages
-  //this is used to set collection zone seen to false beacuse
+  //this is used to set collection zone seen / tag boundary seen to false beacuse
   //there is no report of 0 tags seen
   long int Tdifference = current_time - timeSinceTags;
   float Td = Tdifference/1e3;
   if (Td >= 0.5) {
+    tag_boundary_seen = false;
     collection_zone_seen = false;
     phys= false;
     if (!obstacleAvoided)
@@ -147,8 +148,8 @@ void ObstacleController::ProcessData() {
     timeSinceTags = current_time;
   }
 
-  //if physical obstacle or collection zone visible
-  if (collection_zone_seen || phys)
+  //if physical obstacle, tag boundary, or collection zone visible
+  if (phys || tag_boundary_seen || collection_zone_seen)
   {
     obstacleDetected = true;
     obstacleAvoided = false;
@@ -166,46 +167,50 @@ void ObstacleController::ProcessData() {
 // top of the AprilTag is pointing towards the rover or away.
 // If the top of the tags are away from the rover then treat them as obstacles. 
 void ObstacleController::setTagData(vector<Tag> tags){
+  tag_boundary_seen = false;
   collection_zone_seen = false;
   count_left_collection_zone_tags = 0;
   count_right_collection_zone_tags = 0;
 
+  // give Boundary tag type precedence, even if holding a target
+  for (int i = 0; i < tags.size(); i++) {
+    if (tags[i].getID() == 1) {
+      tag_boundary_seen = true;
+      timeSinceTags = current_time;
+      return; // we don't check anything else if we're at a boundary
+    }
+  }
+
   // this loop is to get the number of center tags
   if (!targetHeld) {
-    for (int i = 0; i < tags.size(); i++) { //redundant for loop
+    for (int i = 0; i < tags.size(); i++) {
       if (tags[i].getID() == 256) {
-
-	collection_zone_seen = checkForCollectionZoneTags( tags );
+        collection_zone_seen = checkForCollectionZoneTags( tags[i] );
         timeSinceTags = current_time;
       }
     }
   }
 }
 
-bool ObstacleController::checkForCollectionZoneTags( vector<Tag> tags ) {
+bool ObstacleController::checkForCollectionZoneTags( Tag tag ) {
 
-  for ( auto & tag : tags ) { 
+  // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle.
+  //If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle.
+  //This allows the robot to leave the collection zone after dropping off a target.
+  if ( tag.calcYaw() > 0 )
+    {
+      // checks if tag is on the right or left side of the image
+      if (tag.getPositionX() + camera_offset_correction > 0) {
+        count_right_collection_zone_tags++;
 
-    // Check the orientation of the tag. If we are outside the collection zone the yaw will be positive so treat the collection zone as an obstacle. 
-    //If the yaw is negative the robot is inside the collection zone and the boundary should not be treated as an obstacle. 
-    //This allows the robot to leave the collection zone after dropping off a target.
-    if ( tag.calcYaw() > 0 ) 
-      {
-	// checks if tag is on the right or left side of the image
-	if (tag.getPositionX() + camera_offset_correction > 0) {
-	  count_right_collection_zone_tags++;
-	  
-	} else {
-	  count_left_collection_zone_tags++;
-	}
+      } else {
+        count_left_collection_zone_tags++;
       }
-    
-  }
+    }
 
 
   // Did any tags indicate that the robot is inside the collection zone?
   return count_left_collection_zone_tags + count_right_collection_zone_tags > 0;
-
 }
 
 //obstacle controller should inrerupt is based upon the transition from not seeing and obstacle to seeing an obstacle
@@ -250,6 +255,8 @@ void ObstacleController::setCurrentTimeInMilliSecs( long int time )
   current_time = time;
 }
 
+
+//TODO need to allow tag boundary to still interrupt and avoid obstacles even when robots are holding cubes
 void ObstacleController::setTargetHeld() {
   targetHeld = true;
 
