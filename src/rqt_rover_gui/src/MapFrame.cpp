@@ -637,24 +637,28 @@ void MapFrame::mouseReleaseEvent(QMouseEvent *event)
 
 void MapFrame::mousePressEvent(QMouseEvent *event)
 {
-  std::set<std::string>::iterator it = display_list.find(rover_currently_selected);
-
-  // Failure condition: a valid rover is not selected.
-  if(it == display_list.end())
+  if ( event->buttons() == Qt::LeftButton )
   {
-    emit sendInfoLogMessage("Waypoints Error: a valid rover is not selected!");
-    return;
+    previous_clicked_position = event->pos();
   }
-  // Failure condition: don't accept waypoints for rovers in autonomous mode
-  else if(! map_data->inManualMode(rover_currently_selected))
+  else if ( event->buttons() == Qt::RightButton )
   {
-    return;
-  }
+    std::set<std::string>::iterator it = display_list.find(rover_currently_selected);
 
-  float waypoint_click_tolerance = 0.25*(scale/10);
+    // Failure condition: a valid rover is not selected.
+    if(it == display_list.end())
+    {
+      emit sendInfoLogMessage("Waypoints Error: a valid rover is not selected!");
+      return;
+    }
+    // Failure condition: don't accept waypoints for rovers in autonomous mode
+    else if(! map_data->inManualMode(rover_currently_selected))
+    {
+      return;
+    }
 
-  if ( event->buttons() == Qt::RightButton )
-  {
+    float waypoint_click_tolerance = 0.25*(scale/10);
+
     // Solve for map coordinates in terms of frame coordinates
     float mouse_map_x = ((event->pos().x() - map_origin_x*1.0f)/(map_width-map_origin_x))*max_seen_width + min_seen_x;
     float mouse_map_y = ((event->pos().y() - map_origin_y*1.0f)/(map_height-map_origin_y))*max_seen_height + min_seen_y;
@@ -682,7 +686,7 @@ void MapFrame::mousePressEvent(QMouseEvent *event)
       float y1 = get<1>(coordinate);
       float y2 = mouse_map_y;
 
-emit sendInfoLogMessage(" x1: " + QString::number(x1)
+      emit sendInfoLogMessage(" x1: " + QString::number(x1)
                               + " x2: " + QString::number(x2)
                               + " y1: " + QString::number(y1)
                               + " y2: " + QString::number(y2)
@@ -702,13 +706,8 @@ emit sendInfoLogMessage(" x1: " + QString::number(x1)
       addWaypoint(rover_currently_selected, mouse_map_x, mouse_map_y);
     }
   }
-  else if ( event->buttons() == Qt::LeftButton )
-  {
-    previous_clicked_position = event->pos();
-  }
 
-    // emit sendInfoLogMessage("MapFrame: mouse press. x: " + QString::number(mouse_event->pos().x()) + ", y: " + QString::number(mouse_event->pos().y()));
-
+  // emit sendInfoLogMessage("MapFrame: mouse press. x: " + QString::number(mouse_event->pos().x()) + ", y: " + QString::number(mouse_event->pos().y()));
 }
 
 void MapFrame::mouseMoveEvent(QMouseEvent *event)
