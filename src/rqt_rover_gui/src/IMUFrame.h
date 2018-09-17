@@ -33,6 +33,7 @@ namespace rqt_rover_gui
 class IMUFrame : public QFrame
 {
     Q_OBJECT
+
 public:
     IMUFrame(QWidget *parent, Qt::WindowFlags = 0);
     void setLinearAcceleration(float x, float y, float z);
@@ -40,15 +41,12 @@ public:
     void setOrientation(float w, float x, float y, float z);
 
 signals:
-
     void delayedUpdate();
 
 public slots:
     void rotateTimerEventHandler();
 
-
 protected:
-
     void paintEvent(QPaintEvent *event);
 
 private:
@@ -56,7 +54,7 @@ private:
     tuple<float, float, float> rotateByQuaternion( tuple<float, float, float> point,  tuple<float, float, float, float> quaternion);
     tuple<float, float, float> inverseRotateByQuaternion( tuple<float, float, float> point,  tuple<float, float, float, float> quaternion);
     tuple<float, float, float> rotateAboutAxis(tuple<float, float, float> point, float angle,  tuple<float, float, float> axis_of_rotation);
-    float** setUpRotationMatrix(float angle, tuple<float, float, float> axis_rotation); // angle in radians   
+    float** setUpRotationMatrix(float angle, tuple<float, float, float> axis_rotation); // angle in radians
 
     tuple<float, float, float> linear_acceleration; // ROS Geometry Messages Vector3: <x, y, z>
     tuple<float, float, float> angular_velocity; // ROS Geometry Messages Vector3: <x, y, z>
