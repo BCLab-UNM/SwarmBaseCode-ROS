@@ -373,6 +373,6 @@ function runSwarmieWebsite() {
         setTimeout(drawMapCallback, 50); 
     };
     setTimeout(drawMapCallback, 50);
-            
-
+    
+    dicument.title = Name;
     };
