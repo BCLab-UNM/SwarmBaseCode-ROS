@@ -13,27 +13,26 @@
 class Controller {
 public:
   Controller() {}
-
-  // Resets internal state to defaults
-  virtual void reset() = 0;
-
-  // Determines what action should be taken based on current
-  // internal state and data
-  virtual Result doWork() = 0;
-
-  // Returns whether or not an interrupt must be thrown
-  virtual bool shouldInterrupt() = 0;
-
-  // Returns whether or not a controller should be polled for a Result
-  virtual bool hasWork() = 0;
-
   ~Controller() {}
+
+  //Resets internal state to defaults
+  virtual void Reset() = 0;
+
+  //Determines what action should be taken based on current
+  //internal state and data
+  virtual Result DoWork() = 0;
+
+  //Returns whether or not an interrupt must be thrown
+  virtual bool ShouldInterrupt() = 0;
+
+  //Returns whether or not a controller should be polled for a Result
+  virtual bool HasWork() = 0;
 
 protected:
 
-  // Looks at external data and determines if an interrupt must be thrown
-  // or if the controller should be polled
-  virtual void processData() = 0;
+  //Looks at external data and determines if an interrupt must be thrown
+  //or if the controller should be polled
+  virtual void ProcessData() = 0;
 };
 
 #endif // CONTROLLER_H

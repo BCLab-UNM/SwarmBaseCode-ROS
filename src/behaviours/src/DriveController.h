@@ -9,18 +9,17 @@ class DriveController : virtual Controller
 {
 public:
   DriveController();
-
-
-  void reset() override;
-  Result doWork() override;
-  bool shouldInterrupt() override;
-  bool hasWork() override;
-
-  void setResultData(Result result) {this->result = result;}
-  void setVelocityData(float linear_velocity,float angular_velocity);
-  void setCurrentLocation(Point current_location) {this->current_location = current_location;}
-
   ~DriveController();
+
+  void Reset() override;
+  Result DoWork() override;
+  bool ShouldInterrupt() override;
+  bool HasWork() override;
+
+  void SetResultData(Result result) {this->result = result;}
+  void SetVelocityData(float linearVelocity,float angularVelocity);
+  void SetCurrentLocation(Point currentLocation) {this->currentLocation = currentLocation;}
+
 private:
 
   Result result;
@@ -30,26 +29,26 @@ private:
   float left; //left wheels PWM value
   float right; //right wheels PWM value
 
-  bool interrupt = false; //hold if interupt has occured yet
+  bool interupt = false; //hold if interupt has occured yet
 
-  float rotate_only_angle_tolerance = 0.05;  //May be too low?
-  float final_rotation_tolerance = 0.1; //dead code not used
-  const float waypoint_tolerance = 0.15; //15 cm tolerance.
+  float rotateOnlyAngleTolerance = 0.05;  //May be too low?
+  float finalRotationTolerance = 0.1; //dead code not used
+  const float waypointTolerance = 0.15; //15 cm tolerance.
 
   //0.65 MAX value
-  float search_velocity = 0.35; // meters/second
+  float searchVelocity = 0.35; // meters/second
 
-  float linear_velocity = 0;
-  float angular_velocity = 0;
+  float linearVelocity = 0;
+  float angularVelocity = 0;
 
   // Numeric Variables for rover positioning
-  Point current_location;
-  Point current_location_map;
-  Point current_location_average;
+  Point currentLocation;
+  Point currentLocationMap;
+  Point currentLocationAverage;
 
-  Point center_location;
-  Point center_location_map;
-  Point center_location_odom;
+  Point centerLocation;
+  Point centerLocationMap;
+  Point centerLocationOdom;
 
   vector<Point> waypoints;
 
@@ -61,20 +60,20 @@ private:
   PIDConfig constVelConfig();
   PIDConfig constYawConfig();
 
-  void fastPID(float error_vel,float error_yaw, float set_point_vel, float set_point_yaw);
-  void slowPID(float error_vel,float error_yaw, float set_point_vel, float set_point_yaw);
-  void constPID(float error_vel,float const_angular_error, float set_point_vel, float set_point_yaw);
+  void fastPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
+  void slowPID(float errorVel,float errorYaw, float setPointVel, float setPointYaw);
+  void constPID(float erroVel,float constAngularError, float setPointVel, float setPointYaw);
 
   //each PID movement paradigm needs at minimum two PIDs to acheive good robot motion.
   //one PID is for linear movement and the second for rotational movements
-  PID fast_vel_PID;
-  PID fast_yaw_PID;
+  PID fastVelPID;
+  PID fastYawPID;
 
-  PID slow_vel_PID;
-  PID slow_yaw_PID;
+  PID slowVelPID;
+  PID slowYawPID;
 
-  PID const_vel_PID;
-  PID const_yaw_PID;
+  PID constVelPID;
+  PID constYawPID;
 
   // state machine states
   enum StateMachineStates {
@@ -88,9 +87,9 @@ private:
   };
 
 
-  StateMachineStates state_machine_state = STATE_MACHINE_WAITING;
+  StateMachineStates stateMachineState = STATE_MACHINE_WAITING;
 
-  void processData();
+  void ProcessData();
 
 };
 
