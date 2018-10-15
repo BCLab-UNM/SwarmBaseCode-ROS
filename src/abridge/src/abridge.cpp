@@ -180,7 +180,7 @@ void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message)
   }
   else if (left < -max_motor_cmd)
   {
-    left = - max_motor_cmd;
+    left = -max_motor_cmd;
   }
 
   if (right > max_motor_cmd)
