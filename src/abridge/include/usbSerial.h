@@ -18,17 +18,17 @@ public:
     USBSerial();
     virtual ~USBSerial();
   
-    void openUSBPort(string devicePath, int baud);
+    void openUSBPort(string device_path, int baud);
     void sendData(char data[]);
     string readData();
     void closeUSBPort();
 
 private:
 
-    struct termios ioStruct;
-    int usbFileDescriptor;
-    char serialDataIn[200];
-    char dataOut[16];
+    struct termios io_struct;
+    int usb_file_descriptor;
+    char serial_data_in[200];
+    char data_out[16];
 
 };
 

@@ -1,4 +1,4 @@
-#include "usbSerial.h" // Where is this file in this directory?
+#include "usbSerial.h"
 
 using namespace std;
 
@@ -8,13 +8,13 @@ USBSerial::USBSerial() {
 
 void USBSerial::openUSBPort(string device_path, int baud)
 {
-  memset(&ioStruct, 0, sizeof (ioStruct));
-  ioStruct.c_iflag = 0;
-  ioStruct.c_oflag = 0;
-  ioStruct.c_cflag = CS8 | CREAD | CLOCAL;
-  ioStruct.c_lflag = 0;
-  ioStruct.c_cc[VMIN] = 1;
-  ioStruct.c_cc[VTIME] = 5;
+  memset(&io_struct, 0, sizeof (io_struct));
+  io_struct.c_iflag = 0;
+  io_struct.c_oflag = 0;
+  io_struct.c_cflag = CS8 | CREAD | CLOCAL;
+  io_struct.c_lflag = 0;
+  io_struct.c_cc[VMIN] = 1;
+  io_struct.c_cc[VTIME] = 5;
 
   usb_file_descriptor = open(device_path.c_str(), O_RDWR | O_NONBLOCK);
   if (usb_file_descriptor <= 0)
@@ -22,9 +22,9 @@ void USBSerial::openUSBPort(string device_path, int baud)
     cout << "Opening USB0 FAILED " << usb_file_descriptor << endl;
     exit(1);
   }
-  cfsetospeed(&ioStruct, B115200);
-  cfsetispeed(&ioStruct, B115200);
-  tcsetattr(usb_file_descriptor, TCSANOW, &ioStruct);
+  cfsetospeed(&io_struct, B115200);
+  cfsetispeed(&io_struct, B115200);
+  tcsetattr(usb_file_descriptor, TCSANOW, &io_struct);
 }
 
 void USBSerial::sendData(char data[])
