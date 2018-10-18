@@ -418,6 +418,8 @@ void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     const ros::M_string& header = event.getConnectionHeader();
     ros::Time receipt_time = event.getReceiptTime();
 
+    string topic = header.at("topic");
+
     const boost::shared_ptr<const nav_msgs::Odometry> msg = event.getMessage();
 
     float x = msg->pose.pose.position.x;
@@ -426,8 +428,8 @@ void RoverGUIPlugin::EKFEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     QString x_str; x_str.setNum(x);
     QString y_str; y_str.setNum(y);
     // Extract rover name from the message source. Publisher is in the format /*rover_name*_MAP
-    size_t found = publisher_name.find("_MAP");
-    string rover_name = publisher_name.substr(1,found-1);
+    size_t found = topic.find("/odom/ekf");
+    string rover_name = topic.substr(1,found-1);
 
     // Store map info for the appropriate rover name
     ui.map_frame->addToEKFRoverPath(rover_name, x, y);
@@ -464,6 +466,8 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     const ros::M_string& header = event.getConnectionHeader();
     ros::Time receipt_time = event.getReceiptTime();
 
+    string topic = header.at("topic");
+
     const boost::shared_ptr<const nav_msgs::Odometry> msg = event.getMessage();
     float x = msg->pose.pose.position.x;
     float y = msg->pose.pose.position.y;
@@ -472,8 +476,8 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
     QString y_str; y_str.setNum(y);
 
     // Extract rover name from the message source. Publisher is in the format /*rover_name*_NAVSAT
-    size_t found = publisher_name.find("_NAVSAT");
-    string rover_name = publisher_name.substr(1,found-1);
+    size_t found = topic.find("/odom/navsat");
+    string rover_name = topic.substr(1,found-1);
 
     // Store map info for the appropriate rover name
     ui.map_frame->addToGPSRoverPath(rover_name, x, y);
@@ -482,9 +486,11 @@ void RoverGUIPlugin::GPSEventHandler(const ros::MessageEvent<const nav_msgs::Odo
 void RoverGUIPlugin::GPSNavSolutionEventHandler(const ros::MessageEvent<const ublox_msgs::NavSOL> &event) {
     const boost::shared_ptr<const ublox_msgs::NavSOL> msg = event.getMessage();
 
+    const ros::M_string& header = event.getConnectionHeader();
+    string topic = header.at("topic");
     // Extract rover name from the message source. Publisher is in the format /*rover_name*_UBLOX
-    size_t found = event.getPublisherName().find("_UBLOX");
-    QString rover_name = event.getPublisherName().substr(1,found-1).c_str();
+    size_t found = topic.find("/navsol");
+    QString rover_name = topic.substr(1,found-1).c_str();
 
     // Update the number of sattellites detected for the specified rover
     rover_numSV_state[rover_name.toStdString()] = msg.get()->numSV;
@@ -697,7 +703,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     //Set up subscribers
     image_transport::ImageTransport it(nh);
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("theora"));
+    camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("compressed"));
     imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
     us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
     us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+
+<script type="text/javascript" src="eventemitter2.min.js"></script>
+<script type="text/javascript" src="roslib.min.js"></script>
+<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript" src="swarmie.js"></script>
+<script type="text/javascript" src="swarmie-web.js"></script>
+</head>
+
+<body>
+  <h1 align='center'>Swarmie Robot</h1>
+  <style>
+    .center {
+      margin: auto;
+      width: 50%;
+      padding: 1px;
+     <!-- border: 1px solid #000000;-->
+    }
+    .right {
+      float: right;
+      width: 400px;
+      padding: 1px;
+    }
+    .left {
+      float: left;
+      width: 400px;
+      padding: 1px;
+      margin-left: 70px;
+    }
+  </style>
+    <div class = 'left'>
+      <img id = 'image'></img>
+    </div>
+    <div class = 'right'>
+      <canvas id = 'sonarImage' width = '300' height = '300' style='border:1px solid #000000;'></canvas>
+    </div>
+   <!-- <div class = 'center'>
+     <!-- <p id = 'sonarL'></p>
+      <p id = 'sonarC'></p>
+      <p id = 'sonarR'></p>-->
+   </div>
+   <div class = 'center'>
+     <canvas id = 'positionmap' width = '600' height = '600' style='border:1px solid #000000;'></canvas>
+   </div>
+    <div class="slidecontainer">
+      <div class='center'>
+      <input type="range" min="1" max="1000" value="250" step="1" class="slider" id="myRange">
+      <output id="output"></output>
+      </div>
+    </div>
+    <div class = 'center'>
+      <button id='button'><p id='textonbutton'>Mode</p></button>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

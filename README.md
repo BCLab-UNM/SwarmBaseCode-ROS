@@ -66,6 +66,10 @@ The ROS USB camera package:
 ```
 sudo apt install ros-kinetic-usb-cam
 ```
+If you intend to use the rosbridge tools to run robots independently of the laptop you will need to install rosbridge:
+```
+sudo apt install ros-kinetic-rosbridge-server
+```
 
 ##### 3. Install additional Gazebo plugins
 
