@@ -9,7 +9,7 @@ function eventWindowLoaded () {
 
 function runSwarmieWebsite() {
 
-    var Name = prompt("Please enter the robot's name.").toUpperCase();
+    var Name = prompt("Please enter the robot's name.");
     var swarmieName = new Swarmie(Name);
 
 // Publishing a Topic
@@ -17,25 +17,25 @@ function runSwarmieWebsite() {
 
     
   var robotMovement = new ROSLIB.Topic({
-      ros : robotRos,
+      ros : swarmieName.robotRos,
       name : '/' + Name + '/driveControl',
       messageType : 'geometry_msgs/Twist'
   });
 
   var fingerAction = new ROSLIB.Topic({
-      ros : robotRos,
+      ros : swarmieName.robotRos,
       name : '/' + Name + '/fingerAngle/cmd',
       messageType : 'std_msgs/Float32'
   });
 
   var wristAction = new ROSLIB.Topic({
-      ros : robotRos,
+      ros : swarmieName.robotRos,
       name : '/' + Name + '/wristAngle/cmd',
       messageType : 'std_msgs/Float32'
   });
 
   var robotMode = new ROSLIB.Topic({
-      ros : robotRos,
+      ros : swarmieName.robotRos,
       name : '/' + Name + '/mode',
       messageType : 'std_msgs/UInt8'
   });
@@ -168,7 +168,7 @@ function runSwarmieWebsite() {
     };
     
   var positionReader = new ROSLIB.Topic({
-      ros : robotRos,
+      ros : swarmieName.robotRos,
       name : '/' + Name + '/odom/filtered',
       messageType : 'nav_msgs/Odometry'
   });
@@ -237,7 +237,7 @@ function runSwarmieWebsite() {
     var sonarLeft, sonarRight, sonarCenter;
       
     sonarLeft = new ROSLIB.Topic({
-        ros : robotRos,
+        ros : swarmieName.robotRos,
         name : '/' + Name + '/sonarLeft',
         messageType : 'sensor_msgs/Range'
         });
@@ -262,7 +262,7 @@ function runSwarmieWebsite() {
     };
 
     sonarCenter = new ROSLIB.Topic({
-        ros : robotRos,
+        ros : swarmieName.robotRos,
         name : '/' + Name + '/sonarCenter',
         messageType : 'sensor_msgs/Range'
     });
@@ -287,7 +287,7 @@ function runSwarmieWebsite() {
     };
 
     sonarRight = new ROSLIB.Topic({
-        ros : robotRos,
+        ros : swarmieName.robotRos,
         name : '/' + Name + '/sonarRight',
         messageType : 'sensor_msgs/Range'
     });
@@ -313,7 +313,7 @@ function runSwarmieWebsite() {
 
 
   var imageTopic = new ROSLIB.Topic({
-      ros : robotRos,
+      ros : swarmieName.robotRos,
       name : '/' + Name + '/targets/image/compressed',
       messageType : 'sensor_msgs/CompressedImage'
   });
@@ -374,5 +374,5 @@ function runSwarmieWebsite() {
     };
     setTimeout(drawMapCallback, 50);
     
-    dicument.title = Name;
+    document.title = Name;
     };
