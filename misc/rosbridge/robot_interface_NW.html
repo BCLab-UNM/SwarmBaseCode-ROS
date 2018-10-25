@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Context Menu</title>
+  </head>
+  <body style="width: 100%; height: 100%;">
+
+    <p>'Right click' to show context menu.</p>
+
+    <script>
+      var rl = require('readline');
+
+      var menu = new nw.Menu();
+
+      menu.append(new nw.MenuItem({
+      label: 'Add Robot',
+      click: function(){
+      var r1 = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+      });
+
+      r1.question('What do you think of Node.js? ', (answer) => {
+          console.log('Thank you for your valuable feedback: ${answer}');
+
+      r1.close();
+      }
+                 )
+      }}));
+
+      document.body.addEventListener('contextmenu', function(ev) {
+      ev.preventDefault();
+      menu.popup(ev.x, ev.y);
+      return false;
+      }, false);
+      /*
+      var menu = new nw.Menu();
+
+      menu.append(new nw.MenuItem({
+        label: 'Add Robot',
+        click: function(){
+      alert('Please enter the robot name.');
+        }
+      }));
+   
+
+      document.body.addEventListener('contextmenu', function(ev) {
+        ev.preventDefault();
+        menu.popup(ev.x, ev.y);
+      return false;
+      }, false);
+      */
+    </script>  
+  </body>
+</html>
