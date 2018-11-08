@@ -30,10 +30,9 @@ function runSwarmieWebsite() {
 
   var wristAction = new ROSLIB.Topic({
       ros : robotRos,
-      name : '/' + Name + '/wristAngle/cmd',
+    name : '/' + Name + '/wristAngle/cmd',
       messageType : 'std_msgs/Float32'
   });
-
   var robotMode = new ROSLIB.Topic({
       ros : robotRos,
       name : '/' + Name + '/mode',
