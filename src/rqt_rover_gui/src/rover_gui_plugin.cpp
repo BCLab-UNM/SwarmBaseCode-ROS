@@ -1854,15 +1854,21 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if (ui.final_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
          arena_dim = 23.1;
-         //addFinalsWalls();
+#ifndef _TAG_BOUNDARIES
+         addFinalsWalls();
+#else
          addFinalsTagBoundary();
+#endif
          emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else if (ui.prelim_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
         arena_dim = 15;
-        //addPrelimsWalls();
+#ifndef _TAG_BOUNDARIES
+        addPrelimsWalls();
+#else
         addPrelimsTagBoundary();
+#endif
         emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else
