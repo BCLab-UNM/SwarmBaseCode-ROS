@@ -3,7 +3,7 @@
 # start_robots.sh [--prefix <prefix directory>] [--team-prefix <team prefix>] <calibration file name> <team name> <robot list>
 
 launch_delay=10
-OPTSTRING=`getopt -l prefix:,team-prefix: -- $0 $@`
+OPTSTRING=`getopt -l prefix:,team-prefix:,bridged -- $0 $@`
 
 if [ $? != 0 ]
 then
@@ -19,6 +19,7 @@ do
     case "$1" in
         --prefix ) prefix="$2"; shift 2 ;;
         --team-prefix ) team_prefix="$2"; shift 2 ;;
+        --bridged ) bridged="true"; shift 1 ;;
         -- ) shift ; args="$@";  break ;;
     esac
 done
@@ -35,7 +36,13 @@ else
     path=$prefix/$team_prefix$team
 fi
 
-master=`hostname`
+if [ -z $bridged ]
+then
+    launch_command="./rover_onboard_node_launch.sh `hostname` $cal_file"
+else
+    launch_command="./rover_launch_local.sh localhost $cal_file"
+fi
+
 # start the robots
 for robot in $robots
 do
@@ -46,7 +53,7 @@ do
 		ssh -t swarmie@$robot 'echo 'Running $robot';
         cd $path/misc;
         . /opt/ros/kinetic/setup.bash;
-		./rover_onboard_node_launch.sh $master $cal_file;
+        $launch_command;
 		exit 1;
 		exit 1;
 		/bin/bash;' exec $SHELL"
@@ -63,3 +70,9 @@ do
     echo "---"
     echo
 done
+
+if ! [ -z $bridged ]
+then
+    sleep 30
+    ./start_bridge.sh $robots
+fi
