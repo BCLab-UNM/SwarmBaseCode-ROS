@@ -382,14 +382,14 @@ That's it! You should now have a seamless way to SSH without having to type in p
 
 ## Notes for using rosbridge
 
-The `misc/start_robots.sh` script now accepts a `--bridged` option that will run each robot independently and connect them to the gui using rosbridge. For example:
+The `misc/start_robots.sh` script now accepts a `--bridged` option that will run each robot independently and connect them to the GUI using rosbridge. For example:
 ```
 $ ./start_robots.sh --bridged --prefix path/to/directory/containing/code/on/robot <calibration file> Swarmathon-UNM <list robot names>
 ```
 
 You can also start a single robot manually using `misc/rover_launch_local.sh <calibration file>` script. Once the robot is running and the GUI is running use `misc/start_bridge.sh <robot-name>` to connect the robot to the GUI via rosbridge.
 
-If the robot does not appear in the GUI try reloading the robot interface page in the browser.
+A firefox tab will open for each robot (if there is an error connecting to the robot it will appear in the browser console). If the robot does not appear in the GUI try reloading the robot interface page in the browser.
 
 ## Behaviours
 
