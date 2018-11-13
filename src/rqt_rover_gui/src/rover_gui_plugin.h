@@ -64,7 +64,6 @@
 #include "GazeboSimManager.h"
 #include "JoystickGripperInterface.h"
 
-
 // Forward declarations
 class MapData;
 
