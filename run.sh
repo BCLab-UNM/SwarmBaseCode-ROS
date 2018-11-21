@@ -2,7 +2,7 @@
 previous_gazebo_model_path=${GAZEBO_MODEL_PATH}
 previous_gazebo_plugin_path=${GAZEBO_PLUGIN_PATH}
 export SWARMATHON_APP_ROOT="$(catkin locate)"
-if [ -z "$t" ]; then SWARMATHON_APP_ROOT=$(dirname "$0"); fi
+if [ -z "$SWARMATHON_APP_ROOT" ]; then SWARMATHON_APP_ROOT=$(dirname "$0"); fi
 echo "Running from: $PWD with repo root: $SWARMATHON_APP_ROOT"
 export GAZEBO_MODEL_PATH="$SWARMATHON_APP_ROOT/simulation/models"
 export GAZEBO_PLUGIN_PATH="$SWARMATHON_APP_ROOT/build/gazebo_plugins"
