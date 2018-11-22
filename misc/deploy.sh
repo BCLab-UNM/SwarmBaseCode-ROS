@@ -8,9 +8,9 @@ branch=""
 needsReboot=false
 calFile=""
 
-cd ..
-dirPath="$(pwd)"
-dirName="$(basename `pwd`)"
+export dirPath="$(catkin locate)"
+if [ -z "$dirPath" ]; then dirPath=$(dirname "$0"); fi
+dirName="$(basename $dirPath)"
 
 #Functions
 #--------------------------------------------------------------------------
