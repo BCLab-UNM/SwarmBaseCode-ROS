@@ -18,29 +18,29 @@ using namespace std;
  */
 class sbridge {
 
-	public:
+public:
 
-		sbridge(std::string publishedName);
-		void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
-        ~sbridge();
+  sbridge(std::string published_name);
+  void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
+  ~sbridge();
 
-	private:
+private:
 
-                // Publishers
-		ros::Publisher skidsteerPublish;
-        ros::Publisher heartbeatPublisher;
-        ros::Publisher infoLogPublisher;
+  // Publishers
+  ros::Publisher skidsteer_publisher;
+  ros::Publisher heartbeat_publisher;
+  ros::Publisher info_log_publisher;
 
-                // Subscribers
-		ros::Subscriber driveControlSubscriber;
-        ros::Subscriber modeSubscriber;
+  // Subscribers
+  ros::Subscriber drive_control_subscriber;
+  ros::Subscriber mode_subscriber;
 
-        // Timer callback handler
-        void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
+  // Timer callback handler
+  void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);
 
-        ros::Timer publish_heartbeat_timer;
+  ros::Timer publish_heartbeat_timer;
 
-		geometry_msgs::Twist velocity;
+  geometry_msgs::Twist velocity;
 };
 
 #endif /* SBRIDGE */
