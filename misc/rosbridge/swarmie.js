@@ -48,7 +48,7 @@ class Swarmie {
         this.sonarRight = this.createPassthrough(this.robotRos, this.laptopRos, '/sonarRight_throttle', 'sensor_msgs/Range', false, false);
         this.stateMachine = this.createPassthrough(this.robotRos, this.laptopRos, '/state_machine', 'std_msgs/String', false, false);
         this.status = this.createPassthrough(this.robotRos, this.laptopRos, '/status', 'std_msgs/String', false, false);
-        this.targetsImageCompressed = this.createPassthrough(this.robotRos, this.laptopRos, '/targets/image/compressed', 'sensor_msgs/CompressedImage', false, false);
+        this.targetsImageCompressed = this.createPassthrough(this.robotRos, this.laptopRos, '/targets/image_throttle/compressed', 'sensor_msgs/CompressedImage', false, false);
         this.virtualFence = this.createPassthrough(this.laptopRos, this.robotRos, '/virtualFence', 'std_msgs/Float32MultiArray', false, true);
         this.wristAngle = this.createPassthrough(this.laptopRos, this.robotRos, '/wristAngle/cmd', 'std_msgs/Float32', false, false);
     }

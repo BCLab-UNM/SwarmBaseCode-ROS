@@ -703,7 +703,7 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     //Set up subscribers
     image_transport::ImageTransport it(nh);
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("compressed"));
+    camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image_throttle", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("compressed"));
     imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu_throttle", 10, &RoverGUIPlugin::IMUEventHandler, this);
     us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter_throttle", 10, &RoverGUIPlugin::centerUSEventHandler, this);
     us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft_throttle", 10, &RoverGUIPlugin::leftUSEventHandler, this);
