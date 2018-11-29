@@ -148,7 +148,7 @@ throttle()
     nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
 }
 
-throttle /$HOSTNAME/targets/image/compressed
+throttle /$HOSTNAME/targets/image
 throttle /$HOSTNAME/sonarLeft
 throttle /$HOSTNAME/sonarRight
 throttle /$HOSTNAME/sonarCenter

@@ -704,10 +704,10 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
     //Set up subscribers
     image_transport::ImageTransport it(nh);
     camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("compressed"));
-    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
-    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
-    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
-    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
+    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu_throttle", 10, &RoverGUIPlugin::IMUEventHandler, this);
+    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter_throttle", 10, &RoverGUIPlugin::centerUSEventHandler, this);
+    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft_throttle", 10, &RoverGUIPlugin::leftUSEventHandler, this);
+    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight_throttle", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
     emit sendInfoLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
 
@@ -924,10 +924,10 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
         waypoint_subscribers[*i] = nh.subscribe("/"+*i+"/waypoints", 10, &RoverGUIPlugin::waypointEventHandler, this);
         obstacle_subscribers[*i] = nh.subscribe("/"+*i+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
-        encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered", 10, &RoverGUIPlugin::encoderEventHandler, this);
-        ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
-        gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-        gps_nav_solution_subscribers[*i] = nh.subscribe("/"+*i+"/navsol", 10, &RoverGUIPlugin::GPSNavSolutionEventHandler, this);
+        encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered_throttle", 10, &RoverGUIPlugin::encoderEventHandler, this);
+        ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf_throttle", 10, &RoverGUIPlugin::EKFEventHandler, this);
+        gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat_throttle", 10, &RoverGUIPlugin::GPSEventHandler, this);
+        gps_nav_solution_subscribers[*i] = nh.subscribe("/"+*i+"/navsol_throttle", 10, &RoverGUIPlugin::GPSNavSolutionEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 1, &RoverGUIPlugin::diagnosticEventHandler, this);
 
         RoverStatus rover_status;
