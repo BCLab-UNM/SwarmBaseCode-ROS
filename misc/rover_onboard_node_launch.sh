@@ -155,9 +155,7 @@ throttle /$HOSTNAME/sonarCenter
 throttle /$HOSTNAME/odom/navsat
 throttle /$HOSTNAME/odom/filtered
 throttle /$HOSTNAME/odom/ekf
-throttle /$HOSTNAME/odom
 throttle /$HOSTNAME/navsol
-throttle /$HOSTNAME/odom
 throttle /$HOSTNAME/imu
 
 #Wait for user input to terminate processes
