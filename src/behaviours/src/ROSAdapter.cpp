@@ -62,6 +62,7 @@ private:
 // Random number generator
 random_numbers::RandomNumberGenerator* rng;
 
+std_msgs::UInt8 collision_msg;
 // Create logic controller
 
 LogicController logicController;
@@ -129,6 +130,7 @@ ros::Publisher wristAnglePublish;		//publishes wrist angle to move wrist
 ros::Publisher infoLogPublisher;		//publishes a message to the infolog box on GUI
 ros::Publisher driveControlPublish;		//publishes motor commands to the motors
 ros::Publisher heartbeatPublisher;		//publishes ROSAdapters status via its "heartbeat"
+ros::Publisher obstaclePublisher;
 // Publishes swarmie_msgs::Waypoint messages on "/<robot>/waypooints"
 // to indicate when waypoints have been reached.
 ros::Publisher waypointFeedbackPublisher;	//publishes a waypoint to travel to if the rover is given a waypoint in manual mode
@@ -214,6 +216,7 @@ int main(int argc, char **argv) {
 
   //publishers
   status_publisher = mNH.advertise<std_msgs::String>((publishedName + "/swarmie_status"), 1, true);			//publishes rover status
+  obstaclePublisher = mNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle"), 10, true);
   stateMachinePublish = mNH.advertise<std_msgs::String>((publishedName + "/state_machine"), 1, true);			//publishes state machine status
   fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);			//publishes gripper angle to move gripper finger
   wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);			//publishes wrist angle to move wrist
@@ -369,7 +372,8 @@ void behaviourStateMachine(const ros::TimerEvent&)
         prevWrist = result.wristAngle;		//store the last known gripper wrist angle
       }
     }
-    
+  collision_msg.data = logicController.getCollisionCalls();
+  obstaclePublisher.publish(collision_msg);
     //publishHandeling here
     //logicController.getPublishData(); //Not Currently Implemented, used to get data from logic controller and publish to the appropriate ROS Topic; Suggested
     
