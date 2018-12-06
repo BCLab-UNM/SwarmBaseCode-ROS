@@ -1,4 +1,15 @@
 #!/bin/bash
+OPTSTRING=`getopt -l demo-mode -- $0 $@`
+demo_mode=false
+eval set -- "$OPTSTRING"
+while true
+do
+    case "$1" in
+        --demo-mode ) demo_mode=true; shift 1 ;;
+        -- ) shift ; break ;;
+    esac
+done
+    
 echo "running pkill on old rosnodes"
 pkill usb_cam_node
 pkill behaviours
@@ -148,7 +159,11 @@ throttle()
     nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
 }
 
-nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed 1.0 /$HOSTNAME/targets/image_throttle/compressed &
+if $demo_mode ; then
+    nohup >/dev/null rosrun topic_tools throttle messages $1 10.0 &
+else
+    nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
+fi
 throttle /$HOSTNAME/sonarLeft
 throttle /$HOSTNAME/sonarRight
 throttle /$HOSTNAME/sonarCenter
