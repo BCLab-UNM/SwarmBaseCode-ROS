@@ -160,9 +160,9 @@ throttle()
 }
 
 if $demo_mode ; then
-    nohup >/dev/null rosrun topic_tools throttle messages $1 10.0 &
+    nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed 10.0 /$HOSTNAME/targets/image_throttle/compressed &
 else
-    nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
+    nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed 1.0 /$HOSTNAME/targets/image_throttle/compressed &
 fi
 throttle /$HOSTNAME/sonarLeft
 throttle /$HOSTNAME/sonarRight
