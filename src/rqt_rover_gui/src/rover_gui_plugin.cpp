@@ -1865,7 +1865,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
          {
              addFinalsWalls();
          }
-         if (ui.wall_apriltag_radio_button->isChecked())
+         else
          {
              addFinalsTagBoundary();
          }
@@ -1880,7 +1880,7 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
         {
             addPrelimsWalls();
         }
-        if (ui.wall_apriltag_radio_button->isChecked())
+        else
         {
             addPrelimsTagBoundary();
         }
