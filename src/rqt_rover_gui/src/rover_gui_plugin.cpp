@@ -1817,11 +1817,17 @@ void RoverGUIPlugin::unboundedRadioButtonEventHandler(bool toggled)
 
     if(toggled)
     {
+        ui.round_type_wall_group->setStyleSheet("color: grey;");
+        ui.round_type_wall_group->setEnabled(!toggled);
+
         ui.unbounded_arena_size_label->setStyleSheet("color: white;");
         ui.unbounded_arena_size_combobox->setStyleSheet("color: white; border:2px solid white; padding: 1px 0px 1px 3px");
     }
     else
     {
+        ui.round_type_wall_group->setStyleSheet("color: white;");
+        ui.round_type_wall_group->setEnabled(!toggled);
+
         ui.unbounded_arena_size_label->setStyleSheet("color: grey;");
         ui.unbounded_arena_size_combobox->setStyleSheet("color: grey; border:2px solid grey; padding: 1px 0px 1px 3px");
     }
@@ -1854,21 +1860,31 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if (ui.final_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
          arena_dim = 23.1;
-#ifndef _TAG_BOUNDARIES
-         addFinalsWalls();
-#else
-         addFinalsTagBoundary();
-#endif
+
+         if (ui.wall_radio_button->isChecked())
+         {
+             addFinalsWalls();
+         }
+         if (ui.wall_apriltag_radio_button->isChecked())
+         {
+             addFinalsTagBoundary();
+         }
+
          emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else if (ui.prelim_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
         arena_dim = 15;
-#ifndef _TAG_BOUNDARIES
-        addPrelimsWalls();
-#else
-        addPrelimsTagBoundary();
-#endif
+
+        if (ui.wall_radio_button->isChecked())
+        {
+            addPrelimsWalls();
+        }
+        if (ui.wall_apriltag_radio_button->isChecked())
+        {
+            addPrelimsTagBoundary();
+        }
+
         emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else
