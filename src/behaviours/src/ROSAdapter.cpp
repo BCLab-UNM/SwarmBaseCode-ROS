@@ -29,6 +29,7 @@
 
 #include "Point.h"
 #include "Tag.h"
+#include "PositionPublisher.hpp"
 
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
@@ -81,6 +82,7 @@ void resultHandler();	// Not Used/Dead Code, prototype has no definition
 Point updateCenterLocation();		//calls transformMapCenterToOdom, returns a center location in ODOM frame
 void transformMapCentertoOdom();	//checks ODOMs perceived idea of where the center is with a stored GPS center coordinate and adjusts ODOM center value to account for drift
 
+PositionPublisher* positionPublisher;
 
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;		//current location using ODOM
@@ -198,6 +200,7 @@ int main(int argc, char **argv) {
   // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
   ros::init(argc, argv, (publishedName + "_BEHAVIOUR"), ros::init_options::NoSigintHandler);
   ros::NodeHandle mNH;
+  positionPublisher = new PositionPublisher(mNH, publishedName);
   
   // Register the SIGINT event handler so the node can shutdown properly
   signal(SIGINT, sigintEventHandler);
@@ -256,7 +259,8 @@ obstaclePublisher = mNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle")
   timerStartTime = time(0);
   
   ros::spin();
-  
+
+  delete positionPublisher;
   return EXIT_SUCCESS;
 }
 
@@ -469,7 +473,10 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 							    tagPose.pose.orientation.w ) );
       tags.push_back(loc);
     }
-    
+    Point curr_loc;
+    curr_loc.x = currentLocationMap.x;
+    curr_loc.y = currentLocationMap.y;
+    positionPublisher->setDetections(tags, curr_loc);
     logicController.SetAprilTags(tags);
   }
   
