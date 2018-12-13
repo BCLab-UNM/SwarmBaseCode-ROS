@@ -11,18 +11,15 @@ class Swarmie {
         this.laptopRos = new ROSLIB.Ros({
             url : 'ws://localhost:9090'
         });
-               
         this.robotRos.on('connection', function() {
             console.log('Connected to robot websocket server.');
         });
         this.laptopRos.on('connection', function() {
             console.log('Connected to laptop websocket server');
         });
-        
         this.robotRos.on('error', function(error) {
             console.log('Error connecting to websocket server: ', error);
         });
-
         this.robotRos.on('close', function() {
             console.log('Connection to websocket server closed.');
         });

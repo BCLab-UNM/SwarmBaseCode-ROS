@@ -1,11 +1,11 @@
 #!/bin/bash
-OPTSTRING=`getopt -l demo-mode -- $0 $@`
-demo_mode=false
+OPTSTRING=`getopt -l frame-rate: -- $0 $@`
+frame_rate=10
 eval set -- "$OPTSTRING"
 while true
 do
     case "$1" in
-        --demo-mode ) demo_mode=true; shift 1 ;;
+        --frame-rate ) frame_rate="$2"; shift 2 ;;
         -- ) shift ; break ;;
     esac
 done
@@ -159,11 +159,8 @@ throttle()
     nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
 }
 
-if $demo_mode ; then
-    nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed 10.0 /$HOSTNAME/targets/image_throttle/compressed &
-else
-    nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed 1.0 /$HOSTNAME/targets/image_throttle/compressed &
-fi
+nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed $frame_rate /$HOSTNAME/targets/image_throttle/compressed &
+
 throttle /$HOSTNAME/sonarLeft
 throttle /$HOSTNAME/sonarRight
 throttle /$HOSTNAME/sonarCenter

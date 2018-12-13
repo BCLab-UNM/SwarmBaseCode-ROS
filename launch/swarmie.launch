@@ -71,7 +71,7 @@
         args="messages /$(arg name)/sonarLeft 1.0" />
 
   <node name="targets_image_throttle" pkg="topic_tools" type="throttle"
-        args="messages /$(arg name)/targets/image/compressed 10.0 /$(arg name)/targets/image_throttle/compressed" />
+        args="messages /$(arg name)/targets/image/compressed 20.0 /$(arg name)/targets/image_throttle/compressed" />
 
   <node pkg="robot_localization" type="ekf_localization_node" name="$(arg name)_MAP">
 

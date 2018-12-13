@@ -3,7 +3,7 @@
 # start_robots.sh [--prefix <prefix directory>] [--team-prefix <team prefix>] <calibration file name> <team name> <robot list>
 
 launch_delay=10
-OPTSTRING=`getopt -l prefix:,team-prefix:,bridged,demo-mode -- $0 $@`
+OPTSTRING=`getopt -l prefix:,team-prefix:,bridged,frame-rate: -- $0 $@`
 
 if [ $? != 0 ]
 then
@@ -13,7 +13,7 @@ fi
 
 eval set -- "$OPTSTRING"
 
-demo_mode=false
+frame_rate=10
 prefix=""
 while true
 do
@@ -21,7 +21,7 @@ do
         --prefix ) prefix="$2"; shift 2 ;;
         --team-prefix ) team_prefix="$2"; shift 2 ;;
         --bridged ) bridged="true"; shift 1 ;;
-        --demo-mode ) demo_mode=true; shift 1 ;;
+        --frame-rate ) frame_rate="$2"; shift 2 ;;
         -- ) shift ; args="$@";  break ;;
     esac
 done
@@ -40,13 +40,9 @@ fi
 
 if [ -z $bridged ]
 then
-    if $demo_mode ; then
-        launch_command="./rover_onboard_node_launch.sh --demo-mode `hostname` $cal_file"
-    else
-        launch_command="./rover_onboard_node_launch.sh `hostname` $cal_file"
-    fi
+    launch_command="./rover_onboard_node_launch.sh --frame-rate $frame_rate `hostname` $cal_file"
 else
-    launch_command="./rover_launch_local.sh localhost $cal_file"
+    launch_command="./rover_launch_local.sh --frame-rate $frame_rate localhost $cal_file"
 fi
 
 # start the robots
