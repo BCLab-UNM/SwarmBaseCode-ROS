@@ -26,6 +26,7 @@ public:
   void SetCurrentLocation(Point currentLocation);
   void SetCenterLocation(Point centerLocation);
   void SetSuccesfullPickup();
+  void setRecruitmentLocation(Point p);
 
 protected:
 

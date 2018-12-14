@@ -22,6 +22,7 @@
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32MultiArray.h>
 #include "swarmie_msgs/Waypoint.h"
+#include "swarmie_msgs/Recruitment.h"
 
 // Include Controllers
 #include "LogicController.h"
@@ -147,6 +148,7 @@ ros::Subscriber virtualFenceSubscriber;		//receives data for vitrual boundaries
 // manualWaypointSubscriber listens on "/<robot>/waypoints/cmd" for
 // swarmie_msgs::Waypoint messages.
 ros::Subscriber manualWaypointSubscriber; 	//receives manual waypoints given from GUI
+ros::Subscriber recruitmentSubscriber;
 
 // Timers
 ros::Timer stateMachineTimer;
@@ -179,6 +181,7 @@ void behaviourStateMachine(const ros::TimerEvent&);					//Upper most state machi
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);			//Publishes "ONLINE" when rover is successfully connected
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);			
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);	//handles ultrasound data and stores data
+void recruitmentHandler(const swarmie_msgs::Recruitment& msg);
 
 // Converts the time passed as reported by ROS (which takes Gazebo simulation rate into account) into milliseconds as an integer.
 long int getROSTimeInMilliSecs();
@@ -216,6 +219,7 @@ int main(int argc, char **argv) {
   message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
+  recruitmentSubscriber = mNH.subscribe("/detectionLocations", 10, recruitmentHandler);
 
   //publishers
 obstaclePublisher = mNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle"), 10, true);
@@ -640,6 +644,16 @@ void manualWaypointHandler(const swarmie_msgs::Waypoint& message) {
     logicController.RemoveManualWaypoint(message.id);
     break;
   }
+}
+
+void recruitmentHandler(const swarmie_msgs::Recruitment& msg)
+{
+   if(msg.name.data != publishedName) {
+      Point p;
+      p.x = msg.x;
+      p.y = msg.y;
+      logicController.gotRecruitmentMessage(p);
+   }
 }
 
 void sigintEventHandler(int sig) {

@@ -89,6 +89,12 @@ void SearchController::SetCurrentLocation(Point currentLocation) {
   this->currentLocation = currentLocation;
 }
 
+void SearchController::setRecruitmentLocation(Point p) {
+   attemptCount = 1;
+   result.wpts.waypoints.clear();
+   result.wpts.waypoints.insert(result.wpts.waypoints.begin(), p);
+}
+
 void SearchController::ProcessData() {
 }
 

@@ -422,6 +422,11 @@ std::vector<int> LogicController::GetClearedWaypoints()
   return manualWaypointController.ReachedWaypoints();
 }
 
+void LogicController::gotRecruitmentMessage(Point p)
+{
+   searchController.setRecruitmentLocation(p);
+}
+
 void LogicController::setVirtualFenceOn( RangeShape* range )
 {
   range_controller.setRangeShape(range);
