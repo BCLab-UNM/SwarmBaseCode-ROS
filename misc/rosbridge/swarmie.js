@@ -51,7 +51,32 @@ class Swarmie {
         this.targetsImageCompressed = this.createPassthrough(this.robotRos, this.laptopRos, '/targets/image/compressed_throttle', 'sensor_msgs/CompressedImage', false, false);
         this.virtualFence = this.createPassthrough(this.laptopRos, this.robotRos, '/virtualFence', 'std_msgs/Float32MultiArray', false, true);
         this.wristAngle = this.createPassthrough(this.laptopRos, this.robotRos, '/wristAngle/cmd', 'std_msgs/Float32', false, false);
-        this.recruitment = this.createPassthrough(this.laptopRos this.robotRos, '/detectionLocations', 'swarmie_msgs/Recruitment', false, true)
+
+        //// topics for recruitment pass through.
+        this.recruitmentTopic = new ROSLIB.Topic({
+            ros : this.robotRos,
+            name: "/detectionLocations",
+            messageType: "swarmie_msgs/Recruitment"
+        });
+        this.ltRecruitmentTopic = new ROSLIB.Topic({
+            ros : this.laptopRos,
+            name: "/detectionLocations",
+            messageType: "swarmie_msgs/Recruitment"
+        });
+        this.recruitmentTopic.subscribe(function(msg) {
+            // only share our own recruitment messages
+            if(msg.name.data == this.robotName)
+            {
+                this.ltRecruitmentTopic.publish(msg);
+            }
+        });
+        this.ltRecruitmentTopic.subscribe(function(msg) {
+            // only pass through messages that are from other robots
+            if(msg.name.data != this.robotName)
+            {
+                this.recruitmentTopic.publish(msg);
+            }
+        });
     }
 
     createPassthrough(sourceRosHandle, destinationRosHandle, robotSubscription, messageReceived, oneShot, global) {
