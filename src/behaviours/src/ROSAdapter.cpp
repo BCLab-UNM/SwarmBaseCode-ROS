@@ -478,8 +478,8 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
       tags.push_back(loc);
     }
     Point curr_loc;
-    curr_loc.x = currentLocationMap.x;
-    curr_loc.y = currentLocationMap.y;
+    curr_loc.x = currentLocation.x;
+    curr_loc.y = currentLocation.y;
     positionPublisher->setDetections(tags, curr_loc);
     logicController.SetAprilTags(tags);
   }

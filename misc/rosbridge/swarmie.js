@@ -63,16 +63,16 @@ class Swarmie {
             name: "/detectionLocations",
             messageType: "swarmie_msgs/Recruitment"
         });
-        this.recruitmentTopic.subscribe(function(msg) {
+        this.recruitmentTopic.subscribe((msg) => {
             // only share our own recruitment messages
-            if(msg.name.data == this.robotName)
+            if(msg.name.data == robotName)
             {
                 this.ltRecruitmentTopic.publish(msg);
             }
         });
-        this.ltRecruitmentTopic.subscribe(function(msg) {
+        this.ltRecruitmentTopic.subscribe((msg) => {
             // only pass through messages that are from other robots
-            if(msg.name.data != this.robotName)
+            if(msg.name.data != robotName)
             {
                 this.recruitmentTopic.publish(msg);
             }
