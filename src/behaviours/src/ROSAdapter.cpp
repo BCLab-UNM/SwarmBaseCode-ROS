@@ -480,8 +480,8 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 
     // To enable recruitment uncomment these lines.
     // Point curr_loc;
-    // curr_loc.x = currentLocation.x;
-    // curr_loc.y = currentLocation.y;
+    // curr_loc.x = currentLocationMap.x;
+    // curr_loc.y = currentLocationMap.y;
     // positionPublisher->setDetections(tags, curr_loc);
 
     logicController.SetAprilTags(tags);
