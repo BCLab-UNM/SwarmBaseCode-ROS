@@ -5,6 +5,8 @@
 class Swarmie {
     constructor(robotName) {
         this.robotName = robotName;
+
+        // Connect to websocket server on robot and on laptop
         this.robotRos = new ROSLIB.Ros({
             url : 'ws://' + robotName + ':9090'
         });
@@ -27,6 +29,7 @@ class Swarmie {
             console.log('Connection to websocket server closed.');
         });
 
+        // Set up topics used by the rqt rover GUI
         this.abridgeHeartbeat = this.createPassthrough(this.robotRos, this.laptopRos, '/abridge/heartbeat', 'std_msgs/String', false, false);
         this.behaviourHeartbeat = this.createPassthrough(this.robotRos, this.laptopRos, '/behaviour/heartbeat', 'std_msgs/String', false, false);
         this.cameraInfo = this.createPassthrough(this.robotRos, this.laptopRos, '/camera/camera_info', 'sensor_msgs/CameraInfo', true, false);

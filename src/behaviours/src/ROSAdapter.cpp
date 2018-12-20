@@ -477,10 +477,13 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 							    tagPose.pose.orientation.w ) );
       tags.push_back(loc);
     }
-    Point curr_loc;
-    curr_loc.x = currentLocation.x;
-    curr_loc.y = currentLocation.y;
-    positionPublisher->setDetections(tags, curr_loc);
+
+    // To enable recruitment uncomment these lines.
+    // Point curr_loc;
+    // curr_loc.x = currentLocation.x;
+    // curr_loc.y = currentLocation.y;
+    // positionPublisher->setDetections(tags, curr_loc);
+
     logicController.SetAprilTags(tags);
   }
   
