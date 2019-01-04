@@ -556,7 +556,7 @@ set<string> RoverGUIPlugin::findConnectedRovers()
 
         string rover_name;
 
-        std::size_t found = info.name.find("/status");
+        std::size_t found = info.name.find("/swarmie_status");
           if (found!=std::string::npos)
           {
             rover_name = info.name.substr(1,found-1);
@@ -582,7 +582,7 @@ void RoverGUIPlugin::statusEventHandler(const ros::MessageEvent<std_msgs::String
 
     // This method is used rather than reading the publisher name to accomodate teams that changed the node name.
     string topic = header.at("topic");
-    size_t found = topic.find("/status");
+    size_t found = topic.find("/swarmie_status");
     string rover_name = topic.substr(1,found-1);
 
     const std_msgs::StringConstPtr& msg = event.getMessage();
@@ -921,7 +921,7 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
 
 
         //Set up subscribers
-        status_subscribers[*i] = nh.subscribe("/"+*i+"/status", 10, &RoverGUIPlugin::statusEventHandler, this);
+        status_subscribers[*i] = nh.subscribe("/"+*i+"/swarmie_status", 10, &RoverGUIPlugin::statusEventHandler, this);
         waypoint_subscribers[*i] = nh.subscribe("/"+*i+"/waypoints", 10, &RoverGUIPlugin::waypointEventHandler, this);
         obstacle_subscribers[*i] = nh.subscribe("/"+*i+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
         encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered_throttle", 10, &RoverGUIPlugin::encoderEventHandler, this);
