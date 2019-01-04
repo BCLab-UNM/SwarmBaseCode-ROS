@@ -1,4 +1,15 @@
 #!/bin/bash
+OPTSTRING=`getopt -l frame-rate: -- $0 $@`
+frame_rate=10
+eval set -- "$OPTSTRING"
+while true
+do
+    case "$1" in
+        --frame-rate ) frame_rate="$2"; shift 2 ;;
+        -- ) shift ; break ;;
+    esac
+done
+    
 echo "running pkill on old rosnodes"
 pkill usb_cam_node
 pkill behaviours
@@ -148,16 +159,15 @@ throttle()
     nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
 }
 
-throttle /$HOSTNAME/targets/image/compressed
+nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed $frame_rate /$HOSTNAME/targets/image_throttle/compressed &
+
 throttle /$HOSTNAME/sonarLeft
 throttle /$HOSTNAME/sonarRight
 throttle /$HOSTNAME/sonarCenter
 throttle /$HOSTNAME/odom/navsat
 throttle /$HOSTNAME/odom/filtered
 throttle /$HOSTNAME/odom/ekf
-throttle /$HOSTNAME/odom
 throttle /$HOSTNAME/navsol
-throttle /$HOSTNAME/odom
 throttle /$HOSTNAME/imu
 
 #Wait for user input to terminate processes

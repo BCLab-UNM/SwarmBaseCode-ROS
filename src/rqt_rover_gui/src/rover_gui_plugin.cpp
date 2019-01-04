@@ -703,11 +703,11 @@ void RoverGUIPlugin::currentRoverChangedEventHandler(QListWidgetItem *current, Q
 
     //Set up subscribers
     image_transport::ImageTransport it(nh);
-    camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("compressed"));
-    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu", 10, &RoverGUIPlugin::IMUEventHandler, this);
-    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter", 10, &RoverGUIPlugin::centerUSEventHandler, this);
-    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft", 10, &RoverGUIPlugin::leftUSEventHandler, this);
-    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight", 10, &RoverGUIPlugin::rightUSEventHandler, this);
+    camera_subscriber = it.subscribe("/"+selected_rover_name+"/targets/image_throttle", 1, &RoverGUIPlugin::cameraEventHandler, this, image_transport::TransportHints("compressed"));
+    imu_subscriber = nh.subscribe("/"+selected_rover_name+"/imu_throttle", 10, &RoverGUIPlugin::IMUEventHandler, this);
+    us_center_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarCenter_throttle", 10, &RoverGUIPlugin::centerUSEventHandler, this);
+    us_left_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarLeft_throttle", 10, &RoverGUIPlugin::leftUSEventHandler, this);
+    us_right_subscriber = nh.subscribe("/"+selected_rover_name+"/sonarRight_throttle", 10, &RoverGUIPlugin::rightUSEventHandler, this);
 
     emit sendInfoLogMessage(QString("Displaying map for ")+QString::fromStdString(selected_rover_name));
 
@@ -924,10 +924,10 @@ void RoverGUIPlugin::pollRoversTimerEventHandler()
         status_subscribers[*i] = nh.subscribe("/"+*i+"/swarmie_status", 10, &RoverGUIPlugin::statusEventHandler, this);
         waypoint_subscribers[*i] = nh.subscribe("/"+*i+"/waypoints", 10, &RoverGUIPlugin::waypointEventHandler, this);
         obstacle_subscribers[*i] = nh.subscribe("/"+*i+"/obstacle", 10, &RoverGUIPlugin::obstacleEventHandler, this);
-        encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered", 10, &RoverGUIPlugin::encoderEventHandler, this);
-        ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf", 10, &RoverGUIPlugin::EKFEventHandler, this);
-        gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat", 10, &RoverGUIPlugin::GPSEventHandler, this);
-        gps_nav_solution_subscribers[*i] = nh.subscribe("/"+*i+"/navsol", 10, &RoverGUIPlugin::GPSNavSolutionEventHandler, this);
+        encoder_subscribers[*i] = nh.subscribe("/"+*i+"/odom/filtered_throttle", 10, &RoverGUIPlugin::encoderEventHandler, this);
+        ekf_subscribers[*i] = nh.subscribe("/"+*i+"/odom/ekf_throttle", 10, &RoverGUIPlugin::EKFEventHandler, this);
+        gps_subscribers[*i] = nh.subscribe("/"+*i+"/odom/navsat_throttle", 10, &RoverGUIPlugin::GPSEventHandler, this);
+        gps_nav_solution_subscribers[*i] = nh.subscribe("/"+*i+"/navsol_throttle", 10, &RoverGUIPlugin::GPSNavSolutionEventHandler, this);
         rover_diagnostic_subscribers[*i] = nh.subscribe("/"+*i+"/diagnostics", 1, &RoverGUIPlugin::diagnosticEventHandler, this);
 
         RoverStatus rover_status;
@@ -1817,11 +1817,17 @@ void RoverGUIPlugin::unboundedRadioButtonEventHandler(bool toggled)
 
     if(toggled)
     {
+        ui.round_type_wall_group->setStyleSheet("color: grey;");
+        ui.round_type_wall_group->setEnabled(!toggled);
+
         ui.unbounded_arena_size_label->setStyleSheet("color: white;");
         ui.unbounded_arena_size_combobox->setStyleSheet("color: white; border:2px solid white; padding: 1px 0px 1px 3px");
     }
     else
     {
+        ui.round_type_wall_group->setStyleSheet("color: white;");
+        ui.round_type_wall_group->setEnabled(!toggled);
+
         ui.unbounded_arena_size_label->setStyleSheet("color: grey;");
         ui.unbounded_arena_size_combobox->setStyleSheet("color: grey; border:2px solid grey; padding: 1px 0px 1px 3px");
     }
@@ -1854,21 +1860,31 @@ void RoverGUIPlugin::buildSimulationButtonEventHandler()
     if (ui.final_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
          arena_dim = 23.1;
-#ifndef _TAG_BOUNDARIES
-         addFinalsWalls();
-#else
-         addFinalsTagBoundary();
-#endif
+
+         if (ui.wall_radio_button->isChecked())
+         {
+             addFinalsWalls();
+         }
+         else
+         {
+             addFinalsTagBoundary();
+         }
+
          emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else if (ui.prelim_radio_button->isChecked() && !ui.create_savable_world_checkbox->isChecked())
     {
         arena_dim = 15;
-#ifndef _TAG_BOUNDARIES
-        addPrelimsWalls();
-#else
-        addPrelimsTagBoundary();
-#endif
+
+        if (ui.wall_radio_button->isChecked())
+        {
+            addPrelimsWalls();
+        }
+        else
+        {
+            addPrelimsTagBoundary();
+        }
+
         emit sendInfoLogMessage(QString("Set arena size to ")+QString::number(arena_dim)+"x"+QString::number(arena_dim));
     }
     else

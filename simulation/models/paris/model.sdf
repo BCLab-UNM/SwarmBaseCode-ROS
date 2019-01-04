@@ -301,7 +301,7 @@
 					<lower>0.0</lower>
 				</limit>
 				<dynamics>
-				  <damping>0.5</damping>
+				  <damping>0.07</damping>
 				</dynamics>
 			</axis>
 		</joint>
@@ -382,7 +382,7 @@
 					<lower>0.0</lower>
 				</limit>
 				<dynamics>
-				  <damping>0.3</damping>
+				  <damping>0.07</damping>
 				</dynamics>
 			</axis>
 		</joint>
@@ -463,7 +463,7 @@
 					<lower>-0.7854</lower>
 				</limit>
 				<dynamics>
-				  <damping>0.3</damping>
+				  <damping>0.07</damping>
 				</dynamics>
 			</axis>
 		</joint>
