@@ -10,6 +10,8 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/UInt8.h>
 
+#include <swarmie_msgs/Skid.h>
+
 using namespace std;
 
 /**
@@ -21,7 +23,7 @@ class sbridge {
 public:
 
   sbridge(std::string published_name);
-  void cmdHandler(const geometry_msgs::Twist::ConstPtr& message);
+  void cmdHandler(const swarmie_msgs::Skid::ConstPtr& message);
   ~sbridge();
 
 private:

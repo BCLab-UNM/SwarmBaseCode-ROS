@@ -8,10 +8,11 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   nav_msgs
+  swarmie_msgs
 )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs tf nav_msgs
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs tf nav_msgs swarmie_msgs
 )
 
 include_directories(
