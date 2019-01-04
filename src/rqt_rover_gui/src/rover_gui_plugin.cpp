@@ -1558,6 +1558,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             timer_start_time_in_seconds = current_simulated_time_in_seconds;
             timer_stop_time_in_seconds = timer_start_time_in_seconds + 600.0;
             is_timer_on = true;
+            // reset the obstacle_call_count for this timed run
+            obstacle_call_count = 0;
+            emit updateObstacleCallCount("<font color='white'>"+QString::number(obstacle_call_count)+"</font>");
             emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
                                     QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
@@ -1580,6 +1583,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             timer_start_time_in_seconds = current_simulated_time_in_seconds;
             timer_stop_time_in_seconds = timer_start_time_in_seconds + 1200.0;
             is_timer_on = true;
+            // reset the obstacle_call_count for this timed run
+            obstacle_call_count = 0;
+            emit updateObstacleCallCount("<font color='white'>"+QString::number(obstacle_call_count)+"</font>");
             emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
                                     QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
@@ -1602,6 +1608,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             timer_start_time_in_seconds = current_simulated_time_in_seconds;
             timer_stop_time_in_seconds = timer_start_time_in_seconds + 1800.0;
             is_timer_on = true;
+            // reset the obstacle_call_count for this timed run
+            obstacle_call_count = 0;
+            emit updateObstacleCallCount("<font color='white'>"+QString::number(obstacle_call_count)+"</font>");
             emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
                                     QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
@@ -1624,6 +1633,9 @@ void RoverGUIPlugin::allAutonomousButtonEventHandler()
             timer_start_time_in_seconds = current_simulated_time_in_seconds;
             timer_stop_time_in_seconds = timer_start_time_in_seconds + 3600.0;
             is_timer_on = true;
+            // reset the obstacle_call_count for this timed run
+            obstacle_call_count = 0;
+            emit updateObstacleCallCount("<font color='white'>"+QString::number(obstacle_call_count)+"</font>");
             emit sendInfoLogMessage("\nSetting experiment timer to start at: " +
                                     QString::number(getHours(timer_start_time_in_seconds)) + " hours, " +
                                     QString::number(getMinutes(timer_start_time_in_seconds)) + " minutes, " +
