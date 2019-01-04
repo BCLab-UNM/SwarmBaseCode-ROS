@@ -14,13 +14,15 @@
 #include <sensor_msgs/Range.h>
 #include <std_msgs/UInt8.h>
 
+#include <swarmie_msgs/Skid.h>
+
 //Package include
 #include <usbSerial.h>
 
 using namespace std;
 
 //aBridge functions
-void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message);
+void driveCommandHandler(const swarmie_msgs::Skid::ConstPtr& message);
 void fingerAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void wristAngleHandler(const std_msgs::Float32::ConstPtr& angle);
 void serialActivityTimer(const ros::TimerEvent& e);
@@ -160,14 +162,12 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-//This command handler recives a linear velocity setpoint and a angular yaw error
-//and produces a command output for the left and right motors of the robot.
-//See the following paper for description of PID controllers.
-//Bennett, Stuart (November 1984). "Nicholas Minorsky and the automatic steering of ships". IEEE Control Systems Magazine. 4 (4): 10–15. doi:10.1109/MCS.1984.1104827. ISSN 0272-1708.
-void driveCommandHandler(const geometry_msgs::Twist::ConstPtr& message)
+// Receives a left/right skid steer command to set the left and right
+// PWM control for the robot wheels
+void driveCommandHandler(const swarmie_msgs::Skid::ConstPtr& message)
 {
-  float left = (message->linear.x); // Target linear velocity in meters per second
-  float right = (message->angular.z); // Angular error in radians
+  float left = message->left;
+  float right = message->right;
 
   // Cap motor commands at 120. Experimentally determined that high values (tested 180 and 255) can cause 
   // the hardware to fail when the robot moves itself too violently.

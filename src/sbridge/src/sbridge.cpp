@@ -49,12 +49,12 @@ sbridge::sbridge(std::string published_name)
 
 // Command Handler
 // PWM (pulse with modulation) values to linear values
-void sbridge::cmdHandler(const geometry_msgs::Twist::ConstPtr& message)
+void sbridge::cmdHandler(const swarmie_msgs::Skid::ConstPtr& message)
 {
-  // Gets and sets the linear PWM value
-  double left = (message->linear.x);
-  // Gets and sets the angular PWM value
-  double right = (message->angular.z);
+  // Gets and sets the left PWM value
+  double left = message->left;
+  // Gets and sets the right PWM value
+  double right = message->right;
     
   // Set max values
   float max_turn_rate = 4.5; // radians per second

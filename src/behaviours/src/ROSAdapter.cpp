@@ -23,6 +23,7 @@
 #include <std_msgs/Float32MultiArray.h>
 #include "swarmie_msgs/Waypoint.h"
 #include "swarmie_msgs/Recruitment.h"
+#include "swarmie_msgs/Skid.h"
 
 // Include Controllers
 #include "LogicController.h"
@@ -120,7 +121,6 @@ Result result;		//result struct for passing and storing values to drive robot
 std_msgs::String msg;	//used for passing messages to the GUI
 
 
-geometry_msgs::Twist velocity;
 char host[128];		//rovers hostname
 string publishedName;	//published hostname
 char prev_state_machine[128];
@@ -228,7 +228,7 @@ int main(int argc, char **argv) {
   fingerAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/fingerAngle/cmd"), 1, true);			//publishes gripper angle to move gripper finger
   wristAnglePublish = mNH.advertise<std_msgs::Float32>((publishedName + "/wristAngle/cmd"), 1, true);			//publishes wrist angle to move wrist
   infoLogPublisher = mNH.advertise<std_msgs::String>("/infoLog", 1, true);						//publishes a message to the infolog box on GUI
-  driveControlPublish = mNH.advertise<geometry_msgs::Twist>((publishedName + "/driveControl"), 10);			//publishes motor commands to the motors
+  driveControlPublish = mNH.advertise<swarmie_msgs::Skid>((publishedName + "/driveControl"), 10);			//publishes motor commands to the motors
   heartbeatPublisher = mNH.advertise<std_msgs::String>((publishedName + "/behaviour/heartbeat"), 1, true);		//publishes ROSAdapters status via its "heartbeat"
   waypointFeedbackPublisher = mNH.advertise<swarmie_msgs::Waypoint>((publishedName + "/waypoints"), 1, true);		//publishes a waypoint to travel to if the rover is given a waypoint in manual mode
 
@@ -434,11 +434,11 @@ void behaviourStateMachine(const ros::TimerEvent&)
 
 void sendDriveCommand(double left, double right)
 {
-  velocity.linear.x = left,
-      velocity.angular.z = right;
-  
+  swarmie_msgs::Skid skid_command;
+  skid_command.left  = left;
+  skid_command.right = right;
   // publish the drive commands
-  driveControlPublish.publish(velocity);
+  driveControlPublish.publish(skid_command);
 }
 
 /*************************

@@ -47,6 +47,7 @@ add_message_files(
   FILES
   Waypoint.msg
   Recruitment.msg
+  Skid.msg
 )
 
 ## Generate services in the 'srv' folder
