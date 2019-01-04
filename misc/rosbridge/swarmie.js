@@ -5,6 +5,8 @@
 class Swarmie {
     constructor(robotName) {
         this.robotName = robotName;
+
+        // Connect to websocket server on robot and on laptop
         this.robotRos = new ROSLIB.Ros({
             url : 'ws://' + robotName + ':9090'
         });
@@ -24,6 +26,7 @@ class Swarmie {
             console.log('Connection to websocket server closed.');
         });
 
+        // Set up topics used by the rqt rover GUI
         this.abridgeHeartbeat = this.createPassthrough(this.robotRos, this.laptopRos, '/abridge/heartbeat', 'std_msgs/String', false, false);
         this.behaviourHeartbeat = this.createPassthrough(this.robotRos, this.laptopRos, '/behaviour/heartbeat', 'std_msgs/String', false, false);
         this.cameraInfo = this.createPassthrough(this.robotRos, this.laptopRos, '/camera/camera_info', 'sensor_msgs/CameraInfo', true, false);
@@ -48,6 +51,32 @@ class Swarmie {
         this.targetsImageCompressed = this.createPassthrough(this.robotRos, this.laptopRos, '/targets/image_throttle/compressed', 'sensor_msgs/CompressedImage', false, false);
         this.virtualFence = this.createPassthrough(this.laptopRos, this.robotRos, '/virtualFence', 'std_msgs/Float32MultiArray', false, true);
         this.wristAngle = this.createPassthrough(this.laptopRos, this.robotRos, '/wristAngle/cmd', 'std_msgs/Float32', false, false);
+
+        //// topics for recruitment pass through.
+        this.recruitmentTopic = new ROSLIB.Topic({
+            ros : this.robotRos,
+            name: "/detectionLocations",
+            messageType: "swarmie_msgs/Recruitment"
+        });
+        this.ltRecruitmentTopic = new ROSLIB.Topic({
+            ros : this.laptopRos,
+            name: "/detectionLocations",
+            messageType: "swarmie_msgs/Recruitment"
+        });
+        this.recruitmentTopic.subscribe((msg) => {
+            // only share our own recruitment messages
+            if(msg.name.data == robotName)
+            {
+                this.ltRecruitmentTopic.publish(msg);
+            }
+        });
+        this.ltRecruitmentTopic.subscribe((msg) => {
+            // only pass through messages that are from other robots
+            if(msg.name.data != robotName)
+            {
+                this.recruitmentTopic.publish(msg);
+            }
+        });
     }
 
     createPassthrough(sourceRosHandle, destinationRosHandle, robotSubscription, messageReceived, oneShot, global) {

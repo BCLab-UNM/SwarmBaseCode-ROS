@@ -22,6 +22,7 @@
 #include <apriltags_ros/AprilTagDetectionArray.h>
 #include <std_msgs/Float32MultiArray.h>
 #include "swarmie_msgs/Waypoint.h"
+#include "swarmie_msgs/Recruitment.h"
 
 // Include Controllers
 #include "LogicController.h"
@@ -29,6 +30,7 @@
 
 #include "Point.h"
 #include "Tag.h"
+#include "PositionPublisher.hpp"
 
 // To handle shutdown signals so the node quits
 // properly in response to "rosnode kill"
@@ -81,6 +83,7 @@ void resultHandler();	// Not Used/Dead Code, prototype has no definition
 Point updateCenterLocation();		//calls transformMapCenterToOdom, returns a center location in ODOM frame
 void transformMapCentertoOdom();	//checks ODOMs perceived idea of where the center is with a stored GPS center coordinate and adjusts ODOM center value to account for drift
 
+PositionPublisher* positionPublisher;
 
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;		//current location using ODOM
@@ -145,6 +148,7 @@ ros::Subscriber virtualFenceSubscriber;		//receives data for vitrual boundaries
 // manualWaypointSubscriber listens on "/<robot>/waypoints/cmd" for
 // swarmie_msgs::Waypoint messages.
 ros::Subscriber manualWaypointSubscriber; 	//receives manual waypoints given from GUI
+ros::Subscriber recruitmentSubscriber;
 
 // Timers
 ros::Timer stateMachineTimer;
@@ -177,6 +181,7 @@ void behaviourStateMachine(const ros::TimerEvent&);					//Upper most state machi
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);			//Publishes "ONLINE" when rover is successfully connected
 void publishHeartBeatTimerEventHandler(const ros::TimerEvent& event);			
 void sonarHandler(const sensor_msgs::Range::ConstPtr& sonarLeft, const sensor_msgs::Range::ConstPtr& sonarCenter, const sensor_msgs::Range::ConstPtr& sonarRight);	//handles ultrasound data and stores data
+void recruitmentHandler(const swarmie_msgs::Recruitment& msg);
 
 // Converts the time passed as reported by ROS (which takes Gazebo simulation rate into account) into milliseconds as an integer.
 long int getROSTimeInMilliSecs();
@@ -198,6 +203,7 @@ int main(int argc, char **argv) {
   // NoSignalHandler so we can catch SIGINT ourselves and shutdown the node
   ros::init(argc, argv, (publishedName + "_BEHAVIOUR"), ros::init_options::NoSigintHandler);
   ros::NodeHandle mNH;
+  positionPublisher = new PositionPublisher(mNH, publishedName);
   
   // Register the SIGINT event handler so the node can shutdown properly
   signal(SIGINT, sigintEventHandler);
@@ -213,6 +219,7 @@ int main(int argc, char **argv) {
   message_filters::Subscriber<sensor_msgs::Range> sonarLeftSubscriber(mNH, (publishedName + "/sonarLeft"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarCenterSubscriber(mNH, (publishedName + "/sonarCenter"), 10);
   message_filters::Subscriber<sensor_msgs::Range> sonarRightSubscriber(mNH, (publishedName + "/sonarRight"), 10);
+  recruitmentSubscriber = mNH.subscribe("/detectionLocations", 10, recruitmentHandler);
 
   //publishers
 obstaclePublisher = mNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle"), 10, true);
@@ -256,7 +263,8 @@ obstaclePublisher = mNH.advertise<std_msgs::UInt8>((publishedName + "/obstacle")
   timerStartTime = time(0);
   
   ros::spin();
-  
+
+  delete positionPublisher;
   return EXIT_SUCCESS;
 }
 
@@ -469,7 +477,13 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 							    tagPose.pose.orientation.w ) );
       tags.push_back(loc);
     }
-    
+
+    // To enable recruitment uncomment these lines.
+    // Point curr_loc;
+    // curr_loc.x = currentLocationMap.x;
+    // curr_loc.y = currentLocationMap.y;
+    // positionPublisher->setDetections(tags, curr_loc);
+
     logicController.SetAprilTags(tags);
   }
   
@@ -633,6 +647,16 @@ void manualWaypointHandler(const swarmie_msgs::Waypoint& message) {
     logicController.RemoveManualWaypoint(message.id);
     break;
   }
+}
+
+void recruitmentHandler(const swarmie_msgs::Recruitment& msg)
+{
+   if(msg.name.data != publishedName) {
+      Point p;
+      p.x = msg.x;
+      p.y = msg.y;
+      logicController.gotRecruitmentMessage(p);
+   }
 }
 
 void sigintEventHandler(int sig) {
