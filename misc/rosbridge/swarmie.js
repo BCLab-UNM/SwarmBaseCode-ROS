@@ -11,18 +11,15 @@ class Swarmie {
         this.laptopRos = new ROSLIB.Ros({
             url : 'ws://localhost:9090'
         });
-               
         this.robotRos.on('connection', function() {
             console.log('Connected to robot websocket server.');
         });
         this.laptopRos.on('connection', function() {
             console.log('Connected to laptop websocket server');
         });
-        
         this.robotRos.on('error', function(error) {
             console.log('Error connecting to websocket server: ', error);
         });
-
         this.robotRos.on('close', function() {
             console.log('Connection to websocket server closed.');
         });
@@ -38,7 +35,7 @@ class Swarmie {
         this.joystick = this.createPassthrough(this.laptopRos, this.robotRos, '/joystick', 'sensor_msgs/Joy', false, false);
         this.mode = this.createPassthrough(this.laptopRos, this.robotRos, '/mode', 'std_msgs/UInt8', false, false);
         this.navsol = this.createPassthrough(this.robotRos, this.laptopRos, '/navsol_throttle', 'ublox_msgs/NavSOL', false, false);
-        this.odom = this.createPassthrough(this.robotRos, this.laptopRos, '/odom_throttle', 'nav_msgs/Odometry', false, false);
+      //  this.odom = this.createPassthrough(this.robotRos, this.laptopRos, '/odom_throttle', 'nav_msgs/Odometry', false, false);
         this.odomEkf = this.createPassthrough(this.robotRos, this.laptopRos, '/odom/ekf_throttle', 'nav_msgs/Odometry', false, false);
         this.odomFiltered = this.createPassthrough(this.robotRos, this.laptopRos, '/odom/filtered_throttle', 'nav_msgs/Odometry', false, false);
         this.odomNavsat = this.createPassthrough(this.robotRos, this.laptopRos, '/odom/navsat_throttle', 'nav_msgs/Odometry', false, false);
@@ -48,7 +45,7 @@ class Swarmie {
         this.sonarRight = this.createPassthrough(this.robotRos, this.laptopRos, '/sonarRight_throttle', 'sensor_msgs/Range', false, false);
         this.stateMachine = this.createPassthrough(this.robotRos, this.laptopRos, '/state_machine', 'std_msgs/String', false, false);
         this.status = this.createPassthrough(this.robotRos, this.laptopRos, '/status', 'std_msgs/String', false, false);
-        this.targetsImageCompressed = this.createPassthrough(this.robotRos, this.laptopRos, '/targets/image/compressed_throttle', 'sensor_msgs/CompressedImage', false, false);
+        this.targetsImageCompressed = this.createPassthrough(this.robotRos, this.laptopRos, '/targets/image_throttle/compressed', 'sensor_msgs/CompressedImage', false, false);
         this.virtualFence = this.createPassthrough(this.laptopRos, this.robotRos, '/virtualFence', 'std_msgs/Float32MultiArray', false, true);
         this.wristAngle = this.createPassthrough(this.laptopRos, this.robotRos, '/wristAngle/cmd', 'std_msgs/Float32', false, false);
     }
@@ -63,14 +60,8 @@ class Swarmie {
             sourceTopicName = '/' + this.robotName + robotSubscription;
         }
 
-	if(sourceTopicName.endsWith("_throttle"))
-	{
-	    destTopicName = sourceTopicName.slice(0, -9);
-	}
-	else
-	{
+
 	    destTopicName = sourceTopicName;
-	}
             
         var passthroughHandle = {
             sourceTopic : new ROSLIB.Topic({
