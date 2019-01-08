@@ -66,7 +66,7 @@ findDevicePath() {
 echo "Loading calibration data and swarmie_control sketch"
 ./load_swarmie_control_sketch.sh $2
 
-if [ -eq "$1" "localhost" ]
+if [ "$1" == "localhost" ]
 then
     roslaunch rosbridge_server rosbridge_websocket.launch &
 fi
