@@ -333,8 +333,8 @@ echo "The specified experiment duration ($EXPERIMENT_DURATION_IN_MINUTES) has el
 # Send the manual command to all rovers
 for (( i=0;i<$NUM_ROVERS;i++ ));
 do
-    # Publish the autonomous mode command ("1") to each rover. Latch the message ("-l").
-    rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/String "1" &
+    # Publish the manual mode command ("1") to each rover. Latch the message ("-l").
+    rostopic pub -l /${ROVER_NAMES[i]}/mode std_msgs/UInt8 1 &
     echo "Publishing 1 on /${ROVER_NAMES[i]}/mode"
 done
 
