@@ -69,7 +69,7 @@ echo "Loading calibration data and swarmie_control sketch"
 if [ -eq "$1" "localhost" ]
 then
     roslaunch rosbridge_server rosbridge_websocket.launch &
-else
+fi
 
 echo "rosrun tf static_transform_publisher"
 nohup > logs/$HOSTNAME"_transform_log.txt" rosrun tf static_transform_publisher __name:=$HOSTNAME\_BASE2CAM 0.12 -0.03 0.195 -1.57 0 -2.22 /$HOSTNAME/base_link /$HOSTNAME/camera_link 100 &
