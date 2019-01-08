@@ -46,31 +46,31 @@
     
   </node>
 
-  <node name="imu_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_imu_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/imu 1.0" />
 
-  <node name="navsol_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_navsol_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/navsol 1.0" />
 
-  <node name="odom_ekf_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_odom_ekf_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/odom/ekf 1.0" />
 
-  <node name="odom_filtered_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_odom_filtered_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/odom/filtered 1.0" />
 
-  <node name="odom_navsat_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_odom_navsat_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/odom/navsat 1.0" />
 
-  <node name="sonarCenter_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_sonarCenter_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/sonarCenter 1.0" />
 
-  <node name="sonarRight_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_sonarRight_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/sonarRight 1.0" />
 
-  <node name="sonarLeft_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_sonarLeft_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/sonarLeft 1.0" />
 
-  <node name="targets_image_throttle" pkg="topic_tools" type="throttle"
+  <node name="$(arg name)_targets_image_throttle" pkg="topic_tools" type="throttle"
         args="messages /$(arg name)/targets/image/compressed 20.0 /$(arg name)/targets/image_throttle/compressed" />
 
   <node pkg="robot_localization" type="ekf_localization_node" name="$(arg name)_MAP">
