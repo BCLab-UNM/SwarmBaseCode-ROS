@@ -156,19 +156,19 @@ nohup > logs/$HOSTNAME"_map_EKF_log.txt" rosrun robot_localization ekf_localizat
 
 throttle()
 {
-    nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 &
+    nohup >/dev/null rosrun topic_tools throttle messages $1 1.0 __name:=$2 &
 }
 
-nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed $frame_rate /$HOSTNAME/targets/image_throttle/compressed &
+nohup >/dev/null rosrun topic_tools throttle messages /$HOSTNAME/targets/image/compressed $frame_rate /$HOSTNAME/targets/image_throttle/compressed __name:=${HOSTNAME}_throttle_image & 
 
-throttle /$HOSTNAME/sonarLeft
-throttle /$HOSTNAME/sonarRight
-throttle /$HOSTNAME/sonarCenter
-throttle /$HOSTNAME/odom/navsat
-throttle /$HOSTNAME/odom/filtered
-throttle /$HOSTNAME/odom/ekf
-throttle /$HOSTNAME/navsol
-throttle /$HOSTNAME/imu
+throttle /$HOSTNAME/sonarLeft ${HOSTNAME}_throttle_sonarLeft
+throttle /$HOSTNAME/sonarRight ${HOSTNAME}_throttle_sonarRight
+throttle /$HOSTNAME/sonarCenter ${HOSTNAME}_throttle_sonarCenter
+throttle /$HOSTNAME/odom/navsat ${HOSTNAME}_throttle_navsat
+throttle /$HOSTNAME/odom/filtered ${HOSTNAME}_throttle_odom_filered
+throttle /$HOSTNAME/odom/ekf ${HOSTNAME}_throttle_odom_ekf
+throttle /$HOSTNAME/navsol ${HOSTNAME}_throttle_navsol
+throttle /$HOSTNAME/imu ${HOSTNAME}_throttle_imu
 
 #Wait for user input to terminate processes
 while true; do
