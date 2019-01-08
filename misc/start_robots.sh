@@ -42,7 +42,7 @@ if [ -z $bridged ]
 then
     launch_command="./rover_onboard_node_launch.sh --frame-rate $frame_rate `hostname` $cal_file"
 else
-    launch_command="./rover_launch_local.sh --frame-rate $frame_rate localhost $cal_file"
+    launch_command="./rover_launch_local.sh --frame-rate $frame_rate $cal_file"
 fi
 
 # start the robots
