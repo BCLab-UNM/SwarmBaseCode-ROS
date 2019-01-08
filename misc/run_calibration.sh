@@ -19,7 +19,7 @@ full_path=repo_path
 
 #Start ROS core for ros serial
 roscore &
-sleep 1
+sleep 10
 rosrun rosserial_python serial_node.py _baud:=9600 $arduino_port &
 sleep 1
 
