@@ -537,6 +537,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 		<link name="right_front_wheel">base_link
@@ -589,6 +595,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 		<link name="left_rear_wheel">
@@ -641,6 +653,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 		<link name="right_rear_wheel">
@@ -693,7 +711,13 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
-		</joint>   
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
+		</joint>
 
 		<!-- Gripper plugin-->
 		<plugin name="gripper_sim" filename="libgazebo_plugins_gripper.so">
