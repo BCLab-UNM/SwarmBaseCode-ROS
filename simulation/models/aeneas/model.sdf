@@ -68,7 +68,7 @@
 				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
 					<gaussianNoise>0.005</gaussianNoise>
 					<topicName>/aeneas/sonarLeft</topicName>
-					<frameId>us_center_link</frameId>
+					<frameId>aeneas/us_left_link</frameId>
 				</plugin>
 			</sensor>
 			<sensor type="ray" name="us_right_sensor">
@@ -93,7 +93,7 @@
 				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
 					<gaussianNoise>0.005</gaussianNoise>
 					<topicName>/aeneas/sonarRight</topicName>
-					<frameId>us_center_link</frameId>
+					<frameId>aeneas/us_right_link</frameId>
 				</plugin>
 			</sensor>
 			<sensor type="ray" name="us_center_sensor">
@@ -118,7 +118,7 @@
 				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
 					<gaussianNoise>0.005</gaussianNoise>
 					<topicName>/aeneas/sonarCenter</topicName>
-					<frameId>us_center_link</frameId>
+					<frameId>aeneas/us_center_link</frameId>
 				</plugin>
 			</sensor>
 
