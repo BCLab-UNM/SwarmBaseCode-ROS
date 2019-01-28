@@ -527,6 +527,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 		<link name="right_front_wheel">
@@ -579,6 +585,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 		<link name="left_rear_wheel">
@@ -631,6 +643,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 		<link name="right_rear_wheel">
@@ -683,6 +701,12 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 			</axis>
+			<physics>
+				<ode>
+					<cfm>0.01</cfm>
+					<erp>0.8</erp>
+				</ode>
+			</physics>
 		</joint>
 
 
