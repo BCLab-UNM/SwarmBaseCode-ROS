@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<%-
+# This is the master rover model config template. Any updates to the
+# configuration should be make to this file before regenerating the file for
+# each rover.
+
+if !defined?(rovername)
+  STDERR.puts "Usage: erb -T - rovername=name -- " + __FILE__
+  exit(false)
+end
+-%>
+<model>
+	<name><%= rovername %></name>
+	<version>1.0</version>
+	<sdf version='1.4'>model.sdf</sdf>
+
+	<author>
+		<name>NASA Swarmathon</name>
+		<email>swarmathon@cs.unm.edu</email>
+	</author>
+
+	<description>
+		Swarmie Version Three
+	</description>
+</model>
