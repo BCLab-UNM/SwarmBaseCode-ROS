@@ -30,19 +30,20 @@ sonar_frames = {
 us_x = 0.15
 us_y = 0.07
 us_z = 0.053
+us_pitch = -1.5708
 us_yaw = 0.43633
 
 sonar_config = {
   "left" => {
-    :x0 => us_x, :y0 => us_y, :z0 => us_z, :yaw => us_yaw,
+    :x0 => us_x, :y0 => us_y, :z0 => us_z, :pitch => us_pitch, :yaw => us_yaw,
     :topic => "/" + rovername + "/sonarLeft", :frame => sonar_frames["left"]
   },
   "right" => {
-    :x0 => us_x, :y0 => -us_y, :z0 => us_z, :yaw => -us_yaw,
+    :x0 => us_x, :y0 => -us_y, :z0 => us_z, :pitch => us_pitch, :yaw => -us_yaw,
     :topic => "/" + rovername + "/sonarRight", :frame => sonar_frames["right"]
   },
   "center" => {
-    :x0 => us_x, :y0 => 0, :z0 => us_z, :yaw => 0,
+    :x0 => us_x, :y0 => 0, :z0 => us_z, :pitch => us_pitch, :yaw => 0,
     :topic => "/" + rovername + "/sonarCenter", :frame => sonar_frames["center"]
   }
 }
@@ -154,33 +155,25 @@ wheel_config = {
 					x0 = sonar_config[key][:x0]
 					y0 = sonar_config[key][:y0]
 					z0 = sonar_config[key][:z0]
+					pitch = sonar_config[key][:pitch]
 					yaw = sonar_config[key][:yaw]
 					topic = sonar_config[key][:topic]
 					frame = sonar_config[key][:frame]
 			-%>
-			<sensor type="ray" name="<%= 'us_' + key + '_sensor' %>">
-				<pose><%= x0 %> <%= y0 %> <%= z0 %> 0 0 <%= yaw %></pose>
+			<sensor type="sonar" name="<%= 'us_' + key + '_sensor' %>">
+				<pose><%= x0 %> <%= y0 %> <%= z0 %> 0 <%= pitch %> <%= yaw %></pose>
 				<visualize>false</visualize>
 				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
+				<sonar>
+					<min>0.01</min>
+					<max>3.0</max>
+					<radius>0.5</radius>
+				</sonar>
+				<plugin name="us" filename="libgazebo_plugins_sonar.so">
+					<gaussianNoise>0.15</gaussianNoise>
 					<topicName><%= topic %></topicName>
-					<frameId><%= frame %></frameId>
+					<frameName><%= frame %></frameName>
+					<fov>0.5</fov>
 				</plugin>
 			</sensor>
 			<%- end -%>
