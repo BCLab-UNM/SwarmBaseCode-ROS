@@ -46,79 +46,52 @@
 				</material>
 			</visual>
 
-			<sensor type="ray" name="us_left_sensor">
-				<pose>0.15 0.07 0.053 0 0 0.43633</pose>
+			<sensor type="sonar" name="us_left_sensor">
+				<pose>0.15 0.07 0.053 0 -1.5708 0.43633</pose>
 				<visualize>false</visualize>
 				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
+				<sonar>
+					<min>0.01</min>
+					<max>3.0</max>
+					<radius>0.5</radius>
+				</sonar>
+				<plugin name="us" filename="libgazebo_plugins_sonar.so">
+					<gaussianNoise>0.15</gaussianNoise>
 					<topicName>/paris/sonarLeft</topicName>
-					<frameId>paris/us_left_link</frameId>
+					<frameName>paris/us_left_link</frameName>
+					<fov>0.5</fov>
 				</plugin>
 			</sensor>
-			<sensor type="ray" name="us_right_sensor">
-				<pose>0.15 -0.07 0.053 0 0 -0.43633</pose>
+			<sensor type="sonar" name="us_right_sensor">
+				<pose>0.15 -0.07 0.053 0 -1.5708 -0.43633</pose>
 				<visualize>false</visualize>
 				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
+				<sonar>
+					<min>0.01</min>
+					<max>3.0</max>
+					<radius>0.5</radius>
+				</sonar>
+				<plugin name="us" filename="libgazebo_plugins_sonar.so">
+					<gaussianNoise>0.15</gaussianNoise>
 					<topicName>/paris/sonarRight</topicName>
-					<frameId>paris/us_right_link</frameId>
+					<frameName>paris/us_right_link</frameName>
+					<fov>0.5</fov>
 				</plugin>
 			</sensor>
-			<sensor type="ray" name="us_center_sensor">
-				<pose>0.15 0 0.053 0 0 0</pose>
+			<sensor type="sonar" name="us_center_sensor">
+				<pose>0.15 0 0.053 0 -1.5708 0</pose>
 				<visualize>false</visualize>
 				<update_rate>5</update_rate>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>3</samples>
-							<resolution>1.0</resolution>
-							<min_angle>-.478</min_angle>
-							<max_angle>0.478</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.010</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-				</ray>
-				<plugin name="us" filename="libhector_gazebo_ros_sonar.so">
-					<gaussianNoise>0.005</gaussianNoise>
+				<sonar>
+					<min>0.01</min>
+					<max>3.0</max>
+					<radius>0.5</radius>
+				</sonar>
+				<plugin name="us" filename="libgazebo_plugins_sonar.so">
+					<gaussianNoise>0.15</gaussianNoise>
 					<topicName>/paris/sonarCenter</topicName>
-					<frameId>paris/us_center_link</frameId>
+					<frameName>paris/us_center_link</frameName>
+					<fov>0.5</fov>
 				</plugin>
 			</sensor>
 

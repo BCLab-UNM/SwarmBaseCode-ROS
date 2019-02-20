@@ -33,3 +33,6 @@ add_library(${PROJECT_NAME}_score
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
+add_library(${PROJECT_NAME}_sonar
+  src/SonarPlugin/gazebo_ros_sonar.cpp)
+target_link_libraries(${PROJECT_NAME}_sonar ${catkin_LIBRARIES} ${Boost_LIBRARIES} SonarPlugin)
