@@ -28,6 +28,7 @@
       <param name="imu0" value="/$(arg name)/imu" />
       <param name="two_d_mode" value="true" />
       <param name="world_frame" value="odom" />
+      <param name="base_link_frame_output" value="$(arg name)/base_link" />
       <param name="frequency" value="10" />
 
       <rosparam param="odom0_config">[false, false, false,
@@ -80,6 +81,7 @@
       <param name="imu0" value="/$(arg name)/imu" />
       <param name="two_d_mode" value="true" />
       <param name="world_frame" value="map" />
+      <param name="base_link_frame_output" value="$(arg name)/base_link" />
       <param name="frequency" value="10" />
 
       <rosparam param="odom0_config">[true, true, false,
