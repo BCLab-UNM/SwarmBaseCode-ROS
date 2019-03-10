@@ -38,11 +38,6 @@ else
 fi
 
 
-#Set prefix to fully qualify transforms for each robot
-echo "set prefix to fully qualify transforms for each robot: $HOSTNAME"
-rosparam set tf_prefix $HOSTNAME
-
-
 #Function to lookup correct path for a given device
 echo "findDevicePath() for usb devices (arduino, camera, etc)"
 findDevicePath() {
@@ -109,13 +104,13 @@ else
     nohup > logs/$HOSTNAME"_ublox_log.txt" rosrun ublox_gps ublox_gps __name:=$HOSTNAME\_UBLOX /$HOSTNAME\_UBLOX/fix:=/$HOSTNAME/fix /$HOSTNAME\_UBLOX/fix_velocity:=/$HOSTNAME/fix_velocity /$HOSTNAME\_UBLOX/navposllh:=/$HOSTNAME/navposllh /$HOSTNAME\_UBLOX/navsol:=/$HOSTNAME/navsol /$HOSTNAME\_UBLOX/navstatus:=/$HOSTNAME/navstatus /$HOSTNAME\_UBLOX/navvelned:=/$HOSTNAME/navvelned _device:=/dev/$gpsDevicePath _frame_id:=$HOSTNAME/base_link &
 fi
 
-nohup > logs/$HOSTNAME"_localization_navsat_log.txt" rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=map _frequency:=10 _magnetic_declination_radians:=0.1530654 _yaw_offset:=0 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
+nohup > logs/$HOSTNAME"_localization_navsat_log.txt" rosrun robot_localization navsat_transform_node __name:=$HOSTNAME\_NAVSAT _world_frame:=$HOSTNAME/map _frequency:=10 _magnetic_declination_radians:=0.1530654 _yaw_offset:=0 /imu/data:=/$HOSTNAME/imu /gps/fix:=/$HOSTNAME/fix /odometry/filtered:=/$HOSTNAME/odom/ekf /odometry/gps:=/$HOSTNAME/odom/navsat &
 
 rosparam set /$HOSTNAME\_ODOM/odom0 /$HOSTNAME/odom
 rosparam set /$HOSTNAME\_ODOM/imu0 /$HOSTNAME/imu
 rosparam set /$HOSTNAME\_ODOM/odom0_config [false,false,false,false,false,false,true,false,false,false,false,true,false,false,false]
 rosparam set /$HOSTNAME\_ODOM/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
-nohup > logs/$HOSTNAME"_odom_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=odom _frequency:=10 __name:=$HOSTNAME\_ODOM /odometry/filtered:=/$HOSTNAME/odom/filtered &
+nohup > logs/$HOSTNAME"_odom_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=$HOSTNAME/odom _odom_frame:=$HOSTNAME/odom _base_link_frame:=$HOSTNAME/base_link _frequency:=10 __name:=$HOSTNAME\_ODOM /odometry/filtered:=/$HOSTNAME/odom/filtered &
 
 rosparam set /$HOSTNAME\_MAP/odom0 /$HOSTNAME/odom/navsat
 rosparam set /$HOSTNAME\_MAP/odom1 /$HOSTNAME/odom/filtered
@@ -157,7 +152,7 @@ rosparam set $HOSTNAME\_MAP/process_noise_covariance "[0.005, 0, 0, 0, 0, 0, 0, 
                                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0,  /
                                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1]"
 
-nohup > logs/$HOSTNAME"_map_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=map _frequency:=10 __name:=$HOSTNAME\_MAP /odometry/filtered:=/$HOSTNAME/odom/ekf &
+nohup > logs/$HOSTNAME"_map_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=$HOSTNAME/map _map_frame:=$HOSTNAME/map _odom_frame:=$HOSTNAME/odom _base_link_frame:=$HOSTNAME/base_link _frequency:=10 __name:=$HOSTNAME\_MAP /odometry/filtered:=/$HOSTNAME/odom/ekf &
 
 throttle()
 {
