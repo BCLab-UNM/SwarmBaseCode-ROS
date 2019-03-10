@@ -115,7 +115,7 @@ rosparam set /$HOSTNAME\_ODOM/odom0 /$HOSTNAME/odom
 rosparam set /$HOSTNAME\_ODOM/imu0 /$HOSTNAME/imu
 rosparam set /$HOSTNAME\_ODOM/odom0_config [false,false,false,false,false,false,true,false,false,false,false,true,false,false,false]
 rosparam set /$HOSTNAME\_ODOM/imu0_config [false,false,false,false,false,true,false,false,false,false,false,true,true,false,false]
-nohup > logs/$HOSTNAME"_odom_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=odom _frequency:=10 __name:=$HOSTNAME\_ODOM /odometry/filtered:=/$HOSTNAME/odom/filtered &
+nohup > logs/$HOSTNAME"_odom_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=odom _base_link_frame_output:=$HOSTNAME/base_link _frequency:=10 __name:=$HOSTNAME\_ODOM /odometry/filtered:=/$HOSTNAME/odom/filtered &
 
 rosparam set /$HOSTNAME\_MAP/odom0 /$HOSTNAME/odom/navsat
 rosparam set /$HOSTNAME\_MAP/odom1 /$HOSTNAME/odom/filtered
@@ -157,7 +157,7 @@ rosparam set $HOSTNAME\_MAP/process_noise_covariance "[0.005, 0, 0, 0, 0, 0, 0, 
                                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0,  /
                                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1]"
 
-nohup > logs/$HOSTNAME"_map_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=map _frequency:=10 __name:=$HOSTNAME\_MAP /odometry/filtered:=/$HOSTNAME/odom/ekf &
+nohup > logs/$HOSTNAME"_map_EKF_log.txt" rosrun robot_localization ekf_localization_node _two_d_mode:=true _world_frame:=map _base_link_frame_output:=$HOSTNAME/base_link _frequency:=10 __name:=$HOSTNAME\_MAP /odometry/filtered:=/$HOSTNAME/odom/ekf &
 
 throttle()
 {
