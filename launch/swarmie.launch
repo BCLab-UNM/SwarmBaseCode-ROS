@@ -1,7 +1,5 @@
 <launch>
 
-  <param name="tf_prefix" value="$(arg name)" />
-
   <node name="$(arg name)_BASE2CAM" pkg="tf" type="static_transform_publisher" args="0.12 -0.03 0.195 -1.57 0 -2.22 $(arg name)/base_link $(arg name)/camera_link 100" />
   <node name="$(arg name)_DIAGNOSTICS" pkg="diagnostics" type="diagnostics" args="$(arg name)" />
   <node name="$(arg name)_SBRIDGE" pkg="sbridge" type="sbridge" args="$(arg name)" />
@@ -11,7 +9,7 @@
 
       <param name="magnetic_declination_radians" value="0.0"/>
       <param name="yaw_offset" value="1.57079632679"/>
-      <param name="world_frame" value="map"/>
+      <param name="world_frame" value="$(arg name)/map"/>
       <param name="frequency" value="10"/>
 
       <remap from="/imu/data" to="/$(arg name)/imu" />
@@ -27,7 +25,9 @@
       <param name="odom0" value="/$(arg name)/odom" />
       <param name="imu0" value="/$(arg name)/imu" />
       <param name="two_d_mode" value="true" />
-      <param name="world_frame" value="odom" />
+      <param name="world_frame" value="$(arg name)/odom" />
+      <param name="odom_frame" value="$(arg name)/odom" />
+      <param name="base_link_frame" value="$(arg name)/base_link" />
       <param name="frequency" value="10" />
 
       <rosparam param="odom0_config">[false, false, false,
@@ -79,7 +79,10 @@
       <param name="odom1" value="/$(arg name)/odom/filtered" />
       <param name="imu0" value="/$(arg name)/imu" />
       <param name="two_d_mode" value="true" />
-      <param name="world_frame" value="map" />
+      <param name="world_frame" value="$(arg name)/map" />
+      <param name="map_frame" value="$(arg name)/map" />
+      <param name="odom_frame" value="$(arg name)/odom" />
+      <param name="base_link_frame" value="$(arg name)/base_link" />
       <param name="frequency" value="10" />
 
       <rosparam param="odom0_config">[true, true, false,
